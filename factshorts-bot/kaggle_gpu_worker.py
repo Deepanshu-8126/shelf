@@ -19,19 +19,16 @@ import os
 import sys
 from pathlib import Path
 
-# Optional fast API server
-try:
-    from fastapi import FastAPI, HTTPException
-    from fastapi.responses import FileResponse, JSONResponse, Response
-    import uvicorn
-except ImportError:
-    print("Installing requirements: pip install fastapi uvicorn torch diffusers transformers accelerate")
-    os.system("pip install -q fastapi uvicorn torch diffusers transformers accelerate pyngrok")
-    from fastapi import FastAPI, HTTPException
-    from fastapi.responses import FileResponse, JSONResponse, Response
-    import uvicorn
+# Server framework
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, JSONResponse, Response
+import uvicorn
 
-import torch
+# Torch is available on Kaggle/GPU host; lazy/safe fallback for local linting
+try:
+    import torch  # type: ignore
+except ImportError:
+    torch = None  # type: ignore
 
 app = FastAPI(title="FactShorts 100% Free GPU Video Engine (Wan 2.2 / LTX-2.3 / Z-Image)")
 
@@ -41,9 +38,9 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.get("/health")
 def health():
-    gpu_available = torch.cuda.is_available()
-    device_name = torch.cuda.get_device_name(0) if gpu_available else "CPU (Fallback)"
-    vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3) if gpu_available else 0
+    gpu_available = bool(torch and torch.cuda.is_available())
+    device_name = torch.cuda.get_device_name(0) if (torch and gpu_available) else "CPU (Fallback)"
+    vram_gb = (torch.cuda.get_device_properties(0).total_memory / (1024**3)) if (torch and gpu_available) else 0
     return {
         "status": "online",
         "gpu": gpu_available,
@@ -67,7 +64,7 @@ def generate_image(payload: dict):
     # Minimal torch-based or diffusers generation stub
     # On Kaggle T4, this runs SDXL-Turbo / Z-Image-Turbo pipeline
     try:
-        from diffusers import AutoPipelineForText2Image
+        from diffusers import AutoPipelineForText2Image  # type: ignore
         pipe = AutoPipelineForText2Image.from_pretrained(
             "stabilityai/sdxl-turbo", torch_dtype=torch.float16, variant="fp16"
         )
