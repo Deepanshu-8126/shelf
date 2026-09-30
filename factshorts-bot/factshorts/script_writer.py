@@ -277,28 +277,36 @@ def _enforce_length(script: Script, cfg: Config) -> Script:
 def _story_prompt(topic: Topic, cfg: Config, target: int) -> str:
     cta = cta_of(cfg)
     cta_rule = {
-        "none": "closing: max 10 words, a payoff line only - NO call to action",
-        "soft": "closing: max 10 words, a soft payoff line is fine, no hard selling",
-        "follow": "closing: max 10 words, at most one light call to follow",
+        "none": "closing: 6-12 words, a profound payoff line or perspective shift that leaves the viewer thinking - NO call to action",
+        "soft": "closing: 6-12 words, a thought-provoking line or memorable realization, no hard selling",
+        "follow": "closing: 6-12 words, a clever loop or light invite to follow for more deep mysteries",
     }[cta]
     src_note = (
-        f"\nSource (do not invent anything beyond this): {topic.source_name or 'given material'}"
+        f"\nSource context: {topic.source_name or 'verified science'}"
         f" {topic.source_url}".rstrip()
     ) if topic.source_url else ""
     return (
-        f"Niche: {topic.niche}\nTopic: {topic.topic}\nMaterial: {topic.fact}\nAngle: {topic.angle}"
+        f"You are a master viral storyteller and science scriptwriter for high-retention vertical videos (like Veritasium, Kurzgesagt, MagnatesMedia).\n"
+        f"Niche: {topic.niche}\n"
+        f"Topic: {topic.topic}\n"
+        f"Premise: {topic.fact}\n"
+        f"Angle: {topic.angle or 'unraveling the hidden reality'}\n"
         f"{src_note}\n\n"
-        f"Write a spoken story script of {target - 15}-{target + 15} words TOTAL for a "
-        "60 second vertical video. It must be a real story, not a list of facts:\n"
-        "- hook: 6-12 words, opens a curiosity gap in the first 2 seconds\n"
-        "- body: the story in 4-6 short sentences - setup, what actually happened, the surprising "
-        "turn, and why it matters. Plain words, one idea per sentence.\n"
+        f"Craft an immersive, suspenseful spoken narrative of {max(125, target - 25)}-{target + 20} words total (approx 50-60 seconds when narrated):\n"
+        "- hook: 6-10 words, opening an immediate psychological curiosity gap or paradox in the first 2 seconds (stops the scroll dead in its tracks).\n"
+        "- body: An escalating 4-stage narrative arc (110-140 words):\n"
+        "  1. The Setup: paint a vivid picture of the mystery or common misconception.\n"
+        "  2. The Discovery: what scientists actually uncovered when they tested it.\n"
+        "  3. The Twist / Paradox: the shocking physics or psychological reality that defies intuition.\n"
+        "  4. The Climax: the mind-bending consequence that permanently changes how you see reality.\n"
         f"- {cta_rule}\n"
-        "Only use the material above. Never invent numbers, dates or names.\n"
-        "Never use these words/phrases: in this video, subscribe, link in description, you won't "
-        "believe, insane, mind-blowing, guys, literally, must watch, viral.\n\n"
-        "Return JSON with keys: hook, body, closing, sentences (array of the body split into 4-6 "
-        "pieces, each {\"text\": \"...\", \"keywords\": [2-3 English stock-footage search terms]})."
+        "Use active verbs, vivid sensory details, and natural conversational cadence. No cliché filler ('in this video', 'subscribe', 'insane', 'literally', 'guys').\n\n"
+        "Return ONLY a JSON object with keys:\n"
+        "- hook (string)\n"
+        "- body (string: full narrative body paragraphs)\n"
+        "- closing (string)\n"
+        "- sentences: an array of 7-10 discrete scene beats covering the full script. Each element must be:\n"
+        "  {\"text\": \"the spoken lines for this 4-6s scene beat\", \"keywords\": [\"cinematic B-roll query 1\", \"cinematic B-roll query 2\"]}"
     )
 
 
@@ -405,16 +413,17 @@ async def write_script(topic: Topic, llm: LLM | None = None, cfg: Config | None 
             "Return JSON with keys: hook, body, closing, sentences (array of the body split into 2-3 pieces, "
             "each {\"text\": \"...\", \"keywords\": [2-3 English stock-footage search terms, 1-3 words each]})."
         )
+        tokens_limit = 1500 if story_mode else 800
         for attempt in range(1, 3):
             try:
-                data = await llm.json(prompt, system, max_tokens=800, temperature=0.85)
+                data = await llm.json(prompt, system, max_tokens=tokens_limit, temperature=0.85)
             except LLMError as exc:
-                log.warning("script generation failed (%s) -> offline template", exc)
-                break
+                log.warning("script generation failed (%s) attempt %d/2", exc, attempt)
+                continue
             script = Script(
-                hook=strip_ad_language(clean_text(str(data.get("hook") or ""), 70)),
+                hook=strip_ad_language(clean_text(str(data.get("hook") or ""), 85)),
                 body=strip_ad_language(clean_text(str(data.get("body") or ""))),
-                closing=strip_ad_language(clean_text(str(data.get("closing") or ""), 60)),
+                closing=strip_ad_language(clean_text(str(data.get("closing") or ""), 70)),
                 sentences=[],
                 topic=topic.topic,
                 niche=topic.niche,
@@ -433,12 +442,16 @@ async def write_script(topic: Topic, llm: LLM | None = None, cfg: Config | None 
                 for i, kw in enumerate(sanitize_keywords(topic.keywords, topic.niche)[:3]):
                     script.sentences[i % len(script.sentences)].keywords.append(kw)
             script = _enforce_length(script, cfg)
-            if _min_words <= script.word_count <= _max_words:
+            
+            # Acceptance criteria: exact window or realistic story length
+            min_acceptable = 100 if story_mode else _min_words
+            max_acceptable = _max_words + 25 if story_mode else _max_words
+            if min_acceptable <= script.word_count <= max_acceptable:
                 log.info("script ready (%d words, %s mode=%s)", script.word_count, script.source,
                          cfg.profile().name)
                 return script
             log.info("script length %d outside window %d-%d, retrying (%d/2)",
-                     script.word_count, _min_words, _max_words, attempt)
+                     script.word_count, min_acceptable, max_acceptable, attempt)
 
     fallback = _offline_story(topic, cfg) if story_mode else _offline_script(topic, cfg)
     script = _enforce_length(fallback, cfg)

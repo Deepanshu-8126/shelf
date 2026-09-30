@@ -162,25 +162,30 @@ def get_model_specs_summary() -> list[dict[str, Any]]:
     ]
 
 
-# -----------------------------------------------------------------------------
-# Remote Kaggle / Local GPU Worker Client (Wan 2.2 / LTX-2.3 / Z-Image-Turbo)
-# -----------------------------------------------------------------------------
+_WORKER_ONLINE: bool | None = None
+
+
 async def check_gpu_worker_health(cfg: Config | None = None) -> dict[str, Any]:
     """Check connectivity and loaded models on the remote GPU worker (Kaggle/Colab/Local)."""
+    global _WORKER_ONLINE
     import httpx
     cfg = cfg or get_config()
     worker_url = getattr(cfg, "gpu_worker_url", "")
     if not worker_url:
+        _WORKER_ONLINE = False
         return {"online": False, "reason": "No GPU_WORKER_URL configured in .env"}
 
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(4.0)) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(2.5)) as client:
             resp = await client.get(f"{worker_url.rstrip('/')}/health")
             if resp.status_code == 200:
                 data = resp.json()
+                _WORKER_ONLINE = True
                 return {"online": True, **data}
+            _WORKER_ONLINE = False
             return {"online": False, "status_code": resp.status_code}
     except Exception as exc:
+        _WORKER_ONLINE = False
         return {"online": False, "reason": str(exc)}
 
 
@@ -196,12 +201,24 @@ async def generate_remote_video(
     100% Free, Apache 2.0 / LTX Community license, NO paid API.
     Returns path to downloaded MP4 clip, or None if worker is unavailable.
     """
+    global _WORKER_ONLINE
+    if _WORKER_ONLINE is False:
+        return None
+
     import httpx
     cfg = cfg or get_config()
     worker_url = getattr(cfg, "gpu_worker_url", "")
     if not worker_url:
-        log.debug("No GPU_WORKER_URL set — skipping remote Wan/LTX video generation")
+        _WORKER_ONLINE = False
         return None
+
+    # First-call health check to prevent 10x timeout loops on dead tunnels
+    if _WORKER_ONLINE is None:
+        health = await check_gpu_worker_health(cfg)
+        if not health.get("online"):
+            log.info("GPU worker offline (%s) -> using local visuals + B-roll mode", health.get("reason", "unknown"))
+            _WORKER_ONLINE = False
+            return None
 
     norm_model = model.strip().lower()
     endpoint = f"{worker_url.rstrip('/')}/generate_video"

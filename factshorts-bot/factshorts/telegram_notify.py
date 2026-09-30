@@ -69,6 +69,28 @@ class TelegramNotifier:
         path = Path(video_path)
         if not path.exists():
             return await self.send_message(f"⚠️ Video file missing: {path}")
+
+        # Telegram Bot API enforces a hard 50 MB limit for /sendVideo
+        send_path = path
+        temp_compressed = None
+        if path.stat().st_size > 48 * 1024 * 1024:
+            log.info("Video %s is %.1f MB (>48MB Telegram limit) -> compressing for delivery",
+                     path.name, path.stat().st_size / (1024 * 1024))
+            temp_compressed = path.parent / f"tg_{path.stem}.mp4"
+            import subprocess
+            cmd = [
+                "ffmpeg", "-y", "-i", str(path),
+                "-c:v", "libx264", "-crf", "24", "-preset", "veryfast",
+                "-c:a", "copy",
+                str(temp_compressed)
+            ]
+            try:
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if temp_compressed.exists() and temp_compressed.stat().st_size > 1000:
+                    send_path = temp_compressed
+            except Exception as exc:
+                log.warning("Fast compression for Telegram failed: %s", exc)
+
         client = await self.client()
         data = {
             "chat_id": str(chat_id or self.chat_id),
@@ -78,10 +100,15 @@ class TelegramNotifier:
             data["caption"] = caption[:1000]
         for attempt in range(1, 4):
             try:
-                with open(path, "rb") as fh:
+                with open(send_path, "rb") as fh:
                     files = {"video": (path.name, fh, "video/mp4")}
                     resp = await client.post("/sendVideo", data=data, files=files)
                 if resp.status_code == 200:
+                    if temp_compressed and temp_compressed.exists():
+                        try:
+                            temp_compressed.unlink()
+                        except Exception:
+                            pass
                     return resp.json()
                 log.warning("sendVideo failed (%s): %s", resp.status_code, resp.text[:200])
             except Exception as exc:  # noqa: BLE001

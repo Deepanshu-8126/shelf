@@ -90,10 +90,8 @@ async def _try_gemini_flash_image(
                     resp = await client.post(url, json=payload)
 
                 if resp.status_code in (503, 429):
-                    wait = 1.5 * attempt
-                    log.warning("Gemini free image %s: HTTP %d — waiting %.1fs", model, resp.status_code, wait)
-                    await asyncio.sleep(wait)
-                    continue
+                    log.debug("Gemini free image %s: HTTP %d (rate limit / unavailable)", model, resp.status_code)
+                    break
 
                 if resp.status_code >= 400:
                     log.debug("Gemini free image %s HTTP %d: %s", model, resp.status_code, resp.text[:120])

@@ -471,7 +471,8 @@ async def _final_pass(
     fade_start = max(0.1, total_duration - 0.35)
     filters = []
     if ass_file is not None:
-        filters.append(f"ass={ass_file.name}")  # cwd = workdir keeps the path escaping trivial
+        fonts_dir_arg = str(cfg.fonts_dir.resolve()).replace('\\', '/').replace(':', r'\:')
+        filters.append(f"ass='{ass_file.name}':fontsdir='{fonts_dir_arg}'")  # cwd = workdir keeps path trivial
     filters.append(f"fade=t=out:st={fade_start:.3f}:d=0.35")
     filters.append("format=yuv420p")
     cmd = [

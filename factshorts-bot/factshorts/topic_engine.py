@@ -451,21 +451,24 @@ async def generate_topic(
             "You write viral-but-accurate short-form science facts. Never invent statistics, "
             "never touch politics, religion or medical advice."
         )
+        story_mode = cfg.profile().name == "story"
         for attempt in range(1, 4):
+            length_desc = "60 second storytelling narrative vertical video (with historical mystery, scientific paradox, or shocking consequence)" if story_mode else "12 second vertical video"
+            fact_desc = "3-5 detailed sentences explaining the phenomenon, how it works, and why it is mind-bending" if story_mode else "2-3 sentences, plain English, no emojis"
             prompt = (
                 f"Niche: {niche}.\n"
                 + (f"Use this exact subject if it is accurate: {forced_topic}\n" if forced_topic else "")
-                + f"Generate ONE surprising, verifiable fact suitable for a 12 second vertical video.\n"
+                + f"Generate ONE surprising, verifiable subject suitable for a {length_desc}.\n"
                 f"Do NOT reuse anything similar to these already used topics: {avoid}\n\n"
-                "Return JSON with keys: topic (max 8 words), fact (2-3 sentences, plain English, no emojis), "
-                "angle (max 6 words hype-free hook angle), keywords (4-6 short English search keywords for "
+                f"Return JSON with keys: topic (max 8 words), fact ({fact_desc}), "
+                "angle (max 6 words curiosity hook angle), keywords (4-6 short English search keywords for "
                 "matching stock footage, each 1-3 words)."
             )
             try:
-                data = await llm.json(prompt, system, max_tokens=700, temperature=0.95)
+                data = await llm.json(prompt, system, max_tokens=850, temperature=0.95)
             except LLMError as exc:
-                log.warning("topic generation failed (%s) -> offline bank", exc)
-                break
+                log.warning("topic generation failed (%s) attempt %d/3", exc, attempt)
+                continue
             candidate = Topic(
                 niche=niche,
                 topic=str(data.get("topic") or "").strip()[:90],
