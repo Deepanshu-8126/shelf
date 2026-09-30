@@ -115,17 +115,55 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--ngrok", action="store_true", help="Start ngrok tunnel")
     parser.add_argument("--ngrok-token", type=str, default="")
+    parser.add_argument("--cloudflare", action="store_true", default=True, help="Start free Cloudflare tunnel (no account needed)")
     args = parser.parse_args()
 
-    if args.ngrok:
+    # Cloudflare tunnel (100% Free, NO account or token needed)
+    if args.cloudflare and not args.ngrok:
+        import subprocess
+        import time
+        import urllib.request
+        import re
+
+        print("Setting up free Cloudflare tunnel (no login needed)...")
+        cf_bin = Path("/tmp/cloudflared") if os.name != "nt" else Path("./cloudflared.exe")
+        if not cf_bin.exists():
+            url = "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64" if os.name != "nt" else "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe"
+            urllib.request.urlretrieve(url, cf_bin)
+            if os.name != "nt":
+                os.chmod(cf_bin, 0o755)
+
+        log_file = open("/tmp/cf.log" if os.name != "nt" else "./cf.log", "w")
+        proc = subprocess.Popen([str(cf_bin), "tunnel", "--url", f"http://127.0.0.1:{args.port}"],
+                                stdout=log_file, stderr=log_file)
+        time.sleep(4)
+
+        # Extract trycloudflare.com URL
+        log_content = open("/tmp/cf.log" if os.name != "nt" else "./cf.log").read()
+        match = re.search(r"https://[a-zA-Z0-9-]+\.trycloudflare\.com", log_content)
+        tunnel_url = match.group(0) if match else "Check /tmp/cf.log for tunnel URL"
+
+        print("\n" + "=" * 65)
+        print("🚀 KAGGLE GPU WORKER IS LIVE (100% FREE CLOUDFLARE TUNNEL)!")
+        print(f"👉 PUBLIC URL: {tunnel_url}")
+        print("-" * 65)
+        print("Copy this into your local factshorts-bot/.env:")
+        print(f"GPU_WORKER_URL={tunnel_url}")
+        print("VIDEO_GEN_MODEL=wan-2.2")
+        print("=" * 65 + "\n")
+
+    elif args.ngrok:
         from pyngrok import ngrok
         if args.ngrok_token:
             ngrok.set_auth_token(args.ngrok_token)
         tunnel = ngrok.connect(args.port)
-        print("\n" + "=" * 60)
+        print("\n" + "=" * 65)
         print(f"🚀 KAGGLE GPU WORKER RUNNING AT: {tunnel.public_url}")
-        print("Copy this URL into your factshorts-bot/.env as:")
+        print("-" * 65)
+        print("Copy this into your local factshorts-bot/.env:")
         print(f"GPU_WORKER_URL={tunnel.public_url}")
-        print("=" * 60 + "\n")
+        print("VIDEO_GEN_MODEL=wan-2.2")
+        print("=" * 65 + "\n")
 
     uvicorn.run(app, host="0.0.0.0", port=args.port)
+
