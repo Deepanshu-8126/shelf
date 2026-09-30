@@ -1,0 +1,11 @@
+# Core app uses Python standard library. Optional integrations:
+Pillow>=10.0.0
+opencv-python-headless>=4.9.0
+# Optional media pipeline helpers; Edge TTS is a network service, not local synthesis.
+edge-tts>=7.0.0
+imageio-ffmpeg>=0.5.1
+# Required only for YouTube OAuth upload + YouTube Analytics API:
+google-api-python-client>=2.150.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+# Optional local speech-provider integration is called over HTTPS; no SDK required.
