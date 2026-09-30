@@ -1,0 +1,9 @@
+.env
+secrets/
+data/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+*.log
