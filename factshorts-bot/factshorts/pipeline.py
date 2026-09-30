@@ -119,22 +119,25 @@ async def generate_and_render(
         script: Script = await write_script(topic, llm=llm, cfg=cfg)
         db.update_video(video_id, script=script.full_text, hook=script.hook)
 
-        # --- PRIMARY: AI-generated unique footage (zero copyright, zero reused-content) ---
+        # --- PRIMARY: 100% Free AI Video Generation (Wan 2.2 / LTX-2.3 on Kaggle GPU) ---
+        # --- FALLBACK: Z-Image-Turbo / Gemini 3.1 Flash Image (500/day free) + FFmpeg ---
         ai_clips_raw: list = []
-        if cfg.gemini_api_key:
-            await progress("Generating unique AI visuals (Gemini Imagen)…")
-            ai_work = cfg.cache_dir / "tmp" / f"{video_id}-ai-footage"
-            ai_clips_raw = await generate_scene_clips(
-                script_text=script.full_text,
-                output_dir=ai_work,
-                total_duration=profile.max_duration,
-                clip_count=profile.clip_count,
-                niche=niche,
-                cfg=cfg,
-            )
+        is_gpu_worker = bool(getattr(cfg, "gpu_worker_url", ""))
+        mode_label = "GPU mode (Real AI Video: Wan 2.2 / LTX-2.3)" if is_gpu_worker else "CPU fallback mode (Free AI Visuals)"
+        log.info("Visual generation engine: %s", mode_label)
+        await progress(f"Generating footage [{mode_label}]…")
+
+        ai_work = cfg.cache_dir / "tmp" / f"{video_id}-ai-footage"
+        ai_clips_raw = await generate_scene_clips(
+            script_text=script.full_text,
+            output_dir=ai_work,
+            total_duration=profile.max_duration,
+            clip_count=profile.clip_count,
+            niche=niche,
+            cfg=cfg,
+        )
 
         if ai_clips_raw:
-            # Convert AI-generated clip dicts into Clip objects the render pipeline expects
             from .footage import Clip, ClipCandidate
             clips = []
             for ac in ai_clips_raw:
@@ -142,20 +145,21 @@ async def generate_and_render(
                 if p.exists():
                     from .utils import media_duration
                     dur = media_duration(p)
+                    source_model = ac.get("source", "ai_generated")
                     cand = ClipCandidate(
-                        source="ai_generated", source_id=ac["source_id"],
+                        source=source_model, source_id=ac["source_id"],
                         download_url=p.as_uri(), page_url="",
-                        author="AI Generated (Gemini Imagen)",
-                        license=ac.get("license", "AI-Generated — 100% original"),
+                        author=ac.get("author", "Open-Source AI (Apache 2.0)"),
+                        license=ac.get("license", "Apache 2.0 / Free Open-Source"),
                         duration=dur, width=ac.get("width", 1080),
                         height=ac.get("height", 1920), query=ac.get("prompt", ""),
                     )
                     clips.append(Clip(path=p, candidate=cand, duration=dur,
                                       width=ac.get("width", 1080), height=ac.get("height", 1920)))
-            log.info("AI footage: %d unique clips generated (zero stock, zero copyright risk)", len(clips))
+            log.info("Footage generated in %s: %d clips (100%% Free Open-Source)", mode_label, len(clips))
         else:
-            # --- FALLBACK: stock footage (Pexels/NASA/Wikimedia) ---
-            await progress("Finding matching stock footage…")
+            log.info("Visual generator returned 0 clips -> using local assets/stock fallback")
+            await progress("Finding matching footage…")
             clips = await collect_clips(script.visual_keywords(), profile.clip_count, cfg=cfg, client=footage)
 
         # pick the sharpest shots (and drop obviously soft ones) before the expensive render

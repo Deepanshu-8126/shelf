@@ -108,7 +108,7 @@ def provider_for(cfg: Config) -> str:
             return "kokoro"
         if "piper" in installed:
             return "piper"
-        return "elevenlabs" if cfg.elevenlabs_api_key else "edge"
+        return "edge"
     if want == "local":
         installed = available_engines()
         if "kokoro" in installed:
