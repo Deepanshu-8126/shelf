@@ -1,38 +1,36 @@
-"""AI-Generated Footage Provider — Gemini Imagen + FFmpeg Animation.
+"""100% Free AI Video & Visual Footage Engine (September 2026).
 
-Instead of downloading generic stock clips from Pexels that every other creator
-uses (which triggers YouTube's "Reused Content" flag), this provider:
-
-1. Takes a scene description from the script
-2. Generates a UNIQUE 1024×1792 (9:16) AI image via Gemini Imagen
-3. Animates it with cinematic Ken-Burns zoom + parallax drift via FFmpeg
-4. Returns it as a clip ready for the render pipeline
-
-Result: 100% original visuals. Zero copyright. Zero reused-content risk.
-Works on CPU (no GPU required). Uses the GEMINI_API_KEY you already have.
+Zero Paid APIs. 100% Free / Apache 2.0 / MIT Open-Source Stack:
+1. REAL VIDEO (PRIMARY):
+   - Wan 2.2 (Alibaba, Apache 2.0, 5s 720p, Kaggle T4 / Local GPU)
+   - LTX-2.3 (Lightricks, Free Community, 20s 4K, Kaggle T4 / Local GPU)
+2. AI IMAGERY (FALLBACK):
+   - PRIMARY: Z-Image-Turbo (Apache 2.0, 1024x1024, local/Kaggle GPU)
+   - FALLBACK: Gemini 3.1 Flash Image (gemini-3.1-flash-image, 500/day FREE)
+3. CINEMATIC CAMERA MOTION (EMERGENCY FALLBACK):
+   - FFmpeg Ken-Burns zoom/pan/drift only when real video generator is offline.
 """
 from __future__ import annotations
 
 import asyncio
 import base64
-import json
 import random
 import re
-import tempfile
 from pathlib import Path
 from typing import Any
 
 import httpx
 
+from .ai_video import generate_remote_image_z_turbo, generate_remote_video
 from .config import Config, get_config
-from .utils import module_logger, run_cmd, slugify
+from .utils import media_duration, module_logger, run_cmd, slugify, video_size
 
 log = module_logger("ai_footage")
 
-# Gemini API endpoint for image generation
-GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+# Gemini 3.1 Flash Image endpoint (Free tier: 500 requests/day, NO paid Imagen)
+GEMINI_GENERATE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
-# Cinematic prompt enhancers per niche to make AI images look like video stills
+# Cinematic prompt enhancers per niche
 NICHE_STYLE: dict[str, str] = {
     "space": "cinematic 8K photograph, deep space, volumetric nebula lighting, NASA telescope style, ultra realistic, dark cosmic background, lens flare, photorealistic",
     "psychology": "cinematic 8K photograph, dramatic studio lighting, human brain visualization, neural network glow, dark moody atmosphere, photorealistic, depth of field",
@@ -42,39 +40,28 @@ NICHE_STYLE: dict[str, str] = {
     "facts": "cinematic 8K photograph, dramatic lighting, surreal visualization, dark moody atmosphere, ultra detailed, photorealistic, epic composition",
 }
 DEFAULT_STYLE = "cinematic 8K photograph, dramatic lighting, ultra realistic, dark moody atmosphere, photorealistic, epic wide angle composition"
-
-# Negative aspects to avoid in prompts
 NEGATIVE = "text, watermark, logo, signature, blurry, low quality, cartoon, anime, illustration, drawing, painting, sketch, CGI render, 3D render"
 
 
 def _enhance_prompt(scene_description: str, niche: str) -> str:
-    """Turn a plain scene description into a cinematic image generation prompt."""
+    """Turn a plain scene description into a cinematic visual prompt."""
     style = NICHE_STYLE.get(niche, DEFAULT_STYLE)
-    # Clean the description
     desc = re.sub(r"[^\w\s,.:;!?'-]", "", scene_description).strip()
     return f"{desc}, {style}. Avoid: {NEGATIVE}"
 
 
-async def generate_ai_image(
-    scene_description: str,
-    output_path: Path,
-    niche: str = "space",
-    cfg: Config | None = None,
-    width: int = 1024,
-    height: int = 1792,
+# -----------------------------------------------------------------------------
+# 1. AI Image Generation: Z-Image-Turbo (Primary) -> Gemini 3.1 Flash Image (Fallback)
+# -----------------------------------------------------------------------------
+async def _try_gemini_flash_image(
+    prompt: str, output_path: Path, api_key: str
 ) -> Path | None:
-    """Generate a single AI image for a scene using Gemini Imagen.
+    """Free Gemini 3.1 Flash Image generator (500 free requests/day).
 
-    Returns the path to the saved image, or None on failure.
+    NEVER uses paid Imagen. Uses the standard generative language v1beta endpoint.
     """
-    cfg = cfg or get_config()
-    api_key = cfg.gemini_api_key
-    if not api_key:
-        log.warning("GEMINI_API_KEY not set — cannot generate AI images")
-        return None
-
-    prompt = _enhance_prompt(scene_description, niche)
-    model = "gemini-2.0-flash"
+    # Free tier models supporting multimodal image output
+    free_image_models = ["gemini-3.1-flash-image", "gemini-2.5-flash-image", "gemini-3.1-flash"]
 
     payload = {
         "contents": [
@@ -84,51 +71,85 @@ async def generate_ai_image(
                         "text": (
                             f"Generate a stunning cinematic vertical image (9:16 aspect ratio) for a YouTube Short. "
                             f"Scene: {prompt}. "
-                            f"The image must look like a frame from a high-budget documentary film. "
-                            f"No text, no watermarks, no logos."
+                            f"The image must look like a high-budget film frame. No text, no watermarks."
                         )
                     }
                 ]
             }
         ],
         "generationConfig": {
-            "responseModalities": ["TEXT", "IMAGE"],
+            "responseModalities": ["IMAGE"],
         },
     }
 
-    url = GEMINI_API.format(model=model) + f"?key={api_key}"
+    for model in free_image_models:
+        url = GEMINI_GENERATE.format(model=model) + f"?key={api_key}"
+        for attempt in range(1, 3):
+            try:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(45.0)) as client:
+                    resp = await client.post(url, json=payload)
 
-    try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0)) as client:
-            resp = await client.post(url, json=payload)
+                if resp.status_code in (503, 429):
+                    wait = 1.5 * attempt
+                    log.warning("Gemini free image %s: HTTP %d — waiting %.1fs", model, resp.status_code, wait)
+                    await asyncio.sleep(wait)
+                    continue
 
-        if resp.status_code >= 400:
-            log.warning("Gemini image generation failed: HTTP %d: %s", resp.status_code, resp.text[:300])
-            return None
+                if resp.status_code >= 400:
+                    log.debug("Gemini free image %s HTTP %d: %s", model, resp.status_code, resp.text[:120])
+                    break  # Try next free model
 
-        data = resp.json()
+                data = resp.json()
+                for candidate in data.get("candidates", []):
+                    for part in candidate.get("content", {}).get("parts", []):
+                        inline_data = part.get("inlineData")
+                        if inline_data and inline_data.get("mimeType", "").startswith("image/"):
+                            image_bytes = base64.b64decode(inline_data["data"])
+                            output_path.parent.mkdir(parents=True, exist_ok=True)
+                            output_path.write_bytes(image_bytes)
+                            log.info("AI image generated (%s FREE): %s (%d KB)",
+                                     model, output_path.name, len(image_bytes) // 1024)
+                            return output_path
+                break  # Next model
+            except Exception as exc:
+                log.debug("Gemini free image error: %s", exc)
+                break
 
-        # Extract image from response
-        candidates = data.get("candidates", [])
-        for candidate in candidates:
-            parts = candidate.get("content", {}).get("parts", [])
-            for part in parts:
-                inline_data = part.get("inlineData")
-                if inline_data and inline_data.get("mimeType", "").startswith("image/"):
-                    image_bytes = base64.b64decode(inline_data["data"])
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
-                    output_path.write_bytes(image_bytes)
-                    log.info("AI image generated: %s (%d KB)", output_path.name, len(image_bytes) // 1024)
-                    return output_path
-
-        log.warning("Gemini response contained no image data")
-        return None
-
-    except Exception as exc:
-        log.warning("AI image generation error: %s", exc)
-        return None
+    return None
 
 
+async def generate_ai_image(
+    scene_description: str,
+    output_path: Path,
+    niche: str = "space",
+    cfg: Config | None = None,
+) -> Path | None:
+    """Generate a single AI image for a scene:
+
+    Priority 1: Z-Image-Turbo (Apache 2.0, FREE, local or remote worker)
+    Priority 2: Gemini 3.1 Flash Image (500/day FREE, zero paid Imagen)
+    """
+    cfg = cfg or get_config()
+    prompt = _enhance_prompt(scene_description, niche)
+
+    # 1. PRIMARY: Z-Image-Turbo (Apache 2.0, 100% Free)
+    res = await generate_remote_image_z_turbo(prompt, output_path, cfg)
+    if res and res.exists():
+        return res
+
+    # 2. FALLBACK: Gemini 3.1 Flash Image (Free tier)
+    if cfg.gemini_api_key:
+        res = await _try_gemini_flash_image(prompt, output_path, cfg.gemini_api_key)
+        if res and res.exists():
+            return res
+
+    log.debug("Free AI image generation unavailable for: %s", scene_description[:50])
+    return None
+
+
+# -----------------------------------------------------------------------------
+# 2. Emergency Fallback: FFmpeg Ken-Burns Camera Motion (Only if Real Video fails)
+# -----------------------------------------------------------------------------
 async def animate_image_to_video(
     image_path: Path,
     output_path: Path,
@@ -138,42 +159,40 @@ async def animate_image_to_video(
     fps: int = 30,
     effect_index: int = 0,
 ) -> Path | None:
-    """Convert a static AI image into a cinematic video clip using FFmpeg.
+    """Convert static AI image into cinematic clip using FFmpeg.
 
-    Applies one of several Ken-Burns / parallax / zoom effects to make the
-    image feel alive and cinematic — not a boring static pan.
+    Used strictly as fallback when real Wan 2.2 / LTX-2.3 video generation is offline.
     """
-    # Different cinematic camera movements
     effects = [
-        # Slow zoom in (documentary reveal)
+        # Zoom in
         (
             f"scale=w='if(gte(t,0),{width}*(1+0.12*t/{duration}),{width})':"
             f"h='if(gte(t,0),{height}*(1+0.12*t/{duration}),{height})':"
             f"eval=frame:flags=bicubic,"
             f"crop={width}:{height}"
         ),
-        # Slow zoom out (establishing shot)
+        # Zoom out
         (
             f"scale=w='{int(width * 1.15)}':h='{int(height * 1.15)}':flags=bicubic,"
             f"crop={width}:{height}:"
             f"x='(in_w-{width})/2-((in_w-{width})/2)*(t/{duration})':"
             f"y='(in_h-{height})/2-((in_h-{height})/2)*(t/{duration})'"
         ),
-        # Left-to-right pan with slight zoom
+        # Left-to-right pan
         (
             f"scale=w='{int(width * 1.2)}':h='{int(height * 1.2)}':flags=bicubic,"
             f"crop={width}:{height}:"
             f"x='(in_w-{width})*(t/{duration})':"
             f"y='(in_h-{height})/2'"
         ),
-        # Top-down drift (epic reveal)
+        # Top-down drift
         (
             f"scale=w='{int(width * 1.15)}':h='{int(height * 1.15)}':flags=bicubic,"
             f"crop={width}:{height}:"
             f"x='(in_w-{width})/2':"
             f"y='(in_h-{height})*(t/{duration})'"
         ),
-        # Diagonal drift with zoom
+        # Diagonal drift
         (
             f"scale=w='if(gte(t,0),{width}*(1+0.08*t/{duration}),{width})':"
             f"h='if(gte(t,0),{height}*(1+0.08*t/{duration}),{height})':"
@@ -185,10 +204,7 @@ async def animate_image_to_video(
     ]
 
     effect = effects[effect_index % len(effects)]
-
-    # Color grade: contrast boost + saturation + vignette (matches existing render.py style)
     color_grade = "eq=contrast=1.05:saturation=1.10,vignette=PI/5"
-
     vf = f"{effect},{color_grade},fps={fps},format=yuv420p"
 
     cmd = [
@@ -196,18 +212,15 @@ async def animate_image_to_video(
         "-loop", "1", "-i", str(image_path),
         "-t", f"{duration:.3f}",
         "-vf", vf,
-        "-c:v", "libx264", "-preset", "medium", "-crf", "18",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "19",
         "-pix_fmt", "yuv420p",
         str(output_path),
     ]
 
     try:
-        code, out, err = run_cmd(cmd, timeout=120)
-        if code != 0:
-            log.warning("FFmpeg animation failed (code %d): %s", code, err[:200])
-            return None
-        if output_path.exists() and output_path.stat().st_size > 5000:
-            log.info("AI clip animated: %s (%.1fs)", output_path.name, duration)
+        code, out, err = run_cmd(cmd, timeout=90)
+        if code == 0 and output_path.exists() and output_path.stat().st_size > 5000:
+            log.info("Fallback animated clip created: %s (%.1fs)", output_path.name, duration)
             return output_path
         return None
     except Exception as exc:
@@ -215,6 +228,9 @@ async def animate_image_to_video(
         return None
 
 
+# -----------------------------------------------------------------------------
+# 3. Main Scene Clip Pipeline (Real Video Primary -> Image+Pan Fallback)
+# -----------------------------------------------------------------------------
 async def generate_ai_clip(
     scene_description: str,
     output_dir: Path,
@@ -223,47 +239,79 @@ async def generate_ai_clip(
     niche: str = "space",
     cfg: Config | None = None,
 ) -> dict[str, Any] | None:
-    """Full pipeline: prompt → AI image → animated video clip.
+    """Generates an individual scene clip:
 
-    Returns a dict with clip metadata, or None on failure.
+    STEP 1: Real AI Video Generation via Wan 2.2 / LTX-2.3 (Kaggle GPU / remote worker).
+    STEP 2: (Fallback) Z-Image-Turbo / Gemini 3.1 Flash Image + FFmpeg camera movement.
     """
     cfg = cfg or get_config()
     output_dir.mkdir(parents=True, exist_ok=True)
-
     slug = slugify(scene_description[:40], 30)
-    image_path = output_dir / f"ai_scene_{clip_index:02d}_{slug}.png"
-    video_path = output_dir / f"ai_clip_{clip_index:02d}_{slug}.mp4"
 
-    # Step 1: Generate unique AI image
-    result = await generate_ai_image(scene_description, image_path, niche, cfg)
-    if result is None:
-        return None
+    video_path = output_dir / f"ai_video_{clip_index:02d}_{slug}.mp4"
+    image_path = output_dir / f"ai_image_{clip_index:02d}_{slug}.png"
+    prompt = _enhance_prompt(scene_description, niche)
 
-    # Step 2: Animate into cinematic video clip
-    animated = await animate_image_to_video(
-        image_path, video_path,
+    # -------------------------------------------------------------------------
+    # STEP 1: REAL AI VIDEO (Wan 2.2 / LTX-2.3 on Kaggle GPU)
+    # -------------------------------------------------------------------------
+    preferred_model = getattr(cfg, "video_gen_model", "wan-2.2")
+    real_video = await generate_remote_video(
+        prompt=prompt,
+        output_path=video_path,
+        model=preferred_model,
         duration=duration,
-        width=cfg.width if cfg else 1080,
-        height=cfg.height if cfg else 1920,
-        fps=cfg.fps if cfg else 30,
-        effect_index=clip_index,
+        cfg=cfg,
     )
-    if animated is None:
-        return None
 
-    return {
-        "source": "ai_generated",
-        "source_id": f"gemini-imagen-{clip_index:02d}-{slug}",
-        "path": str(video_path),
-        "image_path": str(image_path),
-        "duration": duration,
-        "width": cfg.width if cfg else 1080,
-        "height": cfg.height if cfg else 1920,
-        "prompt": scene_description,
-        "niche": niche,
-        "license": "AI-Generated (Gemini Imagen) — 100% original, zero copyright risk",
-        "author": "AI Generated",
-    }
+    if real_video and real_video.exists() and real_video.stat().st_size > 20_000:
+        dur = media_duration(real_video) or duration
+        w, h = video_size(real_video)
+        log.info("Generated REAL AI VIDEO clip (%s): %s (%.1fs)", preferred_model, real_video.name, dur)
+        return {
+            "source": f"ai_video_{preferred_model}",
+            "source_id": f"{preferred_model}-{clip_index:02d}-{slug}",
+            "path": str(real_video),
+            "image_path": "",
+            "duration": dur,
+            "width": w or 1080,
+            "height": h or 1920,
+            "prompt": scene_description,
+            "niche": niche,
+            "license": f"AI Video ({preferred_model}) — 100% Free, Commercial Safe",
+            "author": f"{preferred_model.upper()} AI",
+        }
+
+    # -------------------------------------------------------------------------
+    # STEP 2: FALLBACK (Z-Image-Turbo / Gemini 3.1 Flash Image + FFmpeg Zoom/Pan)
+    # -------------------------------------------------------------------------
+    img = await generate_ai_image(scene_description, image_path, niche=niche, cfg=cfg)
+    if img and img.exists():
+        anim = await animate_image_to_video(
+            image_path=img,
+            output_path=video_path,
+            duration=duration,
+            width=cfg.width if cfg else 1080,
+            height=cfg.height if cfg else 1920,
+            fps=cfg.fps if cfg else 30,
+            effect_index=clip_index,
+        )
+        if anim and anim.exists():
+            return {
+                "source": "ai_image_animated",
+                "source_id": f"ai-img-{clip_index:02d}-{slug}",
+                "path": str(anim),
+                "image_path": str(img),
+                "duration": duration,
+                "width": cfg.width if cfg else 1080,
+                "height": cfg.height if cfg else 1920,
+                "prompt": scene_description,
+                "niche": niche,
+                "license": "AI Visuals (Z-Image/Gemini 3.1 Free) — Commercial Safe",
+                "author": "AI Generated",
+            }
+
+    return None
 
 
 async def generate_scene_clips(
@@ -274,18 +322,8 @@ async def generate_scene_clips(
     niche: str = "space",
     cfg: Config | None = None,
 ) -> list[dict[str, Any]]:
-    """Generate multiple AI clips from a script.
-
-    Breaks the script into scene-appropriate prompts and generates
-    a unique AI clip for each one.
-    """
+    """Generate multiple AI clips from a script using the 100% free AI stack."""
     cfg = cfg or get_config()
-    api_key = cfg.gemini_api_key
-    if not api_key:
-        log.warning("No GEMINI_API_KEY — falling back to stock footage")
-        return []
-
-    # Use LLM to extract scene descriptions from the script
     scenes = _extract_scenes(script_text, clip_count, niche)
     duration_per_clip = total_duration / max(1, len(scenes))
 
@@ -302,35 +340,28 @@ async def generate_scene_clips(
         if clip:
             clips.append(clip)
         else:
-            log.warning("AI clip %d failed for scene: %s", i, scene[:60])
+            log.debug("AI clip %d skipped for scene: %s", i, scene[:50])
 
-    log.info("AI footage: generated %d/%d clips", len(clips), len(scenes))
+    log.info("AI footage engine: generated %d/%d clips (Real Video / Free Visuals)", len(clips), len(scenes))
     return clips
 
 
 def _extract_scenes(script_text: str, count: int, niche: str) -> list[str]:
-    """Break a narration script into visual scene descriptions.
-
-    Simple sentence-based splitting with niche-aware visual enhancement.
-    """
-    # Split by sentences
+    """Break a narration script into visual scene descriptions."""
     sentences = re.split(r'[.!?]+', script_text)
     sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
 
     if not sentences:
         return [f"Dramatic {niche} visualization, epic cinematic shot"]
 
-    # If we have more sentences than needed, pick evenly spaced ones
     if len(sentences) > count:
         step = len(sentences) / count
         picked = [sentences[int(i * step)] for i in range(count)]
     else:
         picked = sentences
-        # Pad if needed
         while len(picked) < count:
             picked.append(f"Epic cinematic {niche} scene, dramatic wide shot")
 
-    # Enhance each sentence into a visual scene description
     enhanced: list[str] = []
     visual_styles = [
         "extreme close-up macro shot",

@@ -124,11 +124,15 @@ class Config:
 
         # ---------- llm ----------
         self.gemini_api_key: str = _s("GEMINI_API_KEY")
-        self.gemini_model: str = _s("GEMINI_MODEL", "gemini-2.0-flash")
+        self.gemini_model: str = _s("GEMINI_MODEL", "gemini-3.8-flash")
         self.groq_api_key: str = _s("GROQ_API_KEY")
         self.groq_model: str = _s("GROQ_MODEL", "llama-3.3-70b-versatile")
         self.llm_provider: str = _s("LLM_PROVIDER", "auto").lower()  # auto|gemini|groq|offline
         self.llm_timeout: int = _i("LLM_TIMEOUT", 60)
+
+        # ---------- ai video generation & gpu worker (Wan 2.2 / LTX-2.3 / Z-Image) ----------
+        self.gpu_worker_url: str = _s("GPU_WORKER_URL", _s("KAGGLE_WORKER_URL", ""))
+        self.video_gen_model: str = _s("VIDEO_GEN_MODEL", "wan-2.2").lower()  # wan-2.2 | ltx-2.3
 
         # ---------- stock footage ----------
         self.pexels_api_key: str = _s("PEXELS_API_KEY")

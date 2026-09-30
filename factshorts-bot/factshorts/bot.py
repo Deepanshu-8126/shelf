@@ -126,38 +126,63 @@ def _keyboard(video_id: int, uploaded: bool = False) -> InlineKeyboardMarkup:
 
 async def _send_preview(chat_id: int, context: ContextTypes.DEFAULT_TYPE, result, header: str = "") -> None:
     caption = (header + "\n\n" if header else "") + pipeline_summary(result)
+    sent_video = False
     try:
         with open(result.path, "rb") as fh:
-            await context.bot.send_video(
-                chat_id=chat_id,
-                video=fh,
-                caption=caption[:1024],
-                parse_mode=ParseMode.MARKDOWN,
-                supports_streaming=True,
-                width=1080,
-                height=1920,
-                read_timeout=120,
-                write_timeout=600,
-            )
-    except Exception as exc:  # noqa: BLE001 - never lose the render because of a send failure
+            try:
+                await context.bot.send_video(
+                    chat_id=chat_id,
+                    video=fh,
+                    caption=caption[:1024],
+                    parse_mode=ParseMode.MARKDOWN,
+                    supports_streaming=True,
+                    width=1080,
+                    height=1920,
+                    read_timeout=120,
+                    write_timeout=600,
+                )
+                sent_video = True
+            except Exception:
+                # Retry without markdown parse mode (fixes Telegram entity errors)
+                fh.seek(0)
+                await context.bot.send_video(
+                    chat_id=chat_id,
+                    video=fh,
+                    caption=caption[:1024],
+                    supports_streaming=True,
+                    width=1080,
+                    height=1920,
+                    read_timeout=120,
+                    write_timeout=600,
+                )
+                sent_video = True
+    except Exception as exc:  # noqa: BLE001
         log.error("send_video failed: %s", exc)
+        try:
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text=f"{caption[:3500]}\n\n⚠️ Preview upload failed ({exc}). File: {result.path}",
+            )
+        except Exception:
+            pass
+
+    full = f"Title: {result.seo['title']}\n\n{result.seo['description']}"
+    try:
         await context.bot.send_message(
             chat_id=chat_id,
-            text=f"{caption[:3500]}\n\n⚠️ Preview upload failed (`{exc}`). File: `{result.path}`",
-            parse_mode=ParseMode.MARKDOWN,
+            text=f"📦 {Path(result.path).name} ({human_bytes(Path(result.path).stat().st_size)})\n\nDescription preview:\n{full[:2500]}",
         )
-    full = f"Title: {result.seo['title']}\n\n{result.seo['description']}"
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text=f"📦 *{html.escape(str(Path(result.path).name))}* ({human_bytes(Path(result.path).stat().st_size)})\n\n"
-             f"Description preview:\n{html.escape(full)[:2500]}",
-        parse_mode=ParseMode.MARKDOWN,
-    )
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text="Approve kar dein to upload ho jayega 👇",
-        reply_markup=_keyboard(result.video_id),
-    )
+    except Exception:
+        pass
+
+    try:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Approve kar dein to upload ho jayega 👇",
+            reply_markup=_keyboard(result.video_id),
+        )
+    except Exception as exc:
+        log.warning("Keyboard send failed: %s", exc)
 
 
 async def _run_generation(chat_id: int, context: ContextTypes.DEFAULT_TYPE, niche: str, note: str = "") -> None:
