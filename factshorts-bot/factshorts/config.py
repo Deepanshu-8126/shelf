@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-NICHES = ["space", "psychology", "history", "science", "animals", "facts", "mystery"]
+NICHES = ["space", "psychology", "history", "science", "animals", "facts", "mystery", "finance", "legal", "kids"]
 
 VIDEO_MODES = ["facts", "story"]
 
@@ -121,6 +121,10 @@ class Config:
         self.telegram_token: str = _s("TELEGRAM_BOT_TOKEN")
         self.telegram_allowed_user_ids: list[int] = _ids("TELEGRAM_ALLOWED_USER_IDS")
         self.telegram_chat_id: int = _i("TELEGRAM_CHAT_ID", 0)
+
+        # ---------- github ----------
+        self.github_token: str = _s("GITHUB_TOKEN")
+        self.github_repo: str = _s("GITHUB_REPO", "Deepanshu-8126/dk_hu")
 
         # ---------- llm ----------
         self.gemini_api_key: str = _s("GEMINI_API_KEY")

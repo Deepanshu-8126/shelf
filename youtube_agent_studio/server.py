@@ -25,8 +25,26 @@ from agent.factshorts_adapter import (
     get_factshorts_status,
     get_factshorts_videos,
     get_task_status,
+    get_active_task,
     start_factshorts_generation,
+    delete_factshorts_video,
 )
+from agent.autoclip_adapter import (
+    SHORTS_DIR,
+    get_autoclip_status,
+    get_autoclip_clips,
+    start_autoclip_generation,
+    get_autoclip_task,
+    publish_clip_now,
+    delete_autoclip_clip,
+)
+from agent.kaggle_adapter import (
+    get_kaggle_telemetry,
+    push_and_start_kaggle_gpu,
+    stop_kaggle_gpu,
+    save_worker_url,
+)
+
 
 init_db()
 
@@ -40,6 +58,8 @@ def dashboard() -> dict:
     jobs = list_jobs(20)
     ready = readiness()
     fs_status = get_factshorts_status()
+    ac_status = get_autoclip_status()
+    ac_clips = get_autoclip_clips()
     return {
         "ok": True,
         "channels": list_channels(),
@@ -52,13 +72,66 @@ def dashboard() -> dict:
             "video_count": fs_status.get("video_count", 0),
             "autonomous": fs_status.get("autonomous", {})
         },
+        "autoclip": {
+            "clip_count": len(ac_clips),
+            "telegram_ready": ac_status.get("telegram_ready", False),
+            "instagram": ac_status.get("instagram", {})
+        },
         "summary": {
             "active_channels": sum(1 for c in list_channels() if c.get("active")),
             "jobs_total": len(list_jobs(200)),
             "factshorts_total": fs_status.get("video_count", 0),
+            "autoclip_total": len(ac_clips),
             "needs_review": sum(1 for j in jobs if j.get("status") in {"draft", "needs_review"}),
             "ready_to_publish": sum(1 for j in jobs if j.get("status") == "approved"),
         },
+    }
+
+
+def get_engines_telemetry() -> dict:
+    fs_status = get_factshorts_status()
+    ac_status = get_autoclip_status()
+    ac_clips = get_autoclip_clips()
+    return {
+        "ok": True,
+        "engines": [
+            {
+                "id": "factshorts",
+                "folder_name": "factshorts-bot",
+                "name": "FactShorts AI",
+                "path": str(FACTSHORTS_OUTPUT.parent.resolve()),
+                "status": "online",
+                "badge": "FACTS ENGINE",
+                "output_dir": str(FACTSHORTS_OUTPUT.resolve()),
+                "item_count": fs_status.get("video_count", 0),
+                "features": ["Edge-TTS Hindi/Eng", "Whisper Subtitles", "Audio Ducking", "Pexels B-Roll", "Telegram Bot Control"],
+                "autonomous": fs_status.get("autonomous", {})
+            },
+            {
+                "id": "autoclip",
+                "folder_name": "ai clipper best",
+                "name": "Auto Clipper Pro",
+                "path": str(SHORTS_DIR.parent.resolve()),
+                "status": "online",
+                "badge": "VIRAL CLIPPER",
+                "output_dir": str(SHORTS_DIR.resolve()),
+                "item_count": len(ac_clips),
+                "features": ["YouTube Ingestion", "Drama Hook AI", "9:16 Face Crop", "Hormozi Kinetic Captions", "Direct Telegram / Instagram", "CapCut Sync"],
+                "telegram": ac_status.get("telegram_ready", False),
+                "instagram": ac_status.get("instagram", {})
+            },
+            {
+                "id": "studio",
+                "folder_name": "youtube_agent_studio",
+                "name": "Studio Operations & Fleet",
+                "path": str(ROOT.resolve()),
+                "status": "online",
+                "badge": "FLEET COMMAND",
+                "output_dir": str((ROOT / "data").resolve()),
+                "item_count": len(list_channels()),
+                "features": ["4 Channel Personas", "Market Scout (US/IN)", "14-Day Playbook", "GTA VI Clips Lab", "SQLite Ledger"]
+            }
+        ]
     }
 
 
@@ -111,6 +184,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(WEB_DIR / "index.html")
         if path == "/api/health":
             return self._json(200, {"ok": True, "name": "CreatorOps", "readiness": readiness()})
+        if path == "/api/engines":
+            return self._json(200, get_engines_telemetry())
         if path == "/api/dashboard":
             return self._json(200, dashboard())
         if path == "/api/platforms":
@@ -148,6 +223,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, get_factshorts_status())
         if path == "/api/factshorts/videos":
             return self._json(200, {"videos": get_factshorts_videos()})
+        if path == "/api/factshorts/active-task":
+            return self._json(200, {"task": get_active_task()})
         match = re.fullmatch(r"/api/factshorts/task/([a-f0-9]+)", path)
         if match:
             task = get_task_status(match.group(1))
@@ -160,6 +237,30 @@ class Handler(BaseHTTPRequestHandler):
             if FACTSHORTS_OUTPUT not in candidate.parents or not candidate.is_file():
                 return self._json(404, {"error": "Video file not found"})
             return self._file(candidate)
+
+        # AutoClip endpoints
+        if path == "/api/autoclip/status":
+            return self._json(200, get_autoclip_status())
+        if path == "/api/autoclip/clips":
+            return self._json(200, {"clips": get_autoclip_clips()})
+        match = re.fullmatch(r"/api/autoclip/task/([a-f0-9]+)", path)
+        if match:
+            task = get_autoclip_task(match.group(1))
+            if not task:
+                return self._json(404, {"error": "Task not found"})
+            return self._json(200, task)
+        match = re.fullmatch(r"/video/autoclip/(.+)", path)
+        if match:
+            rel = match.group(1).lstrip("/")
+            candidate = (SHORTS_DIR / rel).resolve()
+            if SHORTS_DIR not in candidate.parents or not candidate.is_file():
+                return self._json(404, {"error": "Video file not found"})
+            return self._file(candidate)
+
+        # Kaggle GPU endpoints
+        if path == "/api/kaggle/status":
+            return self._json(200, get_kaggle_telemetry())
+
         self._json(404, {"error": "Not found"})
 
     def do_POST(self) -> None:
@@ -167,9 +268,34 @@ class Handler(BaseHTTPRequestHandler):
         path = unquote(parsed.path)
         try:
             body = self._body()
+            if path == "/api/autoclip/generate":
+                task_id = start_autoclip_generation(body)
+                return self._json(202, {"task_id": task_id, "status": "running"})
+            if path == "/api/autoclip/publish":
+                res = publish_clip_now(str(body.get("video_path", "")), str(body.get("platform", "telegram")))
+                return self._json(200 if res.get("ok") else 400, res)
+            if path == "/api/autoclip/delete":
+                clip_path = str(body.get("clip_path", "")).strip()
+                ok = delete_autoclip_clip(clip_path)
+                return self._json(200 if ok else 400, {"ok": ok, "clip_path": clip_path})
             if path == "/api/factshorts/generate":
                 task_id = start_factshorts_generation(body)
                 return self._json(202, {"task_id": task_id, "status": "running"})
+            if path == "/api/factshorts/delete":
+                filename = str(body.get("filename", "")).strip()
+                ok = delete_factshorts_video(filename)
+                return self._json(200 if ok else 400, {"ok": ok, "filename": filename})
+            if path == "/api/kaggle/push":
+                res = push_and_start_kaggle_gpu()
+                return self._json(200 if res.get("ok") else 500, res)
+            if path == "/api/kaggle/stop":
+                res = stop_kaggle_gpu()
+                return self._json(200 if res.get("ok") else 500, res)
+            if path == "/api/kaggle/save-url":
+                url = str(body.get("url", "")).strip()
+                model = str(body.get("model", "wan-2.2")).strip()
+                res = save_worker_url(url, model)
+                return self._json(200, res)
             if path == "/api/research/run":
                 result = scan_market()
                 saved = save_scan(result["mode"], result["candidates"], result["notes"])

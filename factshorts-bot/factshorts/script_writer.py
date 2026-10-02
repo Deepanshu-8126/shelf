@@ -63,8 +63,12 @@ _STOP = {
 # such as "a" or "day" (that is how you end up with a screen recording in your video).
 GENERIC_VISUALS: dict[str, list[str]] = {
     "space": ["space nebula", "planet surface", "stars night sky", "earth from space", "galaxy timelapse"],
-    "psychology": ["human brain abstract", "person thinking", "neon abstract motion", "library books"],
-    "history": ["ancient ruins", "old manuscripts", "museum artifacts", "desert archaeology"],
+    "psychology": ["human brain abstract", "person thinking", "neon abstract motion", "dark psychology aesthetic", "chess strategy thinking"],
+    "history": ["ancient ruins", "old manuscripts", "museum artifacts", "desert archaeology", "historical architecture"],
+    "mystery": ["foggy mystery woods", "dark atmospheric shadows", "magnifying glass investigation", "ancient riddle symbols"],
+    "finance": ["luxury lifestyle modern", "wall street stock charts", "wealth accumulation vaults", "credit card banking luxury", "money counting modern"],
+    "legal": ["courthouse justice scales", "gavel judge courtroom", "legal documents signing", "law library leather books"],
+    "kids": ["colorful cartoon 3d world", "cute baby animals playing", "bright rainbow wonderland", "fun balloon animations"],
     "science": ["laboratory science", "microscope footage", "water droplets macro", "physics experiment"],
     "animals": ["wildlife closeup", "ocean underwater", "birds in flight", "forest animals"],
 }

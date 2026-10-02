@@ -20,7 +20,42 @@ PYTHON_EXE = (FACTSHORTS_DIR / "venv" / "Scripts" / "python.exe").resolve()
 if not PYTHON_EXE.exists():
     PYTHON_EXE = Path(sys.executable)
 
+TASKS_CACHE_FILE = FACTSHORTS_DIR / "cache" / "tasks_state.json"
 TASKS: dict[str, dict[str, Any]] = {}
+
+
+def _save_tasks():
+    try:
+        TASKS_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        sub = dict(list(TASKS.items())[-15:])
+        TASKS_CACHE_FILE.write_text(json.dumps(sub, default=str), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _load_tasks():
+    global TASKS
+    if TASKS_CACHE_FILE.is_file():
+        try:
+            data = json.loads(TASKS_CACHE_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                TASKS.update(data)
+        except Exception:
+            pass
+
+
+_load_tasks()
+
+
+def get_active_task() -> dict[str, Any] | None:
+    # 1. Any task currently running
+    for t_id, task in reversed(list(TASKS.items())):
+        if task.get("status") == "running":
+            return task
+    # 2. Or the latest task
+    if TASKS:
+        return list(TASKS.values())[-1]
+    return None
 
 
 def _load_factshorts_module(name: str) -> Any:
@@ -58,6 +93,7 @@ def get_factshorts_status() -> dict[str, Any]:
 
     return {
         "ok": True,
+        "active_task": get_active_task(),
         "available": FACTSHORTS_DIR.exists(),
         "video_count": video_count,
         "models": [
@@ -106,7 +142,8 @@ def get_factshorts_status() -> dict[str, Any]:
             {"id": "science", "name": "Science Wonders & Quantum", "icon": "🔬"},
             {"id": "history", "name": "Historical Secrets & Empires", "icon": "🏛️"},
             {"id": "facts", "name": "Mindblowing Unbelievable Facts", "icon": "🤯"},
-            {"id": "psychology", "name": "Human Mind & Psychology", "icon": "🧠"}
+            {"id": "psychology", "name": "Human Mind & Psychology", "icon": "🧠"},
+            {"id": "mystery", "name": "Haunted & Dark Mysteries", "icon": "👻"}
         ],
         "autonomous": auto_info
     }
@@ -168,15 +205,20 @@ def start_factshorts_generation(options: dict[str, Any]) -> str:
     mode = str(options.get("mode", "demo")).strip().lower()
     niche = str(options.get("niche", "space")).strip().lower()
     topic = str(options.get("topic", "")).strip()
+    voice = str(options.get("voice", "")).strip()
     caption_style = str(options.get("caption_style", "hormozi")).strip()
     upload = bool(options.get("upload", False))
+
+    model = str(options.get("model", "wan-2.2")).strip().lower()
 
     task: dict[str, Any] = {
         "task_id": task_id,
         "mode": mode,
         "niche": niche,
         "topic": topic,
+        "voice": voice,
         "caption_style": caption_style,
+        "model": model,
         "status": "running",
         "progress": ["Initializing FactShorts Bot..."],
         "logs": [],
@@ -185,24 +227,42 @@ def start_factshorts_generation(options: dict[str, Any]) -> str:
         "error": None
     }
     TASKS[task_id] = task
+    _save_tasks()
 
     def _worker():
         env = os.environ.copy()
         env["PYTHONIOENCODING"] = "utf-8"
-        env["CAPTION_STYLE"] = caption_style
+        if caption_style:
+            env["CAPTION_STYLE"] = caption_style
+        if voice:
+            env["VOICE"] = voice
+        if model:
+            env["VIDEO_GEN_MODEL"] = model
 
         cmd = [str(PYTHON_EXE), "main.py"]
         if mode == "autonomous":
             cmd.extend(["--autonomous"])
             if upload:
                 cmd.append("--upload")
-        elif mode == "brief" and topic:
-            cmd.extend(["--generate", niche, "--offline"]) # fallback to offline factbank/templates if no keys
-        else: # demo mode
+        elif mode == "demo":
             cmd.append("--demo")
+            if niche and niche != "auto":
+                cmd.extend(["--niche", niche])
+            if topic:
+                cmd.extend(["--topic", topic])
+        else:
+            # LIVE ONLINE MODE: Google Trends + Wikipedia + Gemini LLM Script Writer
+            cmd.append("--generate")
+            if niche and niche != "auto":
+                cmd.extend(["--niche", niche])
+            if topic:
+                cmd.extend(["--topic", topic])
+            if options.get("offline") is True:
+                cmd.append("--offline")
 
         try:
             task["progress"].append(f"Starting execution: {' '.join(cmd[1:])}")
+            _save_tasks()
             process = subprocess.Popen(
                 cmd,
                 cwd=str(FACTSHORTS_DIR),
@@ -214,14 +274,18 @@ def start_factshorts_generation(options: dict[str, Any]) -> str:
                 errors="replace"
             )
 
+            lines_count = 0
             for line in iter(process.stdout.readline, ""):
                 line_str = line.strip()
                 if line_str:
                     task["logs"].append(line_str)
-                    if any(term in line_str.lower() for term in ["step", "stage", "rendering", "audio", "captions", "complete", "scout", "video"]):
+                    if any(term in line_str.lower() for term in ["step", "stage", "rendering", "audio", "captions", "complete", "scout", "video", "topic", "script", "voice"]):
                         task["progress"].append(line_str)
                     if len(task["logs"]) > 200:
                         task["logs"].pop(0)
+                    lines_count += 1
+                    if lines_count % 5 == 0:
+                        _save_tasks()
 
             process.wait()
             if process.returncode == 0:
@@ -239,6 +303,8 @@ def start_factshorts_generation(options: dict[str, Any]) -> str:
             task["status"] = "failed"
             task["error"] = str(exc)
             task["progress"].append(f"Error: {exc}")
+        finally:
+            _save_tasks()
 
     thread = threading.Thread(target=_worker, daemon=True)
     thread.start()
@@ -247,3 +313,19 @@ def start_factshorts_generation(options: dict[str, Any]) -> str:
 
 def get_task_status(task_id: str) -> dict[str, Any] | None:
     return TASKS.get(task_id)
+
+
+def delete_factshorts_video(filename: str) -> bool:
+    safe_name = Path(filename).name
+    target = FACTSHORTS_OUTPUT / safe_name
+    if target.is_file() and FACTSHORTS_OUTPUT in target.parents:
+        try:
+            target.unlink()
+            json_target = target.with_suffix(".json")
+            if json_target.is_file():
+                json_target.unlink()
+            return True
+        except Exception:
+            return False
+    return False
+

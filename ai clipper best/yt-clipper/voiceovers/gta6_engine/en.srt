@@ -1,0 +1,19 @@
+1
+00:00:00,096 --> 00:00:03,205
+Everyone says the trailer is pre-rendered. It is
+
+2
+00:00:03,217 --> 00:00:06,088
+not. You can see draw distance pop on
+
+3
+00:00:06,099 --> 00:00:09,420
+the bridge at 38 seconds. That means it runs
+
+4
+00:00:09,432 --> 00:00:11,736
+on the engine, and Rockstar never shows engine
+
+5
+00:00:11,747 --> 00:00:13,958
+footage more than 18 months before launch.

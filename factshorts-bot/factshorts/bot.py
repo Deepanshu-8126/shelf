@@ -829,6 +829,44 @@ def _latest_pending() -> int:
     return rows[0]["id"] if rows else 0
 
 
+async def cmd_cloud(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Trigger the GitHub Action for cloud rendering."""
+    if not await _guard(update):
+        return
+    if not update.message:
+        return
+    cfg = get_config()
+    if not getattr(cfg, "github_token", None):
+        await update.message.reply_text(
+            "❌ <b>GITHUB_TOKEN</b> is missing in <code>.env</code>.\n\n"
+            "To use /cloud, generate a classic Personal Access Token with 'repo' scope at "
+            "https://github.com/settings/tokens and add it to your .env file.",
+            parse_mode=ParseMode.HTML
+        )
+        return
+    repo = getattr(cfg, "github_repo", "Deepanshu-8126/dk_hu")
+    
+    await update.message.reply_text(f"🚀 Triggering cloud rendering on <b>{repo}</b>...", parse_mode=ParseMode.HTML)
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"https://api.github.com/repos/{repo}/actions/workflows/youtube-automation.yml/dispatches",
+                headers={
+                    "Accept": "application/vnd.github+json",
+                    "Authorization": f"Bearer {cfg.github_token}",
+                    "X-GitHub-Api-Version": "2022-11-28"
+                },
+                json={"ref": "main"}
+            )
+            if resp.status_code == 204:
+                await update.message.reply_text("✅ GitHub Action triggered successfully!\n\nIt will generate and upload the video in the cloud. You can close your laptop now.")
+            else:
+                await update.message.reply_text(f"❌ Failed to trigger Action: HTTP {resp.status_code}\n{resp.text[:200]}")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Request failed: {e}")
+
+
 # ------------------------------------------------------------------- app setup
 def build_application() -> Application:
     cfg = get_config()
@@ -845,6 +883,7 @@ def build_application() -> Application:
     )
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_start))
+    app.add_handler(CommandHandler("cloud", cmd_cloud))
     app.add_handler(CommandHandler("generate", cmd_generate))
     app.add_handler(CommandHandler("clip", cmd_clip))
     app.add_handler(CommandHandler("instagram", cmd_instagram))

@@ -3,49 +3,581 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CreatorOps · YouTube Agent Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080d18;--panel:#101827;--panel2:#131e30;--line:#223148;--text:#eef4ff;--muted:#8fa0b8;--teal:#62e5d4;--blue:#8ea9ff;--amber:#ffc66d;--red:#ff8c93;--green:#7be0a3;--shadow:0 20px 60px rgba(0,0,0,.25)}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(1000px 620px at 75% -10%,#152945 0%,var(--bg) 60%);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.sidebar{border-right:1px solid var(--line);padding:26px 18px;background:rgba(8,13,24,.78);position:sticky;top:0;height:100vh;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:11px;padding:2px 10px 28px}.brand-mark{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--teal),#668bff);display:grid;place-items:center;color:#06101a;font-weight:900;font-size:18px;box-shadow:0 8px 26px #43cbbb38}.brand strong{font-size:15px;letter-spacing:.03em}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:1px}.nav-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#70829b;padding:10px 12px 6px}.nav{display:grid;gap:5px}.nav button{color:#aebbd0;background:transparent;text-align:left;padding:11px 12px;border-radius:11px;display:flex;align-items:center;gap:12px;transition:.2s}.nav button:hover,.nav button.active{background:#18263a;color:#f4f8ff}.nav button.active{box-shadow:inset 2px 0 0 var(--teal)}.nav .ico{width:20px;text-align:center;color:var(--teal);font-size:16px}.side-bottom{margin-top:auto}.pilot-card{border:1px solid var(--line);background:linear-gradient(145deg,#122036,#0c1422);border-radius:15px;padding:14px;margin:16px 3px}.pilot-card strong{display:block;font-size:12px;margin-bottom:6px}.pilot-card p{color:var(--muted);font-size:11px;line-height:1.55;margin:0 0 12px}.tiny-link{color:var(--teal);font-size:11px;text-decoration:none}.main{min-width:0}.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,52px);border-bottom:1px solid rgba(34,49,72,.75);background:rgba(8,13,24,.38);position:sticky;top:0;z-index:4;backdrop-filter:blur(14px)}.crumb{color:var(--muted);font-size:12px}.crumb b{color:var(--text);font-weight:600}.top-right{display:flex;align-items:center;gap:10px}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#111b2b;color:#bdc9d9;padding:6px 10px;border-radius:999px;font-size:11px}.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block}.dot.live{background:var(--green);box-shadow:0 0 12px #7be0a377}.icon-btn,.btn{padding:9px 13px;border-radius:10px;background:#1b2b40;color:var(--text);border:1px solid #2a405d}.btn:hover,.icon-btn:hover{filter:brightness(1.12)}.btn.primary{background:linear-gradient(100deg,#38c9ba,#7ba3ff);color:#06131a;border:0;font-weight:750;box-shadow:0 8px 24px #46dac42d}.btn.subtle{background:transparent;color:#c7d4e8}.btn.warn{background:#332814;border-color:#64491d;color:#ffd78b}.btn.danger{background:#321b24;border-color:#612a38;color:#ffb4ba}.btn:disabled{opacity:.45;cursor:not-allowed}.content{padding:28px clamp(20px,4vw,52px) 60px;max-width:1500px;margin:auto}.page{display:none}.page.active{display:block}.hero{display:grid;grid-template-columns:1.55fr .8fr;gap:16px;margin-bottom:18px}.hero-main{background:linear-gradient(125deg,#142842,#101c30 68%,#14283a);border:1px solid #263b59;border-radius:19px;padding:27px 28px;position:relative;overflow:hidden;min-height:210px;box-shadow:var(--shadow)}.hero-main:after{content:"";position:absolute;right:-45px;top:-95px;width:250px;height:250px;border:1px solid #54e3d43c;border-radius:50%;box-shadow:0 0 0 30px #54e3d410,0 0 0 65px #54e3d408}.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-weight:800}.hero h1{font-size:clamp(25px,3.3vw,38px);line-height:1.14;margin:12px 0 10px;max-width:720px;letter-spacing:-.035em}.hero p{color:#a7b7ce;max-width:650px;margin:0 0 20px}.hero-acts{display:flex;gap:9px;flex-wrap:wrap}.hero-side{border:1px solid var(--line);border-radius:19px;padding:20px;background:linear-gradient(155deg,#111d30,#0e1726);display:flex;flex-direction:column;justify-content:space-between}.side-head{display:flex;justify-content:space-between;align-items:center}.side-head h3{font-size:12px;margin:0}.score-ring{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;border:4px solid #275c65;color:var(--teal);font-weight:800;background:#0d1a2b}.score-note{color:var(--muted);font-size:11px;margin-top:7px}.mini-row{display:flex;justify-content:space-between;color:#b6c4d8;font-size:11px;padding:7px 0;border-bottom:1px solid #1f2c40}.mini-row:last-child{border-bottom:0}.mini-row b{color:#f3f7ff;font-weight:650}.section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 13px}.section-head h2{font-size:16px;margin:0;letter-spacing:-.01em}.section-head p{margin:3px 0 0;color:var(--muted);font-size:11px}.section-actions{display:flex;gap:8px;align-items:center}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 23px}.stat{border:1px solid var(--line);background:#0e1726;border-radius:15px;padding:16px 17px}.stat label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.stat strong{display:block;font-size:24px;margin-top:6px;letter-spacing:-.03em}.stat small{display:block;color:#8192aa;font-size:10px;margin-top:2px}.grid-2{display:grid;grid-template-columns:1.25fr .75fr;gap:15px}.panel{background:rgba(16,24,39,.92);border:1px solid var(--line);border-radius:16px;padding:17px;min-width:0}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}.panel-head h3{font-size:13px;margin:0}.panel-head small{color:var(--muted)}.mode-note{color:#bdd4eb;background:#11243a;border-left:2px solid var(--blue);padding:10px 12px;border-radius:8px;font-size:11px;margin:12px 0}.warning-note{color:#f1d6a0;background:#2a2316;border-left:2px solid var(--amber);padding:10px 12px;border-radius:8px;font-size:11px;margin:12px 0}.candidate-list{display:grid;gap:9px}.candidate{border:1px solid #23334a;background:#0d1624;padding:13px;border-radius:12px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center}.candidate-score{width:40px;height:40px;border:1px solid #33736e;border-radius:13px;display:grid;place-items:center;color:var(--teal);font-weight:800;background:#0b2027}.candidate h4{font-size:12px;margin:0 0 4px}.candidate p{font-size:10px;color:var(--muted);margin:0}.candidate .small-stats{display:flex;gap:12px;color:#9eb0c7;font-size:10px;margin-top:6px;flex-wrap:wrap}.candidate .small-stats b{color:#dce7f7}.candidate a{color:var(--teal);font-size:10px}.channels{display:grid;gap:9px}.channel-row{padding:12px;border:1px solid #223148;border-radius:12px;display:flex;align-items:center;gap:11px;background:#0d1624}.channel-avatar{width:32px;height:32px;border-radius:10px;background:#1c2d45;color:#84ded2;display:grid;place-items:center;font-weight:800}.channel-row strong{font-size:11px;display:block}.channel-row small{color:var(--muted);font-size:10px}.status-tag{margin-left:auto;font-size:9px;color:#aab8cb;border:1px solid #34435a;border-radius:999px;padding:4px 7px;white-space:nowrap}.workflow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.step{border:1px solid #24354b;background:#0d1624;border-radius:12px;padding:12px 9px;min-height:92px}.step span{font-size:10px;color:var(--teal);font-weight:800;letter-spacing:.12em}.step strong{display:block;font-size:11px;margin:6px 0 3px}.step small{color:var(--muted);font-size:9px;line-height:1.35;display:block}.jobs{display:grid;gap:9px}.job{border:1px solid #24354b;border-radius:13px;padding:13px;background:#0d1624;display:flex;justify-content:space-between;gap:12px;align-items:center}.job-main{min-width:0}.job-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.job-main small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.job-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.job-actions .btn{font-size:10px;padding:6px 8px}.badge{border-radius:999px;padding:4px 7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.badge.draft{color:#ffd78b;background:#3a2c14}.badge.approved,.badge.published{color:#9df0bb;background:#173b2a}.badge.scheduled{color:#a7c1ff;background:#1b2d50}.badge.blocked,.badge.upload_failed{color:#ffadb3;background:#46222b}.badge.needs_review{color:#a8dce9;background:#12313a}.empty{color:var(--muted);font-size:11px;padding:22px;text-align:center;border:1px dashed #2a3950;border-radius:12px}.page-title{display:flex;justify-content:space-between;align-items:end;margin:5px 0 20px;gap:14px}.page-title h1{font-size:27px;margin:0;letter-spacing:-.035em}.page-title p{color:var(--muted);margin:5px 0 0;font-size:12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field label{font-size:10px;color:#9eafc5;text-transform:uppercase;letter-spacing:.1em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:10px;color:var(--text);background:#0a1320;border:1px solid #2a3a52;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#58cfc1;box-shadow:0 0 0 3px #58cfc11a}.field textarea{min-height:95px;resize:vertical}.full{grid-column:1/-1}.form-actions{display:flex;gap:9px;align-items:center;margin-top:14px}.callout{border:1px solid #24414e;background:#0c1f28;color:#afd5dc;border-radius:12px;padding:13px;font-size:11px;line-height:1.55}.candidate-detail-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}.metric{border-radius:10px;background:#101c2d;padding:11px}.metric small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.08em}.metric strong{display:block;font-size:16px;margin-top:4px}.channel-edit{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;align-items:end;padding:13px;border-bottom:1px solid #213047}.channel-edit:last-child{border-bottom:0}.channel-edit .field input,.channel-edit .field select{padding:8px;font-size:11px}.readiness-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.ready-row{display:flex;align-items:center;justify-content:space-between;background:#0d1624;border:1px solid #25344b;border-radius:11px;padding:11px;font-size:11px}.ready-row b{font-size:10px;color:var(--muted)}.ready-row .ok{color:var(--green)}.ready-row .off{color:var(--amber)}.setup-list{padding-left:20px;color:#aebbd0;font-size:11px}.setup-list li{padding:5px 0}.setup-list code{color:var(--teal);background:#132238;padding:2px 5px;border-radius:5px}.modal-back{position:fixed;inset:0;background:#030711c9;z-index:10;display:none;align-items:center;justify-content:center;padding:20px}.modal-back.open{display:flex}.modal{width:min(850px,100%);max-height:90vh;overflow:auto;background:#101a2a;border:1px solid #32425b;border-radius:17px;box-shadow:var(--shadow);padding:20px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.modal-head h2{font-size:17px;margin:0}.modal-close{background:transparent;color:#c9d5e5;font-size:22px}.modal section{border-top:1px solid #23324a;padding:14px 0}.modal h3{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin:0 0 8px}.modal pre{white-space:pre-wrap;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;color:#cfdbeb;background:#0a1320;border:1px solid #24334a;border-radius:10px;padding:12px;max-height:260px;overflow:auto}.blockers{margin:0;padding-left:18px;color:#f0cb8a;font-size:11px}.blockers li{padding:3px 0}.toast{position:fixed;right:20px;bottom:20px;background:#14253a;border:1px solid #3b5674;color:#e9f3ff;border-radius:12px;padding:12px 15px;box-shadow:var(--shadow);z-index:20;max-width:min(420px,calc(100vw - 40px));font-size:12px;display:none}.toast.show{display:block;animation:pop .2s ease-out}@keyframes pop{from{transform:translateY(7px);opacity:0}to{transform:translateY(0);opacity:1}}.footnote{color:#71829b;font-size:10px;line-height:1.55;margin-top:14px}.mobile-head{display:none}.spinner{width:13px;height:13px;display:inline-block;border:2px solid #496075;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:1050px){.app{grid-template-columns:210px 1fr}.workflow{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.hero-side{min-height:150px}.candidate-detail-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:760px){.app{display:block}.sidebar{position:fixed;z-index:8;left:0;right:0;bottom:0;top:auto;height:auto;padding:6px 7px calc(7px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);background:#09111e}.brand,.nav-label,.side-bottom{display:none}.nav{display:flex;justify-content:space-around;gap:0}.nav button{flex-direction:column;justify-content:center;gap:2px;padding:6px 3px;font-size:9px;flex:1;text-align:center;border-radius:8px}.nav button.active{box-shadow:inset 0 2px 0 var(--teal)}.nav .ico{font-size:15px}.main{padding-bottom:65px}.topbar{height:58px;padding:0 15px}.content{padding:19px 14px 28px}.topbar .crumb{font-size:11px}.top-right .btn{padding:7px 9px;font-size:10px}.top-right .pill{font-size:9px;padding:5px 8px}.hero-main{padding:22px 19px}.hero h1{font-size:27px}.stats{grid-template-columns:repeat(2,1fr);gap:8px}.stat{padding:12px}.stat strong{font-size:20px}.grid-2{grid-template-columns:1fr}.workflow{grid-template-columns:repeat(2,1fr)}.candidate{grid-template-columns:38px 1fr}.candidate .btn{grid-column:2;justify-self:start}.candidate-score{width:36px;height:36px}.section-head{align-items:flex-start}.page-title h1{font-size:22px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.channel-edit{grid-template-columns:1fr 1fr}.channel-edit .btn{grid-column:1/-1}.readiness-grid{grid-template-columns:1fr}.job{align-items:flex-start;flex-direction:column}.job-actions{justify-content:flex-start}.candidate-detail-grid{grid-template-columns:repeat(2,1fr)}.modal{padding:15px}.section-head h2{font-size:14px}}
+:root{
+  --bg:#060911;
+  --bg-gradient:radial-gradient(1200px 700px at 75% -10%, #132742 0%, #060911 65%);
+  --panel:rgba(13, 21, 35, 0.78);
+  --panel2:rgba(18, 28, 46, 0.85);
+  --line:rgba(255, 255, 255, 0.08);
+  --line-strong:rgba(255, 255, 255, 0.14);
+  --text:#f1f5fd;
+  --muted:#8b9bb2;
+  --teal:#4fe5d3;
+  --cyan:#00f2fe;
+  --blue:#699bf7;
+  --violet:#a886ff;
+  --amber:#ffbe5c;
+  --red:#ff6b75;
+  --green:#52e596;
+  --shadow:0 24px 64px rgba(0,0,0,.45);
+  --glow-cyan:0 0 24px rgba(0, 242, 254, 0.22);
+  --glow-teal:0 0 24px rgba(79, 229, 211, 0.22);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg-gradient);
+  color:var(--text);
+  font:14px/1.55 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing:-0.01em;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.app{min-height:100vh;display:grid;grid-template-columns:260px 1fr}
+.sidebar{
+  border-right:1px solid var(--line);
+  padding:24px 18px;
+  background:rgba(6, 10, 18, 0.85);
+  backdrop-filter:blur(20px);
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.brand{display:flex;align-items:center;gap:12px;padding:2px 8px 24px}
+.brand-mark{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  background:linear-gradient(135deg, #00f2fe, #4facfe 50%, #699bf7);
+  display:grid;
+  place-items:center;
+  color:#040d16;
+  font-weight:900;
+  font-size:19px;
+  box-shadow:0 8px 26px rgba(0, 242, 254, 0.35);
+}
+.brand strong{font-size:15px;letter-spacing:.04em;font-weight:800}
+.brand small{display:block;color:var(--muted);font-size:11px;margin-top:1px;font-weight:500}
+.nav-label{
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#5c708a;
+  padding:14px 12px 6px;
+  font-weight:700;
+}
+.nav{display:grid;gap:4px}
+.nav button{
+  color:#9eb0c6;
+  background:transparent;
+  text-align:left;
+  padding:10px 12px;
+  border-radius:11px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-size:13px;
+  font-weight:600;
+  transition:all .2s cubic-bezier(.2,.8,.4,1);
+  border:1px solid transparent;
+}
+.nav button:hover{
+  background:rgba(255,255,255,0.04);
+  color:#f4f8ff;
+  border-color:var(--line);
+  transform:translateX(3px);
+}
+.nav button.active{
+  background:linear-gradient(135deg, rgba(79, 229, 211, 0.12), rgba(105, 155, 247, 0.12));
+  color:#4fe5d3;
+  border-color:rgba(79, 229, 211, 0.3);
+  box-shadow:inset 3px 0 0 var(--teal);
+}
+.nav .ico{width:20px;text-align:center;font-size:15px;opacity:.9}
+.nav-badge{
+  margin-left:auto;
+  font-size:9px;
+  padding:2px 7px;
+  border-radius:999px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+}
+.nav button.active .nav-badge{background:rgba(79, 229, 211, 0.2);color:#4fe5d3}
+.side-bottom{margin-top:auto}
+.pilot-card{
+  border:1px solid var(--line);
+  background:linear-gradient(145deg, rgba(19, 32, 54, 0.8), rgba(12, 20, 34, 0.8));
+  border-radius:15px;
+  padding:14px;
+  margin:16px 3px;
+  backdrop-filter:blur(10px);
+}
+.pilot-card strong{display:block;font-size:12px;margin-bottom:6px;font-weight:700}
+.pilot-card p{color:var(--muted);font-size:11px;line-height:1.5;margin:0 0 12px}
+.tiny-link{color:var(--teal);font-size:11px;text-decoration:none;font-weight:600}
+.tiny-link:hover{text-decoration:underline}
+.main{min-width:0}
 
-.cohort-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}.cohort-card{display:grid;gap:4px;padding:12px;border:1px solid #253650;border-radius:12px;background:#0c1523}.cohort-card strong{font-size:11px}.cohort-card span{font-size:10px;color:var(--muted)}.table-wrap{overflow:auto;max-width:100%;margin-top:12px}.evidence-table{border-collapse:collapse;width:100%;font-size:10px;min-width:760px}.evidence-table th,.evidence-table td{padding:9px 8px;border-bottom:1px solid #223148;text-align:left;vertical-align:top}.evidence-table th{color:#a9bad1;font-weight:700}.evidence-table td{color:#dce6f5}.evidence-table a{color:var(--teal);text-decoration:none}.evidence-table small{display:block;color:var(--muted);margin-top:2px}.platform-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.platform-card{display:grid;gap:7px;padding:12px;border:1px solid #26364e;border-radius:12px;background:#0c1523}.platform-card>div{display:flex;justify-content:space-between;align-items:center;gap:8px}.platform-card strong{font-size:12px}.platform-card small{font-size:10px;color:var(--muted);line-height:1.45}.platform-state{font-size:9px;color:#ffd78b;border:1px solid #614c27;border-radius:999px;padding:4px 7px;white-space:nowrap}.platform-state.implemented{color:#9df0bb;border-color:#2d6244}.strategy-item{padding:11px 0;border-bottom:1px solid #223148}.strategy-item:last-child{border-bottom:0}.strategy-item strong{font-size:12px}.strategy-item p{font-size:11px;color:#c0cde0;margin:5px 0}.strategy-item small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.calendar-list{display:grid;gap:9px}.calendar-card{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:13px;border:1px solid #24354b;border-radius:12px;background:#0d1624}.calendar-date{font-size:11px;color:var(--teal);font-weight:750}.calendar-date small{display:block;color:var(--muted);font-weight:400;margin-top:4px}.calendar-card strong{font-size:12px}.calendar-card p{margin:4px 0;color:#dce7f7;font-size:11px}.calendar-card small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.strategy-list{margin:0;padding-left:18px;color:#bdc9da}.strategy-list li{margin:8px 0;font-size:11px}.checkbox-row{display:flex;align-items:center;gap:9px;color:#bdc9da!important;text-transform:none!important;letter-spacing:0!important}.checkbox-row input{width:auto!important;accent-color:#62e5d4}.page-title select{padding:9px 10px;border-radius:10px;color:var(--text);background:#0a1320;border:1px solid #2a3a52}
-@media(max-width:900px){.cohort-grid{grid-template-columns:1fr}.platform-grid{grid-template-columns:1fr}.calendar-card{grid-template-columns:1fr}.app{grid-template-columns:205px 1fr}}
-.fs-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:14px}
-.fs-video-card{border:1px solid #24354b;background:#0d1624;border-radius:14px;padding:15px;display:flex;flex-direction:column;justify-content:space-between;transition:.2s;position:relative;overflow:hidden}
-.fs-video-card:hover{border-color:#3f5e82;transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.fs-video-badge{position:absolute;top:12px;right:12px;background:#18362d;color:#7be0a3;border:1px solid #295e49;font-size:9px;padding:3px 7px;border-radius:999px;font-weight:700}
+/* Topbar Header */
+.topbar{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 clamp(20px,3.5vw,48px);
+  border-bottom:1px solid var(--line);
+  background:rgba(6, 10, 18, 0.72);
+  position:sticky;
+  top:0;
+  z-index:10;
+  backdrop-filter:blur(20px);
+}
+.crumb{color:var(--muted);font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px}
+.crumb b{color:var(--text);font-weight:700}
+.topbar-nav{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(14, 22, 38, 0.8);
+  padding:4px 6px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  box-shadow:0 4px 18px rgba(0,0,0,0.25);
+}
+.topbar-nav button{
+  background:transparent;
+  color:#94a6bf;
+  padding:7px 14px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  transition:all .2s cubic-bezier(.2,.8,.4,1);
+  border:1px solid transparent;
+}
+.topbar-nav button:hover{
+  color:#fff;
+  background:rgba(255,255,255,0.05);
+  border-color:var(--line);
+}
+.topbar-nav button.active{
+  background:linear-gradient(135deg, rgba(79, 229, 211, 0.2), rgba(105, 155, 247, 0.2));
+  color:#4fe5d3;
+  border-color:rgba(79, 229, 211, 0.45);
+  box-shadow:0 0 20px rgba(79, 229, 211, 0.18);
+}
+.top-right{display:flex;align-items:center;gap:10px}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  border:1px solid var(--line);
+  background:rgba(17, 27, 43, 0.8);
+  color:#c2d0e2;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:600;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block}
+.dot.live{background:var(--green);box-shadow:0 0 12px #52e596bb}
+.btn,.icon-btn{
+  padding:9px 15px;
+  border-radius:11px;
+  background:rgba(27, 43, 64, 0.85);
+  color:var(--text);
+  border:1px solid rgba(255, 255, 255, 0.12);
+  font-weight:600;
+  font-size:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  transition:all .2s cubic-bezier(.2,.8,.4,1);
+}
+.btn:hover{filter:brightness(1.15);transform:translateY(-1px);border-color:rgba(255,255,255,0.22)}
+.btn.primary{
+  background:linear-gradient(110deg, #38c9ba, #699bf7);
+  color:#040d16;
+  border:0;
+  font-weight:750;
+  box-shadow:0 8px 24px rgba(56, 201, 186, 0.3);
+}
+.btn.primary:hover{box-shadow:0 10px 30px rgba(56, 201, 186, 0.45)}
+.btn.subtle{background:rgba(255,255,255,0.04);color:#c7d4e8;border-color:var(--line)}
+.btn.warn{background:#332814;border-color:#64491d;color:#ffd78b}
+.btn.danger{background:#321b24;border-color:#612a38;color:#ffb4ba}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+/* Main Content */
+.content{padding:30px clamp(20px,3.5vw,48px) 60px;max-width:1500px;margin:auto}
+.page{display:none;animation:pageFadeIn .25s ease-out}
+.page.active{display:block}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.55fr .8fr;gap:16px;margin-bottom:20px}
+.hero-main{
+  background:linear-gradient(135deg, rgba(20, 40, 66, 0.75), rgba(16, 28, 48, 0.85) 68%, rgba(20, 40, 58, 0.75));
+  border:1px solid var(--line-strong);
+  border-radius:20px;
+  padding:30px 32px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px);
+}
+.hero-main:after{
+  content:"";
+  position:absolute;
+  right:-45px;
+  top:-95px;
+  width:260px;
+  height:260px;
+  border:1px solid rgba(84, 227, 212, 0.22);
+  border-radius:50%;
+  box-shadow:0 0 0 30px rgba(84, 227, 212, 0.06), 0 0 0 70px rgba(84, 227, 212, 0.03);
+}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-weight:800}
+.hero h1{font-size:clamp(26px,3.3vw,40px);line-height:1.15;margin:12px 0 10px;max-width:720px;letter-spacing:-.035em;font-weight:800}
+.hero p{color:#a7b7ce;max-width:650px;margin:0 0 22px;font-size:14px;line-height:1.6}
+.hero-acts{display:flex;gap:10px;flex-wrap:wrap}
+.hero-side{
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+  background:linear-gradient(155deg, rgba(17, 29, 48, 0.7), rgba(14, 23, 38, 0.85));
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  backdrop-filter:blur(16px);
+}
+.side-head{display:flex;justify-content:space-between;align-items:center}
+.side-head h3{font-size:12px;margin:0;font-weight:700}
+.score-ring{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;border:4px solid #275c65;color:var(--teal);font-weight:800;background:#0d1a2b}
+.score-note{color:var(--muted);font-size:11px;margin-top:7px}
+.mini-row{display:flex;justify-content:space-between;color:#b6c4d8;font-size:11px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.mini-row:last-child{border-bottom:0}
+.mini-row b{color:#f3f7ff;font-weight:650}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0 24px}
+.stat{
+  border:1px solid var(--line);
+  background:rgba(14, 23, 38, 0.75);
+  border-radius:16px;
+  padding:16px 18px;
+  backdrop-filter:blur(14px);
+  transition:transform .2s ease;
+}
+.stat:hover{transform:translateY(-2px);border-color:var(--line-strong)}
+.stat label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.stat strong{display:block;font-size:26px;margin-top:6px;letter-spacing:-.03em;font-weight:800}
+.stat small{display:block;color:#8192aa;font-size:10px;margin-top:2px}
+
+/* Workflow & Grid */
+.workflow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.step{border:1px solid var(--line);background:rgba(13, 22, 36, 0.7);border-radius:12px;padding:12px 10px;min-height:92px}
+.step span{font-size:10px;color:var(--teal);font-weight:800;letter-spacing:.12em}
+.step strong{display:block;font-size:11px;margin:6px 0 3px;font-weight:700}
+.step small{color:var(--muted);font-size:10px;line-height:1.4;display:block}
+
+/* Panels */
+.grid-2{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.panel{
+  background:rgba(14, 22, 36, 0.78);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  min-width:0;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow);
+}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}
+.panel-head h3{font-size:14px;margin:0;font-weight:750;letter-spacing:-0.01em}
+.panel-head small{color:var(--muted);font-size:11px}
+
+/* Form Styles */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:grid;gap:6px}
+.field label{font-size:10px;color:#9eb0c7;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.field input,.field select,.field textarea{
+  width:100%;
+  padding:11px 13px;
+  border-radius:11px;
+  color:var(--text);
+  background:rgba(8, 14, 24, 0.85);
+  border:1px solid rgba(255, 255, 255, 0.1);
+  outline:none;
+  font-size:13px;
+  transition:all .2s ease;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:#4fe5d3;
+  box-shadow:0 0 0 3px rgba(79, 229, 211, 0.16);
+  background:rgba(10, 18, 30, 0.95);
+}
+.field textarea{min-height:95px;resize:vertical}
+.full{grid-column:1/-1}
+.form-actions{display:flex;gap:10px;align-items:center;margin-top:16px}
+.checkbox-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#bdc9da!important;
+  text-transform:none!important;
+  letter-spacing:0!important;
+  font-size:12px;
+  font-weight:500;
+  padding:4px 0;
+  cursor:pointer;
+}
+.checkbox-row input{width:16px!important;height:16px!important;accent-color:#4fe5d3;cursor:pointer}
+
+/* Preset Chips */
+.preset-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:4px 0 10px}
+.chip-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.preset-chip{
+  background:rgba(19, 32, 52, 0.8);
+  border:1px solid rgba(255, 255, 255, 0.1);
+  color:#b4c8e0;
+  border-radius:999px;
+  padding:4px 11px;
+  font-size:11px;
+  font-weight:600;
+  transition:all .18s ease;
+  cursor:pointer;
+}
+.preset-chip:hover{
+  background:rgba(30, 52, 82, 0.95);
+  color:#4fe5d3;
+  border-color:rgba(79, 229, 211, 0.4);
+  transform:translateY(-1px);
+}
+
+/* Video Gallery Cards */
+.fs-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-top:16px}
+.fs-video-card{
+  border:1px solid var(--line);
+  background:rgba(13, 21, 35, 0.85);
+  border-radius:16px;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:all .22s cubic-bezier(.2,.8,.4,1);
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 12px 36px rgba(0,0,0,0.3);
+  backdrop-filter:blur(14px);
+}
+.fs-video-card:hover{
+  border-color:rgba(79, 229, 211, 0.35);
+  transform:translateY(-3px);
+  box-shadow:0 18px 45px rgba(0,0,0,0.45);
+}
+.fs-video-badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:rgba(24, 54, 45, 0.9);
+  color:#52e596;
+  border:1px solid rgba(82, 229, 150, 0.3);
+  font-size:9px;
+  padding:3px 8px;
+  border-radius:999px;
+  font-weight:800;
+  letter-spacing:.04em;
+}
 .fs-meta-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;padding:4px 0}
-.fs-meta-row b{color:#dce7f7}
-.fs-log-box{background:#060b13;border:1px solid #1f2c40;border-radius:10px;padding:10px;max-height:160px;overflow-y:auto;font:11px/1.5 ui-monospace,Consolas,monospace;color:#9ec8e0;margin-top:8px}
+.fs-meta-row b{color:#dce7f7;font-weight:600}
+.fs-log-box{
+  background:#050910;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:11px;
+  padding:12px;
+  max-height:160px;
+  overflow-y:auto;
+  font:11.5px/1.55 'JetBrains Mono', Consolas, monospace;
+  color:#9ec8e0;
+  margin-top:10px;
+}
+.candidate-detail-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}
+.metric{border-radius:12px;background:rgba(16, 28, 45, 0.7);border:1px solid var(--line);padding:12px}
+.metric small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.metric strong{display:block;font-size:17px;margin-top:4px;font-weight:800}
+
+/* Modal, Toast & Utilities */
+.modal-back{position:fixed;inset:0;background:rgba(3, 7, 17, 0.85);z-index:20;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.modal-back.open{display:flex}
+.modal{width:min(850px,100%);max-height:90vh;overflow:auto;background:#0d1624;border:1px solid rgba(255,255,255,0.12);border-radius:18px;box-shadow:var(--shadow);padding:22px}
+.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.modal-head h2{font-size:18px;margin:0;font-weight:800}
+.modal-close{background:transparent;color:#c9d5e5;font-size:22px}
+.toast{position:fixed;right:22px;bottom:22px;background:#132236;border:1px solid rgba(79, 229, 211, 0.35);color:#f1f7ff;border-radius:12px;padding:13px 17px;box-shadow:var(--shadow);z-index:30;max-width:min(420px,calc(100vw - 40px));font-size:12px;font-weight:600;display:none}
+.toast.show{display:block;animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.spinner{width:13px;height:13px;display:inline-block;border:2px solid #496075;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page-title{display:flex;justify-content:space-between;align-items:end;margin:5px 0 22px;gap:14px}
+.page-title h1{font-size:28px;margin:0;letter-spacing:-.035em;font-weight:800}
+.page-title p{color:var(--muted);margin:5px 0 0;font-size:13px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:30px 0 14px}
+.section-head h2{font-size:16px;margin:0;font-weight:800;letter-spacing:-.01em}
+.section-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.footnote{color:#71829b;font-size:10px;line-height:1.55;margin-top:14px}
+
+/* Tri-Engine Command & Folder Navigation */
+.engine-switcher{display:flex;align-items:center;gap:6px;background:rgba(9,15,26,0.85);padding:4px 6px;border-radius:14px;border:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.engine-btn{background:transparent;color:#94a6bf;padding:6px 12px;border-radius:10px;font-size:11.5px;font-weight:650;display:flex;align-items:center;gap:7px;transition:all .2s cubic-bezier(.2,.8,.4,1);border:1px solid transparent}
+.engine-btn:hover{color:#fff;background:rgba(255,255,255,0.05);border-color:var(--line)}
+.engine-btn.active{background:linear-gradient(135deg, rgba(79, 229, 211, 0.16), rgba(0, 242, 254, 0.16));color:#4fe5d3;border-color:rgba(79, 229, 211, 0.4);box-shadow:0 0 16px rgba(79, 229, 211, 0.15)}
+.engine-folder-pill{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#7b8fa7;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.05)}
+.engine-btn.active .engine-folder-pill{color:#4fe5d3;background:rgba(79,229,211,0.15);border-color:rgba(79,229,211,0.3)}
+
+/* Live Subtitle Style Simulator */
+.caption-preview-card{background:linear-gradient(145deg, #070d18, #0b1424);border:1px solid rgba(0, 242, 254, 0.22);border-radius:14px;padding:14px;margin-top:14px;position:relative;overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,0.6)}
+.caption-preview-header{display:flex;justify-content:space-between;align-items:center;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:750;margin-bottom:10px}
+.caption-stage{height:84px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:radial-gradient(circle at center, #132238 0%, #060a12 100%);border:1px dashed rgba(255, 255, 255, 0.12);overflow:hidden;padding:10px;text-align:center}
+.sim-word-wrap{font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-weight:900;letter-spacing:-0.01em;line-height:1.25}
+
+/* Caption Animation Presets */
+.style-hormozi{font-size:20px;text-transform:uppercase;color:#ffffff;text-shadow:2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 4px 10px rgba(0,0,0,0.9)}
+.style-hormozi .highlight{color:#ffea00;display:inline-block;animation:hormoziPop 1.4s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+@keyframes hormoziPop{0%,100%{transform:scale(1)}50%{transform:scale(1.22);color:#00f2fe}}
+
+.style-mrbeast{font-size:20px;font-weight:900;color:#ffeb3b;text-transform:uppercase;letter-spacing:0.04em;-webkit-text-stroke:1.8px #000;text-shadow:0 4px 0 #000, 0 0 16px rgba(255,235,59,0.7);animation:beastPulse 1.2s infinite ease-in-out}
+.style-mrbeast .highlight{color:#ff3366;-webkit-text-stroke:1.8px #000;display:inline-block;animation:beastPop 0.8s infinite alternate}
+@keyframes beastPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes beastPop{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+
+.style-karaoke{font-size:19px;font-weight:800;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.9)}
+.style-karaoke .highlight{color:#00f2fe;text-shadow:0 0 12px rgba(0,242,254,0.8),0 0 24px rgba(0,242,254,0.4);display:inline-block;animation:karaokeSweep 1.6s infinite ease-in-out}
+@keyframes karaokeSweep{0%,100%{opacity:0.6;filter:brightness(1)}50%{opacity:1;filter:brightness(1.4);transform:translateY(-2px)}}
+
+.style-bounce{font-size:19px;color:#ffffff}
+.style-bounce .highlight{display:inline-block;color:#ff5277;animation:bounceJump 1.2s infinite cubic-bezier(0.28, 0.84, 0.42, 1)}
+@keyframes bounceJump{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px) scale(1.1)}}
+
+.style-glow{font-size:20px;color:#fff;text-shadow:0 0 8px #ff007f, 0 0 18px #ff007f, 0 0 28px #00f2fe;letter-spacing:0.04em;animation:neonPulse 2s infinite alternate}
+@keyframes neonPulse{from{text-shadow:0 0 6px #ff007f, 0 0 14px #ff007f, 0 0 22px #00f2fe}to{text-shadow:0 0 10px #00f2fe, 0 0 22px #00f2fe, 0 0 35px #ff007f}}
+
+.style-dark-mystery{font-size:19px;font-weight:800;color:#ff5555;text-shadow:0 0 10px rgba(255,0,0,0.8), 0 0 20px rgba(0,0,0,0.9);letter-spacing:0.04em}
+.style-dark-mystery .highlight{color:#ff1744;text-shadow:0 0 14px #ff1744;display:inline-block;animation:darkGlitch 1.8s infinite}
+@keyframes darkGlitch{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.85;transform:scale(1.08)}}
+
+.style-future{font-size:20px;font-weight:800;color:#00ff88;text-shadow:0 0 10px rgba(0,255,136,0.8),0 0 25px rgba(0,255,136,0.3);letter-spacing:0.06em}
+.style-future .highlight{color:#38ef7d;display:inline-block;animation:futurePulse 1.5s infinite alternate}
+@keyframes futurePulse{from{filter:brightness(1)}to{filter:brightness(1.5)}}
+
+.style-minimal{font-size:17px;font-weight:700;color:#ffffff;letter-spacing:0.12em;text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.style-minimal .highlight{color:#00f2fe;font-weight:900}
+
+.style-plain{font-size:17px;color:#f0f4f9;background:rgba(0,0,0,0.65);padding:4px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.15)}
+
+/* Tactile Duration & Fluffy Chips */
+.duration-selector{display:flex;gap:6px;margin:6px 0 12px}
+.duration-chip{background:rgba(18,29,48,0.7);border:1px solid var(--line);color:#b6c6dc;padding:5px 11px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s ease}
+.duration-chip:hover,.duration-chip.active{background:rgba(0,242,254,0.14);border-color:rgba(0,242,254,0.35);color:#00f2fe}
+
+/* Voice Tester Drawer */
+.voice-test-row{display:flex;align-items:center;justify-content:space-between;background:rgba(14,23,38,0.65);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:6px}
+.voice-test-btn{background:rgba(79,229,211,0.15);border:1px solid rgba(79,229,211,0.3);color:#4fe5d3;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;cursor:pointer;transition:all .18s ease}
+.voice-test-btn:hover{background:rgba(79,229,211,0.25);transform:scale(1.03)}
+
+/* 3-Engine Inspector Cards */
+.inspector-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
+.inspector-card{background:rgba(12,20,34,0.9);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
+.inspector-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+/* Live Pipeline Tracker */
+.fs-stage-step{background:rgba(15,23,42,0.6);border:1px solid #1e293b;border-radius:8px;padding:6px 6px;text-align:center;font-size:10px;color:#64748b;transition:all .3s ease;display:flex;flex-direction:column;align-items:center;gap:3px}
+.fs-stage-step .step-icon{font-size:14px}
+.fs-stage-step .step-name{font-weight:600;font-size:10px}
+.fs-stage-step.active{background:rgba(0,242,254,0.12);border-color:#00f2fe;color:#00f2fe;box-shadow:0 0 14px rgba(0,242,254,0.25);animation:pulseStep 1.6s infinite alternate}
+.fs-stage-step.done{background:rgba(52,211,153,0.12);border-color:#10b981;color:#34d399}
+@keyframes pulseStep{from{opacity:0.85;transform:scale(0.98)}to{opacity:1;transform:scale(1.02)}}
+
+@media(max-width:1050px){.app{grid-template-columns:220px 1fr}.workflow{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}}
+@media(max-width:980px){.topbar-nav,.engine-switcher{display:none}}
+@media(max-width:760px){.app{display:block}.sidebar{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="brand"><div class="brand-mark">C</div><div><strong>CREATOROPS</strong><small>YouTube Agent Studio</small></div></div>
-  <div class="nav-label">Operate</div>
+  <div class="brand"><div class="brand-mark">C</div><div><strong>CREATOROPS</strong><small>Autonomous Studio OS</small></div></div>
+  <div class="nav-label">Triple-Engine Console</div>
   <nav class="nav">
     <button class="active" data-page="overview"><span class="ico">◫</span>Overview</button>
-    <button data-page="factshorts"><span class="ico">⚡</span>FactShorts AI</button>
+    <button data-page="factshorts"><span class="ico">⚡</span>FactShorts AI <span class="nav-badge">FACTS</span></button>
+    <button data-page="autoclip"><span class="ico">✂️</span>Auto Clipper <span class="nav-badge" style="background:rgba(0,242,254,0.18);color:#00f2fe">VIRAL</span></button>
+    <button data-page="gaming"><span class="ico">🎮</span>GTA VI Lab <span class="nav-badge">GAMING</span></button>
+  </nav>
+
+  <div class="nav-label" style="margin-top:10px">Growth & Intelligence</div>
+  <nav class="nav">
     <button data-page="scout"><span class="ico">⌕</span>Market Scout</button>
     <button data-page="strategy"><span class="ico">↗</span>Growth Playbook</button>
     <button data-page="studio"><span class="ico">✦</span>Content Studio</button>
-    <button data-page="gaming"><span class="ico">🎮</span>GTA VI Clips</button>
-    <button data-page="channels"><span class="ico">▣</span>Channels</button>
-    <button data-page="settings"><span class="ico">⚙</span>Connections</button>
   </nav>
-  <div class="side-bottom"><div class="pilot-card"><strong>Dual-Engine Studio</strong><p>FactShorts autonomous viral engine + CreatorOps gaming clips & documentary research.</p><a class="tiny-link" href="#" data-page-link="factshorts">Open FactShorts AI →</a></div><div style="padding:4px 12px;color:#64758e;font-size:10px">Local-first build · v0.1.0</div></div>
+
+  <div class="nav-label" style="margin-top:10px">Operations</div>
+  <nav class="nav">
+    <button data-page="channels"><span class="ico">▣</span>Channels Fleet</button>
+    <button data-page="settings"><span class="ico">⚙</span>Connections & Keys</button>
+  </nav>
+  <div class="side-bottom"><div class="pilot-card"><strong>Triple-Engine Studio</strong><p>FactShorts AI + Auto Clipper + CreatorOps Gaming Lab in 1 local console.</p><a class="tiny-link" href="#" data-page-link="autoclip">Open Auto Clipper →</a></div><div style="padding:4px 12px;color:#64758e;font-size:10px">Local-first build · v0.3.0</div></div>
 </aside>
 <div class="main">
-  <header class="topbar"><div class="crumb"><span>CREATOROPS</span> &nbsp;/&nbsp; <b id="crumbName">Overview</b></div><div class="top-right"><span id="modePill" class="pill"><i class="dot"></i><span>DEMO MODE</span></span><button class="btn primary" data-action="scan"><span id="scanBtnText">Run market scan</span></button></div></header>
+  <header class="topbar">
+    <div class="crumb"><span>CREATOROPS</span> &nbsp;/&nbsp; <b id="crumbName">Overview</b></div>
+    <div class="engine-switcher">
+      <button data-page="overview" class="engine-btn active" title="Studio Overview">
+        <span class="ico">◫</span>
+        <span>Overview</span>
+      </button>
+      <button data-page="factshorts" class="engine-btn" title="Folder: factshorts-bot">
+        <span class="engine-folder-pill">📁 factshorts-bot</span>
+        <span>⚡ FactShorts AI</span>
+        <span class="nav-badge" id="topFsCount" style="background:rgba(82,229,150,0.2);color:#52e596">14</span>
+      </button>
+      <button data-page="autoclip" class="engine-btn" title="Folder: ai clipper best">
+        <span class="engine-folder-pill">📁 ai clipper best</span>
+        <span>✂️ Auto Clipper</span>
+        <span class="nav-badge" id="topAcCount" style="background:rgba(0,242,254,0.2);color:#00f2fe">9</span>
+      </button>
+      <button data-page="gaming" class="engine-btn" title="Folder: youtube_agent_studio">
+        <span class="engine-folder-pill">📁 studio</span>
+        <span>🎮 GTA VI Lab</span>
+        <span class="nav-badge" id="topSlotCount" style="background:rgba(168,134,255,0.2);color:#a886ff">3 Slots</span>
+      </button>
+    </div>
+    <div class="top-right">
+      <button class="btn subtle" data-action="open-inspector" style="padding:6px 12px;font-size:11px" title="Inspect all 3 folders on disk">
+        <span>📁 3-Engine Inspector</span>
+      </button>
+      <span id="modePill" class="pill"><i class="dot live"></i><span>3 ENGINES READY</span></span>
+      <button class="btn primary" data-action="scan"><span id="scanBtnText">Run Market Scan</span></button>
+    </div>
+  </header>
   <main class="content">
     <section id="page-overview" class="page active">
       <div class="hero">
-        <div class="hero-main"><div class="eyebrow">Research · Create · Learn</div><h1>Your original YouTube operation,<br>with an agent at the wheel.</h1><p>Scout opportunities for a US audience, build original video packages, review rights and facts, then schedule through your own YouTube account.</p><div class="hero-acts"><button class="btn primary" data-page-link="factshorts">⚡ Launch FactShorts Studio</button><button class="btn subtle" data-page-link="scout">Explore market signals</button><button class="btn subtle" data-page-link="studio">Create a content package</button></div></div>
+        <div class="hero-main"><div class="eyebrow">Research · Create · Learn</div><h1>Your original YouTube operation,<br>with an agent at the wheel.</h1><p>Scout opportunities for a US audience, build original video packages, review rights and facts, then schedule through your own YouTube account.</p><div class="hero-acts"><button class="btn primary" data-page-link="autoclip">✂️ Launch Auto Clipper</button><button class="btn" style="background:#13283b;border-color:#2a5075;color:#7be0a3" data-page-link="factshorts">⚡ FactShorts Studio</button><button class="btn subtle" data-page-link="scout">Explore market signals</button></div></div>
         <div class="hero-side"><div class="side-head"><div><h3>Today's top signal</h3><div class="score-note" id="topSignalName">Waiting for market scan</div></div><div class="score-ring" id="topScore">—</div></div><div><div class="mini-row"><span>Research data</span><b id="researchStatus">Demo-only</b></div><div class="mini-row"><span>Publishing</span><b id="publishStatus">Locked</b></div><div class="mini-row"><span>Autopilot</span><b id="autoStatus">Off by default</b></div></div></div>
       </div>
-      <div class="stats"><div class="stat"><label>Channel slots</label><strong id="statChannels">3</strong><small>Not connected until OAuth setup</small></div><div class="stat"><label>FactShorts Renders</label><strong id="statFactshorts">0</strong><small>OpenMontage QA verified</small></div><div class="stat"><label>Content packages</label><strong id="statJobs">0</strong><small>Scripts, shotlists and captions</small></div><div class="stat"><label>Ready to publish</label><strong id="statReady">0</strong><small>Only after all gates pass</small></div></div>
+      <div class="stats" style="grid-template-columns:repeat(5,1fr)"><div class="stat"><label>Channel slots</label><strong id="statChannels">3</strong><small>Configured slots</small></div><div class="stat"><label>FactShorts</label><strong id="statFactshorts">0</strong><small>QA verified</small></div><div class="stat"><label>AutoClips</label><strong id="statAutoclip">0</strong><small>Branded 9:16 Shorts</small></div><div class="stat"><label>Packages</label><strong id="statJobs">0</strong><small>Scripts & shotlists</small></div><div class="stat"><label>Ready</label><strong id="statReady">0</strong><small>Approved to publish</small></div></div>
       <div class="section-head"><div><h2>Operating loop</h2><p>The agent plans and prepares; hard gates protect the channel.</p></div></div>
       <div class="workflow"><div class="step"><span>01</span><strong>Scout</strong><small>Recent US-region public metadata</small></div><div class="step"><span>02</span><strong>Score</strong><small>Demand, breakouts, effort, risk</small></div><div class="step"><span>03</span><strong>Write</strong><small>Original angle + sourced claims</small></div><div class="step"><span>04</span><strong>Produce</strong><small>Storyboard, captions, voice track</small></div><div class="step"><span>05</span><strong>Review</strong><small>Facts, asset rights, originality</small></div><div class="step"><span>06</span><strong>Learn</strong><small>Owner analytics inform next test</small></div></div>
       <div class="grid-2"><div><div class="section-head"><div><h2>Market opportunities</h2><p id="scanNote">Scores are illustrative until a YouTube Data API key is added.</p></div><button class="btn subtle" data-page-link="scout">All signals →</button></div><div id="overviewCandidates" class="candidate-list"></div></div><div><div class="section-head"><div><h2>Channel fleet</h2><p>Three configurable slots; no accounts connected yet.</p></div><button class="btn subtle" data-page-link="channels">Manage →</button></div><div id="overviewChannels" class="channels"></div></div></div>
@@ -57,83 +589,173 @@
     <section id="page-factshorts" class="page">
       <div class="page-title">
         <div>
-          <div class="eyebrow" style="color:var(--teal)">Dual-Engine Production</div>
+          <div class="eyebrow" style="color:var(--teal)">Autonomous AI Fact Studio</div>
           <h1>FactShorts AI Studio</h1>
-          <p>100% Autonomous Short-Form Video Generator · Verified ₹0 Open-Source Video Models · Pro Kinetic Captions · Auto-Trend Intelligence</p>
+          <p>Real-Time Trend Discovery · Live Google Trends & Wikipedia · Gemini Script Generation · Wan 2.2 Synced Video</p>
         </div>
         <div class="section-actions">
-          <button class="btn" style="background:#13283b;border-color:#2a5075;color:#7be0a3" data-action="fs-quick-demo">⚡ 1-Click Demo Render (₹0)</button>
-          <button class="btn primary" data-action="fs-quick-auto">🤖 Run Autonomous Cycle</button>
+          <button class="btn" style="background:linear-gradient(135deg,#0284c7,#2563eb);border:none;color:#fff;font-weight:600" data-action="fs-quick-trend">🔥 1-Click Live Trending Video</button>
+          <button class="btn" style="background:#13283b;border-color:#2a5075;color:#7be0a3" data-action="fs-quick-demo">⚡ Test Offline Render</button>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="panel">
           <div class="panel-head">
-            <h3>Generate FactShorts Video</h3>
-            <small>OpenMontage QA Self-Review Enabled</small>
+            <h3>Fact Generation Engine</h3>
+            <span class="badge" style="background:#133827;color:#6ee7b7;font-size:10px;padding:2px 8px;border:1px solid #059669">📡 Live Web Trends Active</span>
           </div>
+
+          <!-- Trend Discovery Info Banner -->
+          <div style="background:linear-gradient(135deg,#0c1a2e 0%,#091322 100%);border:1px solid #1e3a5f;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:16px">🌐</span>
+              <strong style="color:#38bdf8;font-size:12px">Real-Time Autonomous Fact Generation</strong>
+            </div>
+            <p style="font-size:11px;color:#94a3b8;margin:0;line-height:1.4">
+              Leave topic blank to auto-discover today's <b>#1 viral trend</b> across Google Trends & Wikipedia. Gemini LLM writes a 100% brand-new, authentic script every time — exactly like ChatGPT writing a unique narration!
+            </p>
+          </div>
+
           <form id="fsGenerateForm">
             <div class="form-grid">
-              <div class="field">
-                <label for="fsModeSelect">Generation Mode</label>
-                <select id="fsModeSelect">
-                  <option value="demo">Demo Mode (Offline Bank + Stock Clips · ₹0)</option>
-                  <option value="brief">Custom Brief / Prompt to Video</option>
-                  <option value="autonomous">Autonomous Mode (Scout ➔ Script ➔ Render ➔ Learn)</option>
-                </select>
+              <div class="field full">
+                <label for="fsTopicInput">Topic / Question (Leave BLANK for 100% Automatic Live Trend Discovery)</label>
+                <div style="display:flex;gap:8px">
+                  <input id="fsTopicInput" placeholder="Leave empty for today's live viral trend, or type a custom topic..." style="flex:1" value="">
+                  <select id="fsNicheSelect" style="width:210px">
+                    <option value="facts" selected>🤯 Mindblowing Facts (Auto)</option>
+                    <option value="mystery">👻 Haunted & Dark Mysteries</option>
+                    <option value="space">🚀 Space & Cosmos</option>
+                    <option value="science">🔬 Science & Tech</option>
+                    <option value="history">🏛️ Ancient History</option>
+                    <option value="psychology">🧠 Psychology & Human Mind</option>
+                  </select>
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:4px">
+                  💡 <i>Tip: Empty prompt triggers live Google Trends + Wikipedia Most Read to invent an astonishing new fact.</i>
+                </div>
               </div>
-              <div class="field">
-                <label for="fsNicheSelect">Content Niche</label>
-                <select id="fsNicheSelect">
-                  <option value="space">🚀 Space & Cosmic Mysteries</option>
-                  <option value="science">🔬 Science Wonders & Quantum</option>
-                  <option value="history">🏛️ Historical Secrets & Empires</option>
-                  <option value="facts">🤯 Mindblowing Unbelievable Facts</option>
-                  <option value="psychology">🧠 Human Mind & Psychology</option>
-                </select>
-              </div>
-              <div class="field full" id="fsTopicField" style="display:none">
-                <label for="fsTopicInput">Custom Topic / Prompt</label>
-                <input id="fsTopicInput" placeholder="e.g. Why black holes stop time and light">
-              </div>
-              <div class="field">
-                <label for="fsCaptionStyle">Pro Captions Style</label>
-                <select id="fsCaptionStyle">
-                  <option value="hormozi">Hormozi Kinetic Pop (High Retention)</option>
-                  <option value="mrbeast">MrBeast Explosive (With Alert Banner)</option>
-                  <option value="karaoke">Karaoke Glow Sweep (Word Highlight)</option>
-                  <option value="pop_bounce">Elastic Pop-Bounce (Scale Overshoot)</option>
-                  <option value="neon_glow">Cyberpunk Neon Glow (High Contrast)</option>
-                </select>
-              </div>
+
               <div class="field">
                 <label for="fsModelSelect">Video Model Engine</label>
                 <select id="fsModelSelect">
-                  <option value="ltx-2.3">LTX-2.3 (20s Vertical + Native Audio · Kaggle T4)</option>
-                  <option value="wan-2.2">Wan 2.2 (5s Cinematic B-Roll · Apache 2.0)</option>
+                  <option value="wan-2.2" selected>Wan 2.2 (Alibaba T2V · 720p Apache 2.0 Free)</option>
+                  <option value="ltx-2.3">LTX-2.3 (Lightricks · 20s 4K Native Audio)</option>
+                  <option value="openmontage">OpenMontage Hybrid (Stock B-Roll & Visuals · ₹0)</option>
                   <option value="hunyuan-1.5">HunyuanVideo 1.5 (75s Long-Form Documentary)</option>
-                  <option value="openmontage">OpenMontage Hybrid (Stock B-Roll + Kokoro Audio)</option>
                 </select>
               </div>
+
+              <div class="field">
+                <label for="fsVoiceSelect">Voice Artist & Accent (₹0 Local Edge-TTS)</label>
+                <select id="fsVoiceSelect">
+                  <option value="hi-IN-MadhurNeural" selected>🇮🇳 Madhur (Hindi Male · Deep Storyteller)</option>
+                  <option value="hi-IN-SwaraNeural">🇮🇳 Swara (Hindi Female · High Energy Viral)</option>
+                  <option value="en-US-ChristopherNeural">🇺🇸 Christopher (US Male · Cinematic Documentary)</option>
+                  <option value="en-US-JennyNeural">🇺🇸 Jenny (US Female · Natural/Casual Explainer)</option>
+                  <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK Male · Authoritative Documentary)</option>
+                  <option value="hi-IN-NeerjaNeural">🇮🇳 Neerja (Hindi/English Female · Expressive)</option>
+                </select>
+                <div class="voice-test-row">
+                  <span style="font-size:11px;color:var(--muted)">Test voice:</span>
+                  <button type="button" class="voice-test-btn" id="fsVoiceTestBtn">🔊 Listen</button>
+                </div>
+              </div>
+
               <div class="field full">
-                <label class="checkbox-row">
-                  <input id="fsUploadCheck" type="checkbox"> Auto-upload to connected YouTube account if OpenMontage QA passes
+                <label for="fsCaptionStyle">Kinetic Captions Style & Animation</label>
+                <div class="preset-chips" style="margin:4px 0 8px">
+                  <span class="chip-label">🎨 Styles:</span>
+                  <button type="button" class="preset-chip" data-fs-style="hormozi">🔥 Viral Kinetic Pop</button>
+                  <button type="button" class="preset-chip" data-fs-style="headline">⚡ High Voltage</button>
+                  <button type="button" class="preset-chip" data-fs-style="karaoke">✨ Glowing Karaoke</button>
+                  <button type="button" class="preset-chip" data-fs-style="pop_bounce">💥 Kinetic Bounce</button>
+                  <button type="button" class="preset-chip" data-fs-style="neon_glow">🌌 Deep Space Neon</button>
+                  <button type="button" class="preset-chip" data-fs-style="dark_mystery">🔮 Mystery Documentary</button>
+                  <button type="button" class="preset-chip" data-fs-style="future_tech">🔬 Science Discovery</button>
+                  <button type="button" class="preset-chip" data-fs-style="minimal">💎 Clean Minimal</button>
+                </div>
+                <select id="fsCaptionStyle">
+                  <option value="hormozi" selected>🔥 Viral Kinetic Pop (Gold & White High Retention)</option>
+                  <option value="headline">⚡ High Voltage Headline (Bold Alert Highlight)</option>
+                  <option value="karaoke">✨ Glowing Karaoke Sweep (Word-by-Word Golden Glow)</option>
+                  <option value="pop_bounce">💥 Kinetic Bounce (Scale Overshoot Spring Animation)</option>
+                  <option value="neon_glow">🌌 Deep Space Neon Glow (Electric Cyan & Magenta)</option>
+                  <option value="dark_mystery">🔮 Mystery Documentary (Crimson Glitch Glow)</option>
+                  <option value="future_tech">🔬 Science Discovery (Emerald Neon Glow)</option>
+                  <option value="minimal">💎 Clean Minimal (Editorial Typography White/Cyan)</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <div class="caption-preview-card">
+                  <div class="caption-preview-header">
+                    <span>✨ Live Kinetic Caption Simulator & Emoji Tester</span>
+                    <span id="fsSimStyleLabel" style="font-size:10px;color:#00f2fe;font-weight:700">VIRAL KINETIC POP</span>
+                  </div>
+                  <div class="caption-stage">
+                    <div class="sim-word-wrap style-hormozi" id="fsSimWordWrap">
+                      DID YOU KNOW <span class="highlight">THIS ABOUT TIME?</span> ⏳
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap">
+                    <input id="fsSimTextInput" placeholder="Type custom caption text to test live..." value="DID YOU KNOW THIS ABOUT TIME? ⏳" style="flex:1;min-width:200px;font-size:11px;padding:6px 10px;background:#060a12;border:1px solid #1c2b3d;border-radius:8px;color:#fff">
+                    <div style="display:flex;gap:4px">
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="🔥">🔥</button>
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="⏳">⏳</button>
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="⚡">⚡</button>
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="💥">💥</button>
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="🤯">🤯</button>
+                      <button type="button" class="duration-chip emoji-chip" data-emoji="✨">✨</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field full" style="display:flex;justify-content:space-between;align-items:center">
+                <label class="checkbox-row" style="margin:0">
+                  <input id="fsUploadCheck" type="checkbox"> Auto-upload to YouTube if QA passes
                 </label>
+                <span style="font-size:11px;color:var(--muted)">Video Duration: <b>~15–20s Vertical 9:16 HD</b></span>
               </div>
             </div>
-            <div class="form-actions">
-              <button class="btn primary" type="submit" id="fsSubmitBtn">🚀 Generate FactShorts Video Now</button>
+            <div class="form-actions" style="margin-top:12px">
+              <button class="btn primary" type="submit" id="fsSubmitBtn" style="font-size:13px;padding:10px 18px">
+                ✨ Generate Fresh Fact Video Now
+              </button>
               <button class="btn subtle" type="button" data-action="refresh-fs-videos">Refresh Renders</button>
             </div>
           </form>
 
-          <div id="fsProgressBox" style="display:none;margin-top:15px;border:1px solid #233c56;background:#09121d;border-radius:12px;padding:14px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-              <span class="spinner"></span>
-              <strong id="fsProgressTitle" style="color:var(--teal);font-size:12px">Rendering video pipeline...</strong>
+          <div id="fsProgressBox" style="display:none;margin-top:15px;border:1px solid rgba(0,242,254,0.3);background:linear-gradient(180deg,#0a1524 0%,#060d17 100%);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid #1a2f47;padding-bottom:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="spinner" id="fsProgressSpinner" style="width:18px;height:18px;border-width:2.5px"></span>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span id="fsProgressBadge" class="pill" style="font-size:9px;padding:2px 8px;background:rgba(0,242,254,0.15);color:#00f2fe;border:1px solid rgba(0,242,254,0.4)">LIVE TASK ACTIVE</span>
+                    <strong id="fsProgressTitle" style="color:#f1f5fd;font-size:13px">Rendering video pipeline...</strong>
+                  </div>
+                  <small id="fsProgressSub" style="color:var(--muted);font-size:10px;display:block;margin-top:2px">Persistent background worker running on disk</small>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span id="fsElapsedTimer" style="font-size:11px;font-family:monospace;color:#38bdf8;background:rgba(15,23,42,0.8);padding:3px 8px;border-radius:6px;border:1px solid #1e3a5f">⏱️ 0s</span>
+                <button type="button" class="btn subtle" id="fsProgressToggleBtn" style="padding:3px 8px;font-size:10px" data-action="toggle-fs-logbox">Minimize</button>
+              </div>
             </div>
-            <div id="fsLogBox" class="fs-log-box"></div>
+
+            <!-- Visual Stage Pipeline Tracker -->
+            <div id="fsStageTracker" class="fs-stage-tracker" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px">
+              <div class="fs-stage-step" id="fsStepScout"><span class="step-icon">📡</span><span class="step-name">1. Scout</span></div>
+              <div class="fs-stage-step" id="fsStepScript"><span class="step-icon">✍️</span><span class="step-name">2. Script</span></div>
+              <div class="fs-stage-step" id="fsStepVoice"><span class="step-icon">🎙️</span><span class="step-name">3. Voice</span></div>
+              <div class="fs-stage-step" id="fsStepVisual"><span class="step-icon">🎬</span><span class="step-name">4. Visuals</span></div>
+              <div class="fs-stage-step" id="fsStepCaptions"><span class="step-icon">✨</span><span class="step-name">5. Render</span></div>
+            </div>
+
+            <div id="fsLogBox" class="fs-log-box" style="max-height:160px;font-size:11px;background:#030712;border:1px solid #111e30;border-radius:8px;padding:10px;line-height:1.5;color:#94a3b8;overflow-y:auto"></div>
           </div>
         </div>
 
@@ -156,7 +778,40 @@
             <div class="metric"><small>Primary Engine</small><strong>LTX-2.3</strong><span style="font-size:10px;color:var(--muted)">20s 4K 50fps Native Audio</span></div>
             <div class="metric"><small>B-Roll / Transitions</small><strong>Wan 2.2</strong><span style="font-size:10px;color:var(--muted)">5s 720p Apache 2.0</span></div>
             <div class="metric"><small>Long-Form Engine</small><strong>Hunyuan 1.5</strong><span style="font-size:10px;color:var(--muted)">75s Continuous narrative</span></div>
-            <div class="metric"><small>Zero-Cost Audio</small><strong>Kokoro-82M</strong><span style="font-size:10px;color:var(--muted)">Local CPU, Apache 2.0</span></div>
+          <div class="panel-head" style="margin-top:16px">
+            <h3>Cloud T4 GPU Worker (Google Colab / Kaggle · Free ₹0)</h3>
+            <span id="kgStatusPill" class="badge" style="background:#19273c;color:#94a3b8;font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid #334155">OFFLINE</span>
+          </div>
+          <div style="border:1px solid #233e5b;background:linear-gradient(180deg,#0a1422 0%,#060c15 100%);border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,0.35)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div>
+                <strong style="color:#7be0a3;font-size:13px">⚡ Wan 2.2 & LTX-2.3 Cloud Acceleration</strong>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Run colab_gpu_worker.ipynb in Colab or push to Kaggle ➔ Zero PC load & super fast</div>
+              </div>
+              <div id="kgVramBadge" style="font-size:10px;padding:3px 8px;border-radius:6px;background:#15283f;color:#7be0a3;border:1px solid #204167">Tesla T4 · 16GB</div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <button type="button" class="btn primary" id="kgPushBtn" style="flex:1;background:linear-gradient(135deg,#0284c7,#2563eb);border:none;font-weight:600;font-size:12px;padding:8px 12px">
+                🚀 Push & Start Kaggle GPU
+              </button>
+              <button type="button" class="btn" id="kgStopBtn" style="background:#451a1a;border-color:#7f1d1d;color:#fca5a5;font-weight:600;font-size:12px;padding:8px 12px">
+                🛑 Stop GPU Worker
+              </button>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">Cloudflare Tunnel URL (From Google Colab or Kaggle)</label>
+              <div style="display:flex;gap:6px">
+                <input id="kgWorkerUrlInput" placeholder="https://xxxx.trycloudflare.com" style="flex:1;font-size:11px;font-family:monospace;padding:6px 10px;background:#050b12;border:1px solid #1c3149;color:#e2e8f0;border-radius:6px" value="">
+                <button type="button" class="btn subtle" id="kgSaveUrlBtn" style="font-size:11px;padding:6px 12px">Save & Connect</button>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#64748b;padding-top:6px;border-top:1px solid #162436">
+              <span>💡 Colab Notebook: <code>colab_gpu_worker.ipynb</code></span>
+              <span id="kgSessionDetails">Free T4 GPU · ₹0 Cost</span>
+            </div>
           </div>
         </div>
       </div>
@@ -171,6 +826,190 @@
         </div>
       </div>
       <div id="fsVideoGallery" class="fs-card-grid"></div>
+    </section>
+
+    <section id="page-autoclip" class="page">
+      <div class="page-title">
+        <div>
+          <div class="eyebrow" style="color:var(--teal)">Viral Repurposing Studio</div>
+          <h1>Auto Clipper Engine</h1>
+          <p>YouTube Link In ➔ 2s Devanagari/EN Captions · Drama Hook Detection · Hormozi Subtitles · Direct Phone Telegram & Instagram Delivery</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn" style="background:#13283b;border-color:#2a5075;color:#7be0a3" data-action="ac-quick-demo">⚡ Quick Test (Sourav Joshi Vlog)</button>
+          <button class="btn primary" data-action="refresh-ac-clips">🔄 Refresh Clips</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Clip YouTube Video / Stream</h3>
+            <small>Fast 85s Pipeline · No GPU Needed</small>
+          </div>
+          <form id="acGenerateForm">
+            <div class="form-grid">
+              <div class="field full">
+                <div class="preset-chips">
+                  <span class="chip-label">⚡ 1-Click Viral Presets:</span>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/zvRYuphcvQo" data-preset-genre="vlog" data-preset-style="hormozi">🚗 Sourav Joshi Defender Vlog</button>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/v9QtM6qnG50" data-preset-genre="reality" data-preset-style="hormozi">🔥 MrBeast 100-Day Bunker</button>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/a8_K_9xW1Io" data-preset-genre="reality" data-preset-style="bounce">🎙️ India's Got Latent (Ep 7)</button>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/YG14X4QDpGo" data-preset-genre="gaming" data-preset-style="karaoke">🎮 GTA VI Trailer (Vice City)</button>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/36YnV9STBqc" data-preset-genre="news" data-preset-style="plain">🇮🇳 Dhruv Rathee Deep Dive</button>
+                  <button type="button" class="preset-chip" data-preset-url="https://youtu.be/9No-FiEInLA" data-preset-genre="reality" data-preset-style="glow">⚡ Samay Raina Roast</button>
+                </div>
+                <div class="duration-selector">
+                  <span class="chip-label" style="line-height:26px">Duration:</span>
+                  <button type="button" class="duration-chip" data-duration="15">⚡ 15s Hook (Fastest)</button>
+                  <button type="button" class="duration-chip active" data-duration="30">🎯 30s Sweet Spot (Max Viral)</button>
+                  <button type="button" class="duration-chip" data-duration="60">🎬 60s Full Short (Retention)</button>
+                </div>
+                <label for="acUrlInput">YouTube Video or Channel URL</label>
+                <input id="acUrlInput" placeholder="https://youtu.be/...  ya  @channel" required>
+              </div>
+              <div class="field">
+                <label for="acGenreSelect">Content Genre (Drama Lexicon)</label>
+                <select id="acGenreSelect">
+                  <option value="vlog">📹 Vlog (Sourav Joshi, Daily Vlogs)</option>
+                  <option value="gaming">🎮 Gaming (GTA VI, Techno Gamerz, Shooters)</option>
+                  <option value="reality">🔥 Reality Show (Bigg Boss, Fights, Arguments)</option>
+                  <option value="news">📰 News / Podcast / Interviews</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="acCaptionStyle">Subtitle Style & Viral Emojis</label>
+                <div class="preset-chips" style="margin:4px 0 8px">
+                  <span class="chip-label">🎨 Styles:</span>
+                  <button type="button" class="preset-chip" data-ac-style="hormozi">🔥 Hormozi Pop</button>
+                  <button type="button" class="preset-chip" data-ac-style="mrbeast">🚨 MrBeast Explosive</button>
+                  <button type="button" class="preset-chip" data-ac-style="karaoke">🎙️ Karaoke Glow</button>
+                  <button type="button" class="preset-chip" data-ac-style="bounce">💥 Elastic Bounce</button>
+                  <button type="button" class="preset-chip" data-ac-style="glow">⚡ Cyber Neon</button>
+                  <button type="button" class="preset-chip" data-ac-style="dark_mystery">🔮 Dark Mystery</button>
+                  <button type="button" class="preset-chip" data-ac-style="future_tech">🧪 Futuristic Bio</button>
+                  <button type="button" class="preset-chip" data-ac-style="plain">💎 Clean Minimal</button>
+                </div>
+                <select id="acCaptionStyle">
+                  <option value="hormozi" selected>🔥 Hormozi Kinetic Pop (Top Retention · Bold Yellow/Cyan)</option>
+                  <option value="mrbeast">🚨 MrBeast Explosive (Alert Banner · Pulsing Glow)</option>
+                  <option value="karaoke">🎙️ Karaoke Word-Highlight Glow (Gold / Cyan Sweep)</option>
+                  <option value="bounce">💥 Elastic Bounce (Scale Overshoot Animation)</option>
+                  <option value="glow">⚡ Cyberpunk Neon Glow (Electric Cyan & Magenta)</option>
+                  <option value="dark_mystery">🔮 Dark Mystery / Crime (Crimson Glitch Glow)</option>
+                  <option value="future_tech">🧪 Futuristic Bio-Tech (Emerald Neon Glow)</option>
+                  <option value="plain">💎 Clean Standard Style (Minimalist White Badge)</option>
+                </select>
+              </div>
+              <div class="field full">
+                <div class="caption-preview-card">
+                  <div class="caption-preview-header">
+                    <span>✨ Live Kinetic Caption Simulator & Emoji Tester</span>
+                    <span id="acSimStyleLabel" style="font-size:10px;color:#00f2fe;font-weight:750">HORMOZI POP</span>
+                  </div>
+                  <div class="caption-stage" id="acCaptionStage">
+                    <div class="sim-word-wrap style-hormozi" id="acSimWordWrap">
+                      WAIT TILL <span class="highlight">THE END!</span> 🔥
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap">
+                    <input id="acSimTextInput" placeholder="Type custom test caption..." value="WAIT TILL THE END! 🔥" style="flex:1;min-width:200px;font-size:11px;padding:6px 10px;background:#060a12;border:1px solid #1c2b3d;border-radius:8px;color:#fff">
+                    <div style="display:flex;gap:4px">
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="🔥">🔥</button>
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="⚡">⚡</button>
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="💥">💥</button>
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="🚨">🚨</button>
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="😱">😱</button>
+                      <button type="button" class="duration-chip emoji-chip-ac" data-emoji="🤯">🤯</button>
+                    </div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:10px;color:var(--muted)">
+                    <span>⚡ Realtime CSS Preview</span>
+                    <span>Burned with ASS/libass at 1080×1920 60fps</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label for="acClipsCount">Clips to Extract</label>
+                <select id="acClipsCount">
+                  <option value="1">1 Top Viral Moment</option>
+                  <option value="2" selected>2 Best Viral Moments</option>
+                  <option value="3">3 Clips Package</option>
+                  <option value="5">5 Clips Batch</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="acSafeLevel">Copyright Shield</label>
+                <select id="acSafeLevel">
+                  <option value="1" selected>Level 1 (Subtle 1.03x zoom + light grade)</option>
+                  <option value="2">Level 2 (1.06x zoom + 1.03x speed + hue)</option>
+                  <option value="3">Level 3 (1.10x zoom + mirror + grain)</option>
+                  <option value="0">Level 0 (Raw unaltered original frame)</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label class="checkbox-row" style="margin-bottom:6px">
+                  <input id="acTelegramCheck" type="checkbox" checked> 📲 Send rendered video directly to Telegram Phone (6486771356)
+                </label>
+                <label class="checkbox-row" style="margin-bottom:6px">
+                  <input id="acInstagramCheck" type="checkbox"> 📸 Auto-post to Instagram Reels via direct local driver (instapost)
+                </label>
+                <label class="checkbox-row">
+                  <input id="acCaptionBoxCheck" type="checkbox"> 🔲 High-contrast dark plate behind captions (for busy/bright footage)
+                </label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn primary" type="submit" id="acSubmitBtn">🚀 Generate Viral Shorts Now</button>
+              <button class="btn subtle" type="button" data-action="refresh-ac-clips">Refresh Renders</button>
+            </div>
+          </form>
+
+          <div id="acProgressBox" style="display:none;margin-top:15px;border:1px solid #233c56;background:#09121d;border-radius:12px;padding:14px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <span class="spinner"></span>
+              <strong id="acProgressTitle" style="color:var(--teal);font-size:12px">AutoClip running pipeline...</strong>
+            </div>
+            <div id="acLogBox" class="fs-log-box"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Distribution & Engine Telemetry</h3>
+            <small>Connected Channels</small>
+          </div>
+          <div style="border:1px solid #24354b;background:#0d1624;border-radius:12px;padding:14px;margin-bottom:14px">
+            <div class="mini-row"><span>Telegram Phone Delivery</span><b id="acTgStatus" style="color:#7be0a3">✅ Connected (6486771356)</b></div>
+            <div class="mini-row"><span>Instagram Direct Driver</span><b id="acIgStatus">Checking...</b></div>
+            <div class="mini-row"><span>Instagram Daily Quota</span><b id="acIgQuota">0 / 8 reels (Defensive)</b></div>
+            <div class="mini-row"><span>CapCut Draft Sync</span><b style="color:#7be0a3">✅ Enabled (draft_content.json)</b></div>
+            <p class="footnote" style="margin-top:8px">Clips automatically generate both standalone 1080×1920 MP4s and editable CapCut timeline projects.</p>
+          </div>
+
+          <div class="panel-head">
+            <h3>Drama Lexicon & Scoring Metrics</h3>
+            <small>Zero-GPU Heuristic Engine</small>
+          </div>
+          <div class="candidate-detail-grid" style="grid-template-columns:1fr 1fr;gap:8px">
+            <div class="metric"><small>Caption Speed</small><strong>2.0 sec</strong><span style="font-size:10px;color:var(--muted)">YouTube native auto-ASR</span></div>
+            <div class="metric"><small>Punch Zooms</small><strong>1.14×</strong><span style="font-size:10px;color:var(--muted)">Dynamic keyframe cuts</span></div>
+            <div class="metric"><small>Hook Window</small><strong>30–60s</strong><span style="font-size:10px;color:var(--muted)">Optimal retention slice</span></div>
+            <div class="metric"><small>LLM Scoring</small><strong>Groq OSS</strong><span style="font-size:10px;color:var(--muted)">Fast sentiment parsing</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:32px">
+        <div>
+          <h2>Clipped Shorts Gallery</h2>
+          <p>Click any clip to watch 9:16 vertical render or push directly to Telegram & Instagram.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn subtle" data-action="refresh-ac-clips">Refresh Gallery</button>
+        </div>
+      </div>
+      <div id="acClipsGallery" class="fs-card-grid"></div>
     </section>
 
     <section id="page-scout" class="page">
@@ -250,6 +1089,18 @@
 </div>
 </div>
 <div id="modalBack" class="modal-back"><div class="modal"><div class="modal-head"><div><div class="eyebrow">Content package</div><h2 id="modalTitle">Job details</h2></div><button class="modal-close" data-action="close-modal">×</button></div><div id="modalBody"></div></div></div>
+<div id="inspectorModalBack" class="modal-back">
+  <div class="modal" style="max-width:800px;background:#080e18;border:1px solid rgba(0, 242, 254, 0.25);border-radius:18px">
+    <div class="modal-head" style="margin-bottom:16px">
+      <div>
+        <div class="eyebrow" style="color:var(--teal)">Filesystem & Engine Architecture</div>
+        <h2 style="font-size:18px;margin:2px 0 0">Triple-Engine Console Inspector</h2>
+      </div>
+      <button class="modal-close" data-action="close-inspector-modal">×</button>
+    </div>
+    <div id="inspectorContent" class="inspector-grid"></div>
+  </div>
+</div>
 <div id="videoModalBack" class="modal-back"><div class="modal" style="max-width:420px;background:#09121d;text-align:center;padding:16px;border:1px solid #284462"><div class="modal-head" style="margin-bottom:12px"><div><div class="eyebrow" style="color:var(--teal)">FactShorts HD Player</div><h2 id="videoModalTitle" style="font-size:15px;margin:2px 0 0">Video Preview</h2></div><button class="modal-close" data-action="close-video-modal">×</button></div><div style="background:#000;border-radius:12px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,0.6);border:1px solid #1c2e42"><video id="fsVideoPlayer" controls playsinline style="width:100%;max-height:65vh;display:block;margin:auto" src=""></video></div><div id="videoModalMeta" style="margin-top:12px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"></div></div></div>
 <div id="toast" class="toast"></div>
 <script>
@@ -259,7 +1110,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 async function api(path,options={}){const res=await fetch(path,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});let data={};try{data=await res.json()}catch{}if(!res.ok)throw Object.assign(new Error(data.error||`Request failed (${res.status})`),{data,status:res.status});return data}
 function toast(message){const t=$('#toast');t.textContent=message;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4200)}
 function badge(status){const key=String(status||'draft').toLowerCase().replace(/[^a-z_]/g,'_');return `<span class="badge ${esc(key)}">${esc(String(status||'draft').replaceAll('_',' '))}</span>`}
-function go(page){$$('.page').forEach(x=>x.classList.remove('active'));$(`#page-${page}`)?.classList.add('active');$$('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$('#crumbName').textContent={overview:'Overview',factshorts:'FactShorts AI Studio',scout:'Market Scout',strategy:'Growth Playbook',studio:'Content Studio',gaming:'GTA VI Clips',channels:'Channels',settings:'Connections'}[page]||'Overview';window.scrollTo({top:0,behavior:'smooth'});if(page==='strategy')loadStrategy();if(page==='gaming')loadGameSources();if(page==='factshorts')loadFactshorts()}
+function go(page){$$('.page').forEach(x=>x.classList.remove('active'));$(`#page-${page}`)?.classList.add('active');$$('.nav button, .topbar-nav button, .engine-switcher .engine-btn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));$('#crumbName').textContent={overview:'Overview',factshorts:'FactShorts AI Studio',autoclip:'Auto Clipper Pro',scout:'Market Scout',strategy:'Growth Playbook',studio:'Content Studio',gaming:'GTA VI Clips',channels:'Channels',settings:'Connections'}[page]||'Overview';window.scrollTo({top:0,behavior:'smooth'});if(page==='strategy')loadStrategy();if(page==='gaming')loadGameSources();if(page==='factshorts')loadFactshorts();if(page==='autoclip')loadAutoClip()}
 function renderCandidates(list,target,limit=10){const el=$(target);if(!el)return;if(!list?.length){el.innerHTML='<div class="empty">No live results yet. Run a market scan.</div>';return}el.innerHTML=list.slice(0,limit).map(c=>`<article class="candidate"><div class="candidate-score">${esc(c.score??'—')}</div><div><h4>${esc(c.name)}</h4><p>${esc(c.note||'Public-signal screening score; not an RPM or revenue forecast.')}</p><div class="small-stats"><span>Demand <b>${esc(c.demand??'—')}</b></span><span>Breakout <b>${esc(c.breakout??'—')}</b></span><span>Creator diversity <b>${esc(c.competition??'—')}</b></span><span>Sample <b>${esc(c.sample_count??0)}</b></span><span>Confidence <b>${esc(c.confidence||'low')}</b></span><span>Repeatability <b>${esc(c.sustainability_signal||'not assessed')}</b></span>${c.median_views!=null?`<span>Median lifetime views <b>${Number(c.median_views).toLocaleString()}</b></span>`:''}</div>${c.evidence?.length?`<div class="small-stats">${c.evidence.slice(0,2).map(e=>`<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(String(e.title||'Video').slice(0,45))} ↗</a>`).join('')}</div>`:''}</div><button class="btn subtle" data-action="use-niche" data-niche="${esc(c.name)}">Test idea</button></article>`).join('')}
 function renderChannels(channels){const list=$('#overviewChannels');list.innerHTML=(channels||[]).map((c,i)=>`<div class="channel-row"><div class="channel-avatar">${String(i+1).padStart(2,'0')}</div><div><strong>${esc(c.name)}</strong><small>${esc(c.niche)} · ${esc(c.audience_country)} · ${esc(c.language)}</small></div><span class="status-tag">OAuth not connected</span></div>`).join('')||'<div class="empty">No channel slots</div>';
  const select=$('#channelSelect');if(select)select.innerHTML=(channels||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.name)} · ${esc(c.audience_country)}</option>`).join('');
@@ -292,7 +1143,154 @@ async function loadFactshorts(){
     const vid=await api('/api/factshorts/videos');
     renderFsVideos(vid.videos||[]);
     $('#statFactshorts').textContent=(vid.videos||[]).length;
+    await loadKaggleStatus();
+    await checkFsActiveTask();
   }catch(e){toast(e.message)}
+}
+
+async function loadKaggleStatus(){
+  try{
+    const st=await api('/api/kaggle/status');
+    const pill=$('#kgStatusPill');
+    const vram=$('#kgVramBadge');
+    const urlInput=$('#kgWorkerUrlInput');
+    const details=$('#kgSessionDetails');
+    if(!pill)return;
+
+    const worker=st.worker_health||{};
+    if(worker.online){
+      pill.style.background='#133827';
+      pill.style.color='#6ee7b7';
+      pill.style.border='1px solid #059669';
+      pill.innerHTML='🟢 ONLINE (GPU ACTIVE)';
+      if(vram)vram.textContent=`${worker.device||'Tesla T4'} · ${worker.vram_gb||16}GB`;
+    }else if(st.kernel_status==='QUEUED'||st.kernel_status==='RUNNING'){
+      pill.style.background='#3b2d12';
+      pill.style.color='#fcd34d';
+      pill.style.border='1px solid #d97706';
+      pill.innerHTML=`🟡 ${st.kernel_status} (BOOTING)`;
+    }else{
+      pill.style.background='#1e293b';
+      pill.style.color='#94a3b8';
+      pill.style.border='1px solid #334155';
+      pill.innerHTML='⚪ OFFLINE (STOPPED)';
+    }
+
+    if(urlInput && !urlInput.dataset.userEdited && st.worker_url){
+      urlInput.value=st.worker_url;
+    }
+    if(details){
+      details.textContent=`Account: ${st.username||'ukboy7u787'} · Free Quota: 30h/wk`;
+    }
+  }catch(e){
+    console.debug('Kaggle status error:',e);
+  }
+}
+
+function copyToClipboard(text, msg='✓ Copied to clipboard!'){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>toast(msg)).catch(()=>fallbackCopy(text, msg));
+  }else{
+    fallbackCopy(text, msg);
+  }
+}
+function fallbackCopy(text, msg){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand('copy');toast(msg);}catch{toast('Failed to copy');}
+  document.body.removeChild(ta);
+}
+
+function updateSubtitleSimulator(style, prefix='ac', customText=null){
+  const label=$(`#${prefix}SimStyleLabel`);
+  const wrap=$(`#${prefix}SimWordWrap`);
+  if(!label || !wrap)return;
+  const map={
+    hormozi:{label:'VIRAL KINETIC POP',cls:'style-hormozi',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> 🔥':'DID YOU KNOW <span class="highlight">THIS ABOUT TIME?</span> ⏳'},
+    headline:{label:'HIGH IMPACT HEADLINE',cls:'style-mrbeast',text:prefix==='ac'?'DO NOT MISS <span class="highlight">THIS MOMENT!</span> ⚡':'THE REAL TRUTH <span class="highlight">REVEALED!</span> ⚠️'},
+    karaoke:{label:'KARAOKE GLOW',cls:'style-karaoke',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> 🎙️':'UNBELIEVABLE FACT <span class="highlight">DISCOVERED!</span> ✨'},
+    bounce:{label:'ELASTIC BOUNCE',cls:'style-bounce',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> ⚡':'DID YOU KNOW <span class="highlight">THIS ABOUT TIME?</span> 💥'},
+    pop_bounce:{label:'ELASTIC BOUNCE',cls:'style-bounce',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> ⚡':'DID YOU KNOW <span class="highlight">THIS ABOUT TIME?</span> 💥'},
+    glow:{label:'CYBERPUNK NEON',cls:'style-glow',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> ⚡':'DEEP SPACE <span class="highlight">NEON PHENOMENON!</span> 🌌'},
+    neon_glow:{label:'CYBERPUNK NEON',cls:'style-glow',text:prefix==='ac'?'WAIT TILL <span class="highlight">THE END!</span> ⚡':'DEEP SPACE <span class="highlight">NEON PHENOMENON!</span> 🌌'},
+    dark_mystery:{label:'DARK MYSTERY',cls:'style-dark-mystery',text:prefix==='ac'?'SECRET CODE <span class="highlight">DISCOVERED!</span> 🔮':'WHAT THEY HID <span class="highlight">FROM HUMANITY!</span> 🩸'},
+    future_tech:{label:'FUTURISTIC BIO',cls:'style-future',text:prefix==='ac'?'FUTURE TECH <span class="highlight">IS HERE!</span> 🧪':'SUPERHUMAN DNA <span class="highlight">ACTIVATED!</span> 🧬'},
+    minimal:{label:'MINIMAL PRO',cls:'style-minimal',text:prefix==='ac'?'MINDSET <span class="highlight">OVER MATTER</span> 💎':'TIME DILATION <span class="highlight">VERIFIED</span> 👑'},
+    plain:{label:'CLEAN PRO',cls:'style-plain',text:prefix==='ac'?'WAIT TILL THE END!':'DID YOU KNOW THIS ABOUT TIME'}
+  };
+  const conf=map[style]||map.hormozi;
+  label.textContent=conf.label;
+  wrap.className=`sim-word-wrap ${conf.cls}`;
+  if(customText){
+    const words=customText.trim().split(/\s+/);
+    if(words.length>2){
+      const lastWords=words.slice(-2).join(' ');
+      const firstWords=words.slice(0, -2).join(' ');
+      wrap.innerHTML=`${esc(firstWords)} <span class="highlight">${esc(lastWords)}</span>`;
+    }else{
+      wrap.innerHTML=`<span class="highlight">${esc(customText)}</span>`;
+    }
+  }else{
+    wrap.innerHTML=conf.text;
+  }
+}
+
+function testVoiceAudio(){
+  const voiceSelect=$('#fsVoiceSelect');
+  const val=voiceSelect?voiceSelect.value:'hi-IN-MadhurNeural';
+  const text=val.startsWith('hi')
+    ?"नमस्ते! यह फैक्ट शॉर्ट्स का रियल-टाइम वॉयस टेस्ट है। क्या आप जानते हैं कि ब्लैक होल के पास समय रुक जाता है?"
+    :"Hello! This is a FactShorts audio preview. Did you know that time slows down near black holes?";
+  
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang=val.startsWith('hi')?'hi-IN':'en-US';
+    utt.rate=1.02;
+    window.speechSynthesis.speak(utt);
+    toast(`🔊 Speaking sample: ${val}`);
+  }else{
+    toast(`Voice artist selected: ${val}`);
+  }
+}
+
+async function openEngineInspector(){
+  const modal=$('#inspectorModalBack');
+  const container=$('#inspectorContent');
+  if(!modal||!container)return;
+  modal.classList.add('open');
+  container.innerHTML='<div style="text-align:center;padding:24px"><span class="spinner"></span> Querying 3 local engine directories...</div>';
+  try{
+    const data=await api('/api/engines');
+    const engines=data.engines||[];
+    container.innerHTML=engines.map(eng=>`
+      <div class="inspector-card">
+        <div class="inspector-card-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="fs-video-badge" style="position:static;background:rgba(79, 229, 211, 0.15);color:#4fe5d3;border-color:rgba(79, 229, 211, 0.3)">${esc(eng.badge)}</span>
+            <strong style="font-size:14px">${esc(eng.name)}</strong>
+          </div>
+          <span class="pill" style="font-size:10px;padding:3px 9px"><i class="dot live"></i><span>${esc(eng.status.toUpperCase())}</span></span>
+        </div>
+        <div class="inspector-path">
+          <span>📁 ${esc(eng.path)}</span>
+          <button class="btn subtle" style="padding:3px 9px;font-size:10px" data-action="copy-raw-text" data-text="${esc(eng.path)}">Copy Path</button>
+        </div>
+        <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:10px">
+          <span>Ready Files: <b style="color:#f1f5fd">${eng.item_count} items</b></span>
+          <span>Output Folder: <b style="color:#8cc4e8">${esc(eng.output_dir.split(/[/\\\\]/).pop())}</b></span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+          ${(eng.features||[]).map(f=>`<span class="engine-folder-pill" style="color:#b2c6dc">${esc(f)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }catch(err){
+    container.innerHTML=`<div class="empty">Error loading engine telemetry: ${esc(err.message)}</div>`;
+  }
 }
 
 function renderFsVideos(videos){
@@ -302,7 +1300,9 @@ function renderFsVideos(videos){
     el.innerHTML='<div class="empty full" style="grid-column:1/-1">No FactShorts rendered yet. Click "⚡ 1-Click Demo Render" to create your first video!</div>';
     return;
   }
-  el.innerHTML=videos.map(v=>`
+  el.innerHTML=videos.map(v=>{
+    const viralTags=`${v.title} #facts #shorts #viral #mindblowing #trending #factsfeed`;
+    return `
     <div class="fs-video-card">
       <span class="fs-video-badge">✓ QA PASS</span>
       <strong style="font-size:13px;padding-right:75px;margin-bottom:8px;line-height:1.3;display:block">${esc(v.title)}</strong>
@@ -315,11 +1315,12 @@ function renderFsVideos(videos){
       <small style="color:var(--muted);font-size:10px;margin-bottom:10px">${new Date(v.created_at).toLocaleString()}</small>
       <div class="job-actions" style="margin-top:auto">
         <button class="btn primary" style="font-size:11px" data-action="play-fs-video" data-url="${esc(v.video_url)}" data-title="${esc(v.title)}" data-meta="${esc(v.duration)}s · ${esc(v.size_human)}">▶ Play Video</button>
+        <button class="btn subtle" style="font-size:11px" data-action="copy-raw-text" data-text="${esc(viralTags)}">📋 Copy Tags</button>
         <a class="btn subtle" style="font-size:11px" href="${esc(v.video_url)}" download>⬇ Download</a>
-        ${v.json_url?`<a class="btn subtle" style="font-size:11px" href="${esc(v.json_url)}" target="_blank">JSON</a>`:''}
+        <button class="btn warn" style="font-size:11px;padding:6px 9px;background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:#f87171" data-action="delete-fs-video" data-filename="${esc(v.filename)}">🗑️ Delete</button>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
 }
 
 function playFsVideo(url, title, meta){
@@ -332,92 +1333,550 @@ function playFsVideo(url, title, meta){
   p.play().catch(()=>{});
 }
 
-async function startFsGeneration(payload){
-  const btn=$('#fsSubmitBtn');
-  if(btn){
-    btn.disabled=true;
-    btn.innerHTML='<span class="spinner"></span> Starting pipeline...';
+let fsMonitorInterval = null;
+let fsTaskStartTime = null;
+
+function updateFsStagePills(logs, progress) {
+  const allText = (logs.join(' ') + ' ' + progress.join(' ')).toLowerCase();
+  const stages = [
+    { id: '#fsStepScout', match: ['trend', 'google trends', 'wikipedia', 'seed', 'scout'] },
+    { id: '#fsStepScript', match: ['script', 'topic', 'accurate fact', 'llm', 'gemini', 'groq', 'fact check'] },
+    { id: '#fsStepVoice', match: ['voice', 'narration', 'edge-tts', 'recording voiceover', 'elevenlabs', 'synthesize'] },
+    { id: '#fsStepVisual', match: ['visual', 'footage', 'b-roll', 'pexels', 'kaggle', 'wan', 'clip', 'downloaded'] },
+    { id: '#fsStepCaptions', match: ['caption', 'render', 'ffmpeg', 'ass', 'subtitle', 'mux', 'qa pass', 'verified'] },
+  ];
+
+  let currentIdx = -1;
+  stages.forEach((st, idx) => {
+    const el = $(st.id);
+    if (!el) return;
+    const hit = st.match.some(m => allText.includes(m));
+    if (hit) currentIdx = idx;
+  });
+
+  stages.forEach((st, idx) => {
+    const el = $(st.id);
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (idx < currentIdx) el.classList.add('done');
+    else if (idx === currentIdx) el.classList.add('active');
+  });
+}
+
+function monitorFsTask(taskId) {
+  if (fsMonitorInterval) clearInterval(fsMonitorInterval);
+  localStorage.setItem('active_fs_task_id', taskId);
+
+  if (!fsTaskStartTime) {
+    const savedTime = localStorage.getItem('active_fs_task_time');
+    fsTaskStartTime = savedTime ? parseInt(savedTime, 10) : Date.now();
+    localStorage.setItem('active_fs_task_time', fsTaskStartTime);
   }
-  $('#fsProgressBox').style.display='block';
-  $('#fsProgressTitle').textContent='Initializing FactShorts Bot...';
-  $('#fsLogBox').innerHTML='<div>[Task] Sending request to FactShorts Bot...</div>';
 
-  try{
-    const res=await api('/api/factshorts/generate',{method:'POST',body:JSON.stringify(payload)});
-    const taskId=res.task_id;
-    toast('FactShorts generation running in background');
+  const box = $('#fsProgressBox');
+  const btn = $('#fsSubmitBtn');
+  const spinner = $('#fsProgressSpinner');
+  const badge = $('#fsProgressBadge');
+  const topFsCount = $('#topFsCount');
 
-    const interval=setInterval(async ()=>{
-      try{
-        const task=await api(`/api/factshorts/task/${taskId}`);
-        if(task.logs?.length){
-          $('#fsLogBox').innerHTML=task.logs.slice(-20).map(l=>`<div>${esc(l)}</div>`).join('');
-          $('#fsLogBox').scrollTop=$('#fsLogBox').scrollHeight;
-        }
-        if(task.progress?.length){
-          $('#fsProgressTitle').textContent=task.progress[task.progress.length-1];
-        }
-        if(task.status==='completed'){
-          clearInterval(interval);
-          if(btn){btn.disabled=false;btn.textContent='🚀 Generate FactShorts Video Now';}
-          toast('✅ Video Generated & OpenMontage QA Verified!');
-          await loadFactshorts();
-          if(task.video){
-            playFsVideo(task.video.video_url, task.video.title, `${task.video.duration}s · ${task.video.size_human}`);
-          }
-        }else if(task.status==='failed'){
-          clearInterval(interval);
-          if(btn){btn.disabled=false;btn.textContent='🚀 Generate FactShorts Video Now';}
-          toast(`❌ Generation failed: ${task.error}`);
-        }
-      }catch(err){
-        clearInterval(interval);
-        if(btn){btn.disabled=false;btn.textContent='🚀 Generate FactShorts Video Now';}
+  if (box) box.style.display = 'block';
+  if (spinner) spinner.style.display = 'inline-block';
+  if (badge) {
+    badge.style.background = 'rgba(0,242,254,0.15)';
+    badge.style.color = '#00f2fe';
+    badge.style.borderColor = 'rgba(0,242,254,0.4)';
+    badge.textContent = 'LIVE TASK ACTIVE';
+  }
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Pipeline Active...';
+  }
+
+  const poll = async () => {
+    try {
+      const task = await api(`/api/factshorts/task/${taskId}`);
+      if (!task) return;
+
+      const elapsed = Math.round((Date.now() - fsTaskStartTime) / 1000);
+      const timerEl = $('#fsElapsedTimer');
+      if (timerEl) timerEl.textContent = `⏱️ ${elapsed}s`;
+
+      if (topFsCount) {
+        topFsCount.innerHTML = `<span class="spinner" style="width:10px;height:10px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:4px"></span> ${elapsed}s`;
+        topFsCount.style.background = 'rgba(0,242,254,0.25)';
+        topFsCount.style.color = '#00f2fe';
       }
-    }, 1500);
-  }catch(err){
-    if(btn){btn.disabled=false;btn.textContent='🚀 Generate FactShorts Video Now';}
+
+      if (task.logs?.length) {
+        const logBox = $('#fsLogBox');
+        if (logBox) {
+          logBox.innerHTML = task.logs.slice(-35).map(l => `<div>${esc(l)}</div>`).join('');
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+      }
+
+      if (task.progress?.length) {
+        const lastP = task.progress[task.progress.length - 1];
+        const titleEl = $('#fsProgressTitle');
+        if (titleEl) titleEl.textContent = lastP;
+        const subEl = $('#fsProgressSub');
+        if (subEl) subEl.textContent = `Topic: ${task.topic || task.niche || 'Auto Discovery'} · Step ${task.progress.length}`;
+      }
+
+      updateFsStagePills(task.logs || [], task.progress || []);
+
+      if (task.status === 'completed') {
+        clearInterval(fsMonitorInterval);
+        fsMonitorInterval = null;
+        localStorage.removeItem('active_fs_task_id');
+        localStorage.removeItem('active_fs_task_time');
+        fsTaskStartTime = null;
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '✨ Generate Fresh Fact Video Now';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(52,211,153,0.2)';
+          badge.style.color = '#34d399';
+          badge.style.borderColor = '#10b981';
+          badge.textContent = '✓ VIDEO COMPLETED';
+        }
+        if (spinner) spinner.style.display = 'none';
+
+        $$('.fs-stage-step').forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+        toast('✅ FactShorts Video Ready & QA Verified!');
+        await loadFactshorts();
+        if (task.video) {
+          playFsVideo(task.video.video_url, task.video.title, `${task.video.duration}s · ${task.video.size_human}`);
+        }
+      } else if (task.status === 'failed') {
+        clearInterval(fsMonitorInterval);
+        fsMonitorInterval = null;
+        localStorage.removeItem('active_fs_task_id');
+        localStorage.removeItem('active_fs_task_time');
+        fsTaskStartTime = null;
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '✨ Generate Fresh Fact Video Now';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(239,68,68,0.2)';
+          badge.style.color = '#f87171';
+          badge.style.borderColor = '#ef4444';
+          badge.textContent = '❌ GENERATION FAILED';
+        }
+        if (spinner) spinner.style.display = 'none';
+        toast(`❌ Generation failed: ${task.error}`);
+      }
+    } catch (err) {
+      console.debug('Polling error:', err);
+    }
+  };
+
+  poll();
+  fsMonitorInterval = setInterval(poll, 1200);
+}
+
+async function checkFsActiveTask() {
+  try {
+    const res = await api('/api/factshorts/active-task');
+    const task = res.task;
+    const localId = localStorage.getItem('active_fs_task_id');
+
+    if (task && task.status === 'running') {
+      monitorFsTask(task.task_id);
+    } else if (localId) {
+      try {
+        const savedTask = await api(`/api/factshorts/task/${localId}`);
+        if (savedTask && savedTask.status === 'running') {
+          monitorFsTask(localId);
+        } else {
+          localStorage.removeItem('active_fs_task_id');
+          localStorage.removeItem('active_fs_task_time');
+        }
+      } catch {
+        localStorage.removeItem('active_fs_task_id');
+        localStorage.removeItem('active_fs_task_time');
+      }
+    }
+  } catch (e) {
+    console.debug('Active task check failed:', e);
+  }
+}
+
+async function startFsGeneration(payload){
+  const btn = $('#fsSubmitBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Starting pipeline...';
+  }
+  $('#fsProgressBox').style.display = 'block';
+  $('#fsProgressTitle').textContent = 'Initializing FactShorts Bot...';
+  $('#fsLogBox').innerHTML = '<div>[Task] Sending request to FactShorts Bot...</div>';
+
+  try {
+    const res = await api('/api/factshorts/generate', {method: 'POST', body: JSON.stringify(payload)});
+    const taskId = res.task_id;
+    fsTaskStartTime = Date.now();
+    localStorage.setItem('active_fs_task_time', fsTaskStartTime);
+    toast('🚀 FactShorts generation running in background');
+    monitorFsTask(taskId);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Generate Fresh Fact Video Now'; }
     toast(err.message);
   }
 }
 
-function renderDashboard(d){state=d;const r=d.readiness||{};$('#modePill').innerHTML=`<i class="dot ${r.research_connected?'live':''}"></i><span>${r.research_connected?'LIVE RESEARCH':'DEMO MODE'}</span>`;$('#researchStatus').textContent=r.research_connected?'Live public metadata':'Demo-only';$('#publishStatus').textContent=(r.authorized_channels||[]).length?'OAuth connected':'Locked';$('#autoStatus').textContent=r.auto_publish_enabled?'Enabled · gated':'Off by default';$('#statChannels').textContent=(d.channels||[]).length;$('#statFactshorts').textContent=d.summary?.factshorts_total??d.factshorts?.video_count??0;$('#statJobs').textContent=d.summary?.jobs_total??0;$('#statReady').textContent=d.summary?.ready_to_publish??0;$('#scanNote').textContent=d.scan?.notes||'';$('#scoutNote').textContent=d.scan?.notes||'';$('#scanUpdated').textContent=d.scan?.created_at?`Updated ${new Date(d.scan.created_at).toLocaleString()} · ${d.scan.mode}`:'No scan yet';const top=d.scan?.candidates?.[0];$('#topSignalName').textContent=top?.name||'Waiting for market scan';$('#topScore').textContent=top?.score??'—';renderCandidates(d.scan?.candidates,'#overviewCandidates',3);renderCandidates(d.scan?.candidates,'#scoutCandidates',10);renderEvidenceLedger(d.scan?.candidates);renderChannels(d.channels||[]);renderJobs(d.jobs||[],'#overviewJobs');renderJobs(d.jobs||[],'#studioJobs');renderJobs((d.jobs||[]).filter(j=>j.format==='Game Clip'),'#gameJobs');updateGameCountdown();renderReadiness(r);$('#gameFfmpegStatus').textContent=r.ffmpeg_available?'Ready':'Install FFmpeg / imageio-ffmpeg';renderPlatformMatrix(d.platforms||[]);renderAnalytics(d.analytics||[])}
-async function refresh(){try{renderDashboard(await api('/api/dashboard'));await loadGameSources();if($('#page-factshorts')?.classList.contains('active'))await loadFactshorts()}catch(e){toast(e.message)}}
-async function runScan(){const b=$('[data-action="scan"]');if(b){b.disabled=true;const t=b.textContent;b.innerHTML='<span class="spinner"></span> Scanning…';try{const res=await api('/api/research/run',{method:'POST',body:'{}'});toast(`Scan complete · ${res.scan.mode} mode`);await refresh();go('scout')}catch(e){toast(e.message)}finally{b.disabled=false;b.textContent='Run market scan'}}}
+async function loadAutoClip(){
+  try{
+    const st=await api('/api/autoclip/status');
+    if($('#acTgStatus'))$('#acTgStatus').textContent=st.telegram_ready?'✅ Connected (6486771356)':'⚠️ Not Connected';
+    if($('#acIgStatus'))$('#acIgStatus').textContent=st.instagram?.configured?`✅ Ready (${st.instagram.driver})`:'⚠️ Needs Credentials in .env';
+    if($('#acIgQuota'))$('#acIgQuota').textContent=`${st.instagram?.today_count||0} / ${st.instagram?.cap||8} reels today`;
+    const cd=await api('/api/autoclip/clips');
+    renderAutoClipCards(cd.clips||[]);
+    if($('#statAutoclip'))$('#statAutoclip').textContent=(cd.clips||[]).length;
+  }catch(e){toast(e.message)}
+}
+
+function renderAutoClipCards(clips){
+  const el=$('#acClipsGallery');
+  if(!el)return;
+  if(!clips?.length){
+    el.innerHTML='<div class="empty full" style="grid-column:1/-1">No clips rendered yet. Enter a YouTube URL above and click Generate!</div>';
+    return;
+  }
+  el.innerHTML=clips.map(c=>{
+    const safePath=(c.path||'').replace(/\\/g, '/');
+    const viralTags=`${c.title}\n${c.hook||''}\n#shorts #viral #trending #reels #fyp #explore`;
+    const thumbHtml = c.thumb_url
+      ? `<div style="position:relative;background:#000;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);margin-bottom:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+           <img src="${esc(c.thumb_url)}" alt="Hook Thumbnail" style="width:100%;max-height:260px;object-fit:cover;display:block">
+           <span class="fs-video-badge" style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.78);color:#00f2fe;border:1px solid rgba(0,242,254,0.4)">🖼️ 9:16 HOOK THUMB</span>
+           <button class="btn primary" style="position:absolute;bottom:8px;left:8px;right:8px;font-size:11px;padding:6px 12px;background:rgba(0,242,254,0.9);color:#050911;font-weight:750" data-action="play-fs-video" data-url="${esc(c.stream_url)}" data-title="${esc(c.title)}" data-meta="${c.duration}s · ${c.size_mb} MB">▶ Watch 9:16 Video</button>
+         </div>`
+      : `<div style="background:#000;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);margin-bottom:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+           <video controls playsinline preload="metadata" style="width:100%;max-height:260px;display:block;margin:auto" src="${esc(c.stream_url)}"></video>
+         </div>`;
+
+    return `
+    <div class="fs-video-card">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <span class="fs-video-badge" style="position:static;background:rgba(0, 242, 254, 0.12);color:#00f2fe;border:1px solid rgba(0, 242, 254, 0.3)">✂️ 9:16 SHORT</span>
+          <span style="font-size:10px;color:var(--muted);font-weight:600">${c.duration?c.duration+'s':'—'} · ${c.size_mb} MB</span>
+        </div>
+        <h4 style="font-size:13.5px;font-weight:750;margin:0 0 5px;line-height:1.4">${esc(c.title)}</h4>
+        <p style="font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(c.hook||c.source_title||'Viral Hook')}</p>
+        ${thumbHtml}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span class="engine-folder-pill" style="color:#7be0a3;font-size:9.5px">📁 CapCut: draft_content.json</span>
+          <button class="btn subtle" style="padding:3px 8px;font-size:10px" data-action="copy-raw-text" data-text="${esc(viralTags)}">📋 Copy Tags</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+        ${c.thumb_url ? `<a class="btn subtle" style="flex:1;min-width:70px;padding:6px 8px;font-size:10.5px;text-align:center" href="${esc(c.thumb_url)}" download="${esc(c.name)}_thumb.jpg">🖼️ Thumb</a>` : ''}
+        <button class="btn" style="flex:1;min-width:75px;background:rgba(36, 161, 222, 0.15);border-color:rgba(36, 161, 222, 0.35);color:#4fc3f7;padding:6px 8px;font-size:10.5px" data-action="ac-send-telegram" data-path="${esc(safePath)}">📲 Telegram</button>
+        <button class="btn" style="flex:1;min-width:75px;background:rgba(193, 53, 132, 0.15);border-color:rgba(193, 53, 132, 0.35);color:#f48fb1;padding:6px 8px;font-size:10.5px" data-action="ac-send-instagram" data-path="${esc(safePath)}">📸 Instagram</button>
+        <a class="btn subtle" style="padding:6px 8px;font-size:10.5px;text-decoration:none" href="${esc(c.stream_url)}" download="${esc(c.name)}.mp4">📥 MP4</a>
+        <button class="btn warn" style="padding:6px 8px;font-size:10.5px;background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:#f87171" data-action="delete-ac-clip" data-path="${esc(safePath)}" title="Delete Clip from disk">🗑️</button>
+      </div>
+    </div>
+  `;}).join('');
+}
+
+async function startAcGeneration(payload){
+  const btn=$('#acSubmitBtn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Processing video...';}
+  $('#acProgressBox').style.display='block';
+  $('#acProgressTitle').textContent='Starting AutoClip pipeline...';
+  $('#acLogBox').innerHTML='<div>[Task] Initializing YouTube extraction and drama hook detection...</div>';
+
+  try{
+    const res=await api('/api/autoclip/generate',{method:'POST',body:JSON.stringify(payload)});
+    const taskId=res.task_id;
+    toast('AutoClip job started in background');
+
+    const interval=setInterval(async ()=>{
+      try{
+        const task=await api(`/api/autoclip/task/${taskId}`);
+        if(task.logs?.length){
+          $('#acLogBox').innerHTML=task.logs.slice(-25).map(l=>`<div>${esc(l)}</div>`).join('');
+          $('#acLogBox').scrollTop=$('#acLogBox').scrollHeight;
+        }
+        if(task.status==='completed'){
+          clearInterval(interval);
+          if(btn){btn.disabled=false;btn.textContent='🚀 Generate Viral Shorts Now';}
+          toast('✅ Viral Shorts Rendered & Delivered!');
+          await loadAutoClip();
+        }else if(task.status==='failed'){
+          clearInterval(interval);
+          if(btn){btn.disabled=false;btn.textContent='🚀 Generate Viral Shorts Now';}
+          toast(`❌ AutoClip failed: ${task.error}`);
+        }
+      }catch(err){
+        clearInterval(interval);
+        if(btn){btn.disabled=false;btn.textContent='🚀 Generate Viral Shorts Now';}
+      }
+    }, 1500);
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='🚀 Generate Viral Shorts Now';}
+    toast(err.message);
+  }
+}
+
+function renderDashboard(d){state=d;const r=d.readiness||{};$('#modePill').innerHTML=`<i class="dot ${r.research_connected?'live':''}"></i><span>${r.research_connected?'LIVE RESEARCH':'STUDIO ACTIVE'}</span>`;$('#researchStatus').textContent=r.research_connected?'Live public metadata':'Demo-only';$('#publishStatus').textContent=(r.authorized_channels||[]).length?'OAuth connected':'Locked';$('#autoStatus').textContent=r.auto_publish_enabled?'Enabled · gated':'Off by default';$('#statChannels').textContent=(d.channels||[]).length;const fsTot=d.summary?.factshorts_total??d.factshorts?.video_count??0;const acTot=d.summary?.autoclip_total??d.autoclip?.clip_count??0;$('#statFactshorts').textContent=fsTot;if($('#statAutoclip'))$('#statAutoclip').textContent=acTot;if($('#topFsCount'))$('#topFsCount').textContent=fsTot;if($('#topAcCount'))$('#topAcCount').textContent=acTot;$('#statJobs').textContent=d.summary?.jobs_total??0;$('#statReady').textContent=d.summary?.ready_to_publish??0;$('#scanNote').textContent=d.scan?.notes||'';$('#scoutNote').textContent=d.scan?.notes||'';$('#scanUpdated').textContent=d.scan?.created_at?`Updated ${new Date(d.scan.created_at).toLocaleString()} · ${d.scan.mode}`:'No scan yet';const top=d.scan?.candidates?.[0];$('#topSignalName').textContent=top?.name||'Waiting for market scan';$('#topScore').textContent=top?.score??'—';renderCandidates(d.scan?.candidates,'#overviewCandidates',3);renderCandidates(d.scan?.candidates,'#scoutCandidates',10);renderEvidenceLedger(d.scan?.candidates);renderChannels(d.channels||[]);renderJobs(d.jobs||[],'#overviewJobs');renderJobs(d.jobs||[],'#studioJobs');renderJobs((d.jobs||[]).filter(j=>j.format==='Game Clip'),'#gameJobs');updateGameCountdown();renderReadiness(r);$('#gameFfmpegStatus').textContent=r.ffmpeg_available?'Ready':'Install FFmpeg / imageio-ffmpeg';renderPlatformMatrix(d.platforms||[]);renderAnalytics(d.analytics||[])}
+async function refresh(){try{renderDashboard(await api('/api/dashboard'));await loadGameSources();if($('#page-factshorts')?.classList.contains('active'))await loadFactshorts();if($('#page-autoclip')?.classList.contains('active'))await loadAutoClip()}catch(e){toast(e.message)}}
+async function runScan(){const b=$('[data-action="scan"]');if(b){b.disabled=true;const t=b.textContent;b.innerHTML='<span class="spinner"></span> Scanning…';try{const res=await api('/api/research/run',{method:'POST',body:'{}'});toast(`Scan complete · ${res.scan.mode} mode`);await refresh();go('scout')}catch(e){toast(e.message)}finally{b.disabled=false;b.textContent='Run Market Scan'}}}
 async function showDetails(id){try{const {job}=await api(`/api/jobs/${id}`);const content=job.data?.content||{};const clip=job.data?.gaming_clip||null;$('#modalTitle').textContent=job.title;const blockers=job.publish_blockers||[];const clipPanel=clip?`<section><h3>GTA VI clip provenance & gates</h3><pre>Source: ${esc(clip.source_file||'')} (${esc(clip.source_kind||'')})\nTimecode: ${esc(clip.start_seconds)}–${esc(clip.end_seconds)}s\nAttribution: ${esc(clip.attribution||'not supplied')}\nCreator permission reference: ${esc(clip.creator_permission_reference||'not supplied')}\nTake-Two/Rockstar commercial license reference: ${esc(clip.commercial_license_reference||'not documented')}\nHindi voiceover generated: ${clip.voiceover_generated?'yes':'no'}\nCaption style: ${esc(clip.caption_style||'static_srt')}\nKinetic captions burned in: ${clip.captions_burned_in?'yes':'no'}\nRelease date: ${esc(clip.official_release_date||'2026-11-19')}</pre><p class="footnote">A source URL/credit is provenance, not permission. Monetized GTA VI use needs a reviewed, case-specific written commercial license.</p></section>`:'';$('#modalBody').innerHTML=`<section><h3>Hook</h3><pre>${esc(content.hook||'')}</pre></section><section><h3>Draft script · ${esc(job.data?.llm_mode||'')}</h3><pre>${esc(content.script||'')}</pre></section>${clipPanel}<section><h3>Scene plan</h3><pre>${esc(JSON.stringify(content.scenes||[],null,2))}</pre></section><section><h3>Publication blockers</h3>${blockers.length?`<ul class="blockers">${blockers.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<div class="callout">No known blockers, but verify the final rendered video and channel configuration.</div>'}</section><section><h3>Package files</h3><div class="job-actions">${(job.package?.files||[]).map(f=>`<a class="btn subtle" href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join('')}</div></section><section><h3>Next actions</h3><div class="job-actions"><button class="btn" data-action="rights" data-game-clip="${clip?'1':'0'}" data-id="${esc(job.id)}">${clip?'Record licensed rights':'Clear rights'}</button><button class="btn" data-action="factcheck" data-id="${esc(job.id)}">Record fact-check</button><button class="btn" data-action="render-review" data-game-clip="${clip?'1':'0'}" data-id="${esc(job.id)}">Review final render</button><button class="btn" data-action="approve" data-id="${esc(job.id)}">Approve draft</button><button class="btn" data-action="schedule" data-id="${esc(job.id)}">Schedule</button><button class="btn warn" data-action="publish" data-id="${esc(job.id)}">Test upload (private)</button></div><p class="footnote">Public upload remains disabled unless you explicitly set both public-upload and auto-publish switches locally. GTA VI clips have an additional commercial license and content review gate.</p></section>`;$('#modalBack').classList.add('open')}catch(e){toast(e.message)}}
 async function postAction(path,body={},success='Done'){try{const d=await api(path,{method:'POST',body:JSON.stringify(body)});toast(success);await refresh();if(d.job)showDetails(d.job.id);return d}catch(e){const extra=e.data?.blockers?.length?`\n• ${e.data.blockers.join('\n• ')}`:'';toast(e.message+extra);throw e}}
-document.addEventListener('click',async e=>{const nav=e.target.closest('[data-page]');if(nav){go(nav.dataset.page);return}const link=e.target.closest('[data-page-link]');if(link){e.preventDefault();go(link.dataset.pageLink);return}const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;
-if(a==='fs-quick-demo')return startFsGeneration({mode:'demo',niche:'space',caption_style:'hormozi'});
-if(a==='fs-quick-auto')return startFsGeneration({mode:'autonomous'});
-if(a==='refresh-fs-videos')return loadFactshorts();
-if(a==='play-fs-video')return playFsVideo(b.dataset.url,b.dataset.title,b.dataset.meta);
-if(a==='close-video-modal'){$('#fsVideoPlayer')?.pause();return $('#videoModalBack').classList.remove('open')}
+document.addEventListener('click',async e=>{
+  const nav=e.target.closest('[data-page]');
+  if(nav){go(nav.dataset.page);return}
+  const link=e.target.closest('[data-page-link]');
+  if(link){e.preventDefault();go(link.dataset.pageLink);return}
+  const fsTopicPreset=e.target.closest('[data-fs-niche]');
+  if(fsTopicPreset){
+    if($('#fsNicheSelect'))$('#fsNicheSelect').value=fsTopicPreset.dataset.fsNiche;
+    if($('#fsTopicInput'))$('#fsTopicInput').value=fsTopicPreset.dataset.fsTopic;
+    updateSubtitleSimulator($('#fsCaptionStyle')?.value||'hormozi', 'fs', fsTopicPreset.dataset.fsTopic);
+    toast(`⚡ Topic loaded: ${fsTopicPreset.textContent.trim()}`);
+    return;
+  }
+  const fsStyleChip=e.target.closest('[data-fs-style]');
+  if(fsStyleChip){
+    const s=fsStyleChip.dataset.fsStyle;
+    if($('#fsCaptionStyle'))$('#fsCaptionStyle').value=s;
+    updateSubtitleSimulator(s, 'fs', $('#fsSimTextInput')?.value);
+    toast(`🎨 Caption style: ${s.toUpperCase()}`);
+    return;
+  }
+  const acStyleChip=e.target.closest('[data-ac-style]');
+  if(acStyleChip){
+    const s=acStyleChip.dataset.acStyle;
+    if($('#acCaptionStyle'))$('#acCaptionStyle').value=s;
+    updateSubtitleSimulator(s, 'ac', $('#acSimTextInput')?.value);
+    toast(`🎨 Caption style: ${s.toUpperCase()}`);
+    return;
+  }
+  const emChip=e.target.closest('.emoji-chip');
+  if(emChip){
+    const inp=$('#fsSimTextInput');
+    if(inp){
+      inp.value=(inp.value+' '+emChip.dataset.emoji).trim();
+      updateSubtitleSimulator($('#fsCaptionStyle')?.value||'hormozi', 'fs', inp.value);
+    }
+    return;
+  }
+  const emChipAc=e.target.closest('.emoji-chip-ac');
+  if(emChipAc){
+    const inp=$('#acSimTextInput');
+    if(inp){
+      inp.value=(inp.value+' '+emChipAc.dataset.emoji).trim();
+      updateSubtitleSimulator($('#acCaptionStyle')?.value||'hormozi', 'ac', inp.value);
+    }
+    return;
+  }
+  const preset=e.target.closest('[data-preset-url]');
+  if(preset){
+    $('#acUrlInput').value=preset.dataset.presetUrl;
+    if(preset.dataset.presetGenre)$('#acGenreSelect').value=preset.dataset.presetGenre;
+    if(preset.dataset.presetStyle){
+      $('#acCaptionStyle').value=preset.dataset.presetStyle;
+      updateSubtitleSimulator(preset.dataset.presetStyle, 'ac');
+    }
+    toast(`⚡ Preset loaded: ${preset.textContent.trim()}`);
+    return;
+  }
+  const durBtn=e.target.closest('.duration-chip');
+  if(durBtn){
+    $$('.duration-chip').forEach(c=>c.classList.remove('active'));
+    durBtn.classList.add('active');
+    toast(`⏱️ Clip target: ${durBtn.dataset.duration}s optimal retention window`);
+    return;
+  }
+  if(e.target.closest('#fsVoiceTestBtn')){
+    testVoiceAudio();
+    return;
+  }
+  const b=e.target.closest('[data-action]');
+  if(!b)return;
+  const a=b.dataset.action,id=b.dataset.id;
+  if(a==='open-inspector')return openEngineInspector();
+  if(a==='close-inspector-modal')return $('#inspectorModalBack').classList.remove('open');
+  if(a==='copy-raw-text')return copyToClipboard(b.dataset.text);
+  if(a==='toggle-fs-logbox'){
+    const logBox=$('#fsLogBox');
+    const stageTracker=$('#fsStageTracker');
+    const btn=$('#fsProgressToggleBtn');
+    if(!logBox)return;
+    const isHidden=logBox.style.display==='none';
+    logBox.style.display=isHidden?'block':'none';
+    if(stageTracker)stageTracker.style.display=isHidden?'grid':'none';
+    if(btn)btn.textContent=isHidden?'Minimize':'Expand';
+    return;
+  }
+  if(a==='fs-quick-trend')return startFsGeneration({mode:'trends',niche:$('#fsNicheSelect')?.value||'facts',model:$('#fsModelSelect')?.value||'wan-2.2',caption_style:$('#fsCaptionStyle')?.value||'hormozi'});
+  if(a==='fs-quick-demo')return startFsGeneration({mode:'demo',niche:'facts',caption_style:'hormozi'});
+  if(a==='fs-quick-auto')return startFsGeneration({mode:'autonomous'});
+  if(a==='refresh-fs-videos')return loadFactshorts();
+  if(a==='play-fs-video')return playFsVideo(b.dataset.url,b.dataset.title,b.dataset.meta);
+  if(a==='delete-fs-video'){
+    const filename=b.dataset.filename;
+    if(!filename)return;
+    if(!confirm(`Are you sure you want to permanently delete "${filename}" from disk?`))return;
+    b.disabled=true;b.textContent='Deleting…';
+    try{
+      const res=await api('/api/factshorts/delete',{method:'POST',body:JSON.stringify({filename})});
+      if(res.ok){
+        toast('🗑️ FactShorts video deleted from disk');
+        await loadFactshorts();
+      }else{
+        toast(`Delete failed: ${res.error||'Unknown error'}`);
+      }
+    }catch(err){toast(err.message)}finally{b.disabled=false}
+    return;
+  }
+  if(a==='delete-ac-clip'){
+    const clipPath=b.dataset.path;
+    if(!clipPath)return;
+    if(!confirm('Are you sure you want to delete this clip and thumbnail from disk?'))return;
+    b.disabled=true;b.textContent='Deleting…';
+    try{
+      const res=await api('/api/autoclip/delete',{method:'POST',body:JSON.stringify({clip_path:clipPath})});
+      if(res.ok){
+        toast('🗑️ AutoClip video & thumbnail deleted successfully');
+        await loadAutoClip();
+      }else{
+        toast(`Delete failed: ${res.error||'Unknown error'}`);
+      }
+    }catch(err){toast(err.message)}finally{b.disabled=false}
+    return;
+  }
+  if(a==='close-video-modal'){$('#fsVideoPlayer')?.pause();return $('#videoModalBack').classList.remove('open')}
+  if(a==='ac-quick-demo')return startAcGeneration({url:'https://youtu.be/a8_K_9xW1Io',genre:'vlog',clips:1,caption_style:'hormozi',telegram:true});
+  if(a==='refresh-ac-clips')return loadAutoClip();
+  if(a==='ac-send-telegram'){
+    b.disabled=true;b.textContent='Sending…';
+    try{
+      const r=await api('/api/autoclip/publish',{method:'POST',body:JSON.stringify({video_path:b.dataset.path,platform:'telegram'})});
+      toast(r.ok?'✅ Video sent to your Telegram phone!':'❌ Telegram send failed');
+    }catch(err){toast(err.message)}finally{b.disabled=false;b.textContent='📲 Telegram'}
+    return;
+  }
+  if(a==='ac-send-instagram'){
+    b.disabled=true;b.textContent='Posting…';
+    try{
+      const r=await api('/api/autoclip/publish',{method:'POST',body:JSON.stringify({video_path:b.dataset.path,platform:'instagram'})});
+      toast(r.ok?`✅ Posted to Instagram! Reel ID: ${r.reel_id}`:`⚠️ Instagram: ${r.error}`);
+      await loadAutoClip();
+    }catch(err){toast(err.message)}finally{b.disabled=false;b.textContent='📸 Instagram'}
+    return;
+  }
 if(a==='scan')return runScan();if(a==='refresh')return refresh();if(a==='refresh-game-sources')return loadGameSources();if(a==='suggest-game-moments'){const source=$('#gameSourceSelect').value;if(!source){toast('Select an authorized local source file first');return}b.disabled=true;b.textContent='Scanning local frames…';try{const r=await api('/api/gaming/highlights',{method:'POST',body:JSON.stringify({source_file:source})});renderGameMoments(r.suggestions);toast('Local visual-change cues ready · review the footage manually')}catch(err){toast(err.message)}finally{b.disabled=false;b.textContent='Suggest visual-change windows'}return}if(a==='use-game-moment'){$('#gameStart').value=b.dataset.start;$('#gameEnd').value=b.dataset.end;toast('Timecodes copied; verify this moment in the source file');return}if(a==='build-strategy')return buildStrategy();if(a==='close-modal')return $('#modalBack').classList.remove('open');if(a==='details')return showDetails(id);if(a==='render'){b.disabled=true;b.textContent='Rendering…';try{const r=await api(`/api/jobs/${id}/render`,{method:'POST',body:'{}'});toast(r.render.has_audio?'Video rendered with audio':'Storyboard rendered; needs voice/audio before upload');await refresh();showDetails(id)}catch(err){toast(err.message)}finally{b.disabled=false;b.textContent='Render draft'}return}if(a==='rights'){if(b.dataset.gameClip==='1'){const evidence=prompt('Describe the documented commercial rights for the recording, game visuals, audio, music, voice and other assets. A streamer license alone is not enough.');if(!evidence)return;const ref=prompt('Case-specific written Take-Two/Rockstar commercial license or permission reference (agreement ID, signed document reference, contact/date):');if(!ref)return;return postAction(`/api/jobs/${id}/rights`,{status:'licensed',evidence,commercial_license_reference:ref},'Rights and license reference recorded for human review')}const status=prompt('Type OWNED or LICENSED. Only choose what is true for every image, video, sound and font used.');if(!status)return;const evidence=prompt('Rights note (e.g. original graphics made in-house; no third-party footage):');return postAction(`/api/jobs/${id}/rights`,{status:status.toLowerCase(),evidence},'Rights note recorded')}if(a==='factcheck'){const note=prompt('What did you verify? Add a meaningful note. This is your attestation; the system does not certify sources.');if(!note)return;const sources=prompt('Optional: comma-separated source URLs checked (leave blank if none):')||'';return postAction(`/api/jobs/${id}/factcheck`,{note,sources:sources.split(',').map(x=>x.trim()).filter(Boolean)},'Human fact-check recorded')}if(a==='render-review'){const note=prompt('Confirm you reviewed the final MP4 end-to-end: voice track, visuals, captions, licensing and audience fit. Only proceed if a final video with audio is rendered.');if(!note)return;const review={note};if(b.dataset.gameClip==='1'){review.original_commentary_confirmed=confirm('Does the final clip include meaningful original Hindi/Hinglish commentary or analysis (not only captions)?');review.game_audio_rights_confirmed=confirm('Have you cleared commercial rights for game audio, music and every audible element?');review.no_leaked_or_prohibited_content_confirmed=confirm('Have you confirmed there are no leaks, prohibited spoilers/cutscenes, restricted in-game entertainment or cheating promotion?');if(!review.original_commentary_confirmed||!review.game_audio_rights_confirmed||!review.no_leaked_or_prohibited_content_confirmed){toast('GTA VI render review not recorded; all checks must be confirmed.');return}}return postAction(`/api/jobs/${id}/render-review`,review,'Final-render review recorded')}if(a==='approve')return postAction(`/api/jobs/${id}/approve`,{},'Draft approved; publication still has separate gates');if(a==='schedule'){const local=prompt('Enter future local date/time, e.g. 2026-10-01 10:30');if(!local)return;const date=new Date(local.replace(' ','T'));if(Number.isNaN(date.getTime())||date<=new Date()){toast('Enter a valid future local date/time');return}return postAction(`/api/jobs/${id}/schedule`,{scheduled_at:date.toISOString()},'Upload scheduled; worker will still enforce all safety gates')}if(a==='publish'){if(!confirm('Attempt a PRIVATE test upload to the connected channel?'))return;return postAction(`/api/jobs/${id}/publish`,{privacy:'private'},'Private test upload complete')}if(a==='analytics-pull'){const channelId=$('#analyticsChannel')?.value||'ch-1';const videoId=$('#analyticsVideoId')?.value.trim();if(!videoId){toast('Enter a YouTube video ID first');return}try{const r=await api('/api/analytics/pull',{method:'POST',body:JSON.stringify({channel_id:channelId,video_id:videoId})});toast(`Pulled ${Number(r.analytics.views).toLocaleString()} views`);await refresh()}catch(err){toast(err.message)}return}if(a==='from-scout'){const channelId=$('#channelSelect')?.value||'ch-1';try{const r=await api('/api/pipeline/from-scout',{method:'POST',body:JSON.stringify({channel_id:channelId,format:'Shorts'})});toast(`Agent picked: ${r.topic_plan.topic}`);await refresh();go('studio');showDetails(r.job.id)}catch(err){toast(err.message)}return}if(a==='use-niche'){go('studio');$('#topicInput').value=`A practical explainer about ${b.dataset.niche}`;toast('Niche idea copied to the content form')}});
 $('#fsGenerateForm')?.addEventListener('submit',async e=>{
   e.preventDefault();
+  const topic=($('#fsTopicInput')?.value||'').trim();
   const payload={
-    mode:$('#fsModeSelect').value,
+    mode: topic ? 'brief' : 'trends',
     niche:$('#fsNicheSelect').value,
-    topic:$('#fsTopicInput')?.value?.trim()||'',
+    topic: topic,
+    voice:$('#fsVoiceSelect')?.value||'',
     caption_style:$('#fsCaptionStyle').value,
     model:$('#fsModelSelect').value,
     upload:$('#fsUploadCheck').checked
   };
   startFsGeneration(payload);
 });
-$('#fsModeSelect')?.addEventListener('change',e=>{
-  const isBrief=e.target.value==='brief';
-  const field=$('#fsTopicField');
-  if(field)field.style.display=isBrief?'block':'none';
-  if(isBrief)$('#fsTopicInput')?.focus();
+$('#acGenerateForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const payload={
+    url:$('#acUrlInput').value.trim(),
+    genre:$('#acGenreSelect').value,
+    caption_style:$('#acCaptionStyle').value,
+    clips:parseInt($('#acClipsCount').value, 10),
+    safe_level:parseInt($('#acSafeLevel').value, 10),
+    telegram:$('#acTelegramCheck').checked,
+    instagram:$('#acInstagramCheck').checked,
+    caption_box:$('#acCaptionBoxCheck').checked
+  };
+  startAcGeneration(payload);
 });
 $('#generateForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('#generateButton');button.disabled=true;button.innerHTML='<span class="spinner"></span> Building + rendering…';try{const data={channel_id:$('#channelSelect').value,topic:$('#topicInput').value,format:$('#formatSelect').value,angle:$('#angleInput').value,research_notes:$('#researchNotesInput').value,source_urls:$('#sourceUrlsInput').value.split(/\n+/).map(x=>x.trim()).filter(Boolean),generate_voice:$('#voiceCheckbox').checked};const res=await api('/api/pipeline/run',{method:'POST',body:JSON.stringify(data)});const note=res.render_error?`Package saved; preview render failed: ${res.render_error}`:(res.render?.has_audio?'Preview rendered with voice; final human QA still required':'Package + silent preview created; audio and final human QA still required');toast(`${note} · ${res.job.data?.llm_mode||'draft mode'}`);await refresh();showDetails(res.job.id)}catch(err){toast(err.message)}finally{button.disabled=false;button.textContent='Build package + render preview'}});
 $('#gameClipForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('#gameClipButton');button.disabled=true;button.innerHTML='<span class="spinner"></span> Rendering authorized clip…';try{const payload={channel_id:$('#gameChannelSelect').value,source_file:$('#gameSourceSelect').value,source_kind:$('#gameSourceKind').value,source_url:$('#gameSourceUrl').value,pre_release_authorization_reference:$('#gamePreReleaseRef').value,attribution:$('#gameAttribution').value,creator_permission_reference:$('#gamePermissionRef').value,start_seconds:$('#gameStart').value,end_seconds:$('#gameEnd').value,caption_style:$('#gameCaptionStyle').value,title:$('#gameTitle').value,hook:$('#gameHook').value,commentary:$('#gameCommentary').value,caption_lines:$('#gameCaptions').value.split(/\n+/).map(x=>x.trim()).filter(Boolean),generate_voiceover:$('#gameVoiceCheckbox').checked,source_rights_note:$('#gameSourceRightsNote').value};const r=await api('/api/gaming/clips',{method:'POST',body:JSON.stringify(payload)});toast('Clip package rendered · licensing, fact-check and final review still required');await refresh();showDetails(r.job.id)}catch(err){toast(err.message)}finally{button.disabled=false;button.textContent='Render clip + review package'}});
 document.addEventListener('submit',async e=>{const form=e.target.closest('.channel-edit');if(!form)return;e.preventDefault();const fd=new FormData(form);const body=Object.fromEntries(fd.entries());try{await api(`/api/channels/${form.dataset.channel}`,{method:'POST',body:JSON.stringify(body)});toast('Channel slot saved');await refresh()}catch(err){toast(err.message)}});
-document.addEventListener('change',e=>{if(e.target.id==='evidenceCandidate')renderEvidenceLedger(state.scan?.candidates||[]);if(e.target.id==='strategyChannel')loadStrategy()});
+document.addEventListener('change',e=>{
+  if(e.target.id==='evidenceCandidate')renderEvidenceLedger(state.scan?.candidates||[]);
+  if(e.target.id==='strategyChannel')loadStrategy();
+  if(e.target.id==='acCaptionStyle')updateSubtitleSimulator(e.target.value, 'ac', $('#acSimTextInput')?.value);
+  if(e.target.id==='fsCaptionStyle')updateSubtitleSimulator(e.target.value, 'fs', $('#fsSimTextInput')?.value);
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='fsSimTextInput'){
+    updateSubtitleSimulator($('#fsCaptionStyle')?.value||'hormozi', 'fs', e.target.value);
+  }
+  if(e.target.id==='acSimTextInput'){
+    updateSubtitleSimulator($('#acCaptionStyle')?.value||'hormozi', 'ac', e.target.value);
+  }
+});
 $('#modalBack').addEventListener('click',e=>{if(e.target.id==='modalBack')$('#modalBack').classList.remove('open')});
 $('#videoModalBack').addEventListener('click',e=>{if(e.target.id==='videoModalBack'){$('#fsVideoPlayer')?.pause();$('#videoModalBack').classList.remove('open')}});
-refresh();setInterval(refresh,30000);
+$('#kgPushBtn')?.addEventListener('click', async (e)=>{
+  const btn=e.currentTarget;
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Pushing to Kaggle...';
+  try{
+    const res=await api('/api/kaggle/push',{method:'POST',body:'{}'});
+    if(res.ok){
+      toast('🚀 Kaggle GPU kernel pushed! T4 GPU starting now (~60s)...');
+      setTimeout(loadKaggleStatus, 4000);
+    }else{
+      toast(`Push error: ${res.error||'Failed'}`);
+    }
+  }catch(err){toast(err.message)}
+  finally{
+    btn.disabled=false;
+    btn.innerHTML='🚀 Push & Start GPU';
+    await loadKaggleStatus();
+  }
+});
+
+$('#kgStopBtn')?.addEventListener('click', async (e)=>{
+  const btn=e.currentTarget;
+  if(!confirm('Stop Kaggle GPU worker now to preserve your free GPU hours?'))return;
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Stopping...';
+  try{
+    const res=await api('/api/kaggle/stop',{method:'POST',body:'{}'});
+    toast(res.message||'🛑 Stop signal sent. GPU hours preserved!');
+    await loadKaggleStatus();
+  }catch(err){toast(err.message)}
+  finally{
+    btn.disabled=false;
+    btn.innerHTML='🛑 Stop GPU (Save Hours)';
+  }
+});
+
+$('#kgSaveUrlBtn')?.addEventListener('click', async (e)=>{
+  const url=($('#kgWorkerUrlInput')?.value||'').trim();
+  const model=$('#fsModelSelect')?.value||'wan-2.2';
+  try{
+    const res=await api('/api/kaggle/save-url',{method:'POST',body:JSON.stringify({url,model})});
+    toast(res.online?'✅ Connected to Kaggle GPU worker!':'⚠️ URL saved, waiting for GPU tunnel to come online...');
+    await loadKaggleStatus();
+  }catch(err){toast(err.message)}
+});
+
+$('#kgWorkerUrlInput')?.addEventListener('input',()=>{
+  const el=$('#kgWorkerUrlInput');
+  if(el)el.dataset.userEdited='true';
+});
+
+refresh();
+checkFsActiveTask();
+setInterval(refresh,30000);
 </script>
 </body>
 </html>

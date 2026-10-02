@@ -1,0 +1,166 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Noto Sans Devanagari ExtraBold,119,&H00FFFFFF,&H0024E8FF,&H00101010,&HB0000000,-1,0,0,0,100,100,0,0,1,9,3,2,75,75,692,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.36,0:00:00.52,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}HE{\c&H00FFFFFF\fscx100\fscy100} NEVER LEARNED
+Dialogue: 0,0:00:00.52,0:00:00.72,Pop,,0,0,0,,{\fad(40,40)}HE {\c&H0024E8FF\fscx118\fscy118}NEVER{\c&H00FFFFFF\fscx100\fscy100} LEARNED
+Dialogue: 0,0:00:00.72,0:00:01.32,Pop,,0,0,0,,{\fad(40,40)}HE NEVER {\c&H0024E8FF\fscx118\fscy118}LEARNED{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:01.32,0:00:02.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100} CAN TELL
+Dialogue: 0,0:00:02.08,0:00:03.00,Pop,,0,0,0,,{\fad(40,40)}I {\c&H0024E8FF\fscx118\fscy118}CAN{\c&H00FFFFFF\fscx100\fscy100} TELL
+Dialogue: 0,0:00:03.00,0:00:03.28,Pop,,0,0,0,,{\fad(40,40)}I CAN {\c&H0024E8FF\fscx118\fscy118}TELL{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:03.28,0:00:03.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TIME{\c&H00FFFFFF\fscx100\fscy100} NO YOU
+Dialogue: 0,0:00:03.60,0:00:03.80,Pop,,0,0,0,,{\fad(40,40)}TIME {\c&H0024E8FF\fscx118\fscy118}NO{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:03.80,0:00:04.00,Pop,,0,0,0,,{\fad(40,40)}TIME NO {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:04.00,0:00:04.32,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CAN'T{\c&H00FFFFFF\fscx100\fscy100} DID I
+Dialogue: 0,0:00:04.32,0:00:04.44,Pop,,0,0,0,,{\fad(40,40)}CAN'T {\c&H0024E8FF\fscx118\fscy118}DID{\c&H00FFFFFF\fscx100\fscy100} I
+Dialogue: 0,0:00:04.44,0:00:04.56,Pop,,0,0,0,,{\fad(40,40)}CAN'T DID {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:04.56,0:00:04.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ACTUALLY{\c&H00FFFFFF\fscx100\fscy100} FILL A
+Dialogue: 0,0:00:04.72,0:00:04.96,Pop,,0,0,0,,{\fad(40,40)}ACTUALLY {\c&H0024E8FF\fscx118\fscy118}FILL{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:04.96,0:00:05.12,Pop,,0,0,0,,{\fad(40,40)}ACTUALLY FILL {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.12,0:00:05.32,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TEST{\c&H00FFFFFF\fscx100\fscy100} LIKE THIS
+Dialogue: 0,0:00:05.32,0:00:05.48,Pop,,0,0,0,,{\fad(40,40)}TEST {\c&H0024E8FF\fscx118\fscy118}LIKE{\c&H00FFFFFF\fscx100\fscy100} THIS
+Dialogue: 0,0:00:05.48,0:00:05.72,Pop,,0,0,0,,{\fad(40,40)}TEST LIKE {\c&H0024E8FF\fscx118\fscy118}THIS{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.72,0:00:05.84,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YES{\c&H00FFFFFF\fscx100\fscy100} YOU DID
+Dialogue: 0,0:00:05.84,0:00:06.00,Pop,,0,0,0,,{\fad(40,40)}YES {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} DID
+Dialogue: 0,0:00:06.00,0:00:06.28,Pop,,0,0,0,,{\fad(40,40)}YES YOU {\c&H0024E8FF\fscx118\fscy118}DID{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:06.28,0:00:06.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THIRD{\c&H00FFFFFF\fscx100\fscy100} GRADE I
+Dialogue: 0,0:00:06.60,0:00:07.32,Pop,,0,0,0,,{\fad(40,40)}THIRD {\c&H0024E8FF\fscx118\fscy118}GRADE{\c&H00FFFFFF\fscx100\fscy100} I
+Dialogue: 0,0:00:07.32,0:00:07.44,Pop,,0,0,0,,{\fad(40,40)}THIRD GRADE {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:07.44,0:00:07.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CAN{\c&H00FFFFFF\fscx100\fscy100} DO IT
+Dialogue: 0,0:00:07.64,0:00:07.76,Pop,,0,0,0,,{\fad(40,40)}CAN {\c&H0024E8FF\fscx118\fscy118}DO{\c&H00FFFFFF\fscx100\fscy100} IT
+Dialogue: 0,0:00:07.76,0:00:07.92,Pop,,0,0,0,,{\fad(40,40)}CAN DO {\c&H0024E8FF\fscx118\fscy118}IT{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:07.92,0:00:08.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THOUGH{\c&H00FFFFFF\fscx100\fscy100} FOR A
+Dialogue: 0,0:00:08.80,0:00:08.92,Pop,,0,0,0,,{\fad(40,40)}THOUGH {\c&H0024E8FF\fscx118\fscy118}FOR{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:08.92,0:00:09.08,Pop,,0,0,0,,{\fad(40,40)}THOUGH FOR {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:09.08,0:00:09.68,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}GUY{\c&H00FFFFFF\fscx100\fscy100} TELL TIME
+Dialogue: 0,0:00:09.68,0:00:09.92,Pop,,0,0,0,,{\fad(40,40)}GUY {\c&H0024E8FF\fscx118\fscy118}TELL{\c&H00FFFFFF\fscx100\fscy100} TIME
+Dialogue: 0,0:00:09.92,0:00:10.16,Pop,,0,0,0,,{\fad(40,40)}GUY TELL {\c&H0024E8FF\fscx118\fscy118}TIME{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:10.16,0:00:10.36,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} BUY A
+Dialogue: 0,0:00:10.36,0:00:10.56,Pop,,0,0,0,,{\fad(40,40)}YOU {\c&H0024E8FF\fscx118\fscy118}BUY{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:10.56,0:00:10.64,Pop,,0,0,0,,{\fad(40,40)}YOU BUY {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:10.64,0:00:11.56,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}$10,000{\c&H00FFFFFF\fscx100\fscy100} WATCH WHY
+Dialogue: 0,0:00:11.56,0:00:12.12,Pop,,0,0,0,,{\fad(40,40)}$10,000 {\c&H0024E8FF\fscx118\fscy118}WATCH{\c&H00FFFFFF\fscx100\fscy100} WHY
+Dialogue: 0,0:00:12.12,0:00:12.24,Pop,,0,0,0,,{\fad(40,40)}$10,000 WATCH {\c&H0024E8FF\fscx118\fscy118}WHY{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:12.24,0:00:12.40,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}WOULD{\c&H00FFFFFF\fscx100\fscy100} YOU DO
+Dialogue: 0,0:00:12.40,0:00:12.52,Pop,,0,0,0,,{\fad(40,40)}WOULD {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} DO
+Dialogue: 0,0:00:12.52,0:00:12.76,Pop,,0,0,0,,{\fad(40,40)}WOULD YOU {\c&H0024E8FF\fscx118\fscy118}DO{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:12.76,0:00:13.12,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THAT{\c&H00FFFFFF\fscx100\fscy100} I CAN
+Dialogue: 0,0:00:13.12,0:00:13.24,Pop,,0,0,0,,{\fad(40,40)}THAT {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100} CAN
+Dialogue: 0,0:00:13.24,0:00:13.48,Pop,,0,0,0,,{\fad(40,40)}THAT I {\c&H0024E8FF\fscx118\fscy118}CAN{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:13.48,0:00:13.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TELL{\c&H00FFFFFF\fscx100\fscy100} TIME I
+Dialogue: 0,0:00:13.88,0:00:14.68,Pop,,0,0,0,,{\fad(40,40)}TELL {\c&H0024E8FF\fscx118\fscy118}TIME{\c&H00FFFFFF\fscx100\fscy100} I
+Dialogue: 0,0:00:14.68,0:00:14.84,Pop,,0,0,0,,{\fad(40,40)}TELL TIME {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:14.84,0:00:15.44,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CAN{\c&H00FFFFFF\fscx100\fscy100} IT JUST
+Dialogue: 0,0:00:15.44,0:00:15.60,Pop,,0,0,0,,{\fad(40,40)}CAN {\c&H0024E8FF\fscx118\fscy118}IT{\c&H00FFFFFF\fscx100\fscy100} JUST
+Dialogue: 0,0:00:15.60,0:00:15.84,Pop,,0,0,0,,{\fad(40,40)}CAN IT {\c&H0024E8FF\fscx118\fscy118}JUST{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:15.84,0:00:16.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TAKES{\c&H00FFFFFF\fscx100\fscy100} ME A
+Dialogue: 0,0:00:16.08,0:00:16.24,Pop,,0,0,0,,{\fad(40,40)}TAKES {\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:16.24,0:00:16.40,Pop,,0,0,0,,{\fad(40,40)}TAKES ME {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:16.40,0:00:16.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}SECOND{\c&H00FFFFFF\fscx100\fscy100} OH HOW
+Dialogue: 0,0:00:16.80,0:00:17.00,Pop,,0,0,0,,{\fad(40,40)}SECOND {\c&H0024E8FF\fscx118\fscy118}OH{\c&H00FFFFFF\fscx100\fscy100} HOW
+Dialogue: 0,0:00:17.00,0:00:17.16,Pop,,0,0,0,,{\fad(40,40)}SECOND OH {\c&H0024E8FF\fscx118\fscy118}HOW{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:17.16,0:00:17.56,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}LONG{\c&H00FFFFFF\fscx100\fscy100} HONESTLY I
+Dialogue: 0,0:00:17.56,0:00:18.00,Pop,,0,0,0,,{\fad(40,40)}LONG {\c&H0024E8FF\fscx118\fscy118}HONESTLY{\c&H00FFFFFF\fscx100\fscy100} I
+Dialogue: 0,0:00:18.00,0:00:18.12,Pop,,0,0,0,,{\fad(40,40)}LONG HONESTLY {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:18.12,0:00:18.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}GOT{\c&H00FFFFFF\fscx100\fscy100} TO LIKE
+Dialogue: 0,0:00:18.20,0:00:18.40,Pop,,0,0,0,,{\fad(40,40)}GOT {\c&H0024E8FF\fscx118\fscy118}TO{\c&H00FFFFFF\fscx100\fscy100} LIKE
+Dialogue: 0,0:00:18.40,0:00:18.60,Pop,,0,0,0,,{\fad(40,40)}GOT TO {\c&H0024E8FF\fscx118\fscy118}LIKE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:18.60,0:00:18.76,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}MAKE{\c&H00FFFFFF\fscx100\fscy100} SURE YEAH
+Dialogue: 0,0:00:18.76,0:00:19.32,Pop,,0,0,0,,{\fad(40,40)}MAKE {\c&H0024E8FF\fscx118\fscy118}SURE{\c&H00FFFFFF\fscx100\fscy100} YEAH
+Dialogue: 0,0:00:19.32,0:00:19.56,Pop,,0,0,0,,{\fad(40,40)}MAKE SURE {\c&H0024E8FF\fscx118\fscy118}YEAH{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:19.56,0:00:19.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}EXACTLY{\c&H00FFFFFF\fscx100\fscy100} YOU NEED
+Dialogue: 0,0:00:19.88,0:00:19.96,Pop,,0,0,0,,{\fad(40,40)}EXACTLY {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} NEED
+Dialogue: 0,0:00:19.96,0:00:20.12,Pop,,0,0,0,,{\fad(40,40)}EXACTLY YOU {\c&H0024E8FF\fscx118\fscy118}NEED{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:20.12,0:00:20.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TO{\c&H00FFFFFF\fscx100\fscy100} USE YOU
+Dialogue: 0,0:00:20.24,0:00:20.56,Pop,,0,0,0,,{\fad(40,40)}TO {\c&H0024E8FF\fscx118\fscy118}USE{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:20.56,0:00:20.64,Pop,,0,0,0,,{\fad(40,40)}TO USE {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:20.64,0:00:20.84,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CAN'T{\c&H00FFFFFF\fscx100\fscy100} JUST LOOK
+Dialogue: 0,0:00:20.84,0:00:20.96,Pop,,0,0,0,,{\fad(40,40)}CAN'T {\c&H0024E8FF\fscx118\fscy118}JUST{\c&H00FFFFFF\fscx100\fscy100} LOOK
+Dialogue: 0,0:00:20.96,0:00:21.12,Pop,,0,0,0,,{\fad(40,40)}CAN'T JUST {\c&H0024E8FF\fscx118\fscy118}LOOK{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:21.12,0:00:21.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}AND{\c&H00FFFFFF\fscx100\fscy100} GO OH
+Dialogue: 0,0:00:21.24,0:00:21.48,Pop,,0,0,0,,{\fad(40,40)}AND {\c&H0024E8FF\fscx118\fscy118}GO{\c&H00FFFFFF\fscx100\fscy100} OH
+Dialogue: 0,0:00:21.48,0:00:21.80,Pop,,0,0,0,,{\fad(40,40)}AND GO {\c&H0024E8FF\fscx118\fscy118}OH{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:21.80,0:00:22.04,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}IT'S{\c&H00FFFFFF\fscx100\fscy100} BINGLE O'
+Dialogue: 0,0:00:22.04,0:00:22.40,Pop,,0,0,0,,{\fad(40,40)}IT'S {\c&H0024E8FF\fscx118\fscy118}BINGLE{\c&H00FFFFFF\fscx100\fscy100} O'
+Dialogue: 0,0:00:22.40,0:00:22.60,Pop,,0,0,0,,{\fad(40,40)}IT'S BINGLE {\c&H0024E8FF\fscx118\fscy118}O'{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:22.60,0:00:23.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CLOCK{\c&H00FFFFFF\fscx100\fscy100} YOU HAVE
+Dialogue: 0,0:00:23.08,0:00:23.24,Pop,,0,0,0,,{\fad(40,40)}CLOCK {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} HAVE
+Dialogue: 0,0:00:23.24,0:00:23.36,Pop,,0,0,0,,{\fad(40,40)}CLOCK YOU {\c&H0024E8FF\fscx118\fscy118}HAVE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:23.36,0:00:23.48,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TO{\c&H00FFFFFF\fscx100\fscy100} LOOK IT
+Dialogue: 0,0:00:23.48,0:00:23.76,Pop,,0,0,0,,{\fad(40,40)}TO {\c&H0024E8FF\fscx118\fscy118}LOOK{\c&H00FFFFFF\fscx100\fscy100} IT
+Dialogue: 0,0:00:23.76,0:00:23.84,Pop,,0,0,0,,{\fad(40,40)}TO LOOK {\c&H0024E8FF\fscx118\fscy118}IT{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:23.84,0:00:24.04,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}AND{\c&H00FFFFFF\fscx100\fscy100} GO WHERE'S
+Dialogue: 0,0:00:24.04,0:00:24.96,Pop,,0,0,0,,{\fad(40,40)}AND {\c&H0024E8FF\fscx118\fscy118}GO{\c&H00FFFFFF\fscx100\fscy100} WHERE'S
+Dialogue: 0,0:00:24.96,0:00:25.20,Pop,,0,0,0,,{\fad(40,40)}AND GO {\c&H0024E8FF\fscx118\fscy118}WHERE'S{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:25.20,0:00:25.36,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THE{\c&H00FFFFFF\fscx100\fscy100} SHORT IS
+Dialogue: 0,0:00:25.36,0:00:25.76,Pop,,0,0,0,,{\fad(40,40)}THE {\c&H0024E8FF\fscx118\fscy118}SHORT{\c&H00FFFFFF\fscx100\fscy100} IS
+Dialogue: 0,0:00:25.76,0:00:25.96,Pop,,0,0,0,,{\fad(40,40)}THE SHORT {\c&H0024E8FF\fscx118\fscy118}IS{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:25.96,0:00:26.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THAT{\c&H00FFFFFF\fscx100\fscy100} ONE LONGER
+Dialogue: 0,0:00:26.08,0:00:26.28,Pop,,0,0,0,,{\fad(40,40)}THAT {\c&H0024E8FF\fscx118\fscy118}ONE{\c&H00FFFFFF\fscx100\fscy100} LONGER
+Dialogue: 0,0:00:26.28,0:00:26.60,Pop,,0,0,0,,{\fad(40,40)}THAT ONE {\c&H0024E8FF\fscx118\fscy118}LONGER{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:26.60,0:00:26.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THAN{\c&H00FFFFFF\fscx100\fscy100} THIS ONE
+Dialogue: 0,0:00:26.80,0:00:26.92,Pop,,0,0,0,,{\fad(40,40)}THAN {\c&H0024E8FF\fscx118\fscy118}THIS{\c&H00FFFFFF\fscx100\fscy100} ONE
+Dialogue: 0,0:00:26.92,0:00:27.55,Pop,,0,0,0,,{\fad(40,40)}THAN THIS {\c&H0024E8FF\fscx118\fscy118}ONE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:27.56,0:00:27.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}FIRST{\c&H00FFFFFF\fscx100\fscy100} OF ALL
+Dialogue: 0,0:00:27.72,0:00:27.88,Pop,,0,0,0,,{\fad(40,40)}FIRST {\c&H0024E8FF\fscx118\fscy118}OF{\c&H00FFFFFF\fscx100\fscy100} ALL
+Dialogue: 0,0:00:27.88,0:00:28.12,Pop,,0,0,0,,{\fad(40,40)}FIRST OF {\c&H0024E8FF\fscx118\fscy118}ALL{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:28.12,0:00:28.32,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}MY{\c&H00FFFFFF\fscx100\fscy100} PALETTE IS
+Dialogue: 0,0:00:28.32,0:00:28.60,Pop,,0,0,0,,{\fad(40,40)}MY {\c&H0024E8FF\fscx118\fscy118}PALETTE{\c&H00FFFFFF\fscx100\fscy100} IS
+Dialogue: 0,0:00:28.60,0:00:28.76,Pop,,0,0,0,,{\fad(40,40)}MY PALETTE {\c&H0024E8FF\fscx118\fscy118}IS{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:28.76,0:00:28.92,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}WAY{\c&H00FFFFFF\fscx100\fscy100} BIGGER THAN
+Dialogue: 0,0:00:28.92,0:00:29.16,Pop,,0,0,0,,{\fad(40,40)}WAY {\c&H0024E8FF\fscx118\fscy118}BIGGER{\c&H00FFFFFF\fscx100\fscy100} THAN
+Dialogue: 0,0:00:29.16,0:00:29.32,Pop,,0,0,0,,{\fad(40,40)}WAY BIGGER {\c&H0024E8FF\fscx118\fscy118}THAN{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:29.32,0:00:29.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOURS{\c&H00FFFFFF\fscx100\fscy100} LET'S GET
+Dialogue: 0,0:00:29.60,0:00:29.76,Pop,,0,0,0,,{\fad(40,40)}YOURS {\c&H0024E8FF\fscx118\fscy118}LET'S{\c&H00FFFFFF\fscx100\fscy100} GET
+Dialogue: 0,0:00:29.76,0:00:29.88,Pop,,0,0,0,,{\fad(40,40)}YOURS LET'S {\c&H0024E8FF\fscx118\fscy118}GET{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:29.88,0:00:30.00,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THAT{\c&H00FFFFFF\fscx100\fscy100} OUT OF
+Dialogue: 0,0:00:30.00,0:00:30.12,Pop,,0,0,0,,{\fad(40,40)}THAT {\c&H0024E8FF\fscx118\fscy118}OUT{\c&H00FFFFFF\fscx100\fscy100} OF
+Dialogue: 0,0:00:30.12,0:00:30.20,Pop,,0,0,0,,{\fad(40,40)}THAT OUT {\c&H0024E8FF\fscx118\fscy118}OF{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:30.20,0:00:30.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THE{\c&H00FFFFFF\fscx100\fscy100} WAY FIRST
+Dialogue: 0,0:00:30.24,0:00:30.48,Pop,,0,0,0,,{\fad(40,40)}THE {\c&H0024E8FF\fscx118\fscy118}WAY{\c&H00FFFFFF\fscx100\fscy100} FIRST
+Dialogue: 0,0:00:30.48,0:00:30.60,Pop,,0,0,0,,{\fad(40,40)}THE WAY {\c&H0024E8FF\fscx118\fscy118}FIRST{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:30.60,0:00:30.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}OF{\c&H00FFFFFF\fscx100\fscy100} ALL MY
+Dialogue: 0,0:00:30.64,0:00:30.76,Pop,,0,0,0,,{\fad(40,40)}OF {\c&H0024E8FF\fscx118\fscy118}ALL{\c&H00FFFFFF\fscx100\fscy100} MY
+Dialogue: 0,0:00:30.76,0:00:30.96,Pop,,0,0,0,,{\fad(40,40)}OF ALL {\c&H0024E8FF\fscx118\fscy118}MY{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:30.96,0:00:31.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}PALETTE{\c&H00FFFFFF\fscx100\fscy100} IS HUGE
+Dialogue: 0,0:00:31.24,0:00:31.44,Pop,,0,0,0,,{\fad(40,40)}PALETTE {\c&H0024E8FF\fscx118\fscy118}IS{\c&H00FFFFFF\fscx100\fscy100} HUGE
+Dialogue: 0,0:00:31.44,0:00:32.60,Pop,,0,0,0,,{\fad(40,40)}PALETTE IS {\c&H0024E8FF\fscx118\fscy118}HUGE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:32.60,0:00:32.68,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100} HAVE A
+Dialogue: 0,0:00:32.68,0:00:32.76,Pop,,0,0,0,,{\fad(40,40)}I {\c&H0024E8FF\fscx118\fscy118}HAVE{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:32.76,0:00:32.92,Pop,,0,0,0,,{\fad(40,40)}I HAVE {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:32.92,0:00:33.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}WAY{\c&H00FFFFFF\fscx100\fscy100} BIGGER PALET
+Dialogue: 0,0:00:33.08,0:00:33.44,Pop,,0,0,0,,{\fad(40,40)}WAY {\c&H0024E8FF\fscx118\fscy118}BIGGER{\c&H00FFFFFF\fscx100\fscy100} PALET
+Dialogue: 0,0:00:33.44,0:00:33.80,Pop,,0,0,0,,{\fad(40,40)}WAY BIGGER {\c&H0024E8FF\fscx118\fscy118}PALET{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:33.80,0:00:33.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}THAN{\c&H00FFFFFF\fscx100\fscy100} YOU ABSOLUTELY
+Dialogue: 0,0:00:33.88,0:00:34.12,Pop,,0,0,0,,{\fad(40,40)}THAN {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} ABSOLUTELY
+Dialogue: 0,0:00:34.12,0:00:34.52,Pop,,0,0,0,,{\fad(40,40)}THAN YOU {\c&H0024E8FF\fscx118\fscy118}ABSOLUTELY{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:34.52,0:00:34.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} DO NOT
+Dialogue: 0,0:00:34.60,0:00:34.76,Pop,,0,0,0,,{\fad(40,40)}YOU {\c&H0024E8FF\fscx118\fscy118}DO{\c&H00FFFFFF\fscx100\fscy100} NOT
+Dialogue: 0,0:00:34.76,0:00:35.43,Pop,,0,0,0,,{\fad(40,40)}YOU DO {\c&H0024E8FF\fscx118\fscy118}NOT{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:35.44,0:00:35.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} JUST STARTED
+Dialogue: 0,0:00:35.64,0:00:35.76,Pop,,0,0,0,,{\fad(40,40)}YOU {\c&H0024E8FF\fscx118\fscy118}JUST{\c&H00FFFFFF\fscx100\fscy100} STARTED
+Dialogue: 0,0:00:35.76,0:00:36.00,Pop,,0,0,0,,{\fad(40,40)}YOU JUST {\c&H0024E8FF\fscx118\fscy118}STARTED{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:36.00,0:00:36.52,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}EATING{\c&H00FFFFFF\fscx100\fscy100} YOU'VE JUST
+Dialogue: 0,0:00:36.52,0:00:36.80,Pop,,0,0,0,,{\fad(40,40)}EATING {\c&H0024E8FF\fscx118\fscy118}YOU'VE{\c&H00FFFFFF\fscx100\fscy100} JUST
+Dialogue: 0,0:00:36.80,0:00:37.00,Pop,,0,0,0,,{\fad(40,40)}EATING YOU'VE {\c&H0024E8FF\fscx118\fscy118}JUST{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:37.00,0:00:37.28,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}STARTED{\c&H00FFFFFF\fscx100\fscy100} EATING ALL
+Dialogue: 0,0:00:37.28,0:00:37.68,Pop,,0,0,0,,{\fad(40,40)}STARTED {\c&H0024E8FF\fscx118\fscy118}EATING{\c&H00FFFFFF\fscx100\fscy100} ALL
+Dialogue: 0,0:00:37.68,0:00:37.80,Pop,,0,0,0,,{\fad(40,40)}STARTED EATING {\c&H0024E8FF\fscx118\fscy118}ALL{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:37.80,0:00:37.92,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} EAT IS
+Dialogue: 0,0:00:37.92,0:00:38.16,Pop,,0,0,0,,{\fad(40,40)}YOU {\c&H0024E8FF\fscx118\fscy118}EAT{\c&H00FFFFFF\fscx100\fscy100} IS
+Dialogue: 0,0:00:38.16,0:00:38.40,Pop,,0,0,0,,{\fad(40,40)}YOU EAT {\c&H0024E8FF\fscx118\fscy118}IS{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:38.40,0:00:39.04,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}STEAK{\c&H00FFFFFF\fscx100\fscy100} THAT'S NOT
+Dialogue: 0,0:00:39.04,0:00:39.16,Pop,,0,0,0,,{\fad(40,40)}STEAK {\c&H0024E8FF\fscx118\fscy118}THAT'S{\c&H00FFFFFF\fscx100\fscy100} NOT
+Dialogue: 0,0:00:39.16,0:00:39.32,Pop,,0,0,0,,{\fad(40,40)}STEAK THAT'S {\c&H0024E8FF\fscx118\fscy118}NOT{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:39.32,0:00:40.22,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}TRUE{\c&H00FFFFFF\fscx100\fscy100}

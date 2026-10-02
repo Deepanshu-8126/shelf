@@ -1,0 +1,19 @@
+1
+00:00:00,096 --> 00:00:03,738
+Nobody noticed this. In the GTA 6 trailer
+
+2
+00:00:03,750 --> 00:00:06,400
+there is a timer counting down from 47 seconds,
+
+3
+00:00:06,620 --> 00:00:09,769
+and it never resets. Rockstar does not put
+
+4
+00:00:09,779 --> 00:00:12,916
+dead props on screen. Watch the garage scene
+
+5
+00:00:12,928 --> 00:00:13,356
+again.
