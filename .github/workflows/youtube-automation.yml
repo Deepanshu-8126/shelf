@@ -52,4 +52,4 @@ jobs:
           VOICE: en-US-ChristopherNeural
           
         run: |
-          python main.py --generate --mode story --upload 1
+          python main.py --generate --mode story --upload 1 --privacy unlisted
