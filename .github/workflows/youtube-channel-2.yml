@@ -1,0 +1,65 @@
+﻿name: YouTube Shorts - Channel 2 (Mysteries & History)
+
+on:
+  schedule:
+    # Runs twice a day: 11:30 AM IST and 9:30 PM IST
+    - cron: '0 6 * * *'   # 06:00 UTC = 11:30 AM IST
+    - cron: '0 16 * * *'  # 16:00 UTC = 9:30 PM IST
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  generate_and_upload_ch2:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: factshorts-bot
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup YouTube Credentials (Channel 2)
+        env:
+          YT_TOKEN_CH2_B64: ${{ secrets.YT_TOKEN_CH2_B64 || secrets.YT_TOKEN_B64 }}
+          YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
+        run: |
+          mkdir -p credentials
+          # Decode base64-encoded JSON safely
+          [ -n "$YT_TOKEN_CH2_B64" ] && printf '%s' "$YT_TOKEN_CH2_B64" | base64 -d > credentials/token.json || true
+          [ -n "$YT_CLIENT_B64" ]    && printf '%s' "$YT_CLIENT_B64"    | base64 -d > credentials/client_secret.json || true
+          # Verify token is valid JSON
+          python3 -c "import json; json.load(open('credentials/token.json')); print('✅ token.json is valid JSON for Channel 2')" 2>/dev/null || echo "❌ token.json is NOT valid JSON"
+
+      - name: Generate and Upload Short (Unsolved History & Mysteries Mode)
+        env:
+          # API Keys from Secrets
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          FOOTAGE_PROVIDERS: pexels,pixabay,nasa,wikimedia,local
+          
+          # Configuration for Channel 2 (Global High RPM Mysteries)
+          LLM_PROVIDER: gemini
+          NICHE: history
+          VIDEO_MODE: story
+          SCRIPT_STYLE: documentary
+          SCRIPT_LANGUAGE: english
+          VOICE_PROVIDER: edge
+          VOICE: en-US-ChristopherNeural
+          
+        run: |
+          python main.py --generate history --mode story --upload 1 --privacy unlisted
