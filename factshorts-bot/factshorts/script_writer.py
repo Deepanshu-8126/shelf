@@ -306,7 +306,7 @@ def _story_prompt(topic: Topic, cfg: Config, target: int) -> str:
         "- body (string: full narrative body paragraphs)\n"
         "- closing (string)\n"
         "- sentences: an array of 7-10 discrete scene beats covering the full script. Each element must be:\n"
-        "  {\"text\": \"the spoken lines for this 4-6s scene beat\", \"keywords\": [\"cinematic B-roll query 1\", \"cinematic B-roll query 2\"]}"
+        "  {\"text\": \"the spoken lines for this 4-6s scene beat\", \"keywords\": [\"highly visual subject in action, e.g. dolphin swimming underwater\", \"concrete visual 2\"]}"
     )
 
 
@@ -384,11 +384,17 @@ async def write_script(topic: Topic, llm: LLM | None = None, cfg: Config | None 
     story_mode = cfg.profile().name == "story"
 
     if llm.available and not cfg.test_mode:
+        lang = "conversational Hindi (written in Hinglish or Hindi script)" if cfg.script_language == "hindi" else "natural, conversational, spoken-word English"
         system = (
-            "You write tight, spoken-word scripts for YouTube Shorts. Plain English only, no emojis, "
-            "no hashtags, no clickbait lies, no statistics that are not in the given fact. "
-            "The script must sound like a person sharing something interesting, never like an advert: "
-            "no calls to action other than the one specified, no marketing filler, no exaggeration. "
+            "You are a top-tier YouTube Shorts scriptwriter (like a highly creative ChatGPT). "
+            "Do NOT just write basic facts. Write a detailed, mind-blowing, and highly engaging story. "
+            f"Write the script entirely in {lang}. "
+            "CRITICAL STRUCTURE: "
+            "1. HOOK: Start with an extreme hook (first 3 seconds) that forces the viewer to stop scrolling. "
+            "2. BODY: Explain the concept like a gripping story with suspense, mystery, and deep details. "
+            "3. PAYOFF: End with a mind-blowing conclusion or a thought-provoking question. "
+            "Use emojis extensively to make the captions visually pop! ✨🚀🤯 "
+            "Keep the pacing fast. No boring filler, just pure viral storytelling."
             + STYLE_PROMPTS[style_of(cfg)]
         )
         cta = cta_of(cfg)
@@ -404,10 +410,11 @@ async def write_script(topic: Topic, llm: LLM | None = None, cfg: Config | None 
         prompt = _story_prompt(topic, cfg, target) if story_mode else (
             f"Niche: {topic.niche}\nTopic: {topic.topic}\nFact: {topic.fact}\nAngle: {topic.angle}"
             f"{src_note}\n\n"
-            "Write a spoken script of 30-40 words TOTAL for a 12 second vertical video.\n"
-            "- hook: max 7 words, creates curiosity in the first 2 seconds, no question marks needed\n"
-            "- body: 15-28 words, only the fact above, one idea per sentence\n"
+            "Write a punchy spoken script of 28-32 words TOTAL for a 12-second vertical video.\n"
+            "- hook: 5-7 words, creates instant psychological curiosity in the first 2 seconds\n"
+            "- body: 16-20 words, delivers the mind-blowing core fact cleanly\n"
             f"- {cta_rule}\n"
+            "Keep the entire script under 34 words so spoken narration stays strictly under 14 seconds.\n"
             "Never use these words/phrases: in this video, subscribe, link in description, you won't "
             "believe, insane, mind-blowing, guys, literally, must watch, viral.\n\n"
             "Return JSON with keys: hook, body, closing, sentences (array of the body split into 2-3 pieces, "

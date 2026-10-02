@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-NICHES = ["space", "psychology", "history", "science", "animals"]
+NICHES = ["space", "psychology", "history", "science", "animals", "facts", "mystery"]
 
 VIDEO_MODES = ["facts", "story"]
 
@@ -262,6 +262,7 @@ class Config:
         # ---------- script tone ----------
         # friendly (default, "talking to a friend") | documentary | punchy
         self.script_style: str = _s("SCRIPT_STYLE", "friendly").lower()
+        self.script_language: str = _s("SCRIPT_LANGUAGE", "english").lower()
         # none (no call to action at all) | soft | follow
         self.cta_style: str = _s("CTA_STYLE", "soft").lower()
 
@@ -309,7 +310,7 @@ class Config:
             stored = (db.get_setting("video_mode") or "").lower()
         except Exception:  # noqa: BLE001 - e.g. before init_db()
             stored = ""
-        mode = stored or self.video_mode or "facts"
+        mode = self.video_mode or stored or "facts"
         return mode if mode in MODE_PROFILES else "facts"
 
     def profile(self) -> ModeProfile:

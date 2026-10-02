@@ -272,6 +272,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         f"Mode: `{setting_mode()}` (facts = 10-15s · story = ~60s)\n\n"
         "*Commands*\n"
         "`/generate [niche]` – banao abhi\n"
+        "`/clip <url> [genre]` – YouTube link se viral short banao\n"
+        "`/instagram` – Instagram status aur posting setup\n"
         "`/approve [id]` – YouTube pe upload\n"
         "`/reject [id]` – phenko\n"
         "`/regenerate [id]` – naya version\n"
@@ -310,6 +312,129 @@ async def cmd_generate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await update.effective_message.reply_text(f"Unknown niche. Options: {', '.join(NICHES)}")
         return
     await _run_generation(update.effective_chat.id, context, niche, note=f"/generate {niche}")
+
+
+async def cmd_clip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await _guard(update):
+        return
+    if not context.args:
+        await update.effective_message.reply_text(
+            "⚡ *AutoClip Usage:*\n`/clip <youtube_url> [genre]`\n\n"
+            "Genres: `vlog` (default), `gaming`, `reality`, `news`\n"
+            "Example: `/clip https://youtu.be/XYZ gaming`",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+    url = context.args[0].strip()
+    genre = context.args[1].lower() if len(context.args) > 1 else "vlog"
+    chat_id = update.effective_chat.id
+
+    msg = await update.effective_message.reply_text(
+        f"⚡ *AutoClip processing video...*\n`{url}`\n"
+        f"• Genre: `{genre}`\n"
+        f"• Captions: 2s Devanagari/English word timings\n"
+        f"• Style: Hormozi kinetic karaoke\n"
+        "Wait 1-2 minutes...",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+    def _run_autoclip():
+        root_dir = Path(__file__).resolve().parents[2]
+        autoclip_dir = root_dir / "ai clipper best" / "autoclip"
+        import sys
+        if str(autoclip_dir) not in sys.path and autoclip_dir.is_dir():
+            sys.path.insert(0, str(autoclip_dir))
+        from autoclip.pipeline import run as run_pipeline
+        return run_pipeline(url, clips=1, genre=genre, safe_level=1)
+
+    try:
+        results = await asyncio.to_thread(_run_autoclip)
+        if not results:
+            await msg.edit_text("❌ AutoClip could not find suitable clips. Try another link or check video captions.")
+            return
+
+        await msg.edit_text(f"✅ AutoClip finished! Sending {len(results)} short(s)...")
+        for r in results:
+            vpath = r.get("out")
+            if vpath and Path(vpath).is_file():
+                title = r.get("title", "Viral Clip")
+                hook = r.get("hook", "")
+                caption = f"🎬 *{title}*\n\n🔥 *Hook:* {hook}\n⚡ *9:16 Vertical Short*"
+                keyboard = InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton("🚀 Post to Instagram Reel", callback_data=f"ig_post:{Path(vpath).name}"),
+                    ]
+                ])
+                try:
+                    with open(vpath, "rb") as fh:
+                        await context.bot.send_video(
+                            chat_id=chat_id,
+                            video=fh,
+                            caption=caption[:1024],
+                            reply_markup=keyboard,
+                            parse_mode=ParseMode.MARKDOWN,
+                            supports_streaming=True,
+                            width=1080,
+                            height=1920,
+                            read_timeout=120,
+                            write_timeout=600,
+                        )
+                except Exception:
+                    with open(vpath, "rb") as fh:
+                        await context.bot.send_video(
+                            chat_id=chat_id,
+                            video=fh,
+                            caption=caption[:1024],
+                            reply_markup=keyboard,
+                            supports_streaming=True,
+                            width=1080,
+                            height=1920,
+                            read_timeout=120,
+                            write_timeout=600,
+                        )
+    except Exception as exc:
+        log.error("cmd_clip error: %s", exc)
+        await msg.edit_text(f"❌ Error during clipping: {str(exc)[:400]}")
+
+
+async def cmd_instagram(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await _guard(update):
+        return
+    import os
+    root_dir = Path(__file__).resolve().parents[2]
+    instapost_dir = root_dir / "ai clipper best" / "instapost"
+    import sys
+    if str(instapost_dir) not in sys.path and instapost_dir.is_dir():
+        sys.path.insert(0, str(instapost_dir))
+
+    cfg = get_config()
+    official_ok = bool(cfg.ig_user_id and cfg.ig_access_token)
+
+    private_ok = False
+    try:
+        from instapost.private import PrivateInstagram
+        p = PrivateInstagram()
+        private_ok = p.configured()
+    except Exception:
+        pass
+
+    text = "📸 *Instagram Publishing Status:*\n\n"
+    if official_ok:
+        text += f"• *Official Meta Graph API:* ✅ Configured (`IG_USER_ID: {cfg.ig_user_id}`)\n"
+    else:
+        text += "• *Official Meta Graph API:* ❌ Not set (`IG_USER_ID`, `IG_ACCESS_TOKEN`)\n"
+
+    if private_ok:
+        text += "• *Direct Phone API (instagrapi):* ✅ Ready to upload local MP4s\n"
+    else:
+        text += "• *Direct Phone API (instagrapi):* ❌ Needs `IG_USERNAME`, `IG_PASSWORD`, `INSTAPOST_I_ACCEPT_BAN_RISK=yes`\n"
+
+    text += (
+        "\n*Setup Options:*\n"
+        "1. *Direct Phone API (Instant):* Set `IG_USERNAME` and `IG_PASSWORD` in `.env`\n"
+        "2. *Official Meta API (Zero Risk):* Set `IG_USER_ID` and `IG_ACCESS_TOKEN` in `.env`"
+    )
+    await update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 
 async def cmd_approve(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -664,6 +789,31 @@ async def on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         row = db.get_video(video_id) or {}
         await _run_generation(query.message.chat_id, context, row.get("niche") or setting_niche(),
                               note=f"regenerate {video_id}")
+    elif action == "ig_post":
+        filename = raw_id
+        await query.answer("Posting to Instagram Reel...")
+        root_dir = Path(__file__).resolve().parents[2]
+        autoclip_dir = root_dir / "ai clipper best" / "autoclip"
+        import sys
+        if str(autoclip_dir) not in sys.path and autoclip_dir.is_dir():
+            sys.path.insert(0, str(autoclip_dir))
+        from autoclip.notify import post_to_instagram
+
+        target_file = None
+        for cand in root_dir.rglob(filename):
+            if cand.is_file():
+                target_file = cand
+                break
+        if not target_file:
+            await query.message.reply_text(f"❌ File `{filename}` not found locally.")
+            return
+
+        caption = query.message.caption or "Viral Short #shorts #reels"
+        res = await asyncio.to_thread(post_to_instagram, target_file, caption=caption[:500])
+        if res.get("ok"):
+            await query.message.reply_text(f"🎉 Successfully posted to Instagram Reel! ID: `{res.get('reel_id')}`")
+        else:
+            await query.message.reply_text(f"⚠️ Instagram post failed:\n{res.get('error')}\n\nUse `/instagram` for setup instructions.")
 
 
 def _arg_id(args: list[str] | None) -> int:
@@ -696,6 +846,8 @@ def build_application() -> Application:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_start))
     app.add_handler(CommandHandler("generate", cmd_generate))
+    app.add_handler(CommandHandler("clip", cmd_clip))
+    app.add_handler(CommandHandler("instagram", cmd_instagram))
     app.add_handler(CommandHandler("approve", cmd_approve))
     app.add_handler(CommandHandler("reject", cmd_reject))
     app.add_handler(CommandHandler("regenerate", cmd_regenerate))

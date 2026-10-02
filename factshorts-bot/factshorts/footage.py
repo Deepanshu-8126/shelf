@@ -443,7 +443,7 @@ class FootageClient:
         return out
 
     # ------------------------------------------------------------------ search
-    async def search(self, query: str, per_provider: int = 8) -> list[ClipCandidate]:
+    async def search(self, query: str, per_provider: int = 25) -> list[ClipCandidate]:
         """Search providers in the configured order; return everything usable."""
         results: list[ClipCandidate] = []
         errors: list[str] = []
@@ -500,7 +500,7 @@ class FootageClient:
         client = await self.client()
         host_key = "host:" + (httpx.URL(cand.download_url).host or "download")
         for attempt in range(1, 4):
-            await self._throttle(host_key, 1.2)
+            await self._throttle(host_key, 0.3)
             try:
                 async with client.stream("GET", cand.download_url) as resp:
                     if resp.status_code >= 400:
@@ -610,34 +610,61 @@ async def collect_clips(
     cfg: Config | None = None,
     client: FootageClient | None = None,
 ) -> list[Clip]:
-    """Get `count` distinct clips matching the script keywords, in keyword order."""
+    """Get `count` distinct clips matching the script keywords in parallel."""
     cfg = cfg or get_config()
     client = client or FootageClient(cfg)
     kws = [k for k in keywords if k and k.strip()]
     if not kws:
         kws = [cfg.niche, "abstract background", "nature timelapse"]
 
-    seen: set[str] = set()
-    clips: list[Clip] = []
+    # 1. Search script keywords concurrently
+    search_tasks = [client.search(q) for q in kws[:max(count, 4)]]
+    search_results = await asyncio.gather(*search_tasks, return_exceptions=True)
 
-    # 1st pass: try the script keywords; 2nd pass: generic queries as backfill
-    passes = [kws] + [COMMONS_EXTRA_QUERIES[i::4] for i in range(3)]
-    for query_list in passes:
-        for query in query_list:
-            if len(clips) >= count:
-                break
-            candidates = await client.search(query)
-            for cand in candidates:
+    fresh_candidates: list[ClipCandidate] = []
+    used_candidates: list[ClipCandidate] = []
+    seen_keys: set[str] = set()
+
+    from . import db
+
+    for res in search_results:
+        if isinstance(res, list):
+            for cand in res:
+                if cand.key not in seen_keys:
+                    seen_keys.add(cand.key)
+                    cached = db.clip_get(cand.source, cand.source_id)
+                    if cached and cached.get("used_count", 0) > 0:
+                        used_candidates.append(cand)
+                    else:
+                        fresh_candidates.append(cand)
+                        
+    candidates_pool = fresh_candidates + used_candidates
+
+    # Backfill with commons extra queries if candidate pool is thin
+    if len(candidates_pool) < count:
+        extra_res = await asyncio.gather(
+            *[client.search(q) for q in COMMONS_EXTRA_QUERIES[:3]], return_exceptions=True
+        )
+        for res in extra_res:
+            if isinstance(res, list):
+                for cand in res:
+                    if cand.key not in seen_keys:
+                        seen_keys.add(cand.key)
+                        candidates_pool.append(cand)
+
+    # 2. Download candidate clips concurrently for instant parallel retrieval
+    to_download = candidates_pool[:count + 2]
+    dl_results = await asyncio.gather(*[client.download(c) for c in to_download], return_exceptions=True)
+    clips: list[Clip] = [c for c in dl_results if isinstance(c, Clip) and c is not None][:count]
+
+    # Fallback to remainder if needed
+    if len(clips) < count:
+        for cand in candidates_pool[count + 2:]:
+            c = await client.download(cand)
+            if c:
+                clips.append(c)
                 if len(clips) >= count:
                     break
-                if cand.key in seen:
-                    continue
-                seen.add(cand.key)
-                clip = await client.download(cand)
-                if clip:
-                    clips.append(clip)
-        if len(clips) >= count:
-            break
 
     if clips and len(clips) < count:
         log.info("only %d of %d clips found - sequences will be reused", len(clips), count)

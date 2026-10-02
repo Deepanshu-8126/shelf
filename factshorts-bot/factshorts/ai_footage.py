@@ -53,6 +53,8 @@ def _enhance_prompt(scene_description: str, niche: str) -> str:
 # -----------------------------------------------------------------------------
 # 1. AI Image Generation: Z-Image-Turbo (Primary) -> Gemini 3.1 Flash Image (Fallback)
 # -----------------------------------------------------------------------------
+_GEMINI_IMAGE_UNAVAILABLE = False
+
 async def _try_gemini_flash_image(
     prompt: str, output_path: Path, api_key: str
 ) -> Path | None:
@@ -60,6 +62,10 @@ async def _try_gemini_flash_image(
 
     NEVER uses paid Imagen. Uses the standard generative language v1beta endpoint.
     """
+    global _GEMINI_IMAGE_UNAVAILABLE
+    if _GEMINI_IMAGE_UNAVAILABLE:
+        return None
+
     # Free tier models supporting multimodal image output
     free_image_models = ["gemini-3.1-flash-image", "gemini-2.5-flash-image", "gemini-3.1-flash"]
 
@@ -84,9 +90,9 @@ async def _try_gemini_flash_image(
 
     for model in free_image_models:
         url = GEMINI_GENERATE.format(model=model) + f"?key={api_key}"
-        for attempt in range(1, 3):
+        for attempt in range(1, 2):
             try:
-                async with httpx.AsyncClient(timeout=httpx.Timeout(45.0)) as client:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(4.0)) as client:
                     resp = await client.post(url, json=payload)
 
                 if resp.status_code in (503, 429):
@@ -95,7 +101,8 @@ async def _try_gemini_flash_image(
 
                 if resp.status_code >= 400:
                     log.debug("Gemini free image %s HTTP %d: %s", model, resp.status_code, resp.text[:120])
-                    break  # Try next free model
+                    _GEMINI_IMAGE_UNAVAILABLE = True
+                    return None
 
                 data = resp.json()
                 for candidate in data.get("candidates", []):
@@ -319,19 +326,30 @@ async def generate_scene_clips(
     clip_count: int = 4,
     niche: str = "space",
     cfg: Config | None = None,
+    sentence_timings: list[tuple[str, float, float]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Generate multiple AI clips from a script using the 100% free AI stack."""
+    """Generate multiple AI clips from a script using the 100% free AI stack.
+    
+    If sentence_timings is provided [(sentence_text, start_sec, duration_sec), ...],
+    each video clip is explicitly generated and timed to match that exact spoken sentence!
+    """
     cfg = cfg or get_config()
-    scenes = _extract_scenes(script_text, clip_count, niche)
-    duration_per_clip = total_duration / max(1, len(scenes))
+    if sentence_timings and len(sentence_timings) > 0:
+        scenes = [st[0] for st in sentence_timings]
+        durations = [max(1.8, st[2]) for st in sentence_timings]
+    else:
+        scenes = _extract_scenes(script_text, clip_count, niche)
+        duration_per_clip = total_duration / max(1, len(scenes))
+        durations = [duration_per_clip] * len(scenes)
 
     clips: list[dict[str, Any]] = []
     for i, scene in enumerate(scenes):
+        target_dur = durations[i] if i < len(durations) else (total_duration / max(1, len(scenes)))
         clip = await generate_ai_clip(
             scene_description=scene,
             output_dir=output_dir,
             clip_index=i,
-            duration=duration_per_clip,
+            duration=target_dur,
             niche=niche,
             cfg=cfg,
         )
@@ -340,7 +358,7 @@ async def generate_scene_clips(
         else:
             log.debug("AI clip %d skipped for scene: %s", i, scene[:50])
 
-    log.info("AI footage engine: generated %d/%d clips (Real Video / Free Visuals)", len(clips), len(scenes))
+    log.info("AI footage engine: generated %d/%d clips (Sentence Synced to Spoken Beats)", len(clips), len(scenes))
     return clips
 
 

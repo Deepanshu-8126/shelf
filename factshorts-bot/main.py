@@ -258,8 +258,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--check", action="store_true", help="environment/config health check")
     parser.add_argument("--selftest", action="store_true", help="tiny offline test render")
     parser.add_argument("--auth", action="store_true", help="YouTube OAuth consent flow")
-    parser.add_argument("--generate", action="store_true", help="generate + render one video now")
-    parser.add_argument("--demo", action="store_true", help="offline demo render (no API keys)")
+    parser.add_argument("--generate", nargs="?", const=True, default=False, help="generate + render one video now (optional niche)")
+    parser.add_argument("--demo", nargs="?", const=True, default=False, help="offline demo render (no API keys, optional topic)")
     parser.add_argument("--script-test", action="store_true", help="topic/script/SEO dry run (no render)")
     parser.add_argument("--upload", type=int, metavar="VIDEO_ID", help="publish an existing render by id")
     parser.add_argument("--platforms", default=None, help="comma separated: youtube,instagram")
@@ -279,7 +279,24 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--daemon", action="store_true", help="run the scheduler only (no bot)")
     parser.add_argument("--autonomous", action="store_true", help="100% autonomous mode: AI selects niche, discovers topic, produces video, and learns")
     parser.add_argument("--eod-report", action="store_true", help="display latest autonomous learning telemetry & EOD report")
+    parser.add_argument("positional_niche", nargs="?", default=None, help="optional positional niche (e.g. 'facts', 'space')")
     args = parser.parse_args(argv)
+
+    if args.positional_niche:
+        if not args.niche:
+            args.niche = args.positional_niche
+        if not args.generate and not args.demo:
+            args.generate = True
+
+    if isinstance(args.generate, str):
+        if not args.niche:
+            args.niche = args.generate
+        args.generate = True
+
+    if isinstance(args.demo, str):
+        if not args.topic:
+            args.topic = args.demo
+        args.demo = True
 
     if args.brief:
         args.generate = True

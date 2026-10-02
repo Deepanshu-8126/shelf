@@ -448,8 +448,10 @@ async def generate_topic(
 
     if llm.available and not cfg.test_mode:
         system = (
-            "You write viral-but-accurate short-form science facts. Never invent statistics, "
-            "never touch politics, religion or medical advice."
+            "You are a viral YouTube Shorts producer. Generate intense, high-stakes hypothetical scenarios or "
+            "mind-bending science facts (e.g., 'What if you fell into a black hole?', 'What if a Megalodon was still alive?', "
+            "'What if you were swallowed by a whale?'). Keep it factual but frame it as an extreme 'What if' or survival scenario. "
+            "Never touch politics, religion, or medical advice."
         )
         story_mode = cfg.profile().name == "story"
         for attempt in range(1, 4):
@@ -460,9 +462,9 @@ async def generate_topic(
                 + (f"Use this exact subject if it is accurate: {forced_topic}\n" if forced_topic else "")
                 + f"Generate ONE surprising, verifiable subject suitable for a {length_desc}.\n"
                 f"Do NOT reuse anything similar to these already used topics: {avoid}\n\n"
-                f"Return JSON with keys: topic (max 8 words), fact ({fact_desc}), "
+                f"Return JSON with keys: topic (max 8 words, phrasing it as a 'What If' question if possible), fact ({fact_desc}), "
                 "angle (max 6 words curiosity hook angle), keywords (4-6 short English search keywords for "
-                "matching stock footage, each 1-3 words)."
+                "matching stock footage. Make these HIGHLY visual, e.g., if it's about a dolphin, use 'dolphin swimming underwater')."
             )
             try:
                 data = await llm.json(prompt, system, max_tokens=850, temperature=0.95)

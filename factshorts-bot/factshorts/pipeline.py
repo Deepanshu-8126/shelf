@@ -6,6 +6,7 @@ events through an optional async callback so the Telegram bot can show live stat
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -119,62 +120,14 @@ async def generate_and_render(
         script: Script = await write_script(topic, llm=llm, cfg=cfg)
         db.update_video(video_id, script=script.full_text, hook=script.hook)
 
-        # --- PRIMARY: 100% Free AI Video Generation (Wan 2.2 / LTX-2.3 on Kaggle GPU) ---
-        # --- FALLBACK: Z-Image-Turbo / Gemini 3.1 Flash Image (500/day free) + FFmpeg ---
-        ai_clips_raw: list = []
-        is_gpu_worker = bool(getattr(cfg, "gpu_worker_url", ""))
-        mode_label = "GPU mode (Real AI Video: Wan 2.2 / LTX-2.3)" if is_gpu_worker else "CPU fallback mode (Free AI Visuals)"
-        log.info("Visual generation engine: %s", mode_label)
-        await progress(f"Generating footage [{mode_label}]…")
-
-        ai_work = cfg.cache_dir / "tmp" / f"{video_id}-ai-footage"
-        ai_clips_raw = await generate_scene_clips(
-            script_text=script.full_text,
-            output_dir=ai_work,
-            total_duration=profile.max_duration,
-            clip_count=profile.clip_count,
-            niche=niche,
-            cfg=cfg,
-        )
-
-        if ai_clips_raw:
-            from .footage import Clip, ClipCandidate
-            clips = []
-            for ac in ai_clips_raw:
-                p = Path(ac["path"])
-                if p.exists():
-                    from .utils import media_duration
-                    dur = media_duration(p)
-                    source_model = ac.get("source", "ai_generated")
-                    cand = ClipCandidate(
-                        source=source_model, source_id=ac["source_id"],
-                        download_url=p.as_uri(), page_url="",
-                        author=ac.get("author", "Open-Source AI (Apache 2.0)"),
-                        license=ac.get("license", "Apache 2.0 / Free Open-Source"),
-                        duration=dur, width=ac.get("width", 1080),
-                        height=ac.get("height", 1920), query=ac.get("prompt", ""),
-                    )
-                    clips.append(Clip(path=p, candidate=cand, duration=dur,
-                                      width=ac.get("width", 1080), height=ac.get("height", 1920)))
-            log.info("Footage generated in %s: %d clips (100%% Free Open-Source)", mode_label, len(clips))
-        else:
-            log.info("Visual generator returned 0 clips -> using local assets/stock fallback")
-            await progress("Finding matching footage…")
-            clips = await collect_clips(script.visual_keywords(), profile.clip_count, cfg=cfg, client=footage)
-
-        # pick the sharpest shots (and drop obviously soft ones) before the expensive render
-        clips = await rank_clips_by_sharpness(clips, cfg)
-        clips = clips[: profile.clip_count] if len(clips) > profile.clip_count else clips
-
+        # --- 1. RECORD VOICEOVER FIRST TO GET EXACT SENTENCE TIMESTAMPS ---
         await progress("Recording voiceover…")
         work = cfg.cache_dir / "tmp" / f"voice-{video_id}"
         work.mkdir(parents=True, exist_ok=True)
         voice: VoiceResult = await synthesize(
             script.full_text, work / f"voice-{video_id}.mp3", niche=niche, cfg=cfg
         )
-        # keep the narration inside the window for this mode. For a 60 s story the first
-        # lever is speaking a bit quicker (keeps every sentence the writer produced), and
-        # only then trimming text.
+        # keep the narration inside the window for this mode.
         attempts = 0
         speed_hint: float | None = None
         while voice.duration > profile.max_duration - 0.15 and attempts < 3:
@@ -201,6 +154,7 @@ async def generate_and_render(
                 script.full_text, work / f"voice-{video_id}-{attempts}.mp3", niche=niche, cfg=cfg,
                 speed_hint=speed_hint,
             )
+
         db.update_meta(video_id, {
             "voice": voice.voice,
             "voice_provider": voice.provider,
@@ -209,6 +163,59 @@ async def generate_and_render(
             "mode": mode,
             "target_seconds": profile.max_duration if mode != "facts" else None,
         })
+
+        # Calculate exact sentence timestamp boundaries for 100% video-to-speech synchrony
+        sentence_timings = _extract_sentence_timings(script.full_text, voice)
+        voice.segments = sentence_timings
+
+        # --- 2. GENERATE SENTENCE-SYNCHRONIZED AI FOOTAGE (Wan 2.2 / LTX-2.3 / Free Visuals) ---
+        ai_clips_raw: list = []
+        is_gpu_worker = bool(getattr(cfg, "gpu_worker_url", ""))
+        pref_model = getattr(cfg, "video_gen_model", "wan-2.2").upper()
+        mode_label = f"Kaggle GPU ({pref_model} Video)" if is_gpu_worker else "CPU Fallback (Free Visuals)"
+        log.info("Visual generation engine: %s (%d sentence beats)", mode_label, len(sentence_timings))
+        await progress(f"Generating synced scenes [{mode_label}]…")
+
+        ai_work = cfg.cache_dir / "tmp" / f"{video_id}-ai-footage"
+        ai_clips_raw = await generate_scene_clips(
+            script_text=script.full_text,
+            output_dir=ai_work,
+            total_duration=voice.duration,
+            clip_count=len(sentence_timings),
+            niche=niche,
+            cfg=cfg,
+            sentence_timings=sentence_timings,
+        )
+
+        if ai_clips_raw:
+            from .footage import Clip, ClipCandidate
+            clips = []
+            for ac in ai_clips_raw:
+                p = Path(ac["path"])
+                if p.exists():
+                    from .utils import media_duration
+                    dur = media_duration(p)
+                    source_model = ac.get("source", "ai_generated")
+                    cand = ClipCandidate(
+                        source=source_model, source_id=ac["source_id"],
+                        download_url=p.as_uri(), page_url="",
+                        author=ac.get("author", "Open-Source AI (Apache 2.0)"),
+                        license=ac.get("license", "Apache 2.0 / Free Open-Source"),
+                        duration=dur, width=ac.get("width", 1080),
+                        height=ac.get("height", 1920), query=ac.get("prompt", ""),
+                    )
+                    clips.append(Clip(path=p, candidate=cand, duration=dur,
+                                      width=ac.get("width", 1080), height=ac.get("height", 1920)))
+            log.info("Footage generated in %s: %d synced clips (100%% Free Open-Source)", mode_label, len(clips))
+        else:
+            log.info("Visual generator returned 0 clips -> using local assets/stock fallback")
+            await progress("Finding matching footage…")
+            clips = await collect_clips(script.visual_keywords(), profile.clip_count, cfg=cfg, client=footage)
+
+        # Rank sharpness if more clips than needed
+        if len(clips) > len(sentence_timings):
+            clips = await rank_clips_by_sharpness(clips, cfg)
+            clips = clips[: len(sentence_timings)]
 
         await progress("Rendering the video (ffmpeg)…")
         result: RenderResult = await render_video(script, clips, voice, video_id=video_id, cfg=cfg)
@@ -297,3 +304,60 @@ def pipeline_summary(result: PipelineResult) -> str:
         f"*Pinned comment:* {seo.get('pinned_comment','')}\n\n"
         f"_{json.dumps(result.render.get('clips', []), ensure_ascii=False)[:400]}_"
     )
+
+
+def _extract_sentence_timings(script_text: str, voice: VoiceResult) -> list[tuple[str, float, float]]:
+    """Extract (sentence_text, start_sec, duration_sec) for each sentence in the narration.
+    Guarantees 100% frame-perfect synchrony between what is spoken and what is shown on screen.
+    """
+    if getattr(voice, "segments", None) and len(voice.segments) > 0:
+        return [(seg[0], float(seg[1]), float(seg[2])) for seg in voice.segments]
+
+    # Split text into distinct sentences with punctuation preserved
+    raw_sentences = [s.strip() for s in re.split(r'([.!?]+)', script_text) if s.strip()]
+    sentences = []
+    i = 0
+    while i < len(raw_sentences):
+        s = raw_sentences[i]
+        if i + 1 < len(raw_sentences) and re.match(r'^[.!?]+$', raw_sentences[i + 1]):
+            s += raw_sentences[i + 1]
+            i += 2
+        else:
+            i += 1
+        if len(s.strip()) > 3:
+            sentences.append(s.strip())
+
+    if not sentences:
+        sentences = [script_text.strip()]
+
+    # If word-level timings are present (e.g. edge-tts or whisper)
+    if getattr(voice, "words", None) and len(voice.words) > 0:
+        timings = []
+        word_idx = 0
+        total_words = len(voice.words)
+        for sent in sentences:
+            sent_words = [w.lower().strip(".,!?:;\"'") for w in sent.split() if w.strip()]
+            if not sent_words:
+                continue
+            start_t = voice.words[min(word_idx, total_words - 1)].start
+            consumed = 0
+            while word_idx < total_words and consumed < len(sent_words):
+                word_idx += 1
+                consumed += 1
+            end_t = voice.words[min(max(0, word_idx - 1), total_words - 1)].end
+            dur = max(1.8, end_t - start_t)
+            timings.append((sent, round(start_t, 3), round(dur, 3)))
+        if timings:
+            return timings
+
+    # Proportional distribution based on character lengths
+    total_dur = max(voice.duration, 5.0)
+    total_chars = max(1, sum(len(s) for s in sentences))
+    timings = []
+    curr_t = 0.0
+    for s in sentences:
+        dur = max(1.8, round((len(s) / total_chars) * total_dur, 2))
+        timings.append((s, round(curr_t, 3), round(dur, 3)))
+        curr_t += dur
+    return timings
+

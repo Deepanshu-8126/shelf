@@ -121,13 +121,16 @@ class LLM:
                     if provider == "gemini":
                         out = await self._gemini(prompt, system, max_tokens, temperature, is_json=False)
                     else:
-                        out = await self._groq(prompt, system, max_tokens, temperature)
+                        out = await self._groq(prompt, system, max_tokens, temperature, is_json=False)
                     self.last_provider = provider
                     return out
                 except Exception as exc:  # noqa: BLE001 - fall through to next provider
                     errors.append(f"{provider}[{attempt}]: {exc}")
                     log.warning("LLM %s attempt %d failed: %s", provider, attempt, exc)
-                    await asyncio.sleep(1.5 * attempt)
+                    if "429" in str(exc):
+                        log.warning("LLM %s rate limited (429), switching provider immediately", provider)
+                        break
+                    await asyncio.sleep(1.0 * attempt)
         raise LLMError("all LLM providers failed -> " + " | ".join(errors[:4]))
 
     async def json(self, prompt: str, system: str = "", max_tokens: int = 900, temperature: float = 0.9) -> dict[str, Any]:
@@ -141,21 +144,23 @@ class LLM:
                     if provider == "gemini":
                         raw = await self._gemini(prompt, system_json, max_tokens, temperature, is_json=True)
                     else:
-                        raw = await self._groq(prompt, system_json, max_tokens, temperature)
+                        raw = await self._groq(prompt, system_json, max_tokens, temperature, is_json=True)
                     self.last_provider = provider
                     return extract_json(raw)
                 except Exception as exc:  # noqa: BLE001
                     errors.append(f"{provider}[{attempt}]: {exc}")
-                    await asyncio.sleep(1.5 * attempt)
+                    if "429" in str(exc):
+                        log.warning("LLM %s rate limited (429), switching provider immediately", provider)
+                        break
+                    await asyncio.sleep(1.0 * attempt)
         raise LLMError("all LLM providers failed -> " + " | ".join(errors[:4]))
 
     # ------------------------------------------------------------------ providers
     async def _gemini(
         self, prompt: str, system: str, max_tokens: int, temperature: float, is_json: bool = False
     ) -> str:
-        # Verified available models for this API key:
+        # Verified active working models for this API key:
         models = [
-            self.cfg.gemini_model,
             "gemini-3.5-flash-lite",
             "gemini-flash-lite-latest",
             "gemini-3.5-flash",
@@ -209,26 +214,48 @@ class LLM:
 
         raise last_exc or LLMError("All Gemini models failed")
 
-    async def _groq(self, prompt: str, system: str, max_tokens: int, temperature: float) -> str:
-        messages = []
-        if system:
-            messages.append({"role": "system", "content": system})
-        messages.append({"role": "user", "content": prompt})
-        body = {
-            "model": self.cfg.groq_model,
-            "messages": messages,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-            "response_format": {"type": "json_object"},
-        }
+    async def _groq(
+        self, prompt: str, system: str, max_tokens: int, temperature: float, is_json: bool = False
+    ) -> str:
+        models = [
+            "qwen/qwen3.8-27b",
+        ]
+        models = list(dict.fromkeys(m for m in models if m))
+
         client = await self.client()
-        resp = await client.post(
-            GROQ_URL, json=body, headers={"Authorization": f"Bearer {self.cfg.groq_api_key}"}
-        )
-        if resp.status_code >= 400:
-            raise LLMError(f"groq HTTP {resp.status_code}: {resp.text[:300]}")
-        data = resp.json()
-        out = (data.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
-        if not out:
-            raise LLMError("groq returned empty text")
-        return out
+        last_exc: Exception | None = None
+
+        for model in models:
+            messages = []
+            if system:
+                messages.append({"role": "system", "content": system})
+            messages.append({"role": "user", "content": prompt})
+
+            body: dict[str, Any] = {
+                "model": model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            if is_json:
+                body["response_format"] = {"type": "json_object"}
+
+            try:
+                resp = await client.post(
+                    GROQ_URL,
+                    json=body,
+                    headers={"Authorization": f"Bearer {self.cfg.groq_api_key}"},
+                )
+                if resp.status_code >= 400:
+                    log.warning("Groq %s HTTP %d: %s", model, resp.status_code, resp.text[:150])
+                    last_exc = LLMError(f"groq {model} HTTP {resp.status_code}: {resp.text[:150]}")
+                    continue
+                data = resp.json()
+                out = (data.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
+                if out:
+                    return out
+            except Exception as exc:
+                last_exc = exc
+                continue
+
+        raise last_exc or LLMError("All Groq models failed")

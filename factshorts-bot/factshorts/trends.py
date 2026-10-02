@@ -37,7 +37,7 @@ WIKI_RANDOM = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
 WIKI_ACTION = "https://en.wikipedia.org/w/api.php"
 WIKI_REST_SEARCH = "https://en.wikipedia.org/w/rest.php/v1/search/page"
 GOOGLE_TRENDS_RSS = "https://trends.google.com/trending/rss?geo={geo}"
-MAX_GOOGLE_LOOKUPS = 5   # never burn more than a few Wikipedia lookups on trend keywords
+MAX_GOOGLE_LOOKUPS = 3   # max 3 fast lookups to keep trend phase snappy
 ASCII_ONLY_RE = re.compile(r"^[\x00-\x7F]+$")
 
 HEADERS = {
@@ -182,7 +182,7 @@ class TrendClient:
 
     async def client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(timeout=httpx.Timeout(30.0), headers=HEADERS,
+            self._client = httpx.AsyncClient(timeout=httpx.Timeout(10.0, connect=3.0), headers=HEADERS,
                                              follow_redirects=True)
         return self._client
 
@@ -511,7 +511,7 @@ class TrendClient:
                             continue
                         lookups += 1
                         seed = await self.wikipedia_summary(trend.title)
-                        await asyncio.sleep(0.6)  # be polite to the Wikipedia API
+                        await asyncio.sleep(0.2)  # fast polite gap
                         if seed and self._relevant(seed.summary, niche, seed.title):
                             seed.kind = "google"
                             seed.extra = trend.extra

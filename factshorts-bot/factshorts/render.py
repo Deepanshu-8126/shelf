@@ -161,8 +161,37 @@ def picking_window(clip_duration: float, length: float) -> tuple[float, float]:
     return (0.0, latest)
 
 
-def plan_segments(clips: list[Clip], total_duration: float, cfg: Config) -> list[SegmentPlan]:
+def plan_segments(
+    clips: list[Clip],
+    total_duration: float,
+    cfg: Config,
+    sentence_durations: list[float] | None = None,
+) -> list[SegmentPlan]:
     profile = cfg.profile()
+    if sentence_durations and len(sentence_durations) > 0 and len(clips) >= len(sentence_durations):
+        # Frame-perfect sentence synchronization: cut points align with sentence ends
+        plans: list[SegmentPlan] = []
+        raw_sum = sum(sentence_durations)
+        scale = (total_duration / raw_sum) if raw_sum > 0 else 1.0
+        scaled_durations = [round(d * scale, 3) for d in sentence_durations]
+
+        for i, length in enumerate(scaled_durations):
+            clip = clips[i]
+            usable = max(0.6, clip.duration - 0.15)
+            loop = usable < length - 0.05
+            low, high = picking_window(clip.duration, length if not loop else min(length, usable))
+            start = random.uniform(max(0.0, low), max(0.0, high)) if high > low else max(0.0, low)
+            if loop:
+                start = random.uniform(0, max(0.0, min(usable, clip.duration) - 0.6))
+            plans.append(SegmentPlan(clip=clip, start=round(start, 3), length=round(length, 3), loop=loop))
+
+        log.info(
+            "sentence-synced segment plan (%d shots, total %.2fs): %s",
+            len(plans), total_duration,
+            ", ".join(f"{p.clip.candidate.key}@{p.start:.1f}s({p.length:.1f}s){'~loop' if p.loop else ''}" for p in plans),
+        )
+        return plans
+
     seconds_per_clip = profile.seconds_per_clip or TARGET_SECONDS_PER_CLIP
     n = max(1, min(len(clips), max(1, profile.clip_count)))
     # pace by duration instead of always using clip_count: ~3.8s per shot feels right for
@@ -567,7 +596,8 @@ async def render_video(
     workdir.mkdir(parents=True, exist_ok=True)
     log.info("render start -> %s (target %.2fs, %d clips)", out_path.name, total_duration, len(clips))
 
-    plans = plan_segments(clips, total_duration, cfg)  # paced by cfg.profile().seconds_per_clip
+    sentence_durs = [seg[2] for seg in getattr(voice, "segments", [])] if getattr(voice, "segments", None) else None
+    plans = plan_segments(clips, total_duration, cfg, sentence_durations=sentence_durs)
     segments = []
     for i, plan in enumerate(plans):
         segments.append(await _normalize_segment(plan, i, workdir, cfg))

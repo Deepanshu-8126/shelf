@@ -1,0 +1,52 @@
+name: YouTube Shorts Automation
+
+on:
+  schedule:
+    # Runs everyday at 14:00 UTC (around 7:30 PM IST)
+    - cron: '0 14 * * *'
+  workflow_dispatch: # Allows you to run it manually with a button click
+
+jobs:
+  generate_and_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup YouTube Credentials
+        run: |
+          mkdir -p credentials
+          # Creates the token.json file from your GitHub Secrets
+          echo "${{ secrets.YOUTUBE_TOKEN_JSON }}" > credentials/token.json
+
+      - name: Generate and Upload Short (Story Mode)
+        env:
+          # API Keys from Secrets
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          
+          # Configuration for US Channel (Pexels Fallback)
+          LLM_PROVIDER: gemini
+          VIDEO_MODE: story
+          SCRIPT_LANGUAGE: english
+          SCRIPT_STYLE: friendly
+          VOICE_PROVIDER: edge
+          VOICE: en-US-ChristopherNeural
+          
+        run: |
+          python main.py --generate --mode story --upload

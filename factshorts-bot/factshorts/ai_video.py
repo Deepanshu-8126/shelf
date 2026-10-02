@@ -166,27 +166,28 @@ _WORKER_ONLINE: bool | None = None
 
 
 async def check_gpu_worker_health(cfg: Config | None = None) -> dict[str, Any]:
-    """Check connectivity and loaded models on the remote GPU worker (Kaggle/Colab/Local)."""
-    global _WORKER_ONLINE
-    import httpx
+    """Check connectivity and loaded models across all registered GPU workers in pool."""
+    from .gpu_pool import get_gpu_pool
     cfg = cfg or get_config()
     worker_url = getattr(cfg, "gpu_worker_url", "")
     if not worker_url:
-        _WORKER_ONLINE = False
         return {"online": False, "reason": "No GPU_WORKER_URL configured in .env"}
 
-    try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(2.5)) as client:
-            resp = await client.get(f"{worker_url.rstrip('/')}/health")
-            if resp.status_code == 200:
-                data = resp.json()
-                _WORKER_ONLINE = True
-                return {"online": True, **data}
-            _WORKER_ONLINE = False
-            return {"online": False, "status_code": resp.status_code}
-    except Exception as exc:
-        _WORKER_ONLINE = False
-        return {"online": False, "reason": str(exc)}
+    pool = get_gpu_pool(worker_url)
+    active = await pool.get_active_workers(force_refresh=True)
+    if active:
+        best = active[0]
+        return {
+            "online": True,
+            "device": best.device,
+            "vram_gb": best.vram_gb,
+            "latency_ms": best.latency_ms,
+            "active_node": best.url,
+            "pool_size": len(pool.workers),
+            "online_nodes": len(active),
+            "supported_video_models": best.models,
+        }
+    return {"online": False, "reason": f"0 of {len(pool.workers)} GPU workers reachable"}
 
 
 async def generate_remote_video(
@@ -196,32 +197,28 @@ async def generate_remote_video(
     duration: float = 5.0,
     cfg: Config | None = None,
 ) -> Path | None:
-    """Generate real AI video clip using Wan 2.2 or LTX-2.3 running on Kaggle GPU / remote worker.
+    """Generate real AI video clip using Wan 2.2 or LTX-2.3 with multi-GPU failover.
 
     100% Free, Apache 2.0 / LTX Community license, NO paid API.
-    Returns path to downloaded MP4 clip, or None if worker is unavailable.
+    Returns path to downloaded MP4 clip, or None if worker pool is unavailable.
     """
-    global _WORKER_ONLINE
-    if _WORKER_ONLINE is False:
-        return None
-
-    import httpx
+    import os
+    from .gpu_pool import get_gpu_pool
     cfg = cfg or get_config()
+
+    # 1. MiniMax (Hailuo AI Video-01) Direct Cloud Generation
+    minimax_key = os.getenv("MINIMAX_API_KEY", "")
+    norm_model = model.strip().lower()
+    if minimax_key and ("minimax" in norm_model or "hailuo" in norm_model):
+        res = await generate_minimax_hailuo_video(prompt, output_path, minimax_key, duration=duration)
+        if res and res.exists():
+            return res
+
     worker_url = getattr(cfg, "gpu_worker_url", "")
     if not worker_url:
-        _WORKER_ONLINE = False
         return None
 
-    # First-call health check to prevent 10x timeout loops on dead tunnels
-    if _WORKER_ONLINE is None:
-        health = await check_gpu_worker_health(cfg)
-        if not health.get("online"):
-            log.info("GPU worker offline (%s) -> using local visuals + B-roll mode", health.get("reason", "unknown"))
-            _WORKER_ONLINE = False
-            return None
-
-    norm_model = model.strip().lower()
-    endpoint = f"{worker_url.rstrip('/')}/generate_video"
+    pool = get_gpu_pool(worker_url)
     payload = {
         "prompt": prompt,
         "model": norm_model,
@@ -231,48 +228,44 @@ async def generate_remote_video(
         "height": 1280,
     }
 
-    log.info("Requesting AI video from GPU worker: model=%s (%.1fs) -> %s", norm_model, duration, endpoint)
-    try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(300.0)) as client:
-            resp = await client.post(endpoint, json=payload)
+    log.info("Requesting AI video from GPU Pool (%d nodes): model=%s (%.1fs)",
+             len(pool.workers), norm_model, duration)
 
-        if resp.status_code != 200:
-            log.warning("GPU worker video generation failed HTTP %d: %s", resp.status_code, resp.text[:200])
-            return None
-
-        # Check if response is raw MP4 bytes or JSON with download URL / base64
-        content_type = resp.headers.get("content-type", "")
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        if "video" in content_type or "octet-stream" in content_type:
-            output_path.write_bytes(resp.content)
-            log.info("Real AI video generated (%s): %s (%.1f MB)",
-                     norm_model, output_path.name, len(resp.content) / (1024 * 1024))
-            return output_path
-
-        data = resp.json()
-        if "video_base64" in data:
-            import base64
-            video_bytes = base64.b64decode(data["video_base64"])
-            output_path.write_bytes(video_bytes)
-            log.info("Real AI video generated from b64 (%s): %s", norm_model, output_path.name)
-            return output_path
-
-        if "video_url" in data:
-            video_url = data["video_url"]
-            async with httpx.AsyncClient(timeout=httpx.Timeout(120.0)) as dl_client:
-                dl_resp = await dl_client.get(video_url)
-                if dl_resp.status_code == 200:
-                    output_path.write_bytes(dl_resp.content)
-                    log.info("Real AI video downloaded (%s): %s", norm_model, output_path.name)
-                    return output_path
-
-        log.warning("Worker returned JSON without usable video data: %s", list(data.keys()))
+    resp, err = await pool.execute_with_failover("generate_video", payload, timeout=300.0)
+    if not resp or resp.status_code != 200:
+        log.warning("GPU pool generation failed: %s", err)
         return None
 
-    except Exception as exc:
-        log.warning("GPU worker video generation exception: %s", exc)
-        return None
+    # Check if response is raw MP4 bytes or JSON with download URL / base64
+    content_type = resp.headers.get("content-type", "")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if "video" in content_type or "octet-stream" in content_type:
+        output_path.write_bytes(resp.content)
+        log.info("Real AI video generated (%s): %s (%.1f MB)",
+                 norm_model, output_path.name, len(resp.content) / (1024 * 1024))
+        return output_path
+
+    data = resp.json()
+    if "video_base64" in data:
+        import base64
+        video_bytes = base64.b64decode(data["video_base64"])
+        output_path.write_bytes(video_bytes)
+        log.info("Real AI video generated from b64 (%s): %s", norm_model, output_path.name)
+        return output_path
+
+    if "video_url" in data:
+        import httpx
+        video_url = data["video_url"]
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0)) as dl_client:
+            dl_resp = await dl_client.get(video_url)
+            if dl_resp.status_code == 200:
+                output_path.write_bytes(dl_resp.content)
+                log.info("Real AI video downloaded (%s): %s", norm_model, output_path.name)
+                return output_path
+
+    log.warning("Worker returned JSON without usable video data: %s", list(data.keys()))
+    return None
 
 
 async def generate_remote_image_z_turbo(
@@ -321,10 +314,72 @@ async def generate_remote_image_z_turbo(
             image_bytes = base64.b64decode(data["image_base64"])
             output_path.write_bytes(image_bytes)
             log.info("Z-Image-Turbo decoded b64 image: %s", output_path.name)
-            return output_path
-
         return None
     except Exception as exc:
         log.debug("Z-Image worker error: %s", exc)
         return None
+
+
+async def generate_minimax_hailuo_video(
+    prompt: str,
+    output_path: Path,
+    api_key: str,
+    model: str = "video-01",
+    duration: float = 5.0,
+) -> Path | None:
+    """Generate high-end cinematic video using MiniMax / Hailuo AI Video-01 Cloud API.
+
+    Zero local PC GPU load, zero Kaggle/Colab setup needed. Direct cloud generation.
+    """
+    import asyncio
+    import httpx
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    create_url = "https://api.minimax.io/v1/video_generation"
+    payload = {
+        "prompt": prompt,
+        "model": model,
+        "prompt_optimizer": True,
+    }
+
+    log.info("Requesting cinematic AI video from MiniMax / Hailuo Cloud API (Video-01)...")
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
+            resp = await client.post(create_url, json=payload, headers=headers)
+            if resp.status_code != 200:
+                log.warning("MiniMax API call failed HTTP %d: %s", resp.status_code, resp.text[:150])
+                return None
+            task_id = resp.json().get("task_id")
+            if not task_id:
+                return None
+
+        # Poll for completion (typically 20-45 seconds in cloud)
+        query_url = f"https://api.minimax.io/v1/query/video_generation?task_id={task_id}"
+        for _ in range(45):
+            await asyncio.sleep(4.0)
+            async with httpx.AsyncClient(timeout=httpx.Timeout(15.0)) as client:
+                q_resp = await client.get(query_url, headers=headers)
+                if q_resp.status_code == 200:
+                    data = q_resp.json()
+                    status = data.get("status")
+                    if status == "Success":
+                        download_url = data.get("download_url") or data.get("file_url")
+                        if download_url:
+                            dl_resp = await client.get(download_url)
+                            if dl_resp.status_code == 200:
+                                output_path.parent.mkdir(parents=True, exist_ok=True)
+                                output_path.write_bytes(dl_resp.content)
+                                log.info("MiniMax Hailuo video generated: %s (%.1f MB)",
+                                         output_path.name, len(dl_resp.content) / (1024 * 1024))
+                                return output_path
+                    elif status == "Fail":
+                        log.warning("MiniMax video generation failed: %s", data.get("base_resp", {}).get("status_msg"))
+                        return None
+    except Exception as exc:
+        log.warning("MiniMax API exception: %s", exc)
+        return None
+    return None
 
