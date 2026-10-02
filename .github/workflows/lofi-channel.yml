@@ -1,0 +1,134 @@
+name: 🎵 LoFi Channel — Auto Daily Upload
+
+on:
+  schedule:
+    # Run every day at 2 AM IST (8:30 PM UTC)
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+    inputs:
+      track_count:
+        description: 'Number of tracks in mixtape'
+        required: false
+        default: '8'
+      mood:
+        description: 'Music mood (lofi/chill/ambient)'
+        required: false
+        default: 'lofi'
+      upload:
+        description: 'Upload to YouTube (true/false)'
+        required: false
+        default: 'true'
+
+jobs:
+  generate-lofi-video:
+    name: Generate & Upload LoFi Mixtape
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -1
+
+      - name: Install Python dependencies
+        run: |
+          pip install --quiet google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+
+      - name: Restore YouTube credentials
+        run: |
+          mkdir -p lofi_studio/credentials
+          echo '${{ secrets.LOFI_YOUTUBE_TOKEN }}' > lofi_studio/credentials/token.json
+          echo '${{ secrets.LOFI_CLIENT_SECRET }}' > lofi_studio/credentials/client_secret.json
+        shell: bash
+
+      - name: Generate thumbnail background
+        run: |
+          # Create dark cinematic background using ffmpeg
+          mkdir -p lofi_studio/assets
+          ffmpeg -y -f lavfi \
+            -i "color=c=0x0a0a18:s=1920x1080:d=1" \
+            -vf "drawtext=text='':fontsize=1" \
+            -frames:v 1 lofi_studio/assets/background.jpg 2>/dev/null || \
+          ffmpeg -y -f lavfi -i "color=c=0x0d0d1a:s=1920x1080:d=1" \
+            -frames:v 1 lofi_studio/assets/background.jpg
+          echo "✅ Background image created"
+
+      - name: Run LoFi Pipeline
+        id: lofi_run
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          JAMENDO_API_KEY: ${{ secrets.JAMENDO_API_KEY }}
+        run: |
+          cd lofi_studio
+          TRACK_COUNT="${{ github.event.inputs.track_count || '8' }}"
+          MOOD="${{ github.event.inputs.mood || 'lofi' }}"
+          
+          echo "🎵 Starting LoFi pipeline with $TRACK_COUNT tracks (mood: $MOOD)..."
+          python main_lofi.py --run --count $TRACK_COUNT --mood $MOOD
+          
+          # Check output exists
+          if [ -f "output/final_lofi_mashup.mp4" ]; then
+            SIZE=$(du -sh output/final_lofi_mashup.mp4 | cut -f1)
+            echo "✅ Video generated: $SIZE"
+            echo "video_ready=true" >> $GITHUB_OUTPUT
+            echo "video_size=$SIZE" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Video generation failed"
+            echo "video_ready=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Upload to YouTube
+        if: |
+          steps.lofi_run.outputs.video_ready == 'true' && 
+          (github.event.inputs.upload != 'false')
+        run: |
+          cd lofi_studio
+          python -c "
+          import sys, json
+          sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+          from lofi_pipeline import _upload_to_youtube
+          from pathlib import Path
+          
+          meta_file = Path('output/metadata.json')
+          if meta_file.exists():
+              meta = json.loads(meta_file.read_text())
+              _upload_to_youtube(
+                  Path('output/final_lofi_mashup.mp4'),
+                  meta['title'],
+                  meta['description']
+              )
+          else:
+              print('No metadata found')
+          "
+
+      - name: Save artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lofi-video-${{ github.run_number }}
+          path: |
+            lofi_studio/output/final_lofi_mashup.mp4
+            lofi_studio/output/youtube_description.txt
+            lofi_studio/output/metadata.json
+          retention-days: 7
+
+      - name: Commit cache to memory
+        if: steps.lofi_run.outputs.video_ready == 'true'
+        run: |
+          git config user.email "lofi-bot@github.com"
+          git config user.name "LoFi Bot"
+          # Only commit small cache files, not large audio/video
+          git add lofi_studio/output/metadata.json lofi_studio/output/youtube_description.txt 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "🎵 LoFi: Auto-generated mixtape #${{ github.run_number }}"
+          git push 2>/dev/null || echo "Nothing to push"
