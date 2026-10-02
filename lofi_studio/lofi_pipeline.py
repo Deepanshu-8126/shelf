@@ -66,6 +66,7 @@ def create_lofi_mixtape(
     mood: str = "lofi chill",
     upload_to_youtube: bool = False,
     custom_tracks: list[dict] | None = None,
+    style: str = "hindi_sad",
 ) -> dict:
     """
     Full pipeline: Copyright-free music → LoFi DSP → Cinematic Video → YouTube.
@@ -78,6 +79,7 @@ def create_lofi_mixtape(
         mood: Music search mood (lofi/chill/ambient)
         upload_to_youtube: Auto-upload after rendering
         custom_tracks: Optional list of {title, artist, path} dicts
+        style: LoFi DSP style (hindi_sad/study/rain/dark_midnight/anime/jazz_cafe/city_pop)
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -116,7 +118,7 @@ def create_lofi_mixtape(
 
         print(f"  🎚️  Processing [{idx+1}/{len(tracks)}]: {t['title']} by {t['artist']}")
         try:
-            apply_lofi_dsp(in_path, out_dsp, speed=0.86, pitch_factor=0.88)
+            apply_lofi_dsp(in_path, out_dsp, style=style)
             dur = get_audio_duration(out_dsp)
             if dur < 5:
                 print(f"  ⚠️  Track too short ({dur:.1f}s), skipping")
