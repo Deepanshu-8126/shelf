@@ -28,7 +28,8 @@ from typing import Literal
 
 LofiStyle = Literal[
     "hindi_sad", "study", "rain", "dark_midnight",
-    "anime", "jazz_cafe", "city_pop"
+    "anime", "jazz_cafe", "city_pop",
+    "drift_phonk", "slowed_phonk"
 ]
 
 # DSP preset parameters for each style
@@ -36,15 +37,15 @@ STYLE_PRESETS = {
     "hindi_sad": {
         "name": "Hindi Sad Lofi",
         "emoji": "🌙",
-        "speed": 0.82,           # Very slowed
-        "pitch_factor": 0.86,    # Lower pitch = moodier
-        "lowpass_freq": 3200,    # Warm, muffled
-        "bass_boost_db": 7,      # Heavy bass presence
-        "echo_delays": "55|90|140",
-        "echo_decays": "0.4|0.3|0.15",
-        "ambience": "rain",      # Rain background
-        "rain_vol": 0.06,
-        "vinyl_vol": 0.025,
+        "speed": 0.88,           # Emotional Slowed (DK Lofi style: 10-12% slower)
+        "pitch_factor": 0.90,    # Natural deep pitch drop
+        "lowpass_freq": 6500,    # Warm tape roll-off, keeping crystal-clear vocals
+        "bass_boost_db": 6,      # Deep warm bass presence
+        "echo_delays": "60|110|160",
+        "echo_decays": "0.35|0.25|0.15",
+        "ambience": "rain",      # Subtle rain background
+        "rain_vol": 0.05,
+        "vinyl_vol": 0.02,
     },
     "study": {
         "name": "Study / Focus Lofi",
@@ -123,6 +124,32 @@ STYLE_PRESETS = {
         "ambience": "chorus",   # Chorus/synth pad
         "rain_vol": 0.01,
         "vinyl_vol": 0.02,
+    },
+    "drift_phonk": {
+        "name": "Aggressive Drift Phonk",
+        "emoji": "🏎️💨",
+        "speed": 1.05,          # High-tempo punch
+        "pitch_factor": 0.98,   # Punchy cowbell grit
+        "lowpass_freq": 16000,  # Open highs for crispy cowbells
+        "bass_boost_db": 11,    # Massive 808 sub-bass drive
+        "echo_delays": "25|50", # Quick slapback delay
+        "echo_decays": "0.25|0.12",
+        "ambience": "none",
+        "rain_vol": 0.0,
+        "vinyl_vol": 0.01,
+    },
+    "slowed_phonk": {
+        "name": "Slowed + Reverb Drift Phonk",
+        "emoji": "🌌🏎️",
+        "speed": 0.83,          # Heavy slowed Memphis/Drift tempo
+        "pitch_factor": 0.85,   # Deep sinister pitch drop
+        "lowpass_freq": 9000,   # Deep midnight roll-off
+        "bass_boost_db": 13,    # Earth-shaking vibrating 808s
+        "echo_delays": "75|150|260",  # Cavernous night hall reverb
+        "echo_decays": "0.45|0.3|0.18",
+        "ambience": "rain",     # Subtle night rain
+        "rain_vol": 0.03,
+        "vinyl_vol": 0.015,
     },
 }
 

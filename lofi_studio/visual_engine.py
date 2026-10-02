@@ -62,12 +62,17 @@ def _get_font_filter(custom_font_path: Optional[Path] = None) -> str:
     return ""
 
 
+DEFAULT_OVERLAYS_DIR = Path(__file__).parent / "assets" / "overlays"
+
+
 def render_lofi_video(
     background_source: Path,
     audio_path: Path,
     output_video: Path,
     track_title: str = "Trending Hindi LoFi Mix",
     broll_clips: Optional[list[Path]] = None,
+    overlay_video: Optional[Path] = None,
+    channel_name: str = "DK LOFI",
     resolution: tuple[int, int] = (1920, 1080),
     font_path: Optional[Path] = None,
 ) -> Path:
@@ -80,6 +85,8 @@ def render_lofi_video(
         output_video: Output path for final .mp4
         track_title: Title text shown in the Now Playing card
         broll_clips: Optional list of real video clips to loop (Pexels)
+        overlay_video: Optional black-screen particle/dust/rain overlay clip
+        channel_name: Channel watermark text (e.g. DK LOFI)
         resolution: Output resolution (default 1920x1080)
         font_path: Path to .ttf font file (uses system default if None)
     """
@@ -88,8 +95,15 @@ def render_lofi_video(
     output_video = Path(output_video)
     output_video.parent.mkdir(parents=True, exist_ok=True)
 
+    # Auto-detect default dust particle overlay if none provided
+    if overlay_video is None:
+        default_overlay = DEFAULT_OVERLAYS_DIR / "dust_particles.mp4"
+        if default_overlay.exists():
+            overlay_video = default_overlay
+
     w, h = resolution
     clean_title = _escape_for_drawtext(track_title)
+    clean_channel = _escape_for_drawtext(channel_name)
     sub_label = _escape_for_drawtext("SLOWED + REVERB  •  NIGHT VIBES  •  HINDI LOFI")
 
     # Font: use provided TTF, Windows system font, or ffmpeg built-in
@@ -103,7 +117,8 @@ def render_lofi_video(
     else:
         return _render_with_static_image(
             background_source, audio_path, output_video,
-            clean_title, sub_label, font_filter, w, h
+            clean_title, sub_label, clean_channel, font_filter, w, h,
+            overlay_video=overlay_video
         )
 
 
@@ -113,75 +128,133 @@ def _render_with_static_image(
     output_video: Path,
     clean_title: str,
     sub_label: str,
+    clean_channel: str,
     font_filter: str,
-    w: int, h: int
+    w: int, h: int,
+    overlay_video: Optional[Path] = None,
 ) -> Path:
     """
-    Render with static background image.
-    Smooth approach: NO zoompan. Just a clean static cinematic frame.
-    Adds: vignette, warm teal color grade, waveform visualizer.
+    Render with static background image + dynamic particle overlay.
+    Smooth approach: NO zoompan shake. 100% stable base frame.
+    Adds:
+      - Floating glowing dust/sparkle particle loop overlay
+      - Cinematic color grade + vignette
+      - Waveform visualizer
+      - Top-right channel watermark (DK LOFI)
+      - Now Playing title and subtitle
     """
-    print("🎬 Rendering: Static cinematic mode (no zoompan shake)...")
+    overlay_desc = overlay_video.name if overlay_video else 'none'
+    print(f">> Rendering: Static cinematic mode with particle overlay ({overlay_desc})...")
 
-    # Filtergraph:
-    # [0:v] = looped background image
-    # [1:a] = lofi audio
-    # Steps:
-    #   1. Scale+crop bg image to exact resolution
-    #   2. Apply cinematic color grade (eq + curves approximation)
-    #   3. Add vignette overlay
-    #   4. Generate waveform from audio, apply glow, overlay bottom
-    #   5. Draw "Now Playing" card text
-    filtergraph = (
-        # Background: scale + crop (no movement = no shake)
+    inputs = [
+        "-loop", "1", "-framerate", "30", "-i", str(bg_image),  # [0:v] base image
+        "-i", str(audio_path),                                   # [1:a] audio
+    ]
+
+    has_overlay = overlay_video is not None and Path(overlay_video).exists()
+    if has_overlay:
+        inputs.extend(["-stream_loop", "-1", "-i", str(overlay_video)])  # [2:v] overlay loop
+
+    filter_chains = []
+
+    # 1. Base image: scale + crop + subtle color grade + vignette
+    filter_chains.append(
         f"[0:v]scale={w}:{h}:force_original_aspect_ratio=increase,"
         f"crop={w}:{h},"
-        # Cinematic color grade: slightly desaturate + warm shadows + cool mids
-        f"eq=contrast=1.08:brightness=-0.06:saturation=0.82:gamma=0.96,"
-        # Vignette: darken edges for cinematic look
-        f"vignette=PI/4[bg];"
+        f"eq=contrast=1.05:brightness=-0.04:saturation=0.88:gamma=0.98,"
+        f"vignette=PI/4[bg]"
+    )
 
-        # Waveform visualizer: thin elegant line at bottom
-        f"[1:a]showwaves=s={int(w*0.6)}x80:mode=cline:rate=30:"
-        f"colors=0xFFD700@0.7:scale=lin[wave_raw];"
-        f"[wave_raw]format=rgba,"
-        f"boxblur=lr=3:lp=1[wave_glow];"  # soft glow
-        f"[wave_glow][wave_raw]overlay=0:0[wave_fx];"
+    current_v = "[bg]"
 
-        # Overlay wave centered at bottom
-        f"[bg][wave_fx]overlay=x=(W-w)/2:y={h-180}[v_with_wave];"
+    # 2. Particle overlay blend (if available)
+    if has_overlay:
+        filter_chains.append(
+            f"[2:v]scale={w}:{h},"
+            f"eq=contrast=2.0:brightness=-0.2,"
+            f"format=rgba,colorkey=0x000000:0.25:0.1[ov]"
+        )
+        filter_chains.append(
+            f"[bg][ov]overlay=0:0:format=auto[v_part]"
+        )
+        current_v = "[v_part]"
 
-        # Dark gradient bar at bottom for text readability
-        f"[v_with_wave]drawbox=x=0:y={h-220}:w={w}:h=220:color=black@0.5:t=fill[v_bar];"
+    # 3. Waveform visualizer: thin elegant line
+    filter_chains.append(
+        f"[1:a]showwaves=s={int(w*0.55)}x70:mode=cline:rate=30:"
+        f"colors=0xFFD700@0.65:scale=lin[wave_raw]"
+    )
+    filter_chains.append(
+        f"[wave_raw]format=rgba,boxblur=lr=3:lp=1[wave_glow]"
+    )
+    filter_chains.append(
+        f"[wave_glow][wave_raw]overlay=0:0[wave_fx]"
+    )
+    filter_chains.append(
+        f"{current_v}[wave_fx]overlay=x=(W-w)/2:y={h-170}[v_with_wave]"
+    )
 
-        # Title text
-        f"[v_bar]drawtext={font_filter}"
+    # 4. Dark gradient bar at bottom for text readability
+    filter_chains.append(
+        f"[v_with_wave]drawbox=x=0:y={h-210}:w={w}:h=210:color=black@0.45:t=fill[v_bar]"
+    )
+
+    # 5. Text overlays: Channel watermark + Title + Subtitle
+    text_filters = []
+    if clean_channel:
+        text_filters.append(
+            f"drawtext={font_filter}"
+            f"text='{clean_channel}':"
+            f"fontcolor=white@0.9:fontsize=28:x=w-text_w-50:y=45:"
+            f"shadowcolor=black@0.8:shadowx=2:shadowy=2"
+        )
+    text_filters.append(
+        f"drawtext={font_filter}"
         f"text='{clean_title}':"
-        f"fontcolor=white:fontsize=38:x=(w-text_w)/2:y={h-170}:"
-        f"shadowcolor=black@0.8:shadowx=2:shadowy=2,"
-
-        # Subtitle
+        f"fontcolor=white:fontsize=38:x=(w-text_w)/2:y={h-160}:"
+        f"shadowcolor=black@0.9:shadowx=2:shadowy=2"
+    )
+    text_filters.append(
         f"drawtext={font_filter}"
         f"text='{sub_label}':"
-        f"fontcolor=0xFFD700@0.85:fontsize=20:x=(w-text_w)/2:y={h-110}:"
-        f"shadowcolor=black@0.6:shadowx=1:shadowy=1[vout]"
+        f"fontcolor=0xFFD700@0.85:fontsize=20:x=(w-text_w)/2:y={h-100}:"
+        f"shadowcolor=black@0.7:shadowx=1:shadowy=1"
     )
+
+    filter_chains.append(
+        f"[v_bar]{','.join(text_filters)}[vout]"
+    )
+
+    filtergraph = ";".join(filter_chains)
+
+    # Determine audio duration to prevent infinite hangs
+    duration_args = []
+    try:
+        probe = subprocess.check_output([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)
+        ], text=True).strip()
+        dur = float(probe)
+        if dur > 0:
+            duration_args = ["-t", f"{dur:.2f}"]
+    except Exception:
+        pass
 
     cmd = [
         "ffmpeg", "-hide_banner", "-loglevel", "warning", "-y",
-        "-loop", "1", "-framerate", "30", "-i", str(bg_image),  # looped static image
-        "-i", str(audio_path),
+        *inputs,
         "-filter_complex", filtergraph,
         "-map", "[vout]",
         "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast", "-crf", "19", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "256k",
         "-r", "30",
+        *duration_args,
         "-shortest",
         str(output_video)
     ]
     subprocess.run(cmd, check=True)
-    print(f"✅ Static render complete: {output_video}")
+    print(f">> Cinematic particle render complete: {output_video}")
     return output_video
 
 
@@ -198,7 +271,7 @@ def _render_with_broll(
     Render using real B-roll video clips looped to match audio duration.
     Creates concat list, loops clips seamlessly, overlays HUD.
     """
-    print(f"🎬 Rendering with {len(broll_clips)} real B-roll clips...")
+    print(f">> Rendering with {len(broll_clips)} real B-roll clips...")
 
     # Step 1: Create concat list — repeat clips to fill audio
     concat_dir = output_video.parent / "cache"

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>बस ड्राइवर • NH 48 Non-Stop Highway LoFi & Nostalgia</title>
+  <meta name="description" content="An interactive night highway bus journey through India with non-stop Bollywood LoFi, rain atmosphere, and classic road trip vibes.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,700&family=Rozha+One&family=Yatra+One&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Canvas for dynamic weather & rain effects -->
+  <canvas id="rainCanvas"></canvas>
+
+  <div class="app-container">
+    <!-- Top Header Bar -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="brand-badge">
+          <span class="bus-icon">🚌</span>
+          <div class="brand-info">
+            <span class="brand-title">बस ड्राइवर</span>
+            <span class="route-tag">NH 48 • DELHI - MUMBAI</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <button id="themeToggleBtn" class="pill-btn lang-btn" title="Toggle Theme/Language">
+          <span>मराठीत / हिंदी ऐकायचं? 🎧</span>
+        </button>
+      </div>
+
+      <div class="nav-right">
+        <div class="clock-display" id="clockDisplay">16:19</div>
+        <div class="passenger-counter">
+          <span class="live-dot"></span>
+          <span id="passengerCount">107</span> ABOARD
+        </div>
+        <button id="hornBtnTop" class="horn-btn-top" title="Honk Horn! (Press H)">
+          <span>📢 HORN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Stage Animation -->
+    <main class="scene-stage">
+      <!-- Big Center Typography -->
+      <div class="title-billboard">
+        <div class="track-badge">227 TRACKS • NON-STOP NOSTALGIA</div>
+        <h1 class="main-hindi-title">बस ड्राइवर</h1>
+        <div class="sub-location">NIGHT JOURNEY • RAIN • RETRO BEATS</div>
+      </div>
+
+      <!-- Parallax World -->
+      <div class="world-viewport">
+        <!-- Distant Night Hills -->
+        <div class="hills-layer"></div>
+        
+        <!-- Highway Road -->
+        <div class="road-layer">
+          <div class="road-surface"></div>
+          <div class="road-markings"></div>
+        </div>
+
+        <!-- The Bus Entity -->
+        <div class="bus-chassis" id="busChassis">
+          <!-- Headlight Beams -->
+          <div class="headlight-beam"></div>
+
+          <!-- Bus Visual Container (Pure SVG for crisp 4k scaling) -->
+          <svg class="bus-svg" viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FF9933" />
+                <stop offset="50%" stop-color="#FFFFFF" />
+                <stop offset="100%" stop-color="#138808" />
+              </linearGradient>
+              <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#e08020" />
+                <stop offset="100%" stop-color="#c06010" />
+              </linearGradient>
+              <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2a3a4a" />
+                <stop offset="50%" stop-color="#4a6572" />
+                <stop offset="100%" stop-color="#1a252f" />
+              </linearGradient>
+              <radialGradient id="headlightGlow" cx="0%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FFF7C2" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Roof Luggage Rack with Luggage -->
+            <g id="luggageRack">
+              <rect x="180" y="32" width="480" height="14" rx="3" fill="#333" stroke="#222" stroke-width="2" />
+              <rect x="200" y="44" width="10" height="20" fill="#222" />
+              <rect x="350" y="44" width="10" height="20" fill="#222" />
+              <rect x="500" y="44" width="10" height="20" fill="#222" />
+              <rect x="640" y="44" width="10" height="20" fill="#222" />
+              
+              <!-- Boxes, Bags, Tarpaulin tied with ropes -->
+              <rect x="220" y="10" width="110" height="30" rx="4" fill="#5c3a21" stroke="#3d2616" stroke-width="2" />
+              <rect x="340" y="6" width="140" height="34" rx="5" fill="#23425a" stroke="#122534" stroke-width="2" />
+              <rect x="490" y="14" width="90" height="26" rx="4" fill="#7a2a22" stroke="#4d1a15" stroke-width="2" />
+              <rect x="590" y="8" width="65" height="32" rx="3" fill="#3a5a40" stroke="#1c3021" stroke-width="2" />
+              <!-- Ropes -->
+              <line x1="210" y1="12" x2="660" y2="12" stroke="#ffd166" stroke-width="2" stroke-dasharray="6,4" />
+              <line x1="210" y1="26" x2="660" y2="26" stroke="#ffd166" stroke-width="2" stroke-dasharray="6,4" />
+            </g>
+
+            <!-- Bus Main Body -->
+            <rect x="80" y="60" width="620" height="220" rx="22" fill="#d97706" stroke="#1e293b" stroke-width="5" />
+
+            <!-- Classic Desi Geometric Paint Panels (Tricolor / Tribal pattern) -->
+            <polygon points="80,180 260,280 80,280" fill="#138808" />
+            <polygon points="120,60 320,180 80,180 80,60" fill="#FF9933" />
+            <polygon points="260,280 440,160 520,280" fill="#0284c7" />
+            <polygon points="320,60 560,180 440,60" fill="#e11d48" />
+            <polygon points="520,280 620,190 700,280" fill="#138808" />
+            <polygon points="560,60 700,160 700,60" fill="#FF9933" />
+
+            <!-- All Night On NH 48 Front Banner -->
+            <rect x="100" y="66" width="580" height="26" rx="4" fill="#0f172a" />
+            <text x="390" y="84" font-family="'Montserrat', sans-serif" font-weight="900" font-size="14" fill="#fbbf24" text-anchor="middle" letter-spacing="4">★ ALL NIGHT ON NH 48 • SLEEPER COACH ★</text>
+
+            <!-- Passenger Windows -->
+            <g id="windows">
+              <!-- Window 1 (Driver) -->
+              <rect x="100" y="102" width="70" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Driver Silhouette -->
+              <circle cx="138" cy="140" r="14" fill="#facc15" opacity="0.8"/>
+              <ellipse cx="138" cy="172" rx="22" ry="12" fill="#0284c7"/>
+              <circle cx="118" cy="155" r="16" fill="none" stroke="#fff" stroke-width="4"/> <!-- Steering wheel -->
+
+              <!-- Window 2 -->
+              <rect x="180" y="102" width="72" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Window 3 -->
+              <rect x="262" y="102" width="72" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Window 4 -->
+              <rect x="344" y="102" width="72" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Window 5 -->
+              <rect x="426" y="102" width="72" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Window 6 -->
+              <rect x="508" y="102" width="72" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+              <!-- Window 7 (Rear) -->
+              <rect x="590" y="102" width="90" height="74" rx="8" fill="url(#glassGrad)" stroke="#111" stroke-width="4"/>
+
+              <!-- Passengers Inside with Warm Light Glow -->
+              <circle cx="218" cy="142" r="12" fill="#fbbf24" opacity="0.6"/>
+              <circle cx="382" cy="142" r="12" fill="#f472b6" opacity="0.6"/>
+              <circle cx="546" cy="142" r="12" fill="#38bdf8" opacity="0.6"/>
+            </g>
+
+            <!-- Horn Ok Please Center Plaque -->
+            <rect x="300" y="196" width="180" height="42" rx="21" fill="#000000" stroke="#f59e0b" stroke-width="3" />
+            <text x="390" y="214" font-family="'Yatra One', cursive" font-size="14" fill="#ffffff" text-anchor="middle">हॉर्न ओके प्लीज</text>
+            <text x="390" y="229" font-family="'Montserrat', sans-serif" font-weight="700" font-size="9" fill="#f59e0b" text-anchor="middle" letter-spacing="2">HORN OK PLEASEEE</text>
+
+            <!-- Front Grille & Headlight -->
+            <rect x="74" y="180" width="18" height="80" rx="4" fill="#334155" />
+            <circle cx="85" cy="205" r="14" fill="#fef08a" stroke="#fff" stroke-width="3" id="headlightBulb" />
+            <circle cx="85" cy="245" r="9" fill="#f97316" stroke="#fff" stroke-width="2" />
+
+            <!-- Taillight -->
+            <rect x="696" y="210" width="8" height="50" rx="3" fill="#dc2626" />
+
+            <!-- Mudguards -->
+            <path d="M 130 280 A 55 55 0 0 1 250 280 Z" fill="#0f172a" />
+            <path d="M 520 280 A 55 55 0 0 1 640 280 Z" fill="#0f172a" />
+
+            <!-- Wheel 1 (Front Left) -->
+            <g class="bus-wheel" id="wheelFront" transform="translate(190, 280)">
+              <circle cx="0" cy="0" r="46" fill="#18181b" stroke="#3f3f46" stroke-width="7" />
+              <circle cx="0" cy="0" r="28" fill="#e4e4e7" stroke="#71717a" stroke-width="3" />
+              <circle cx="0" cy="0" r="10" fill="#dc2626" />
+              <!-- Spokes -->
+              <line x1="-24" y1="0" x2="24" y2="0" stroke="#71717a" stroke-width="3"/>
+              <line x1="0" y1="-24" x2="0" y2="24" stroke="#71717a" stroke-width="3"/>
+              <line x1="-17" y1="-17" x2="17" y2="17" stroke="#71717a" stroke-width="3"/>
+              <line x1="-17" y1="17" x2="17" y2="-17" stroke="#71717a" stroke-width="3"/>
+            </g>
+
+            <!-- Wheel 2 (Rear) -->
+            <g class="bus-wheel" id="wheelRear" transform="translate(580, 280)">
+              <circle cx="0" cy="0" r="46" fill="#18181b" stroke="#3f3f46" stroke-width="7" />
+              <circle cx="0" cy="0" r="28" fill="#e4e4e7" stroke="#71717a" stroke-width="3" />
+              <circle cx="0" cy="0" r="10" fill="#dc2626" />
+              <!-- Spokes -->
+              <line x1="-24" y1="0" x2="24" y2="0" stroke="#71717a" stroke-width="3"/>
+              <line x1="0" y1="-24" x2="0" y2="24" stroke="#71717a" stroke-width="3"/>
+              <line x1="-17" y1="-17" x2="17" y2="17" stroke="#71717a" stroke-width="3"/>
+              <line x1="-17" y1="17" x2="17" y2="-17" stroke="#71717a" stroke-width="3"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Floating Music Player & Controls -->
+    <footer class="player-wrapper">
+      <div class="glass-player" id="glassPlayer">
+        <!-- Track Thumbnail & Info -->
+        <div class="player-track-info">
+          <div class="track-thumb" id="trackThumb">
+            <span class="music-note-icon">🎵</span>
+          </div>
+          <div class="track-meta">
+            <div class="track-title-scroller">
+              <span class="track-title" id="trackTitle">Tumhein Dekhen Meri Aankhen</span>
+            </div>
+            <span class="track-artist" id="trackArtist">Kumar Sanu, Alka Yagnik • LoFi Rework</span>
+          </div>
+        </div>
+
+        <!-- Center Controls -->
+        <div class="player-controls">
+          <div class="button-row">
+            <button id="prevBtn" class="control-btn" title="Previous Track (P)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            
+            <button id="playPauseBtn" class="control-btn play-btn" title="Play/Pause (Space)">
+              <svg id="playIcon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="pauseIcon" class="hidden" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <button id="nextBtn" class="control-btn" title="Next Track (N)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container">
+            <span id="currentTime" class="time-label">0:00</span>
+            <div class="progress-bar-bg" id="progressBarBg">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="durationTime" class="time-label">3:45</span>
+          </div>
+        </div>
+
+        <!-- Right Sound Mixers & Features -->
+        <div class="player-extras">
+          <!-- Engine Rumble Toggle -->
+          <button id="engineSoundBtn" class="pill-btn sound-toggle active" title="Toggle Bus Engine Rumble">
+            <span>⚙️ Engine</span>
+          </button>
+
+          <!-- Rain Sound Toggle -->
+          <button id="rainSoundBtn" class="pill-btn sound-toggle active" title="Toggle Rain Sound">
+            <span>🌧️ Rain</span>
+          </button>
+
+          <!-- Volume Slider -->
+          <div class="volume-box">
+            <button id="muteBtn" class="icon-btn" title="Mute/Unmute (M)">
+              <span id="volIcon">🔊</span>
+            </button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8" class="vol-slider">
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotkeys Hint Legend -->
+      <div class="hotkeys-legend">
+        <span class="hk-chip"><kbd>Space</kbd> PLAY / PAUSE</span>
+        <span class="hk-chip"><kbd>◀</kbd> <kbd>▶</kbd> SEEK</span>
+        <span class="hk-chip"><kbd>N</kbd> <kbd>P</kbd> TRACK</span>
+        <span class="hk-chip"><kbd>H</kbd> HORN</span>
+        <span class="hk-chip"><kbd>M</kbd> MUTE</span>
+        <span class="hk-chip"><kbd>R</kbd> RAIN</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
