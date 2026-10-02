@@ -233,9 +233,12 @@ def _build_live_filtergraph(
     h: int = 1080,
 ) -> str:
     """Build the FFmpeg filtergraph for live stream overlay."""
+    from visual_engine import _get_font_filter
+    font_filter = _get_font_filter()  # Auto-detects Windows system font
+
     visual = STYLE_VISUALS[style]
     title_color = visual["title_color"]
-    wave_color = visual["wave_color"].split("|")[0]  # primary wave color
+    wave_color = visual["wave_color"].split("|")[0]
     subtitle = visual["subtitle"]
 
     # Escape for drawtext
@@ -264,28 +267,29 @@ def _build_live_filtergraph(
         # Dark gradient band for text
         f"[v_wave]drawbox=x=0:y={h-240}:w={w}:h=240:color=black@0.55:t=fill[v_bar];"
 
-        # LIVE badge (top-left)
-        f"[v_bar]drawbox=x=30:y=30:w=100:h=42:color=red@0.9:t=fill,"
-        f"drawtext=text='● LIVE':fontcolor=white:fontsize=22:"
-        f"x=40:y=42:shadowcolor=black@0.5:shadowx=1:shadowy=1,"
+        # LIVE badge (top-left red box)
+        f"[v_bar]drawbox=x=30:y=30:w=120:h=42:color=red@0.9:t=fill,"
+        f"drawtext={font_filter}text='LIVE':fontcolor=white:fontsize=22:"
+        f"x=50:y=42:shadowcolor=black@0.5:shadowx=1:shadowy=1,"
 
         # Main title
-        f"drawtext=text='{clean_title}':"
+        f"drawtext={font_filter}text='{clean_title}':"
         f"fontcolor={title_color}:fontsize=36:x=(w-text_w)/2:y={h-188}:"
         f"shadowcolor=black@0.9:shadowx=2:shadowy=2,"
 
         # Subtitle
-        f"drawtext=text='{clean_sub}':"
+        f"drawtext={font_filter}text='{clean_sub}':"
         f"fontcolor=white@0.7:fontsize=19:x=(w-text_w)/2:y={h-120}:"
         f"shadowcolor=black@0.6:shadowx=1:shadowy=1,"
 
-        # Viewer count placeholder (timestamp as proxy)
-        f"drawtext=text='%{{pts\\:hms}}':fontcolor=white@0.5:fontsize=16:"
+        # Elapsed time (top-right)
+        f"drawtext={font_filter}text='%{{pts\\:hms}}':fontcolor=white@0.5:fontsize=16:"
         f"x={w-160}:y=42:shadowcolor=black@0.4:shadowx=1:shadowy=1"
 
         f"[vout]"
     )
     return fg
+
 
 
 def start_live_stream(

@@ -29,6 +29,39 @@ def _escape_for_drawtext(text: str) -> str:
     )
 
 
+# Windows system fonts (guaranteed to exist on Windows)
+WINDOWS_FONTS = [
+    "C:/Windows/Fonts/arial.ttf",
+    "C:/Windows/Fonts/Arial.ttf",
+    "C:/Windows/Fonts/calibri.ttf",
+    "C:/Windows/Fonts/segoeui.ttf",
+    "C:/Windows/Fonts/verdana.ttf",
+]
+
+
+def _get_font_filter(custom_font_path: Optional[Path] = None) -> str:
+    """
+    Returns the fontfile= prefix for ffmpeg drawtext filter.
+    Priority: custom_font → Windows system font → empty (ffmpeg builtin).
+    On Windows, fontconfig fails silently — we must specify an explicit path.
+    """
+    # Try custom font first
+    if custom_font_path:
+        fp = Path(custom_font_path)
+        if fp.exists():
+            fpath = fp.as_posix().replace(":", "\\:")
+            return f"fontfile='{fpath}':"
+
+    # Try Windows system fonts
+    for wf in WINDOWS_FONTS:
+        if Path(wf).exists():
+            fpath = wf.replace(":", "\\:")
+            return f"fontfile='{fpath}':"
+
+    # Fallback: no fontfile (ffmpeg uses built-in, may show fontconfig warning)
+    return ""
+
+
 def render_lofi_video(
     background_source: Path,
     audio_path: Path,
@@ -59,12 +92,8 @@ def render_lofi_video(
     clean_title = _escape_for_drawtext(track_title)
     sub_label = _escape_for_drawtext("SLOWED + REVERB  •  NIGHT VIBES  •  HINDI LOFI")
 
-    # Font: use provided or system font
-    if font_path and Path(font_path).exists():
-        fpath = str(Path(font_path).as_posix()).replace(":", "\\:")
-        font_filter = f"fontfile='{fpath}':"
-    else:
-        font_filter = ""  # use ffmpeg default
+    # Font: use provided TTF, Windows system font, or ffmpeg built-in
+    font_filter = _get_font_filter(font_path)
 
     if broll_clips:
         return _render_with_broll(
