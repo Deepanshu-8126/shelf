@@ -46,3 +46,5 @@ factshorts-bot/data/*.db
 Thumbs.db
 .vscode/
 .idea/
+video_core_repos/
+
