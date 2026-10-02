@@ -9,6 +9,9 @@ on:
 jobs:
   generate_and_upload:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: factshorts-bot
 
     steps:
       - name: Checkout repository
