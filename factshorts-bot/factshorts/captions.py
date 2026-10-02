@@ -314,12 +314,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         )
 
     if hook_text and (cfg.hook_v2 or cfg.hook_banner):
-        start, end = 0.05, 2.3
-        if total_duration < 2.5:
-            end = max(1.0, total_duration - 0.2)
-        # Hook V2: Attention-grabbing top alert banner with pill badge style
-        banner = _shorten(hook_text.upper(), 32)
-        text = r"{\fad(100,150)\bord7\shad3\c&H0000FFFF}🚨 " + esc_ass(banner)
+        start, end = 0.05, 3.5
+        if total_duration < 4.0:
+            end = max(1.5, total_duration - 0.2)
+        # Hook V2: Attention-grabbing top alert title banner with pill badge style
+        banner = _shorten(hook_text.upper(), 36)
+        text = r"{\fad(150,250)\bord8\shad4\c&H0000FFFF\fscx105\fscy105}📌 " + esc_ass(banner)
         lines.append(f"Dialogue: 1,{fmt_ts_ass(start)},{fmt_ts_ass(end)},Hook,,0,0,0,,{text}")
 
     return header + "\n".join(lines) + "\n"
