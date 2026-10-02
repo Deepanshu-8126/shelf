@@ -48,3 +48,14 @@ Thumbs.db
 .idea/
 video_core_repos/
 
+# Vox Studio Artifacts & Media
+vox_studio/assets/real_images/*
+vox_studio/assets/video_clips/*
+vox_studio/output/*.mp4
+vox_studio/output/*.wav
+vox_studio/output/*.mp3
+vox_studio/templates/*
+*.png
+*.jpg
+*.webp
+node_modules/

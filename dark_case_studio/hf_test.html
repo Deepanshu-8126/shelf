@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@500;800&display=swap");
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1080px; height: 1920px; overflow: hidden; background: #07090e; font-family: 'JetBrains Mono', monospace; }
+    #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; }
+
+    /* Animated Cyber Grid */
+    .grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Radar Rings */
+    .radar-center {
+      position: absolute; top: 40%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.15);
+    }
+    .radar-inner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 59, 48, 0.5);
+    }
+    .reticle {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px; height: 40px;
+      border: 3px solid #ff3b30;
+      border-radius: 50%;
+      background: rgba(255, 59, 48, 0.3);
+      box-shadow: 0 0 30px #ff3b30;
+    }
+
+    /* Kinetic Title */
+    .title-box {
+      position: absolute; bottom: 350px; left: 80px; right: 80px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 24px;
+      background: rgba(255, 59, 48, 0.2);
+      border: 1px solid #ff3b30;
+      color: #ff3b30;
+      font-size: 24px;
+      letter-spacing: 0.3em;
+      margin-bottom: 24px;
+      border-radius: 4px;
+    }
+    .main-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+      text-transform: uppercase;
+      text-shadow: 0 0 40px rgba(0, 240, 255, 0.4);
+    }
+    .highlight {
+      color: #ffd60a;
+      text-shadow: 0 0 30px rgba(255, 214, 10, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="2.5" data-width="1080" data-height="1920">
+    <div class="grid"></div>
+    <div class="radar-center">
+      <div class="radar-inner"></div>
+      <div class="reticle" id="targetReticle"></div>
+    </div>
+    <div class="title-box">
+      <div class="badge" id="badge">CLASSIFIED TELEMETRY</div>
+      <div class="main-headline" id="headline">ATLANTIS: <span class="highlight">BURIED ANOMALY</span> DETECTED</div>
+    </div>
+  </div>
+
+  <script>
+    gsap.timeline()
+      .from("#badge", { opacity: 0, y: -20, duration: 0.6, ease: "power3.out" })
+      .from("#headline", { opacity: 0, scale: 0.9, duration: 0.8, ease: "back.out(1.7)" }, "-=0.3")
+      .to("#targetReticle", { scale: 1.4, repeat: -1, yoyo: true, duration: 0.5, ease: "sine.inOut" });
+  </script>
+</body>
+</html>
