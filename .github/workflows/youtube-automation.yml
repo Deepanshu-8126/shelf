@@ -49,6 +49,8 @@ jobs:
           # API Keys from Secrets
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          FOOTAGE_PROVIDERS: pexels,pixabay,nasa,wikimedia,local
           
           # Configuration for US Channel (Pexels Fallback)
           LLM_PROVIDER: gemini
