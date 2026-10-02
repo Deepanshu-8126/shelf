@@ -461,16 +461,16 @@ async def _mix_audio(
             "-stream_loop", "-1", "-i", str(music),
         ]
         graph = (
-            f"[0:a]adelay={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo[voice];"
-            f"[1:a]aformat=channel_layouts=stereo,atrim=0:{total_duration:.3f},volume={cfg.music_volume:.3f},afade=t=out:st={music_fade_start:.3f}:d=3.0[music];"
-            f"[music][voice]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
-            f"[voice][ducked]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[mixed];"
+            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo[v0];"
+            f"[1:a]aformat=channel_layouts=stereo,atrim=0:{total_duration:.3f},volume={cfg.music_volume:.3f},afade=t=out:st={music_fade_start:.3f}:d=3.0[m0];"
+            f"[m0][v0]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
+            f"[v0][ducked]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[mixed];"
             f"[mixed]apad,atrim=0:{total_duration:.3f},afade=t=out:st={fade_start:.3f}:d=0.35[aout]"
         )
         cmd += ["-filter_complex", graph, "-map", "[aout]", "-c:a", "aac", "-b:a", "192k", str(out)]
     else:
         graph = (
-            f"[0:a]adelay={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo,"
+            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo,"
             f"apad,atrim=0:{total_duration:.3f},afade=t=out:st={fade_start:.3f}:d=0.35[aout]"
         )
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(voice.path),
