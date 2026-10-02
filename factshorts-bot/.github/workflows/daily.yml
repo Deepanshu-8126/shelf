@@ -39,8 +39,12 @@ jobs:
           YT_TOKEN_B64: ${{ secrets.YT_TOKEN_B64 }}
         run: |
           mkdir -p credentials
-          [ -n "$YT_CLIENT_B64" ] && echo "$YT_CLIENT_B64" | base64 -d > credentials/client_secret.json || true
-          [ -n "$YT_TOKEN_B64" ]  && echo "$YT_TOKEN_B64"  | base64 -d > credentials/token.json || true
+          [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > credentials/client_secret.json || true
+          [ -n "$YT_TOKEN_B64" ]  && printf '%s' "$YT_TOKEN_B64"  | base64 -d > credentials/token.json || true
+          # Debug: verify token.json is valid JSON
+          echo "--- token.json first 80 chars ---"
+          head -c 80 credentials/token.json 2>/dev/null || echo "(no token file)"
+          python3 -c "import json; json.load(open('credentials/token.json')); print('✅ token.json is valid JSON')" 2>/dev/null || echo "❌ token.json is NOT valid JSON"
 
       - name: Render + publish
         env:
