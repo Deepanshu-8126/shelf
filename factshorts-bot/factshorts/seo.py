@@ -16,13 +16,17 @@ TITLE_SUFFIXES = [
     "Why?", "Explained", "You Didn't Know", "Facts", "In 15 Seconds",
 ]
 NICHE_TAGS = {
-    "space": ["space facts", "astronomy", "universe", "science facts", "space shorts", "nasa", "cosmos"],
-    "psychology": ["psychology facts", "human behavior", "brain facts", "mind tricks", "psychology shorts"],
-    "history": ["history facts", "historical facts", "history shorts", "did you know history", "ancient history"],
-    "science": ["science facts", "science shorts", "amazing science", "physics facts", "biology facts"],
-    "animals": ["animal facts", "wildlife facts", "animal shorts", "nature facts", "amazing animals"],
+    "space": ["space facts", "astronomy", "universe", "science facts", "space shorts", "nasa", "cosmos", "astrophysics"],
+    "psychology": ["psychology facts", "dark psychology", "human behavior", "mind tricks", "psychological hacks", "manipulation techniques", "psychology shorts", "body language", "psychology tips"],
+    "history": ["history facts", "historical mysteries", "unsolved history", "ancient history", "bizarre history", "history shorts", "did you know history", "archaeology discoveries"],
+    "mystery": ["unsolved mysteries", "strange events", "creepy mysteries", "conspiracy facts", "bizarre facts", "mystery shorts", "dark mysteries"],
+    "finance": ["personal finance", "money tips", "wealth mindset", "credit card hacks", "investing for beginners", "financial freedom", "money hacks", "finance shorts", "wealth secrets", "passive income"],
+    "legal": ["legal hacks", "court drama", "consumer rights", "lawyer tips", "crazy laws", "legal advice", "bizarre court cases", "legal rights", "law shorts"],
+    "science": ["science facts", "science shorts", "amazing science", "physics facts", "biology facts", "scientific discoveries"],
+    "animals": ["animal facts", "wildlife facts", "animal shorts", "nature facts", "amazing animals", "nature shorts"],
+    "kids": ["kids learning", "fun facts for kids", "cartoon facts", "amazing facts kids", "educational shorts"],
 }
-BASE_TAGS = ["shorts", "didyouknow", "facts", "fact shorts", "learn something new", "youtube shorts", "interesting facts"]
+BASE_TAGS = ["shorts", "didyouknow", "facts", "fact shorts", "learn something new", "youtube shorts", "interesting facts", "viral shorts"]
 
 
 def _clip_title(text: str, limit: int = 60) -> str:

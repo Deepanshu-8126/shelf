@@ -289,9 +289,36 @@ def _story_prompt(topic: Topic, cfg: Config, target: int) -> str:
         f"\nSource context: {topic.source_name or 'verified science'}"
         f" {topic.source_url}".rstrip()
     ) if topic.source_url else ""
+
+    # Niche-specific high-RPM / high-retention expert personas
+    niche_instructions = {
+        "psychology": (
+            "Specialization: Dark Psychology, Subconscious Loops, Manipulation Hacks, and Human Behavioral Paradoxes.\n"
+            "Key Strategy: 'Delayed Answers' Formula. Hook the viewer with an unsettling psychological truth or behavior sign, "
+            "keep them glued by explaining why their brain does it, and reveal the counter-intuitive psychological loop only at the climax."
+        ),
+        "finance": (
+            "Specialization: USA Personal Finance, Hyperspecific Dollar Figures ($100k Rule, Credit Loopholes, Senior Wealth Longevity).\n"
+            "Key Strategy: 'Identity-based Warnings' & Curiosity Gaps. Hook the viewer with an unspoken financial rule, break down the banking/wealth system mechanism, and provide the high-value psychological wealth takeaway."
+        ),
+        "legal": (
+            "Specialization: US Courtroom Drama, Consumer Rights Loopholes, and Bizarre Law Cases.\n"
+            "Key Strategy: 'Suspense & Verdict Reveal'. Open with an unbelievable legal dilemma or citizen vs corporation battle, build intense legal suspense, and reveal the shocking verdict/loophole at the climax."
+        ),
+        "history": (
+            "Specialization: Unsolved Historical Anomalies, Lost Civilizations, and Declassified Ancient Mysteries.\n"
+            "Key Strategy: Gripping historical documentary narration (MagnatesMedia/Discovery style) unraveling forbidden archival facts."
+        ),
+        "mystery": (
+            "Specialization: Bizarre Real-World Mysteries, Eerie Anomalies, and Unexplained Phenomenon.\n"
+            "Key Strategy: Atmospheric suspense, chilling sensory details, and an unresolved philosophical or scientific question."
+        ),
+    }.get(topic.niche.lower(), "Specialization: Engaging, viral vertical storytelling with deep factual accuracy.")
+
     return (
-        f"You are a master viral storyteller and science scriptwriter for high-retention vertical videos (like Veritasium, Kurzgesagt, MagnatesMedia).\n"
+        f"You are a world-class viral storyteller and YouTube Shorts scriptwriter (like MagnatesMedia, Veritasium, LegalEagle).\n"
         f"Niche: {topic.niche}\n"
+        f"{niche_instructions}\n"
         f"Topic: {topic.topic}\n"
         f"Premise: {topic.fact}\n"
         f"Angle: {topic.angle or 'unraveling the hidden reality'}\n"
@@ -299,10 +326,10 @@ def _story_prompt(topic: Topic, cfg: Config, target: int) -> str:
         f"Craft an immersive, suspenseful spoken narrative of {max(125, target - 25)}-{target + 20} words total (approx 50-60 seconds when narrated):\n"
         "- hook: 6-10 words, opening an immediate psychological curiosity gap or paradox in the first 2 seconds (stops the scroll dead in its tracks).\n"
         "- body: An escalating 4-stage narrative arc (110-140 words):\n"
-        "  1. The Setup: paint a vivid picture of the mystery or common misconception.\n"
-        "  2. The Discovery: what scientists actually uncovered when they tested it.\n"
-        "  3. The Twist / Paradox: the shocking physics or psychological reality that defies intuition.\n"
-        "  4. The Climax: the mind-bending consequence that permanently changes how you see reality.\n"
+        "  1. The Setup: paint a vivid picture of the mystery, dilemma, or common misconception.\n"
+        "  2. The Discovery: what was actually uncovered when investigated.\n"
+        "  3. The Twist / Paradox: the shocking reality that defies normal intuition.\n"
+        "  4. The Climax / Solution: the mind-bending answer (delayed until 75%+ into the video for 90%+ retention).\n"
         f"- {cta_rule}\n"
         "Use active verbs, vivid sensory details, and natural conversational cadence. No cliché filler ('in this video', 'subscribe', 'insane', 'literally', 'guys').\n\n"
         "Return ONLY a JSON object with keys:\n"
@@ -310,7 +337,7 @@ def _story_prompt(topic: Topic, cfg: Config, target: int) -> str:
         "- body (string: full narrative body paragraphs)\n"
         "- closing (string)\n"
         "- sentences: an array of 7-10 discrete scene beats covering the full script. Each element must be:\n"
-        "  {\"text\": \"the spoken lines for this 4-6s scene beat\", \"keywords\": [\"highly visual subject in action, e.g. dolphin swimming underwater\", \"concrete visual 2\"]}"
+        "  {\"text\": \"the spoken lines for this 4-6s scene beat\", \"keywords\": [\"highly visual subject in action, e.g. dark courtroom judge gavel\", \"concrete visual 2\"]}"
     )
 
 
