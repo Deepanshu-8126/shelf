@@ -57,7 +57,8 @@ jobs:
       - name: Install System Dependencies & FFmpeg
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2
+          sudo apt-get install -y ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 || true
+          sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2 || true
 
       - name: Install Python Dependencies
         run: |
