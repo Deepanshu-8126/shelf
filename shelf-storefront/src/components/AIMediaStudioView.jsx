@@ -125,69 +125,74 @@ const INITIAL_VIDEOS = [
   }
 ];
 
-const CURATED_PROMPT_PRESETS = [
+const MODEL_PERSONA_VIBES = [
   {
-    id: 'ethnic_regal',
+    id: 'vogue_india_royal',
     icon: '👑',
-    label: 'Ethnic Regal Heritage',
-    category: 'Sarees & Kurtis',
-    prompt: (title) =>
-      `High-fashion Vogue India cover editorial of ${title}, 21yo Indian model with delicate round black bindi and silver oxidised jhumkas, Jaipur royal palace marble courtyard, soft golden hour rim light, 85mm f/1.4 lens, natural skin texture with visible organic pores, zero digital over-sharpening, flowing authentic drape.`
+    title: 'Vogue India Royal (Desi Grace)',
+    badge: 'Regal Heritage',
+    color: '#ffd166',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `High-fashion Vogue India royal cover editorial of ${title} in authentic ${fabric}, 100% faithful garment clone, identical silhouette and embroidery, 21yo radiant Indian model with signature crisp round black bindi and traditional silver oxidised bell-shaped jhumkas with stacked bangles, Jaipur royal palace marble courtyard, soft golden hour sunset rim light illuminating delicate fabric weave, authentic skin texture with visible organic pores, zero digital over-sharpening, regal cascade drape, 85mm f/1.4 portrait prime lens.`
   },
   {
-    id: 'grand_staircase',
-    icon: '🏛️',
-    label: 'Grand Chandelier Staircase',
-    category: 'Gowns & Maxi Dresses',
-    prompt: (title) =>
-      `Cinematic luxury editorial photoshoot of ${title}, grand baroque marble staircase with antique crystal chandelier bokeh in background, soft 50mm portrait lens, dewy olive-gold skin tone, natural skin softness, authentic skin pores, elegant confident poise.`
-  },
-  {
-    id: 'vogue_minimalist',
-    icon: '✨',
-    label: 'Vogue Minimalist Studio',
-    category: 'Co-ord Sets & Tops',
-    prompt: (title) =>
-      `Clean high-end Vogue studio lookbook of ${title}, warm travertine stone pedestal, directional daylight diffusion, soft shadows, 35mm candid lens, organic skin softness, authentic pores, perfectly fitted outfit with clean fabric texture.`
-  },
-  {
-    id: 'mumbai_streetwear',
-    icon: '🌸',
-    label: 'South Mumbai Boulevard',
-    category: 'Gen Z Tops & Y2K',
-    prompt: (title) =>
-      `Editorial street-style candid photoshoot of ${title}, Art Deco boulevard at dusk with warm twilight city bokeh, confident relaxed stride, 35mm film aesthetic, authentic pores and natural skin warmth, candid dimple smile.`
-  },
-  {
-    id: 'midnight_luxury',
-    icon: '🖤',
-    label: 'Midnight Velvet Cocktail',
-    category: 'Bodycon & Clubwear',
-    prompt: (title) =>
-      `Ultra-luxury cocktail lounge photoshoot of ${title}, warm candlelit amber illumination, cinematic shallow depth of field, sleek silhouette, natural skin highlights, subtle smile, authentic organic pores, zero digital sharpening.`
-  },
-  {
-    id: 'coastal_resort',
+    id: 'old_money_european',
     icon: '🏖️',
-    label: 'Breezy Coastal Resort',
-    category: 'Resort & Halter Tops',
-    prompt: (title) =>
-      `Airy summer resort editorial of ${title}, sun-dappled palm leaf shadows, soft coastal ocean breeze in hair, natural unforced smile, crisp clean linen lighting, authentic skin pores, 85mm f/1.8 portrait.`
+    title: 'Old-Money European (Riviera Elegance)',
+    badge: 'Amalfi Quiet Luxury',
+    color: '#38bdf8',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `Old-money European resort editorial of ${title} in ${fabric}, 100% faithful garment clone, identical cuts and drape, sun-dappled lemon tree and palm shadows on terracotta terrace overlooking Amalfi coastline, soft warm ocean breeze gently lifting dark silky hair, authentic skin micro-pores, candid relaxed dimple smile, 50mm f/1.4 lens, crisp linen and cotton textures, 8K editorial clarity, quiet luxury aesthetic.`
+  },
+  {
+    id: 'y2k_streetwear',
+    icon: '⚡',
+    title: 'Y2K Streetwear (Bold & Edgy)',
+    badge: 'Cyber Tokyo / Direct Flash',
+    color: '#ec4899',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `Edgy high-fashion Y2K streetwear campaign of ${title} in ${fabric}, 100% faithful garment clone, Tokyo neon-lit rain-washed boulevard at dusk, 90s direct camera flash aesthetic, low-angle dynamic hip pop pose, bold silver choker, glossy lips, authentic 35mm Portra 400 film grain, high-contrast crisp shadows, raw authentic street swagger, 8K ultra-detailed.`
+  },
+  {
+    id: 'myntra_luxe_studio',
+    icon: '📸',
+    title: 'Myntra Luxe Commercial Studio',
+    badge: '5500K Softbox / Pedestal',
+    color: '#52e396',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `Top-tier commercial e-commerce lookbook of ${title} in pristine ${fabric}, 100% faithful garment clone, clean travertine stone plinth, 5500K balanced daylight softbox diffusion, true-to-life textile color calibration, natural skin softness with visible organic pores, elegant confident posture, 50mm Hasselblad prime lens, zero digital crunch, 8K ultra-detailed.`
+  },
+  {
+    id: 'moody_rooftop_sunset',
+    icon: '🌆',
+    title: 'Moody Rooftop Sunset (Cocktail Glow)',
+    badge: 'City Bokeh / Amber Dusk',
+    color: '#f97316',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `Ultra-luxury cocktail party photoshoot of ${title} in ${fabric}, 100% faithful garment clone, penthouse rooftop overlooking glowing city skyline at twilight golden hour, warm ambient rim light, subtle wind in dark silky hair, candid laughing expression, natural dewy skin highlights, authentic organic pores, Portra 400 35mm film grain, cinematic shallow depth of field.`
+  },
+  {
+    id: 'architectural_brutalist',
+    icon: '🏛️',
+    title: 'Architectural Brutalist (Vogue Runway)',
+    badge: 'Monolithic / High-Contrast',
+    color: '#a78bfa',
+    generatePrompt: (title, fabric = 'luxury textile') =>
+      `Architectural high-fashion editorial of ${title} in ${fabric}, 100% faithful garment clone, monolithic brutalist concrete pavilion, intense directional afternoon sunlight casting dramatic geometric diagonal shadows, confident statuesque runway pose, 8K ultra-sharp fabric weave, authentic skin micro-pores, zero digital sharpening, 35mm f/1.4 lens.`
   }
 ];
 
 const OPTICAL_MODIFIERS = [
-  '+ 8K Ultra-Sharp Master',
-  '+ Authentic Skin Pores',
-  '+ Sun-Dappled Palm Shadows',
-  '+ Subtle Breeze in Hair',
-  '+ Soft Dewy Warmth',
-  '+ Luxury Gold Temple Jewelry',
-  '+ 85mm f/1.4 Bokeh',
-  '+ Portra 400 Film Grain',
-  '+ Candid Dimple Smile',
-  '+ Zero Digital Crunch',
-  '+ Flowing Silk Drape'
+  '+ 🔬 Authentic Skin Pores (Zero CGI)',
+  '+ 📸 Myntra Luxe Studio Softbox (5500K)',
+  '+ ☀️ Golden Hour Sun-Dappled Rim Light',
+  '+ ✨ Candid Dimple Smile & Natural Laugh',
+  '+ 🎞️ 35mm Portra 400 Film Grain',
+  '+ 💨 Soft Wind-Blown Hair Drift',
+  '+ 👑 Regal Silver Jhumkas & Bindi',
+  '+ ⚡ 90s Direct Camera Flash',
+  '+ 🏛️ Travertine Pedestal Backdrop',
+  '+ 🎯 100% Faithful Garment Drape & Seams'
 ];
 
 export default function AIMediaStudioView({ products = [], onToast = () => {}, onUpdateProduct = () => {} }) {
@@ -271,7 +276,15 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
   // Garment Clone Fidelity & Lighting Atmosphere Controls
   const [cloneFidelity, setCloneFidelity] = useState('strict'); // 'strict' | 'creative'
   const [lightingMood, setLightingMood] = useState('golden'); // 'golden' | 'zara_flash' | 'softbox' | 'amber'
-  const [showZaraWatermark, setShowZaraWatermark] = useState(true);
+  // Model Persona & Vibe Selector State
+  const [selectedPersonaId, setSelectedPersonaId] = useState('vogue_india_royal');
+
+  const handleSelectPersonaVibe = (persona) => {
+    setSelectedPersonaId(persona.id);
+    const newPrompt = persona.generatePrompt(genTitle, genFabric);
+    setCustomPrompt(newPrompt);
+    onToast(`✨ Model Persona Vibe Applied: "${persona.title}" with 100% Faithful Garment Drape!`);
+  };
 
   // CSV Knowledge Base & Product Detective State
   const [csvCatalog, setCsvCatalog] = useState([]);
@@ -1121,6 +1134,31 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   </select>
                 </div>
               )}
+              {/* Clean Garment Title & Reseller Arbitrage Summary */}
+              <div style={{ marginTop: '10px', background: 'rgba(0,0,0,0.35)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontWeight: '700' }}>
+                      Verified Outfit Name
+                    </div>
+                    <div style={{ fontSize: '12.5px', fontWeight: '800', color: '#fff', marginTop: '2px', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {genTitle}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: '#4ade80', background: 'rgba(74, 222, 128, 0.15)', padding: '3px 8px', borderRadius: '6px', whiteSpace: 'nowrap' }}>
+                    {genPrice}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <span style={{ fontSize: '10px', color: '#a78bfa', fontWeight: '600' }}>
+                    Fabric: <strong>{genFabric}</strong>
+                  </span>
+                  <span style={{ fontSize: '9.5px', color: '#ffd166', background: 'rgba(255, 209, 102, 0.12)', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
+                    👑 Luxury Arbitrage (+140% Margin)
+                  </span>
+                </div>
+              </div>
 
               <button
                 type="button"
@@ -1243,9 +1281,67 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 </div>
               </div>
 
+              {/* 🎭 MODEL PERSONA & EDITORIAL VIBE SELECTOR (1-CLICK) */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11px', color: '#ffd166', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span>🎭</span> Model Persona &amp; Vibe (1-Click Switch)
+                  </label>
+                  <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)' }}>Outfit Stays Identical</span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  {MODEL_PERSONA_VIBES.map((persona) => {
+                    const isSelected = selectedPersonaId === persona.id;
+                    return (
+                      <button
+                        key={persona.id}
+                        type="button"
+                        onClick={() => handleSelectPersonaVibe(persona)}
+                        style={{
+                          background: isSelected
+                            ? `linear-gradient(135deg, rgba(255, 209, 102, 0.2), rgba(236, 72, 153, 0.2))`
+                            : 'rgba(255, 255, 255, 0.03)',
+                          border: isSelected ? `1px solid ${persona.color || '#ffd166'}` : '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '8px',
+                          padding: '7px 8px',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <span style={{ fontSize: '13px' }}>{persona.icon}</span>
+                          <span style={{ fontSize: '11px', fontWeight: '800', color: isSelected ? '#fff' : 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {persona.title.split('(')[0].trim()}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '9px', color: isSelected ? persona.color : 'rgba(255,255,255,0.5)', fontWeight: '600' }}>
+                            {persona.badge}
+                          </span>
+                          {isSelected && (
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: persona.color || '#ffd166' }}></span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* 5 1-Click Zara / Vogue Brand Campaigns */}
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', fontWeight: '700', marginBottom: '6px' }}>
-                Select Brand Editorial Campaign:
+                Or Choose Curated Brand Campaign:
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1, overflowY: 'auto', maxHeight: '240px' }}>
@@ -1294,26 +1390,56 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   <button
                     type="button"
                     onClick={() => setShowSavePromptInline(!showSavePromptInline)}
-                    style={{ background: 'rgba(82, 227, 150, 0.15)', border: '1px solid rgba(82, 227, 150, 0.35)', color: '#52e396', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '700', cursor: 'pointer' }}
+                    style={{ background: 'rgba(82, 227, 150, 0.15)', border: '1px solid rgba(82, 227, 150, 0.35)', color: '#52e396', padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
-                    ➕ Save to Library
+                    <span>➕</span> Save to Library
                   </button>
                 </div>
               </div>
 
-              {/* Inline Save Form */}
+              {/* Inline Save to Library Form with Emoji Picker */}
               {showSavePromptInline && (
-                <form onSubmit={handleSaveCustomRecipe} style={{ marginBottom: '8px', padding: '8px', background: 'rgba(0,0,0,0.5)', borderRadius: '6px', border: '1px solid rgba(82, 227, 150, 0.25)', display: 'flex', gap: '6px' }}>
-                  <input
-                    type="text"
-                    placeholder="Recipe Name"
-                    value={newRecipeName}
-                    onChange={(e) => setNewRecipeName(e.target.value)}
-                    style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '4px 6px', borderRadius: '4px', fontSize: '11px' }}
-                  />
-                  <button type="submit" style={{ background: '#10b981', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '10.5px', fontWeight: '700', cursor: 'pointer' }}>
-                    Save
-                  </button>
+                <form onSubmit={handleSaveCustomRecipe} style={{ marginBottom: '8px', padding: '10px', background: 'rgba(0,0,0,0.6)', borderRadius: '8px', border: '1px solid rgba(82, 227, 150, 0.35)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '10.5px', color: '#52e396', fontWeight: '800' }}>Save Current Prompt as Recipe</span>
+                    <button type="button" onClick={() => setShowSavePromptInline(false)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '12px', cursor: 'pointer' }}>✕</button>
+                  </div>
+                  
+                  {/* Emoji Quick Picker */}
+                  <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>Icon:</span>
+                    {['👑', '🏖️', '⚡', '📸', '🌆', '🏛️', '✨', '💎', '🌸'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => setNewRecipeIcon(emoji)}
+                        style={{
+                          background: newRecipeIcon === emoji ? 'rgba(82, 227, 150, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                          border: newRecipeIcon === emoji ? '1px solid #52e396' : '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '4px',
+                          padding: '2px 4px',
+                          fontSize: '12px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      placeholder="e.g. Myntra Festive Kurti Glow"
+                      value={newRecipeName}
+                      onChange={(e) => setNewRecipeName(e.target.value)}
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '5px 8px', borderRadius: '5px', fontSize: '11px', outline: 'none' }}
+                      autoFocus
+                    />
+                    <button type="submit" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', border: 'none', padding: '5px 12px', borderRadius: '5px', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
+                      Save Recipe
+                    </button>
+                  </div>
                 </form>
               )}
 
@@ -1403,29 +1529,134 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 }}
               />
 
-              {/* 8K Optical Modifiers Chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px', marginBottom: '8px' }}>
-                {OPTICAL_MODIFIERS.slice(0, 7).map((mod) => (
+              {/* Keyword Chips vs Custom Library Tab Selector */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', gap: '4px' }}>
                   <button
-                    key={mod}
                     type="button"
-                    onClick={() => handleAppendModifier(mod)}
+                    onClick={() => setPromptTab('curated')}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'rgba(255, 255, 255, 0.75)',
-                      padding: '2px 6px',
+                      background: promptTab === 'curated' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                      border: promptTab === 'curated' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+                      color: promptTab === 'curated' ? '#38bdf8' : 'rgba(255, 255, 255, 0.65)',
+                      padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '10px',
+                      fontWeight: '800',
                       cursor: 'pointer'
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ec4899'; e.currentTarget.style.color = '#fff'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'; }}
                   >
-                    {mod}
+                    ⚡ 10 Instant Production Chips
                   </button>
-                ))}
+                  <button
+                    type="button"
+                    onClick={() => setPromptTab('custom')}
+                    style={{
+                      background: promptTab === 'custom' ? 'rgba(82, 227, 150, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                      border: promptTab === 'custom' ? '1px solid #52e396' : '1px solid rgba(255, 255, 255, 0.08)',
+                      color: promptTab === 'custom' ? '#52e396' : 'rgba(255, 255, 255, 0.65)',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '800',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📚 My Library ({customLibrary.length})
+                  </button>
+                </div>
+                <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.45)' }}>Click to Append</span>
               </div>
+
+              {/* 10 Instant Keyword Modifiers Chips or Saved Custom Library */}
+              {promptTab === 'curated' ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                  {OPTICAL_MODIFIERS.map((mod) => (
+                    <button
+                      key={mod}
+                      type="button"
+                      onClick={() => handleAppendModifier(mod)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: 'rgba(255, 255, 255, 0.85)',
+                        padding: '3px 7px',
+                        borderRadius: '4px',
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#ec4899';
+                        e.currentTarget.style.color = '#fff';
+                        e.currentTarget.style.background = 'rgba(236, 72, 153, 0.15)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.85)';
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+                      }}
+                    >
+                      {mod}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px', maxHeight: '110px', overflowY: 'auto' }}>
+                  {customLibrary.length === 0 ? (
+                    <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.4)', padding: '6px' }}>
+                      No custom recipes saved yet. Click "➕ Save to Library" above to create one!
+                    </div>
+                  ) : (
+                    customLibrary.map((recipe) => (
+                      <div
+                        key={recipe.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '6px',
+                          padding: '4px 8px'
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCustomPrompt(recipe.prompt);
+                            onToast(`📋 Applied "${recipe.name}" from your library!`);
+                          }}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#fff',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            textAlign: 'left'
+                          }}
+                        >
+                          <span>{recipe.icon || '✨'}</span> {recipe.name}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCustomRecipe(recipe.id, recipe.name)}
+                          style={{ background: 'transparent', border: 'none', color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px', cursor: 'pointer' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)'; }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
 
               {/* Inputs Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '6px' }}>
