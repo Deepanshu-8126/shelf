@@ -429,17 +429,28 @@ async def execute_google_flow_generation(
                     if await dl_btn.count() > 0 and "%" not in top_text:
                         print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Downloading...")
                         try:
-                            async with page.expect_download(timeout=45000) as dl_info:
+                            async with page.expect_download(timeout=60000) as dl_info:
                                 await dl_btn.click()
                             download = await dl_info.value
-                            await download.save_as(str(output_mp4))
-                            print(f"  ✅ Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
-                            downloaded = True
-                            break
+                            await asyncio.sleep(1.0)
+                            dl_path = await download.path()
+                            if dl_path and Path(dl_path).exists():
+                                import shutil
+                                shutil.copy2(dl_path, str(output_mp4))
+                            else:
+                                await download.save_as(str(output_mp4))
+
+                            if output_mp4.exists() and output_mp4.stat().st_size > 10000:
+                                print(f"  ✅ Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
+                                downloaded = True
+                                break
                         except Exception as dl_err:
                             print(f"    Download retry notice: {dl_err}")
 
-            await browser.close()
+            try:
+                await browser.close()
+            except Exception:
+                pass
             return output_mp4 if downloaded else None
     except Exception as e:
         print(f"  ⚠️ Browser automation error: {e}")
