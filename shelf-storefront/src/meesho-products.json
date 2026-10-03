@@ -1,5 +1,40 @@
 [
   {
+    "id": "p-meesho-try-saree-kurti-or-search-by-produc",
+    "title": "Try Saree, Kurti or Search by Product Code",
+    "subtitle": "Green \u00b7 S, M, L \u00b7 Soft aesthetic drape",
+    "brand": "Meesho Verified Creator Pick",
+    "store": "Meesho",
+    "category": "Women Dresses",
+    "collectionId": "meesho-dresses-2026",
+    "image": "https://images.meesho.com/images/products/542355935/8yqj09_512.webp",
+    "gallery": [],
+    "colors": [
+      "Green"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "imagePosition": "50% 40%",
+    "imageFit": "cover",
+    "tint": "peach",
+    "price": 163,
+    "oldPrice": 356,
+    "clicks": 0,
+    "commission": "10%",
+    "saved": false,
+    "affiliateUrl": "",
+    "productUrl": "",
+    "isRealListing": true,
+    "rating": 4.3,
+    "ratingCount": 345,
+    "priceCheckedAt": "2026-10-03",
+    "status": "pending_review"
+  },
+  {
     "id": "p-meesho-a-line-baby-pink-dress",
     "ext_id": "baj21t",
     "title": "A-LINE BABY PINK DRESS",

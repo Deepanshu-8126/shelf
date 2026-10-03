@@ -153,33 +153,48 @@ export default function IngestInboxView({
 
       {/* Smart Paste & Auto-Crawl Bar */}
       {showCrawler && (
-        <div className="inbox-crawler-card">
-          <div className="crawler-card-header">
-            <div className="crawler-title">
-              <span className="crawler-icon">⚡</span>
+        <div className="inbox-crawler-card" style={{ background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '16px', padding: '20px', marginBottom: '24px', backdropFilter: 'blur(20px)' }}>
+          <div className="crawler-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div className="crawler-title" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span className="crawler-icon" style={{ fontSize: '24px', background: 'rgba(236, 72, 153, 0.15)', padding: '10px', borderRadius: '12px', color: '#ec4899' }}>⚡</span>
               <div>
-                <strong>Smart Meesho Auto-Crawler & Multi-Variant Sync</strong>
-                <p>Paste raw copied text from Meesho (Ctrl+A &rarr; Ctrl+C) or direct product link. Python extracts all Cloud CDN images, color variations, sizes, and attaches your affiliate ID automatically.</p>
+                <strong style={{ fontSize: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  Smart Fashion Ingest & Multi-Variant Sync Engine
+                  <span style={{ fontSize: '11px', background: '#22c55e20', color: '#4ade80', border: '1px solid #22c55e40', padding: '2px 8px', borderRadius: '999px' }}>Live Catalog + Web Scraper Active</span>
+                </strong>
+                <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', margin: '4px 0 0 0' }}>
+                  Paste any Meesho URL, Instagram Reel/Post link, Pinterest Pin, or full page text (Ctrl+A &rarr; Ctrl+C). Python extracts high-res Cloud CDN images, sizes, pricing, and generates your official Creator Affiliate link instantly.
+                </p>
               </div>
             </div>
           </div>
+
           <textarea
             className="crawler-input-textarea"
-            rows={4}
+            rows={3}
             value={pasteText}
             onChange={(e) => setPasteText(e.target.value)}
-            placeholder="Paste copied Meesho text or Meesho URL here..."
+            placeholder="Paste Meesho Product URL (e.g. https://www.meesho.com/a-line-baby-pink-dress/p/baj21t) or copied page text here..."
+            style={{ width: '100%', borderRadius: '12px', padding: '12px 16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px', resize: 'vertical' }}
           />
-          <div className="crawler-action-bar">
-            <button
-              type="button"
-              className="button button-dark crawler-submit-btn"
-              disabled={crawling || !pasteText.trim()}
-              onClick={handleSmartCrawl}
-            >
-              <Icon name="sparkles" size={15} /> {crawling ? 'Crawling & Syncing...' : 'Extract Variations & Add to Inbox'}
-            </button>
-            {crawlNotice && <span className="crawler-notice-msg">{crawlNotice}</span>}
+
+          <div className="crawler-action-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className="button button-dark crawler-submit-btn"
+                disabled={crawling || !pasteText.trim()}
+                onClick={handleSmartCrawl}
+                style={{ background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', border: 'none', color: '#fff', fontWeight: '600', padding: '10px 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
+                <Icon name="sparkles" size={16} /> {crawling ? '🚀 Crawling & Extracting CDN Media...' : '⚡ Extract Variations & Add to Inbox'}
+              </button>
+            </div>
+            {crawlNotice && (
+              <span className="crawler-notice-msg" style={{ fontSize: '12px', color: crawlNotice.includes('Successfully') ? '#4ade80' : '#f87171', background: 'rgba(0,0,0,0.4)', padding: '6px 12px', borderRadius: '8px' }}>
+                {crawlNotice}
+              </span>
+            )}
           </div>
         </div>
       )}
