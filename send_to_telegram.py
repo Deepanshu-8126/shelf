@@ -1,11 +1,12 @@
-"""Utility script to send newly generated video and SEO details to Telegram."""
+"""Zero-dependency Telegram video delivery script (pure Python standard library)."""
 import os
 import sys
-import glob
 import json
 import sqlite3
+import urllib.request
+import urllib.parse
+import uuid
 from pathlib import Path
-import httpx
 
 # UTF-8 for console
 if hasattr(sys.stdout, "reconfigure"):
@@ -28,10 +29,7 @@ def find_latest_video(search_dirs: list[str]) -> Path | None:
 
 
 def get_video_seo(video_path: Path) -> dict:
-    """Try to get video SEO info from database or adjacent json file."""
     seo = {"title": "", "description": "", "tags": ""}
-    
-    # Check SQLite DB
     db_paths = [
         video_path.parent.parent / "data" / "factshorts.db",
         Path("factshorts-bot/data/factshorts.db"),
@@ -61,7 +59,6 @@ def get_video_seo(video_path: Path) -> dict:
             except Exception:
                 pass
 
-    # Check json sidecar
     json_path = video_path.with_suffix(".json")
     if json_path.exists():
         try:
@@ -75,14 +72,51 @@ def get_video_seo(video_path: Path) -> dict:
     return seo
 
 
+def upload_multipart(url: str, fields: dict, file_field: str, file_path: Path) -> bool:
+    """Send multipart/form-data via standard library urllib."""
+    boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
+    body = bytearray()
+
+    for k, v in fields.items():
+        body.extend(f"--{boundary}\r\n".encode("utf-8"))
+        body.extend(f'Content-Disposition: form-data; name="{k}"\r\n\r\n'.encode("utf-8"))
+        body.extend(f"{v}\r\n".encode("utf-8"))
+
+    filename = file_path.name
+    body.extend(f"--{boundary}\r\n".encode("utf-8"))
+    body.extend(f'Content-Disposition: form-data; name="{file_field}"; filename="{filename}"\r\n'.encode("utf-8"))
+    body.extend(b"Content-Type: video/mp4\r\n\r\n")
+    with open(file_path, "rb") as f:
+        body.extend(f.read())
+    body.extend(b"\r\n")
+    body.extend(f"--{boundary}--\r\n".encode("utf-8"))
+
+    req = urllib.request.Request(
+        url,
+        data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=300) as response:
+            resp_data = json.loads(response.read().decode("utf-8"))
+            if resp_data.get("ok"):
+                return True
+            print(f"⚠️ Telegram returned: {resp_data}")
+            return False
+    except Exception as exc:
+        print(f"⚠️ Upload failed: {exc}")
+        return False
+
+
 def send_video(video_path: Path):
     if not BOT_TOKEN or not CHAT_ID:
         print("❌ Telegram BOT_TOKEN or CHAT_ID missing. Skipping Telegram notification.")
         return False
 
     size_mb = video_path.stat().st_size / (1024 * 1024)
-    print(f"📦 Found generated video: {video_path.name} ({size_mb:.2f} MB)")
-    print(f"🚀 Sending directly to Telegram Chat ID: {CHAT_ID}...")
+    print(f"📦 Found video: {video_path.name} ({size_mb:.2f} MB)")
+    print(f"🚀 Sending to Telegram Chat ID: {CHAT_ID}...")
 
     seo = get_video_seo(video_path)
     title = seo.get("title") or video_path.stem.replace("-", " ").title()
@@ -96,39 +130,34 @@ def send_video(video_path: Path):
         f"✅ Video render complete! Ready to upload."
     )
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendVideo"
-    
-    with open(video_path, "rb") as f:
-        files = {"video": (video_path.name, f, "video/mp4")}
-        data = {
-            "chat_id": CHAT_ID,
-            "caption": caption[:1024],
-            "parse_mode": "Markdown",
-            "supports_streaming": "true"
-        }
-        try:
-            with httpx.Client(timeout=300.0) as client:
-                resp = client.post(url, data=data, files=files)
-                if resp.status_code == 200:
-                    print("✅ VIDEO SUCCESSFULLY DELIVERED TO YOUR TELEGRAM!")
-                    return True
-                else:
-                    print(f"⚠️ Telegram sendVideo response ({resp.status_code}): {resp.text}")
-                    # Try fallback to sendDocument
-                    doc_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
-                    f.seek(0)
-                    resp_doc = client.post(
-                        doc_url,
-                        data={"chat_id": CHAT_ID, "caption": caption[:1024], "parse_mode": "Markdown"},
-                        files={"document": (video_path.name, f, "video/mp4")}
-                    )
-                    if resp_doc.status_code == 200:
-                        print("✅ Video sent as document successfully to Telegram!")
-                        return True
-                    return False
-        except Exception as exc:
-            print(f"❌ Error sending to Telegram: {exc}")
-            return False
+    fields = {
+        "chat_id": CHAT_ID,
+        "caption": caption[:1024],
+        "parse_mode": "Markdown",
+        "supports_streaming": "true"
+    }
+
+    # First try sendVideo
+    success = upload_multipart(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendVideo",
+        fields,
+        "video",
+        video_path
+    )
+
+    if not success:
+        print("🔄 Retrying as document...")
+        fields.pop("supports_streaming", None)
+        success = upload_multipart(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument",
+            fields,
+            "document",
+            video_path
+        )
+
+    if success:
+        print("✅ VIDEO SUCCESSFULLY DELIVERED TO YOUR TELEGRAM!")
+    return success
 
 
 if __name__ == "__main__":
@@ -139,7 +168,7 @@ if __name__ == "__main__":
             target_path = arg_path
         elif arg_path.is_dir():
             target_path = find_latest_video([str(arg_path)])
-    
+
     if not target_path:
         target_path = find_latest_video(["factshorts-bot/output", "vox_studio/output", "output", "."])
 
