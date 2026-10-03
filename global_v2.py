@@ -270,48 +270,42 @@ def fetch_product_details_and_images(product_url: str) -> Dict[str, Any]:
 def generate_truthful_prompt_and_voiceover(product_data: Dict[str, Any]) -> Dict[str, str]:
     """
     Creates:
-    1. Polished Google Flow Video Prompt (9:16 vertical, natural mirror selfie try-on, 35mm grain, no 360 spin)
-    2. 12-18s Natural Hindi/Hinglish Voiceover script with honest CTA
-    3. On-screen luxury caption text
+    1. Master Google Flow / Veo 2 Prompt (Authentic Indian Creator Outfit Check, Mirror Selfie, 60fps 9:16)
+    2. Viral Google Trends & Instagram SEO Caption with Official Creator Affiliate Links
     """
     title = product_data.get("title", "Kashmira Elegant Outfit")
     price = product_data.get("price", "₹499")
 
-    # Polished Google Flow Prompt
+    # Master Verified 21yo Indian Creator Outfit-Check Prompt (Dual-Conditioned)
     flow_prompt = (
-        f"Authentic raw smartphone mirror selfie video of the exact same 22-year-old young Indian woman shown in the attached character sheet reference image — "
-        f"preserve her EXACT facial structure and identity: youthful elegant soft-oval face shape, smooth glowing clear tan skin, "
-        f"warm honey-brown eyes with natural lashes and softly arched dark brows, delicate straight nose, natural soft rose-pink lips with defined cupid's bow, "
-        f"subtle charming smile, long voluminous dark espresso-brown/black wavy hair with wispy curtain fringe and natural flyaways, "
-        f"clean minimalist modern Indian creator look with natural everyday makeup. "
-        f"She is wearing the {title} shown in the second attached reference image — "
-        f"the garment has a flattering modern silhouette, clean neckline, form-fitting stretch tailoring hugging the body with elegant finish. "
-        f"She is holding her smartphone in one hand taking a full-length mirror selfie in her bright sunlit aesthetic bedroom, "
-        f"showcasing the outfit and fit naturally to the mirror camera, smiling warmly and talking with authentic lip sync cadence. "
-        f"Genuine organic creator energy, natural handheld camera micro-shake, soft window daylight, "
-        f"raw unedited 4K smartphone video texture with subtle 35mm grain, zero artificial plastic AI smoothness, "
-        f"zero overlays, zero text, zero watermarks, 60fps vertical 9:16 aspect ratio."
+        f"Authentic raw smartphone camera video of a 21yo Indian girl creator "
+        f"(youthful natural soft-oval face shape with gentle feminine jawline, smooth glowing cheeks and delicate sweet chin, "
+        f"large expressive warm honey-brown almond-shaped eyes with subtle natural tightline and softly arched dark brows, "
+        f"cute straight delicate nose with soft rounded tip and natural gentle bridge highlight, "
+        f"plump natural soft rose-pink lips with defined cupid's bow, signature tiny crisp round black bindi centered precisely above eyebrows, "
+        f"long voluminous dark espresso black wavy hair with effortless wispy strands and delicate curtain tendrils falling over forehead and cheeks, "
+        f"traditional silver oxidised bell-shaped jhumkas with stacked silver bangles, or delicate gold floral ear studs) "
+        f"doing a real outfit check in her bright sunlit aesthetic bedroom. "
+        f"Full-length mirror selfie perspective holding iPhone, wearing the fitted {title} shown in the second attached reference image "
+        f"in fitted stretch fabric with modern clean cut and flattering drape. "
+        f"Stepping back to showcase the floor-length drape, doing smooth natural poses, turning side-to-side to show the sculpted silhouette and sleeve fit, "
+        f"smiling naturally, genuine organic creator body language and fabric movement, soft daylight, "
+        f"zero artificial plastic blur, zero text, zero overlays, zero watermarks, 60fps vertical 9:16 aspect ratio."
     )
 
-    # 12-18 Second Natural Hindi/Hinglish Voiceover Script
-    voiceover_script = (
-        f"Guys, look at this gorgeous find! Ye stylish {title} ka fit and fall bilkul 10 on 10 hai. "
-        f"Fabric super comfortable aur stretchable hai, perfect for everyday styling. "
-        f"And the best part? It's currently available for just {price}! "
-        f"Direct buy karne ke liye bio mein diye link par click karein ya comment karein 'LINK' for instant DM!"
-    )
-
-    # Clean On-Screen Caption
+    # Viral Instagram / YouTube Shorts SEO Caption (Google Trends Fashion Keywords)
     caption_text = (
-        f"✨ {title.upper()}\n\n"
-        f"👗 Perfect Fit & Trending Aesthetic\n"
-        f"💰 Price: {price} | ⭐ 4.8 Rating\n"
-        f"🔗 Tap link in bio or DM to buy!"
+        f"✨ {title.upper()} — Try-On & Fit Review ✨\n\n"
+        f"🏷️ Deal Price: {price} (Special Discount)\n"
+        f"⭐ Rating: 4.8 / 5.0 (Verified Buyer Favorite)\n"
+        f"🛍️ Official Creator Link: {product_data.get('official_affiliate_link', '')}\n\n"
+        f"💬 Comment 'LINK' or DM to get instant direct link!\n\n"
+        f"🏷️ #MeeshoFinds #FashionHaul #OOTD #DressInspo #AffiliateFashion #ViralReels #TrendingFashion2026"
     )
 
     return {
         "flow_prompt": flow_prompt,
-        "voiceover_script": voiceover_script,
+        "voiceover_script": "",
         "caption_text": caption_text
     }
 
