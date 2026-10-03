@@ -95,7 +95,9 @@ export default function IngestInboxView({
     }
   };
 
-  // Filter based on active tab and search
+  const [minRating, setMinRating] = useState(0); // 0 (all), 3.8, 4.0, 4.5
+
+  // Filter based on active tab, search, and quality rating
   const filteredProducts = products.filter((p) => {
     const matchesTab =
       activeTab === 'all'
@@ -109,8 +111,29 @@ export default function IngestInboxView({
       (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesTab && matchesSearch;
+    const itemRating = Number(p.rating || 4.2);
+    const matchesRating = minRating === 0 || itemRating >= minRating;
+
+    return matchesTab && matchesSearch && matchesRating;
   });
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Are you sure you want to permanently remove ${selectedIds.size} selected items?`)) return;
+    for (const id of selectedIds) {
+      await onDeleteProduct?.(id);
+    }
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedIds.size === 0) return;
+    for (const id of selectedIds) {
+      const prod = products.find(p => p.id === id);
+      if (prod) await handleApprove(prod);
+    }
+    setSelectedIds(new Set());
+  };
 
   const getVal = (id, field, fallback) => {
     if (editingValues[id] && editingValues[id][field] !== undefined) {
@@ -464,7 +487,7 @@ export default function IngestInboxView({
         <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px', padding: '20px', backdropFilter: 'blur(16px)' }}>
           {/* Table Header & Download Bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>Showing {filteredProducts.length} records</span>
               <button
                 type="button"
@@ -479,8 +502,40 @@ export default function IngestInboxView({
                 placeholder="Search products, fabrics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 12px', color: '#fff', fontSize: '12px', width: '200px' }}
+                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 12px', color: '#fff', fontSize: '12px', width: '180px' }}
               />
+
+              {/* Quality & Rating Filter */}
+              <select
+                value={minRating}
+                onChange={(e) => setMinRating(Number(e.target.value))}
+                style={{ background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 10px', color: '#facc15', fontSize: '12px', fontWeight: '600' }}
+              >
+                <option value={0}>⭐ All Ratings</option>
+                <option value={3.8}>⭐ 3.8+ Stars (Clean Filter)</option>
+                <option value={4.0}>⭐ 4.0+ Stars (High Quality)</option>
+                <option value={4.3}>⭐ 4.3+ Stars (Viral Gems)</option>
+              </select>
+
+              {/* Bulk Actions when selected */}
+              {selectedIds.size > 0 && (
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    style={{ background: 'rgba(239, 68, 68, 0.25)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#f87171', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    🗑️ Delete ({selectedIds.size})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkApprove}
+                    style={{ background: 'rgba(34, 197, 94, 0.25)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#4ade80', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    ✓ Publish ({selectedIds.size})
+                  </button>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

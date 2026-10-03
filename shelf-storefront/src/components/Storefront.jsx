@@ -48,7 +48,20 @@ const HERO_SLIDE_COPY = {
   },
 };
 
-export default function Storefront({ products, collections, creatorName = 'Aanya Mehta', handle = '@aanya.edit', bio = 'Thoughtful finds for everyday life.', onBack, onShare, showStudioControls = false }) {
+export default function Storefront({ 
+  products, 
+  collections, 
+  creatorName = 'Aanya Mehta', 
+  handle = '@aanya.edit', 
+  bio = 'Thoughtful finds for everyday life.', 
+  onBack, 
+  onShare, 
+  showStudioControls = false,
+  isAdmin = false,
+  onDeleteProduct,
+  onTogglePublish,
+  onEditProduct
+}) {
   const [storeFilter, setStoreFilter] = useState('All stores');
   const [categoryFilter, setCategoryFilter] = useState('All picks');
   const [collectionFilter, setCollectionFilter] = useState('all');
@@ -1130,6 +1143,11 @@ export default function Storefront({ products, collections, creatorName = 'Aanya
                   key={product.id} 
                   product={{ ...product, saved: savedIds.includes(product.id) }} 
                   isPublic 
+                  isAdmin={isAdmin}
+                  showStudioControls={showStudioControls}
+                  onDeleteProduct={onDeleteProduct}
+                  onTogglePublish={onTogglePublish}
+                  onEditProduct={onEditProduct}
                   onToggleSaved={toggleSave}
                   onInstantOrder={(prod) => setOrderModalProduct(prod)}
                   onViewDetail={(prod) => {

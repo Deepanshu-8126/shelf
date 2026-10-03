@@ -1430,9 +1430,26 @@ export default function App() {
         body: JSON.stringify({ ids: [productId] })
       });
       setProducts((prev) => prev.filter((p) => p.id !== productId));
-      showToast('Item discarded from inbox');
+      showToast('Item removed from catalog & store');
     } catch {
       showToast('Failed to delete item');
+    }
+  };
+
+  const handleTogglePublish = async (product) => {
+    const nextStatus = product.status === 'published' ? 'draft' : 'published';
+    try {
+      await fetch('/api/products/update-item', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...product, status: nextStatus })
+      });
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, status: nextStatus } : p))
+      );
+      showToast(nextStatus === 'published' ? '🚀 Product is now Live on Storefront!' : '👁️ Product hidden from Storefront (Moved to Drafts)');
+    } catch {
+      showToast('Failed to toggle status');
     }
   };
 
@@ -1626,7 +1643,25 @@ export default function App() {
   };
 
   if (isPublic) {
-    return <><Storefront products={enrichedProducts} collections={collections} creatorName={creatorName} handle={creatorHandle} bio={bio} onBack={closeCreatorPreview} onShare={sharePage} showStudioControls={isCreatorPreview} /><Toast message={toast} /></>;
+    return (
+      <>
+        <Storefront 
+          products={enrichedProducts} 
+          collections={collections} 
+          creatorName={creatorName} 
+          handle={creatorHandle} 
+          bio={bio} 
+          onBack={closeCreatorPreview} 
+          onShare={sharePage} 
+          showStudioControls={isCreatorPreview || isAuthenticated}
+          isAdmin={isAuthenticated}
+          onDeleteProduct={handleDeleteProduct}
+          onTogglePublish={handleTogglePublish}
+          onEditProduct={openEditLink}
+        />
+        <Toast message={toast} />
+      </>
+    );
   }
   if (authLoading) {
     return <main className="owner-login-page"><div className="owner-login-loading"><span className="brand-mark"><i /><i /><i /></span><strong>Opening your studio…</strong><span>Checking your private creator session.</span></div></main>;

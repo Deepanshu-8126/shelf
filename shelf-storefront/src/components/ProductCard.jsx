@@ -27,9 +27,22 @@ export function cleanDisplayTitle(rawTitle) {
   return first ? first.replace(/\bAnd\b/g, '&') : str.slice(0, 36);
 }
 
-export default function ProductCard({ product, isPublic = false, onToggleSaved, onAddLink, onInstantOrder, onViewDetail }) {
+export default function ProductCard({ 
+  product, 
+  isPublic = false, 
+  isAdmin = false,
+  showStudioControls = false,
+  onToggleSaved, 
+  onAddLink, 
+  onInstantOrder, 
+  onViewDetail,
+  onDeleteProduct,
+  onTogglePublish,
+  onEditProduct
+}) {
   const [activeImage, setActiveImage] = useState(0);
   const [galleryPaused, setGalleryPaused] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const touchStartX = useRef(null);
   const imageSlides = useMemo(() => {
     const seen = new Set();
@@ -100,9 +113,27 @@ export default function ProductCard({ product, isPublic = false, onToggleSaved, 
     setGalleryPaused(false);
   };
 
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (window.confirm(`Are you sure you want to remove "${product.title.slice(0, 30)}..." from your store?`)) {
+      setDeleting(true);
+      onDeleteProduct?.(product.id);
+    }
+  };
+
+  const handleHideClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onTogglePublish?.(product);
+  };
+
+  const isOwnerAdmin = isAdmin || showStudioControls;
+
   return (
     <article
-      className={`product-card${isPublic ? ' product-card-public' : ''}`}
+      className={`product-card${isPublic ? ' product-card-public' : ''}${isOwnerAdmin ? ' has-admin-controls' : ''}`}
+      style={{ opacity: deleting ? 0.3 : 1, transition: 'opacity 0.2s ease' }}
       onMouseMove={handleTilt}
       onMouseLeave={resetTilt}
     >
@@ -112,6 +143,88 @@ export default function ProductCard({ product, isPublic = false, onToggleSaved, 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
+        {/* ADMIN QUICK ACTION OVERLAY */}
+        {isOwnerAdmin && onDeleteProduct && (
+          <div 
+            className="admin-card-overlay"
+            style={{
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              zIndex: 30,
+              display: 'flex',
+              gap: '4px',
+              background: 'rgba(11, 13, 19, 0.85)',
+              backdropFilter: 'blur(10px)',
+              padding: '3px 6px',
+              borderRadius: '999px',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              title="Remove product from Storefront"
+              style={{
+                background: 'rgba(239, 68, 68, 0.25)',
+                border: '1px solid rgba(239, 68, 68, 0.5)',
+                color: '#f87171',
+                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '11px',
+                cursor: 'pointer'
+              }}
+            >
+              🗑️
+            </button>
+            {onTogglePublish && (
+              <button
+                type="button"
+                onClick={handleHideClick}
+                title="Hide / Move to Ingest Drafts"
+                style={{
+                  background: 'rgba(234, 179, 8, 0.25)',
+                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                  color: '#fde047',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: '11px',
+                  cursor: 'pointer'
+                }}
+              >
+                👁️
+              </button>
+            )}
+            {onEditProduct && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
+                title="Edit Product Price / Details"
+                style={{
+                  background: 'rgba(56, 189, 248, 0.25)',
+                  border: '1px solid rgba(56, 189, 248, 0.5)',
+                  color: '#38bdf8',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: '11px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✏️
+              </button>
+            )}
+          </div>
+        )}
         <img
           className={`product-photo${(product.galleryUseAsPrimary ? product.galleryImageFit : product.imageFit) === 'contain' ? ' product-photo-contain' : ''}`}
           src={imageSlides[activeImage] || product.image || '/images/meesho-dress-ae6lv9.webp'}
