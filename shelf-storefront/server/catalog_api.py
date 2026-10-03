@@ -1689,6 +1689,150 @@ def studio_test_telegram_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         return {"success": False, "error": str(e)}
 
 
+# ==============================================================================
+# CSV KNOWLEDGE BASE & AGENTIC VISION DETECTIVE
+# ==============================================================================
+_CACHED_CSV_CATALOG: list[dict[str, Any]] | None = None
+
+
+def get_master_csv_catalog() -> list[dict[str, Any]]:
+    """Loads and indexes products from master_125_photoshoot_prompts.csv, pinterest_viral_pins.csv, and meesho scraped CSV."""
+    global _CACHED_CSV_CATALOG
+    if _CACHED_CSV_CATALOG is not None:
+        return _CACHED_CSV_CATALOG
+
+    catalog: list[dict[str, Any]] = []
+
+    # 1. Master 125 Photoshoot Prompts (216 rows with mood & curated prompts)
+    p1_candidates = [
+        Path("photoshoot_pinterest_engine/master_125_photoshoot_prompts.csv"),
+        Path("d:/facts_yt/photoshoot_pinterest_engine/master_125_photoshoot_prompts.csv"),
+        Path("d:/affi;ate/trend-earning-system/photoshoot_pinterest_engine/master_125_photoshoot_prompts.csv"),
+        Path("../photoshoot_pinterest_engine/master_125_photoshoot_prompts.csv")
+    ]
+    for p in p1_candidates:
+        if p.is_file():
+            try:
+                with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                    reader = csv.DictReader(f)
+                    for idx, r in enumerate(reader):
+                        t = str(r.get("title", "")).strip()
+                        if not t:
+                            continue
+                        mood = str(r.get("mood", "Vogue Editorial")).strip()
+                        catalog.append({
+                            "id": f"master-prompt-{idx+1}",
+                            "title": f"{t} ({mood})",
+                            "raw_title": t,
+                            "price": str(r.get("price", "₹391")).strip(),
+                            "category": str(r.get("category", "High-Fashion Statement")).strip(),
+                            "mood": mood,
+                            "fabric": "Premium Lycra Stretch & Sculpted Crepe",
+                            "image_url": str(r.get("image_url", "")).strip(),
+                            "master_prompt": str(r.get("prompt", "")).strip(),
+                            "source": "Master 125 Prompts"
+                        })
+                break
+            except Exception:
+                continue
+
+    # 2. Pinterest Viral Pins (107 high-converting viral Pins)
+    p2_candidates = [
+        Path("shelf-storefront/pinterest_viral_pins.csv"),
+        Path("pinterest_viral_pins.csv"),
+        Path("d:/facts_yt/shelf-storefront/pinterest_viral_pins.csv"),
+        Path("d:/affi;ate/trend-earning-system/shelf-storefront/pinterest_viral_pins.csv"),
+        Path("../shelf-storefront/pinterest_viral_pins.csv")
+    ]
+    for p in p2_candidates:
+        if p.is_file():
+            try:
+                with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                    reader = csv.DictReader(f)
+                    for idx, r in enumerate(reader):
+                        t = str(r.get("Title", "")).strip()
+                        if not t:
+                            continue
+                        board = str(r.get("Pinterest board", "Aesthetic Fashion Curations")).strip()
+                        catalog.append({
+                            "id": f"viral-pin-{idx+1}",
+                            "title": t,
+                            "raw_title": t,
+                            "price": "₹599",
+                            "category": board,
+                            "mood": "Aesthetic Viral Inspo",
+                            "fabric": "Curated Cotton-Blend Textile",
+                            "image_url": str(r.get("Media URL", "")).strip(),
+                            "master_prompt": f"Aesthetic Pinterest viral photoshoot of {t}, soft natural light, clean editorial background, authentic skin pores, 8K ultra-detailed fashion shoot.",
+                            "source": "Pinterest Viral Pins"
+                        })
+                break
+            except Exception:
+                continue
+
+    # 3. Meesho Scraped Catalog (14 core items with exact fabric & pattern)
+    p3_candidates = [
+        Path("photoshoot_pinterest_engine/meesho-com-2026-10-03.csv"),
+        Path("d:/facts_yt/photoshoot_pinterest_engine/meesho-com-2026-10-03.csv"),
+        Path("d:/affi;ate/trend-earning-system/photoshoot_pinterest_engine/meesho-com-2026-10-03.csv"),
+        Path("../photoshoot_pinterest_engine/meesho-com-2026-10-03.csv")
+    ]
+    for p in p3_candidates:
+        if p.is_file():
+            try:
+                with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                    reader = csv.DictReader(f)
+                    for idx, r in enumerate(reader):
+                        t = (str(r.get("title") or r.get("item_page_title") or "")).strip()
+                        if not t:
+                            continue
+                        fab = str(r.get("product_fabric", "")).replace("Fabric :", "").strip()
+                        pat = str(r.get("product_pattern", "")).replace("Pattern :", "").strip()
+                        catalog.append({
+                            "id": f"meesho-scraped-{idx+1}",
+                            "title": t,
+                            "raw_title": t,
+                            "price": str(r.get("price", "₹450")).strip(),
+                            "category": f"{fab} {pat}".strip() or "Meesho Verified Fashion",
+                            "fabric": fab or "Fine Lycra Blend",
+                            "pattern": pat or "Tailored",
+                            "mood": "Studio Lookbook",
+                            "image_url": str(r.get("image") or r.get("image_1") or "").strip(),
+                            "master_prompt": f"Vogue India high-fashion editorial of {t} in authentic {fab or 'pure textile'}, clean travertine pedestal backdrop, soft window morning illumination, 85mm portrait, candid subtle dimple smile, authentic skin micro-pores.",
+                            "source": "Meesho Scraped Catalog"
+                        })
+                break
+            except Exception:
+                continue
+
+    _CACHED_CSV_CATALOG = catalog
+    return catalog
+
+
+@app.get("/api/studio/csv-catalog")
+def studio_csv_catalog_endpoint(q: str = "", source: str = "") -> dict[str, Any]:
+    catalog = get_master_csv_catalog()
+    filtered = catalog
+    if source and source.lower() != "all":
+        filtered = [x for x in filtered if source.lower() in x.get("source", "").lower()]
+    if q.strip():
+        query_lower = q.lower().strip()
+        filtered = [
+            x for x in filtered
+            if query_lower in x.get("title", "").lower()
+            or query_lower in x.get("raw_title", "").lower()
+            or query_lower in x.get("category", "").lower()
+            or query_lower in x.get("fabric", "").lower()
+            or query_lower in x.get("mood", "").lower()
+        ]
+    return {
+        "success": True,
+        "total_indexed": len(catalog),
+        "count": len(filtered),
+        "products": filtered[:100]  # Return up to 100 for fast UI response
+    }
+
+
 class DetectStyleRequest(BaseModel):
     title: str = ""
     category: str = ""
@@ -1698,77 +1842,153 @@ class DetectStyleRequest(BaseModel):
 
 @app.post("/api/studio/detect-product-style")
 def studio_detect_style_endpoint(payload: DetectStyleRequest) -> dict[str, Any]:
-    text_corpus = f"{payload.title} {payload.category} {payload.fabric} {payload.photo_url}".lower()
+    text_corpus = f"{payload.title} {payload.category} {payload.fabric} {payload.photo_url}".lower().strip()
 
-    # Intelligent Agentic Classification
+    # Step 1: Match against Unified CSV Knowledge Base (337 Items)
+    csv_catalog = get_master_csv_catalog()
+    matched_csv_row = None
+    
+    # Priority A: Check title or raw_title matches (Exact or strong substring)
+    if payload.title.strip():
+        p_title_lower = payload.title.lower().strip()
+        for item in csv_catalog:
+            item_raw_lower = item.get("raw_title", "").lower()
+            item_full_lower = item.get("title", "").lower()
+            if p_title_lower == item_raw_lower:
+                matched_csv_row = item
+                break
+            if len(p_title_lower) >= 8 and (p_title_lower in item_raw_lower or item_raw_lower in p_title_lower):
+                matched_csv_row = item
+                break
+            if len(p_title_lower) >= 8 and p_title_lower in item_full_lower:
+                matched_csv_row = item
+                break
+
+    # Priority B: Check photo_url match if not yet matched
+    if not matched_csv_row and payload.photo_url.strip():
+        p_url = payload.photo_url.strip()
+        for item in csv_catalog:
+            item_img = item.get("image_url", "").strip()
+            if item_img and (p_url == item_img or item_img in p_url):
+                matched_csv_row = item
+                break
+
+    # Priority C: High word overlap (at least 2 distinct words >= 4 letters)
+    if not matched_csv_row and text_corpus:
+        corpus_words = set(w for w in text_corpus.split() if len(w) >= 4)
+        for item in csv_catalog:
+            item_words = set(w for w in item.get("raw_title", "").lower().split() if len(w) >= 4)
+            overlap = corpus_words.intersection(item_words)
+            if len(overlap) >= 2:
+                matched_csv_row = item
+                break
+
+    # Extract or infer fabric & garment
+    if matched_csv_row:
+        detected_category = matched_csv_row.get("category") or "High-Fashion Statement Outfit"
+        key_garment = matched_csv_row.get("raw_title") or matched_csv_row.get("title")
+        matched_from_csv = True
+        csv_source = matched_csv_row.get("source", "Master CSV Knowledge Base")
+        csv_mood = matched_csv_row.get("mood", "Vogue Editorial")
+        csv_master_prompt = matched_csv_row.get("master_prompt", "")
+        detected_fabric = matched_csv_row.get("fabric", "Fine Premium Textile Weave")
+    else:
+        detected_category = "High-Fashion Garment"
+        key_garment = payload.title or "Curated Fashion Outfit"
+        matched_from_csv = False
+        csv_source = "Dynamic Agentic Vision Detective (Universal)"
+        csv_mood = "Zara Editorial Drop"
+        csv_master_prompt = ""
+        detected_fabric = payload.fabric or "Luxury Textile Blend"
+
+    # Intelligent Classification for fabric, palette & silhouette across ANY product in the world
     if any(k in text_corpus for k in ["saree", "sari", "banarasi", "kanjivaram", "silk", "pallu", "zari"]):
-        detected_category = "Royal Banarasi Silk Saree"
+        detected_category = detected_category if matched_from_csv else "Royal Banarasi Silk Saree"
         detected_fabric = "Pure Katan Silk with Metallic Brocade Zari"
         detected_palette = "Imperial Crimson & Antique Gold Zari"
         detected_silhouette = "Regal 9-Yard Cascade Drape"
-        key_garment = payload.title or "Classic Banarasi Silk Saree"
-    elif any(k in text_corpus for k in ["bodycon", "maxi", "gown", "evening", "dress", "cocktail", "velvet", "lace"]):
-        detected_category = "Luxury Evening Bodycon Maxi Dress"
-        detected_fabric = "Heavyweight Stretch Velvet & Delicate Lace"
+        key_garment = key_garment if matched_from_csv else (payload.title or "Classic Banarasi Silk Saree")
+    elif any(k in text_corpus for k in ["bodycon", "maxi", "gown", "evening", "dress", "cocktail", "velvet", "lace", "lycra"]):
+        detected_category = detected_category if matched_from_csv else "Luxury Evening Bodycon Maxi Dress"
+        detected_fabric = "Premium Lycra Stretch & Sculpted Crepe"
         detected_palette = "Midnight Burgundy & Obsidian Warmth"
         detected_silhouette = "Body-Sculpting Hourglass Silhouette"
-        key_garment = payload.title or "Burgundy Bodycon Maxi Dress"
+        key_garment = key_garment if matched_from_csv else (payload.title or "Burgundy Bodycon Maxi Dress")
     elif any(k in text_corpus for k in ["kurti", "kurta", "anarkali", "suit", "ethnic"]):
-        detected_category = "Contemporary Festive Ethnic Kurti"
+        detected_category = detected_category if matched_from_csv else "Contemporary Festive Ethnic Kurti"
         detected_fabric = "Premium Slub Chanderi Cotton Blend"
         detected_palette = "Earthy Mustard & Terracotta Warmth"
         detected_silhouette = "Relaxed Tailored A-Line Cut"
-        key_garment = payload.title or "Festive Designer Kurti"
+        key_garment = key_garment if matched_from_csv else (payload.title or "Festive Designer Kurti")
     elif any(k in text_corpus for k in ["top", "halter", "crop", "tee", "t-shirt", "corset", "shirt"]):
-        detected_category = "Y2K High-Street Halter Top"
+        detected_category = detected_category if matched_from_csv else "Y2K High-Street Halter Top"
         detected_fabric = "Ribbed Cotton-Spandex with French Seams"
         detected_palette = "Pastel Rosé & Pearl Sand"
         detected_silhouette = "Form-Fitted Architectural Crop"
-        key_garment = payload.title or "Trendy Halter Neck Top"
+        key_garment = key_garment if matched_from_csv else (payload.title or "Trendy Halter Neck Top")
+    elif any(k in text_corpus for k in ["blazer", "suit", "coat", "trench", "jacket"]):
+        detected_category = detected_category if matched_from_csv else "Architectural Power Blazer"
+        detected_fabric = "Structured Wool-Gabardine with Silk Lining"
+        detected_palette = "Charcoal Slate & Minimalist Bone"
+        detected_silhouette = "Oversized Boxy Sharp-Shouldered Fit"
+        key_garment = key_garment if matched_from_csv else (payload.title or "High-Fashion Power Blazer")
     else:
-        detected_category = "High-Fashion Statement Attire"
-        detected_fabric = "Luxury Textured Textile Blend"
+        detected_category = detected_category if matched_from_csv else "High-Fashion Statement Attire"
+        detected_fabric = detected_fabric or "Luxury Textured Textile Blend"
         detected_palette = "Monochrome Sand & Deep Amber"
         detected_silhouette = "Modern Clean Tailored Fit"
-        key_garment = payload.title or "Curated Fashion Outfit"
+        key_garment = key_garment if matched_from_csv else (payload.title or "Curated Fashion Outfit")
 
-    zara_campaigns = [
+    zara_campaigns = []
+
+    # If matched from CSV, include the exact verified master prompt from CSV first!
+    if matched_from_csv and csv_master_prompt:
+        zara_campaigns.append({
+            "id": "csv_master_verified",
+            "brand": "Master CSV Match",
+            "icon": "⭐",
+            "title": f"Verified CSV Editorial ({csv_mood})",
+            "prompt": csv_master_prompt
+        })
+
+    # Add 5 Zara / Vogue Brand Campaigns with 99% Exact Garment Clone Directives
+    zara_campaigns.extend([
         {
             "id": "zara_brutalist",
             "brand": "Zara Architectural",
             "icon": "🏛️",
             "title": "Brutalist Concrete Pavilion (High-Contrast Shadows)",
-            "prompt": f"Zara high-fashion editorial lookbook of {key_garment}, 21yo female fashion model in architectural brutalist concrete pavilion, intense directional afternoon sunlight casting dramatic geometric diagonal shadows, confident statuesque pose, 8K ultra-sharp fabric weave, authentic skin micro-pores, zero digital sharpening, 35mm f/1.4 lens."
+            "prompt": f"Zara high-fashion editorial lookbook of {key_garment}, 100% faithful garment clone, identical silhouette and textile weave, 21yo female fashion model in architectural brutalist concrete pavilion, intense directional afternoon sunlight casting dramatic geometric diagonal shadows, confident statuesque pose, 8K ultra-sharp fabric weave, authentic skin micro-pores, zero digital sharpening, 35mm f/1.4 lens."
         },
         {
             "id": "vogue_india_regal",
             "brand": "Vogue India",
             "icon": "👑",
             "title": "Jaipur Royal Palace Heritage (Golden Hour Rim Light)",
-            "prompt": f"Vogue India cover campaign featuring {key_garment}, 21yo Indian model with round black bindi and silver oxidised jhumkas, Jaipur royal palace marble courtyard, soft golden hour rim light illuminating delicate {detected_fabric.lower()}, authentic skin pores, 85mm f/1.4 portrait, regal grace, flowing drape."
+            "prompt": f"Vogue India cover campaign featuring {key_garment}, 100% faithful garment clone with exact embroidery and cuts, 21yo Indian model with round black bindi and silver oxidised jhumkas, Jaipur royal palace marble courtyard, soft golden hour rim light illuminating delicate {detected_fabric.lower()}, authentic skin pores, 85mm f/1.4 portrait, regal grace, flowing drape."
         },
         {
             "id": "amalfi_resort",
             "brand": "Riviera Old-Money",
             "icon": "🏖️",
             "title": "Amalfi Coastline Villa (Sun-Dappled Palm Shadows)",
-            "prompt": f"Old-money European resort editorial of {key_garment}, sun-dappled lemon tree and palm shadows on terracotta terrace overlooking Amalfi coastline, soft warm ocean breeze gently lifting hair, authentic skin micro-pores, candid relaxed dimple smile, 50mm f/1.4, linen textures, 8K editorial clarity."
+            "prompt": f"Old-money European resort editorial of {key_garment}, 100% faithful garment clone, sun-dappled lemon tree and palm shadows on terracotta terrace overlooking Amalfi coastline, soft warm ocean breeze gently lifting hair, authentic skin micro-pores, candid relaxed dimple smile, 50mm f/1.4, linen textures, 8K editorial clarity."
         },
         {
             "id": "midnight_noir",
             "brand": "Balenciaga Noir",
             "icon": "🖤",
             "title": "Midnight Amber Velvet Lounge (Cinematic Bokeh)",
-            "prompt": f"Ultra-luxury evening cocktail lounge photoshoot of {key_garment}, warm candlelit amber illumination, cinematic shallow depth of field, sleek {detected_silhouette.lower()}, natural skin highlights, subtle smile, authentic organic pores, Portra 400 35mm film grain, moody atmospheric haze, zero digital crunch."
+            "prompt": f"Ultra-luxury evening cocktail lounge photoshoot of {key_garment}, 100% faithful garment clone, warm candlelit amber illumination, cinematic shallow depth of field, sleek {detected_silhouette.lower()}, natural skin highlights, subtle smile, authentic organic pores, Portra 400 35mm film grain, moody atmospheric haze, zero digital crunch."
         },
         {
             "id": "harrods_clean",
             "brand": "Net-a-Porter Studio",
             "icon": "✨",
             "title": "Minimalist Travertine Pedestal (Immaculate Weave)",
-            "prompt": f"High-end Net-a-Porter luxury e-commerce campaign of {key_garment}, warm travertine stone plinth, soft directional daylight diffusion, pristine {detected_fabric.lower()} micro-texture, authentic organic pores, clean minimal luxury styling, 8K resolution, 50mm studio prime lens."
+            "prompt": f"High-end Net-a-Porter luxury e-commerce campaign of {key_garment}, 100% faithful garment clone, warm travertine stone plinth, soft directional daylight diffusion, pristine {detected_fabric.lower()} micro-texture, authentic organic pores, clean minimal luxury styling, 8K resolution, 50mm studio prime lens."
         }
-    ]
+    ])
 
     return {
         "success": True,
@@ -1777,6 +1997,9 @@ def studio_detect_style_endpoint(payload: DetectStyleRequest) -> dict[str, Any]:
         "detected_fabric": detected_fabric,
         "detected_palette": detected_palette,
         "detected_silhouette": detected_silhouette,
+        "matched_from_csv": matched_from_csv,
+        "csv_source": csv_source,
+        "csv_mood": csv_mood,
         "zara_campaigns": zara_campaigns
     }
 

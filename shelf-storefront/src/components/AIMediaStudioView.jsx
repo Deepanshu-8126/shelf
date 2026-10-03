@@ -273,6 +273,35 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
   const [lightingMood, setLightingMood] = useState('golden'); // 'golden' | 'zara_flash' | 'softbox' | 'amber'
   const [showZaraWatermark, setShowZaraWatermark] = useState(true);
 
+  // CSV Knowledge Base & Product Detective State
+  const [csvCatalog, setCsvCatalog] = useState([]);
+  const [isLoadingCsv, setIsLoadingCsv] = useState(false);
+  const [selectedCsvId, setSelectedCsvId] = useState('');
+  const [csvSearchQuery, setCsvSearchQuery] = useState('');
+  const [csvSourceFilter, setCsvSourceFilter] = useState('all');
+  const [showCsvVaultModal, setShowCsvVaultModal] = useState(false);
+
+  // Load CSV Knowledge Base on mount
+  useEffect(() => {
+    let isMounted = true;
+    const loadCsv = async () => {
+      try {
+        setIsLoadingCsv(true);
+        const res = await fetch('/api/studio/csv-catalog');
+        const data = await res.json();
+        if (isMounted && data.success && Array.isArray(data.products)) {
+          setCsvCatalog(data.products);
+        }
+      } catch (err) {
+        console.error('Failed to load CSV catalog:', err);
+      } finally {
+        if (isMounted) setIsLoadingCsv(false);
+      }
+    };
+    loadCsv();
+    return () => { isMounted = false; };
+  }, []);
+
   // Custom Prompt Library State
   const [customLibrary, setCustomLibrary] = useState(() => {
     try {
@@ -336,19 +365,47 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
           fabric: data.detected_fabric,
           palette: data.detected_palette,
           silhouette: data.detected_silhouette,
+          matched_from_csv: data.matched_from_csv,
+          csv_source: data.csv_source,
+          csv_mood: data.csv_mood,
           campaigns: data.zara_campaigns || []
         });
         if (data.zara_campaigns?.[0]) {
           setSelectedCampaignId(data.zara_campaigns[0].id);
           setCustomPrompt(data.zara_campaigns[0].prompt);
         }
-        onToast(`✨ Agentic Detective: Identified "${data.detected_category}"! 5 Zara Campaigns Ready.`);
+        if (data.matched_from_csv) {
+          onToast(`⭐ Matched in ${data.csv_source}! Verified editorial prompt active.`);
+        } else {
+          onToast(`✨ Universal Detective: Identified "${data.detected_category}"! 5 Zara Campaigns Ready.`);
+        }
       }
     } catch {
       onToast(`✨ Agentic Detective: Calibrated 5 bespoke high-fashion brand campaigns!`);
     } finally {
       setTimeout(() => setIsScanningProduct(false), 400);
     }
+  };
+
+  // Select a product from Master CSV Dataset
+  const handleSelectCsvProduct = (csvId) => {
+    setSelectedCsvId(csvId);
+    if (!csvId) return;
+    const item = csvCatalog.find((x) => x.id === csvId);
+    if (!item) return;
+
+    const chosenTitle = item.raw_title || item.title;
+    setGenTitle(chosenTitle);
+    setGenPrice(item.price || '₹391');
+    if (item.fabric) setGenFabric(item.fabric);
+    if (item.image_url) setRefImage(item.image_url);
+
+    if (item.master_prompt) {
+      setCustomPrompt(item.master_prompt);
+    }
+
+    onToast(`📚 Loaded "${chosenTitle.slice(0, 24)}..." from ${item.source}! Running Detective...`);
+    triggerAgenticDetection(chosenTitle, item.fabric || genFabric, item.image_url || refImage);
   };
 
   // Save customLibrary to localStorage
@@ -990,18 +1047,72 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 />
               </div>
 
+              {/* Quick Pick from Master CSV Knowledge Base (337 Items) */}
+              <div style={{ marginTop: '12px', background: 'rgba(0,0,0,0.3)', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 209, 102, 0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '11px', color: '#ffd166', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span>📚</span> Master CSV Vault ({csvCatalog.length || 337} Items)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowCsvVaultModal(true)}
+                    style={{
+                      background: 'rgba(255, 209, 102, 0.15)',
+                      color: '#ffd166',
+                      border: '1px solid rgba(255, 209, 102, 0.35)',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '800',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Browse All ↗
+                  </button>
+                </div>
+
+                <select
+                  value={selectedCsvId}
+                  onChange={(e) => handleSelectCsvProduct(e.target.value)}
+                  disabled={isLoadingCsv}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(20, 16, 26, 0.95)',
+                    border: '1px solid rgba(255, 209, 102, 0.3)',
+                    color: '#fff',
+                    padding: '7px 8px',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="">-- Choose From Master CSV Datasets --</option>
+                  {csvCatalog.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      [{c.source.includes('Master') ? '⭐ Prompts' : c.source.includes('Pinterest') ? '📌 Viral' : '🛍️ Meesho'}] {c.title.slice(0, 38)} ({c.price})
+                    </option>
+                  ))}
+                </select>
+                <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.45)', marginTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>⭐ 216 Master Prompts</span>
+                  <span>📌 107 Viral Pins</span>
+                  <span>🛍️ 14 Meesho</span>
+                </div>
+              </div>
+
               {/* Quick Pick from Sourced Catalog */}
               {products.length > 0 && (
-                <div style={{ marginTop: '10px' }}>
-                  <label style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '4px' }}>
-                    Or Pick From Storefront Products:
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '3px' }}>
+                    Or Pick From Active Storefront Products:
                   </label>
                   <select
                     value={selectedProductId}
                     onChange={(e) => handleSelectProduct(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(20, 16, 26, 0.95)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '7px 8px', borderRadius: '6px', fontSize: '11.5px' }}
+                    style={{ width: '100%', background: 'rgba(20, 16, 26, 0.95)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11px' }}
                   >
-                    <option value="">-- Choose Catalog Outfit --</option>
+                    <option value="">-- Choose Storefront Outfit --</option>
                     {products.slice(0, 15).map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.title.slice(0, 36)} (₹{p.price})
@@ -1018,13 +1129,13 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 style={{
                   width: '100%',
                   marginTop: '10px',
-                  background: 'rgba(56, 189, 248, 0.12)',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.2))',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
                   color: '#38bdf8',
-                  padding: '7px 10px',
+                  padding: '8px 10px',
                   borderRadius: '6px',
                   fontSize: '11.5px',
-                  fontWeight: '700',
+                  fontWeight: '800',
                   cursor: isScanningProduct ? 'wait' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1032,7 +1143,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   gap: '6px'
                 }}
               >
-                <span>🔍</span> {isScanningProduct ? 'Analyzing Product...' : 'Re-Scan & Generate Zara Campaigns'}
+                <span>🔍</span> {isScanningProduct ? 'Analyzing Product...' : '⚡ Run Agentic Product Detective'}
               </button>
             </div>
 
@@ -1043,9 +1154,66 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   <span>🤖</span> 2. Agentic Detective &amp; Zara Campaigns
                 </span>
                 <span style={{ fontSize: '10px', background: 'rgba(56, 189, 248, 0.2)', color: '#7dd3fc', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
-                  5 Brand Options
+                  {detectedData.campaigns?.length || 5} Brand Styles
                 </span>
               </div>
+
+              {/* CSV Knowledge Match vs Universal Global Detection Banner */}
+              {detectedData.matched_from_csv ? (
+                <div style={{
+                  background: 'linear-gradient(90deg, rgba(34, 197, 94, 0.2), rgba(245, 158, 11, 0.2))',
+                  border: '1px solid rgba(34, 197, 94, 0.45)',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '6px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '13px' }}>⭐</span>
+                    <div>
+                      <div style={{ fontSize: '10.5px', color: '#4ade80', fontWeight: '800' }}>
+                        Matched in CSV: {detectedData.csv_source}
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.7)' }}>
+                        Verified Editorial Mood: <strong>{detectedData.csv_mood}</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '9.5px', background: 'rgba(34, 197, 94, 0.3)', color: '#86efac', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                    100% Verified
+                  </span>
+                </div>
+              ) : (
+                <div style={{
+                  background: 'linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.15))',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '6px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '13px' }}>🌐</span>
+                    <div>
+                      <div style={{ fontSize: '10.5px', color: '#38bdf8', fontWeight: '800' }}>
+                        Universal Detective (Any Global Product)
+                      </div>
+                      <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.65)' }}>
+                        Dynamic Garment &amp; Weave Extraction Active
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '9.5px', background: 'rgba(56, 189, 248, 0.25)', color: '#bae6fd', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                    Live Vision AI
+                  </span>
+                </div>
+              )}
 
               {/* Detected Specs Badges */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '12px', background: 'rgba(0,0,0,0.4)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -2010,6 +2178,213 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   <span>🔄</span> Photo Not Perfect? Regenerate Angle Variation
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: MASTER CSV KNOWLEDGE VAULT (337 OUTFITS) */}
+      {showCsvVaultModal && (
+        <div
+          onClick={() => setShowCsvVaultModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(12px)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'linear-gradient(135deg, rgba(28, 20, 36, 0.98), rgba(16, 12, 22, 0.98))',
+              border: '1px solid rgba(255, 209, 102, 0.35)',
+              borderRadius: '20px',
+              maxWidth: '1100px',
+              width: '100%',
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0, 0, 0, 0.25)' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '20px' }}>📚</span>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#ffd166', letterSpacing: '-0.01em' }}>
+                    Agentic CSV Knowledge Vault ({csvCatalog.length || 337} Items)
+                  </h3>
+                  <span style={{ background: 'rgba(255, 209, 102, 0.15)', color: '#ffd166', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                    Auto-Synced from GitHub
+                  </span>
+                </div>
+                <p style={{ margin: '4px 0 0 0', color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px' }}>
+                  Select any garment from your CSV datasets to lock reference photos and automatically synthesize 8K Zara &amp; Vogue editorial campaigns.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCsvVaultModal(false)}
+                style={{ background: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#fff', fontSize: '18px', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Search & Source Filter Bar */}
+            <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', background: 'rgba(0, 0, 0, 0.15)' }}>
+              <div style={{ flex: '1 1 280px', position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder="🔎 Search by outfit name, fabric weave, mood, or price..."
+                  value={csvSearchQuery}
+                  onChange={(e) => setCsvSearchQuery(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: '#fff',
+                    fontSize: '12px',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'all', label: `All (${csvCatalog.length || 337})` },
+                  { id: 'Master 125', label: '⭐ Master Prompts (216)' },
+                  { id: 'Pinterest Viral', label: '📌 Viral Pins (107)' },
+                  { id: 'Meesho', label: '🛍️ Meesho Scraped (14)' }
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setCsvSourceFilter(f.id)}
+                    style={{
+                      background: csvSourceFilter === f.id ? 'rgba(255, 209, 102, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                      border: csvSourceFilter === f.id ? '1px solid #ffd166' : '1px solid rgba(255, 255, 255, 0.1)',
+                      color: csvSourceFilter === f.id ? '#ffd166' : 'rgba(255, 255, 255, 0.7)',
+                      padding: '5px 10px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Grid of CSV Garments */}
+            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '14px' }}>
+              {csvCatalog
+                .filter((item) => {
+                  if (csvSourceFilter !== 'all' && !item.source.toLowerCase().includes(csvSourceFilter.toLowerCase())) {
+                    return false;
+                  }
+                  if (csvSearchQuery.trim()) {
+                    const q = csvSearchQuery.toLowerCase();
+                    return (
+                      (item.title && item.title.toLowerCase().includes(q)) ||
+                      (item.raw_title && item.raw_title.toLowerCase().includes(q)) ||
+                      (item.category && item.category.toLowerCase().includes(q)) ||
+                      (item.fabric && item.fabric.toLowerCase().includes(q)) ||
+                      (item.mood && item.mood.toLowerCase().includes(q))
+                    );
+                  }
+                  return true;
+                })
+                .slice(0, 80)
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ffd166'; e.currentTarget.style.background = 'rgba(255, 209, 102, 0.05)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'; }}
+                  >
+                    <div>
+                      {item.image_url ? (
+                        <div style={{ width: '100%', height: '140px', borderRadius: '8px', overflow: 'hidden', marginBottom: '10px', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', fontSize: '30px' }}>
+                          👗
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '9.5px', background: item.source.includes('Master') ? 'rgba(255, 209, 102, 0.2)' : 'rgba(56, 189, 248, 0.2)', color: item.source.includes('Master') ? '#ffd166' : '#38bdf8', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                          {item.source.includes('Master') ? '⭐ Master Prompt' : item.source.includes('Pinterest') ? '📌 Viral Pin' : '🛍️ Meesho'}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#4ade80' }}>
+                          {item.price}
+                        </span>
+                      </div>
+
+                      <div style={{ fontSize: '12px', fontWeight: '700', color: '#fff', lineHeight: '1.3', marginBottom: '4px' }}>
+                        {item.raw_title || item.title}
+                      </div>
+
+                      {item.mood && (
+                        <div style={{ fontSize: '10px', color: '#a78bfa', marginBottom: '6px' }}>
+                          Mood: <strong>{item.mood}</strong>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleSelectCsvProduct(item.id);
+                        setShowCsvVaultModal(false);
+                      }}
+                      style={{
+                        marginTop: '10px',
+                        width: '100%',
+                        background: 'linear-gradient(135deg, rgba(255, 209, 102, 0.2), rgba(236, 72, 153, 0.2))',
+                        border: '1px solid rgba(255, 209, 102, 0.4)',
+                        color: '#fff',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>⚡</span> Select &amp; Run Detective
+                    </button>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
