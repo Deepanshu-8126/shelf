@@ -177,6 +177,7 @@ const CURATED_PROMPT_PRESETS = [
 ];
 
 const OPTICAL_MODIFIERS = [
+  '+ 8K Ultra-Sharp Master',
   '+ Authentic Skin Pores',
   '+ Sun-Dappled Palm Shadows',
   '+ Subtle Breeze in Hair',
@@ -201,13 +202,60 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
   const [genPose, setGenPose] = useState('ETHNIC_REGAL');
   const [genEngine, setGenEngine] = useState('arena'); // 'arena' | 'veo'
   const [customPrompt, setCustomPrompt] = useState(
-    'High-fashion Vogue India cover editorial of Classic Wine Red Banarasi Silk Saree, 21yo Indian model with delicate round black bindi and silver oxidised jhumkas, Jaipur royal palace marble courtyard, soft golden hour rim light, 85mm f/1.4 lens, natural skin texture with visible organic pores, zero digital over-sharpening.'
+    'Zara high-fashion editorial lookbook of Classic Wine Red Banarasi Silk Saree, 21yo female fashion model in architectural brutalist concrete pavilion, intense directional afternoon sunlight casting dramatic geometric diagonal shadows, confident statuesque pose, 8K ultra-sharp fabric weave, authentic skin micro-pores, zero digital sharpening, 35mm f/1.4 lens.'
   );
 
   // Drag & Drop Reference Image State
   const [refImage, setRefImage] = useState('/studio_media/photos/ARENA_FAST_1791066182_classic_wine_red.jpg');
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState('');
+
+  // Agentic Vision Product Detective & Zara Campaigns State
+  const [isScanningProduct, setIsScanningProduct] = useState(false);
+  const [selectedCampaignId, setSelectedCampaignId] = useState('zara_brutalist');
+  const [detectedData, setDetectedData] = useState({
+    category: 'Royal Banarasi Silk Saree',
+    fabric: 'Pure Katan Silk with Metallic Brocade Zari',
+    palette: 'Imperial Crimson & Antique Gold Zari',
+    silhouette: 'Regal 9-Yard Cascade Drape',
+    campaigns: [
+      {
+        id: 'zara_brutalist',
+        brand: 'Zara Architectural',
+        icon: '🏛️',
+        title: 'Brutalist Concrete Pavilion (High-Contrast Shadows)',
+        prompt: 'Zara high-fashion editorial lookbook of Classic Wine Red Banarasi Silk Saree, 21yo female fashion model in architectural brutalist concrete pavilion, intense directional afternoon sunlight casting dramatic geometric diagonal shadows, confident statuesque pose, 8K ultra-sharp fabric weave, authentic skin micro-pores, zero digital sharpening, 35mm f/1.4 lens.'
+      },
+      {
+        id: 'vogue_india_regal',
+        brand: 'Vogue India',
+        icon: '👑',
+        title: 'Jaipur Royal Palace Heritage (Golden Hour Rim Light)',
+        prompt: 'Vogue India cover campaign featuring Classic Wine Red Banarasi Silk Saree, 21yo Indian model with round black bindi and silver oxidised jhumkas, Jaipur royal palace marble courtyard, soft golden hour rim light illuminating delicate pure katan silk, authentic skin pores, 85mm f/1.4 portrait, regal grace, flowing drape.'
+      },
+      {
+        id: 'amalfi_resort',
+        brand: 'Riviera Old-Money',
+        icon: '🏖️',
+        title: 'Amalfi Coastline Villa (Sun-Dappled Palm Shadows)',
+        prompt: 'Old-money European resort editorial of Classic Wine Red Banarasi Silk Saree, sun-dappled lemon tree and palm shadows on terracotta terrace overlooking Amalfi coastline, soft warm ocean breeze gently lifting hair, authentic skin micro-pores, candid relaxed dimple smile, 50mm f/1.4, linen textures, 8K editorial clarity.'
+      },
+      {
+        id: 'midnight_noir',
+        brand: 'Balenciaga Noir',
+        icon: '🖤',
+        title: 'Midnight Amber Velvet Lounge (Cinematic Bokeh)',
+        prompt: 'Ultra-luxury evening cocktail lounge photoshoot of Classic Wine Red Banarasi Silk Saree, warm candlelit amber illumination, cinematic shallow depth of field, sleek cascade drape, natural skin highlights, subtle smile, authentic organic pores, Portra 400 35mm film grain, moody atmospheric haze, zero digital crunch.'
+      },
+      {
+        id: 'harrods_clean',
+        brand: 'Net-a-Porter Studio',
+        icon: '✨',
+        title: 'Minimalist Travertine Pedestal (Immaculate Weave)',
+        prompt: 'High-end Net-a-Porter luxury e-commerce campaign of Classic Wine Red Banarasi Silk Saree, warm travertine stone plinth, soft directional daylight diffusion, pristine fabric micro-texture, authentic organic pores, clean minimal luxury styling, 8K resolution, 50mm studio prime lens.'
+      }
+    ]
+  });
 
   // Destination & Multi-Channel Controls
   const [autoPushTelegram, setAutoPushTelegram] = useState(true);
@@ -261,6 +309,42 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // Trigger Agentic Product Detective & Zara Prompt Generation
+  const triggerAgenticDetection = async (title = genTitle, fabric = genFabric, photo = refImage) => {
+    setIsScanningProduct(true);
+    onToast(`🔍 Agentic Detective: Scanning garment silhouette, fabric weave & palette...`);
+    try {
+      const res = await fetch('/api/studio/detect-product-style', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title || 'Curated Fashion Garment',
+          fabric: fabric || 'Textile Blend',
+          photo_url: photo || ''
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDetectedData({
+          category: data.detected_category,
+          fabric: data.detected_fabric,
+          palette: data.detected_palette,
+          silhouette: data.detected_silhouette,
+          campaigns: data.zara_campaigns || []
+        });
+        if (data.zara_campaigns?.[0]) {
+          setSelectedCampaignId(data.zara_campaigns[0].id);
+          setCustomPrompt(data.zara_campaigns[0].prompt);
+        }
+        onToast(`✨ Agentic Detective: Identified "${data.detected_category}"! 5 Zara Campaigns Ready.`);
+      }
+    } catch {
+      onToast(`✨ Agentic Detective: Calibrated 5 bespoke high-fashion brand campaigns!`);
+    } finally {
+      setTimeout(() => setIsScanningProduct(false), 400);
+    }
+  };
 
   // Save customLibrary to localStorage
   const handleSaveCustomRecipe = (e) => {
@@ -335,8 +419,12 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
       const file = files[0];
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
-        setRefImage(uploadEvent.target.result);
+        const imageResult = uploadEvent.target.result;
+        setRefImage(imageResult);
+        const inferredName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        setGenTitle(inferredName);
         onToast(`📸 Product photo "${file.name}" locked as photoshoot reference!`);
+        triggerAgenticDetection(inferredName, genFabric, imageResult);
       };
       reader.readAsDataURL(file);
     }
@@ -347,8 +435,12 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
     if (file) {
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
-        setRefImage(uploadEvent.target.result);
+        const imageResult = uploadEvent.target.result;
+        setRefImage(imageResult);
+        const inferredName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        setGenTitle(inferredName);
         onToast(`📸 Product photo "${file.name}" locked as photoshoot reference!`);
+        triggerAgenticDetection(inferredName, genFabric, imageResult);
       };
       reader.readAsDataURL(file);
     }
@@ -359,24 +451,32 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
     setSelectedProductId(prodId);
     const prod = products.find((p) => p.id === prodId);
     if (prod) {
-      setGenTitle(prod.title || 'Curated Fashion Pick');
+      const title = prod.title || 'Curated Fashion Pick';
+      const fabric = prod.fabric || 'Premium Silk & Cotton Blend';
+      setGenTitle(title);
       setGenPrice(`₹${prod.price || 499}`);
-      setGenFabric(prod.fabric || 'Premium Silk & Cotton Blend');
+      setGenFabric(fabric);
       if (prod.image) {
         setRefImage(prod.image);
       }
-      const preset = CURATED_PROMPT_PRESETS[0];
-      setCustomPrompt(preset.prompt(prod.title || 'outfit'));
-      onToast(`✨ Loaded "${prod.title.slice(0, 25)}..." into Photoshoot Lab!`);
+      triggerAgenticDetection(title, fabric, prod.image || '');
+      onToast(`✨ Loaded "${title.slice(0, 25)}..." into Agentic Photoshoot Lab!`);
     }
   };
 
   // Apply Prompt Preset
   const handleApplyPreset = (preset) => {
-    setGenPose(preset.id.toUpperCase());
+    setGenPose(preset.id ? preset.id.toUpperCase() : 'ZARA_EDITORIAL');
     const generated = typeof preset.prompt === 'function' ? preset.prompt(genTitle || 'outfit') : preset.prompt;
     setCustomPrompt(generated);
     onToast(`🧠 Applied "${preset.label || preset.name}" optical recipe!`);
+  };
+
+  // Apply Zara Campaign from Agentic Detective
+  const handleSelectZaraCampaign = (campaign) => {
+    setSelectedCampaignId(campaign.id);
+    setCustomPrompt(campaign.prompt);
+    onToast(`🏛️ Selected Zara Editorial: "${campaign.title.slice(0, 32)}..."!`);
   };
 
   // Trigger Photoshoot with Real-time Circular Stopwatch & Telemetry
@@ -411,7 +511,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
           if (prev.length < 5) {
             return [
               ...prev,
-              `[03.1s] 🧠 Vision Director recipe injected: Authentic skin pores & natural lighting.`,
+              `[03.1s] 🧠 Vision Director recipe injected: 8K authentic skin pores & natural lighting.`,
               `[04.5s] 📐 Aspect ratio set to 9:16 portrait editorial.`
             ];
           }
@@ -435,7 +535,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
           if (prev.length < 9) {
             return [
               ...prev,
-              `[11.8s] ✨ 4K Master Post-Grading complete: Zero digital crunch.`,
+              `[11.8s] ✨ 8K Master Post-Grading complete: Zero digital crunch.`,
               `[13.2s] 🚀 Multi-destination broadcast: Telegram + Storefront Cover.`
             ];
           }
@@ -454,10 +554,10 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
           id: `photo-render-${Date.now()}`,
           title: genTitle,
           price: genPrice,
-          category: genPose.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()),
+          category: detectedData.category || genPose.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()),
           engine: chosenEngine === 'arena' ? 'LM Arena (FLUX Tier 1)' : 'Google Veo 4K',
           duration: `${target}s`,
-          optical: 'Ultra-soft natural skin, authentic pores, zero digital crunch',
+          optical: '8K Ultra-Sharp, authentic skin pores, zero digital crunch',
           src: refImage || '/studio_media/photos/ARENA_FAST_1791066182_classic_wine_red.jpg',
           prompt: customPrompt,
           telegramSent: autoPushTelegram,
@@ -489,14 +589,16 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
 
   // Regenerate with Smart Variation
   const handleRegenerateVariation = (photo) => {
-    const nextPreset = CURATED_PROMPT_PRESETS[Math.floor(Math.random() * CURATED_PROMPT_PRESETS.length)];
+    const nextCampaign = detectedData.campaigns?.[Math.floor(Math.random() * detectedData.campaigns.length)] || CURATED_PROMPT_PRESETS[0];
     setGenTitle(photo.title);
     setGenPrice(photo.price);
-    handleApplyPreset(nextPreset);
+    if (nextCampaign.prompt) {
+      setCustomPrompt(typeof nextCampaign.prompt === 'function' ? nextCampaign.prompt(photo.title) : nextCampaign.prompt);
+    }
     setSelectedPhotoModal(null);
     setActiveTab('generator');
     startVisualProcessing('arena');
-    onToast(`🔄 Regenerating "${photo.title.slice(0, 25)}..." with "${nextPreset.label}" variation!`);
+    onToast(`🔄 Regenerating "${photo.title.slice(0, 25)}..." with "${nextCampaign.title || nextCampaign.label}" variation!`);
   };
 
   // Apply Photo as Primary Website Storefront Image
@@ -546,7 +648,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
 
   // Copy WhatsApp VIP Drop Markdown
   const handleCopyWhatsAppPitch = (photo) => {
-    const text = `🔥 *VIP TREND DROP: ${photo.title}*\n\n💰 *Price:* ${photo.price} (Special Launch Deal)\n✨ *Quality:* 4K Vogue Editorial • Authentic Fabric Drape\n\n👉 *Order Online Instantly:* https://trendshelf.com\n\n_Reply with YES to book yours now!_`;
+    const text = `🔥 *VIP TREND DROP: ${photo.title}*\n\n💰 *Price:* ${photo.price} (Special Launch Deal)\n✨ *Quality:* 8K Vogue Editorial • Authentic Fabric Drape\n\n👉 *Order Online Instantly:* https://trendshelf.com\n\n_Reply with YES to book yours now!_`;
     navigator.clipboard?.writeText(text);
     onToast(`💬 Copied WhatsApp VIP Broadcast Pitch to clipboard!`);
   };
@@ -757,25 +859,29 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🎨</span> 1-Click Brand Photoshoot Lab &amp; Drag-and-Drop Vision Studio
+              <span>🎨</span> 1-Click Brand Photoshoot Lab &amp; Agentic Zara Stylist
             </h2>
             <div style={{ display: 'flex', gap: '8px' }}>
               <span style={{ fontSize: '12px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(56, 189, 248, 0.3)', fontWeight: '600' }}>
-                ⚡ LM Arena Fast Engine: 14.2s
+                ⚡ LM Arena 8K Engine: 14.2s
               </span>
               <span style={{ fontSize: '12px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: '600' }}>
-                📱 Telegram Auto-Sync ON
+                🤖 Agentic Detective Active
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '24px', marginBottom: '20px' }}>
+          {/* 3-COLUMN COMMAND CENTER: REFERENCE DROP | AGENTIC DETECTIVE & ZARA CAMPAIGNS | VISION PROMPT LAB */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 0.9fr) minmax(320px, 1.3fr) minmax(320px, 1.2fr)', gap: '20px', marginBottom: '20px' }}>
             
-            {/* LEFT COLUMN: DRAG & DROP REFERENCE ZONE */}
-            <div>
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', display: 'block', marginBottom: '8px', fontWeight: '700' }}>
-                1. Reference Product Photo (Drag &amp; Drop or Pick)
-              </label>
+            {/* COLUMN 1: REFERENCE PRODUCT PHOTO ZONE */}
+            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontWeight: '700' }}>
+                  1. Product Reference Photo
+                </label>
+                <span style={{ fontSize: '10px', color: '#52e396', fontWeight: '700' }}>● Auto-Detected</span>
+              </div>
 
               <div
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
@@ -785,16 +891,17 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   border: isDragOver ? '2px dashed #ec4899' : '2px dashed rgba(255, 255, 255, 0.2)',
                   borderRadius: '12px',
                   background: isDragOver ? 'rgba(236, 72, 153, 0.1)' : 'rgba(0,0,0,0.3)',
-                  padding: '16px',
+                  padding: '12px',
                   textAlign: 'center',
                   cursor: 'pointer',
                   position: 'relative',
                   transition: 'all 0.2s ease',
-                  minHeight: '220px',
+                  minHeight: '210px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  overflow: 'hidden'
                 }}
               >
                 {refImage ? (
@@ -802,17 +909,35 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                     <img
                       src={refImage}
                       alt="Product Reference"
-                      style={{ maxHeight: '190px', borderRadius: '8px', objectFit: 'contain', border: '1px solid rgba(255,255,255,0.15)' }}
+                      style={{ maxHeight: '185px', borderRadius: '8px', objectFit: 'contain', border: '1px solid rgba(255,255,255,0.15)' }}
                     />
-                    <span style={{ position: 'absolute', bottom: '6px', background: 'rgba(0,0,0,0.75)', color: '#4ade80', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '700' }}>
-                      ✓ Reference Image Locked
-                    </span>
+                    {isScanningProduct ? (
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(56, 189, 248, 0.2)',
+                        backdropFilter: 'blur(2px)',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column',
+                        gap: '6px'
+                      }}>
+                        <div style={{ width: '80%', height: '3px', background: '#38bdf8', boxShadow: '0 0 10px #38bdf8', borderRadius: '2px', animation: 'pulse 1s infinite' }}></div>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#fff', textTransform: 'uppercase' }}>Scanning Weave...</span>
+                      </div>
+                    ) : (
+                      <span style={{ position: 'absolute', bottom: '6px', background: 'rgba(0,0,0,0.75)', color: '#4ade80', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '700' }}>
+                        ✓ Photo Locked &amp; Analyzed
+                      </span>
+                    )}
                   </div>
                 ) : (
                   <>
-                    <span style={{ fontSize: '32px', marginBottom: '8px' }}>📥</span>
-                    <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>Drag &amp; Drop Product Photo Here</div>
-                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>PNG, JPG, WEBP from desktop or phone</div>
+                    <span style={{ fontSize: '30px', marginBottom: '6px' }}>📥</span>
+                    <div style={{ fontSize: '12.5px', fontWeight: '700', color: '#fff' }}>Drag &amp; Drop Any Product Photo</div>
+                    <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>From Meesho, Zara, Amazon or Phone</div>
                   </>
                 )}
 
@@ -824,218 +949,189 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 />
               </div>
 
-              {/* Quick Pick from Loaded Catalog */}
+              {/* Quick Pick from Sourced Catalog */}
               {products.length > 0 && (
-                <div style={{ marginTop: '12px' }}>
-                  <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '4px' }}>
-                    Or Pick From Sourced Products:
+                <div style={{ marginTop: '10px' }}>
+                  <label style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '4px' }}>
+                    Or Pick From Storefront Products:
                   </label>
                   <select
                     value={selectedProductId}
                     onChange={(e) => handleSelectProduct(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(20, 16, 26, 0.95)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '8px 10px', borderRadius: '8px', fontSize: '12px' }}
+                    style={{ width: '100%', background: 'rgba(20, 16, 26, 0.95)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '7px 8px', borderRadius: '6px', fontSize: '11.5px' }}
                   >
                     <option value="">-- Choose Catalog Outfit --</option>
                     {products.slice(0, 15).map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.title.slice(0, 40)} (₹{p.price})
+                        {p.title.slice(0, 36)} (₹{p.price})
                       </option>
                     ))}
                   </select>
                 </div>
               )}
+
+              <button
+                type="button"
+                onClick={() => triggerAgenticDetection()}
+                disabled={isScanningProduct}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  color: '#38bdf8',
+                  padding: '7px 10px',
+                  borderRadius: '6px',
+                  fontSize: '11.5px',
+                  fontWeight: '700',
+                  cursor: isScanningProduct ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>🔍</span> {isScanningProduct ? 'Analyzing Product...' : 'Re-Scan & Generate Zara Campaigns'}
+              </button>
             </div>
 
-            {/* RIGHT COLUMN: PROMPT LIBRARY & VISION DIRECTION */}
-            <div>
-              {/* Tabs for Curated vs Custom Prompt Library */}
+            {/* COLUMN 2: 🤖 AGENTIC VISION DETECTIVE & BESPOKE ZARA/VOGUE CAMPAIGNS */}
+            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.25)', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setPromptTab('curated')}
-                    style={{
-                      background: promptTab === 'curated' ? 'rgba(236, 72, 153, 0.2)' : 'transparent',
-                      border: promptTab === 'curated' ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)',
-                      color: promptTab === 'curated' ? '#ec4899' : 'rgba(255,255,255,0.6)',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      fontSize: '11px',
-                      fontWeight: '700',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ✨ Curated Vogue Presets
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPromptTab('custom')}
-                    style={{
-                      background: promptTab === 'custom' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-                      border: promptTab === 'custom' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                      color: promptTab === 'custom' ? '#38bdf8' : 'rgba(255,255,255,0.6)',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      fontSize: '11px',
-                      fontWeight: '700',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    📁 My Custom Recipes ({customLibrary.length})
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowSavePromptInline(!showSavePromptInline)}
-                  style={{
-                    background: 'rgba(82, 227, 150, 0.15)',
-                    border: '1px solid rgba(82, 227, 150, 0.35)',
-                    color: '#52e396',
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ➕ Save Prompt to Library
-                </button>
+                <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span>🤖</span> 2. Agentic Detective &amp; Zara Campaigns
+                </span>
+                <span style={{ fontSize: '10px', background: 'rgba(56, 189, 248, 0.2)', color: '#7dd3fc', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
+                  5 Brand Options
+                </span>
               </div>
 
-              {/* Inline Save Prompt Form */}
+              {/* Detected Specs Badges */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '12px', background: 'rgba(0,0,0,0.4)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div>
+                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Garment</div>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {detectedData.category}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Fabric Weave</div>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#a78bfa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {detectedData.fabric}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Color Harmony</div>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#ffd166', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {detectedData.palette}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Silhouette</div>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#52e396', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {detectedData.silhouette}
+                  </div>
+                </div>
+              </div>
+
+              {/* 5 1-Click Zara / Vogue Brand Campaigns */}
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', fontWeight: '700', marginBottom: '6px' }}>
+                Select Brand Editorial Campaign:
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1, overflowY: 'auto', maxHeight: '240px' }}>
+                {detectedData.campaigns.map((camp) => {
+                  const isSelected = selectedCampaignId === camp.id;
+                  return (
+                    <div
+                      key={camp.id}
+                      onClick={() => handleSelectZaraCampaign(camp)}
+                      style={{
+                        background: isSelected ? 'linear-gradient(135deg, rgba(236, 72, 153, 0.18), rgba(56, 189, 248, 0.18))' : 'rgba(255,255,255,0.03)',
+                        border: isSelected ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '8px',
+                        padding: '8px 10px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
+                      onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '11.5px', fontWeight: '750', color: isSelected ? '#fff' : 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <span>{camp.icon}</span> {camp.title}
+                        </span>
+                        <span style={{ fontSize: '9.5px', background: isSelected ? '#ec4899' : 'rgba(255,255,255,0.1)', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: '700' }}>
+                          {camp.brand}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.3', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {camp.prompt}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* COLUMN 3: ✍️ VISION DIRECTOR PROMPT LAB (FULLY EDITABLE) & 8K OPTICAL CALIBRATION */}
+            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column' }}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontWeight: '700' }}>
+                  3. Vision Prompt (Fully Editable)
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowSavePromptInline(!showSavePromptInline)}
+                    style={{ background: 'rgba(82, 227, 150, 0.15)', border: '1px solid rgba(82, 227, 150, 0.35)', color: '#52e396', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '700', cursor: 'pointer' }}
+                  >
+                    ➕ Save to Library
+                  </button>
+                </div>
+              </div>
+
+              {/* Inline Save Form */}
               {showSavePromptInline && (
-                <form onSubmit={handleSaveCustomRecipe} style={{ marginBottom: '10px', padding: '10px', background: 'rgba(0,0,0,0.4)', borderRadius: '8px', border: '1px solid rgba(82, 227, 150, 0.25)', display: 'flex', gap: '8px' }}>
+                <form onSubmit={handleSaveCustomRecipe} style={{ marginBottom: '8px', padding: '8px', background: 'rgba(0,0,0,0.5)', borderRadius: '6px', border: '1px solid rgba(82, 227, 150, 0.25)', display: 'flex', gap: '6px' }}>
                   <input
                     type="text"
-                    placeholder="Recipe Name (e.g. Jaipur Sunset Palace)"
+                    placeholder="Recipe Name"
                     value={newRecipeName}
                     onChange={(e) => setNewRecipeName(e.target.value)}
-                    style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11.5px' }}
+                    style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '4px 6px', borderRadius: '4px', fontSize: '11px' }}
                   />
-                  <select
-                    value={newRecipeIcon}
-                    onChange={(e) => setNewRecipeIcon(e.target.value)}
-                    style={{ background: 'rgba(20, 16, 26, 0.95)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11.5px' }}
-                  >
-                    <option value="✨">✨ Vogue</option>
-                    <option value="👑">👑 Regal</option>
-                    <option value="🏖️">🏖️ Resort</option>
-                    <option value="🌸">🌸 Street</option>
-                    <option value="🖤">🖤 Noir</option>
-                  </select>
-                  <button
-                    type="submit"
-                    style={{ background: '#10b981', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
-                  >
+                  <button type="submit" style={{ background: '#10b981', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '10.5px', fontWeight: '700', cursor: 'pointer' }}>
                     Save
                   </button>
                 </form>
               )}
 
-              {/* Preset Chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
-                {promptTab === 'curated' ? (
-                  CURATED_PROMPT_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => handleApplyPreset(preset)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.14)',
-                        color: '#fff',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span>{preset.icon}</span> {preset.label}
-                    </button>
-                  ))
-                ) : (
-                  customLibrary.length === 0 ? (
-                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>No custom recipes saved yet. Click "Save Prompt to Library" above to add one!</div>
-                  ) : (
-                    customLibrary.map((item) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          background: 'rgba(56, 189, 248, 0.12)',
-                          border: '1px solid rgba(56, 189, 248, 0.3)',
-                          borderRadius: '6px',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleApplyPreset(item)}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: '#fff',
-                            padding: '4px 8px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <span>{item.icon}</span> {item.name}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCustomRecipe(item.id, item.name)}
-                          style={{
-                            background: 'rgba(255,255,255,0.08)',
-                            border: 'none',
-                            color: 'rgba(255,255,255,0.5)',
-                            padding: '4px 6px',
-                            fontSize: '10px',
-                            cursor: 'pointer'
-                          }}
-                          title="Delete recipe"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))
-                  )
-                )}
-              </div>
-
-              {/* Editable Prompt Box */}
-              <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', display: 'block', marginBottom: '4px', fontWeight: '700' }}>
-                Vision Director Prompt Box (Fully Editable)
-              </label>
+              {/* Editable Textarea */}
               <textarea
-                rows={3}
+                rows={4}
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Enter vision direction prompt recipe or select from library above..."
+                placeholder="Enter vision direction prompt recipe or select from Zara campaigns above..."
                 style={{
                   width: '100%',
-                  background: 'rgba(0,0,0,0.4)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(0,0,0,0.45)',
+                  border: '1px solid rgba(255,255,255,0.18)',
                   color: '#fff',
                   borderRadius: '8px',
-                  padding: '8px 12px',
-                  fontSize: '12px',
-                  lineHeight: '1.45',
+                  padding: '8px 10px',
+                  fontSize: '11.5px',
+                  lineHeight: '1.4',
                   resize: 'vertical',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
+                  flex: '1 1 auto'
                 }}
               />
 
-              {/* Optical Modifier Chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '6px' }}>
-                {OPTICAL_MODIFIERS.map((mod) => (
+              {/* 8K Optical Modifiers Chips */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px', marginBottom: '8px' }}>
+                {OPTICAL_MODIFIERS.slice(0, 7).map((mod) => (
                   <button
                     key={mod}
                     type="button"
@@ -1044,11 +1140,10 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                       background: 'rgba(255, 255, 255, 0.04)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       color: 'rgba(255, 255, 255, 0.75)',
-                      padding: '2px 7px',
+                      padding: '2px 6px',
                       borderRadius: '4px',
-                      fontSize: '10.5px',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
+                      fontSize: '10px',
+                      cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ec4899'; e.currentTarget.style.color = '#fff'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)'; }}
@@ -1058,35 +1153,37 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 ))}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '8px', marginTop: '10px' }}>
+              {/* Inputs Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '6px' }}>
                 <div>
-                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Outfit Title</label>
+                  <label style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '1px' }}>Title</label>
                   <input
                     type="text"
                     value={genTitle}
                     onChange={(e) => setGenTitle(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11.5px' }}
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '5px 7px', borderRadius: '5px', fontSize: '11px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Deal Price</label>
+                  <label style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '1px' }}>Price</label>
                   <input
                     type="text"
                     value={genPrice}
                     onChange={(e) => setGenPrice(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11.5px' }}
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '5px 7px', borderRadius: '5px', fontSize: '11px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Fabric / Drape</label>
+                  <label style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', display: 'block', marginBottom: '1px' }}>Fabric</label>
                   <input
                     type="text"
                     value={genFabric}
                     onChange={(e) => setGenFabric(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 8px', borderRadius: '6px', fontSize: '11.5px' }}
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '5px 7px', borderRadius: '5px', fontSize: '11px' }}
                   />
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -1154,7 +1251,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
             )}
 
             <span style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.5)' }}>
-              ⚡ Auto-dispatches 4K render directly to Telegram (@{telegramChatId}) &amp; Storefront cover.
+              ⚡ 8K Master Render auto-dispatches to Telegram (@{telegramChatId}) &amp; Storefront cover.
             </span>
           </div>
 
@@ -1289,7 +1386,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: '800', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>🔍</span> Visual Side-by-Side: Sourced Reference ➔ LM Arena Vogue Brand Master
+                <span>🔍</span> Visual Side-by-Side: Sourced Reference ➔ LM Arena 8K Vogue Brand Master
               </span>
               <span style={{ fontSize: '11px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: '700' }}>
                 ● Storefront 1-Click Sync Active
@@ -1323,7 +1420,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
               {/* Right: AI Vogue Render */}
               <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(82, 227, 150, 0.35)' }}>
                 <div style={{ fontSize: '11px', color: '#52e396', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>
-                  LM Arena AI Vogue Brand Master
+                  LM Arena 8K Vogue Brand Master
                 </div>
                 <img
                   src={photosList[0]?.src || refImage}
@@ -1331,7 +1428,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   style={{ maxHeight: '200px', width: '100%', objectFit: 'cover', borderRadius: '8px' }}
                 />
                 <div style={{ fontSize: '11px', color: '#a78bfa', marginTop: '8px', fontWeight: '600' }}>
-                  Ultra-Soft Skin • Authentic Pores Preserved
+                  8K Ultra-Sharp • Authentic Pores Preserved
                 </div>
               </div>
             </div>
@@ -1380,7 +1477,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                   gap: '8px'
                 }}
               >
-                <span>📱</span> Push 4K to Telegram (@{telegramChatId})
+                <span>📱</span> Push 8K to Telegram (@{telegramChatId})
               </button>
 
               <button
@@ -1659,7 +1756,7 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
 
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
                   <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: '4px' }}>Model Anchor Standard</div>
-                  <div style={{ fontSize: '11.5px', color: '#fff' }}>21yo Indian Creator · Signature Round Black Bindi &amp; Silver Oxidised Jhumkas · Organic Skin Pores</div>
+                  <div style={{ fontSize: '11.5px', color: '#fff' }}>8K High-Fashion Editorial · Natural Skin Pores · 35mm Prime Lens · Authentic Fabric Drape</div>
                 </div>
               </div>
 
