@@ -45,9 +45,13 @@ if sys.platform == "win32":
 # ------------------------------------------------------------------------------
 # CONFIGURATION & REAL AFFILIATE CREDENTIALS
 # ------------------------------------------------------------------------------
-AFFILIATE_PROJECT_DIR = Path("D:/affi;ate/trend-earning-system")
 ROOT_DIR = Path(__file__).resolve().parent
-DATA_DIR = ROOT_DIR / "data" if (ROOT_DIR / "data" / "model_face_dataset").exists() else AFFILIATE_PROJECT_DIR / "data"
+local_affiliate_data = Path("D:/affi;ate/trend-earning-system/data")
+if local_affiliate_data.exists():
+    DATA_DIR = local_affiliate_data
+else:
+    DATA_DIR = ROOT_DIR / "data"
+
 VEO_DIR = DATA_DIR / "veo_extracted_videos"
 SCRAPED_DIR = DATA_DIR / "scraped_products"
 MODEL_DATASET_DIR = DATA_DIR / "model_face_dataset"
@@ -195,46 +199,81 @@ def fetch_product_details_and_images(product_url: str) -> Dict[str, Any]:
     price = "₹499"
     images: List[str] = []
 
-    # Check local pre-scraped or asset files first
-    local_candidates = list(SCRAPED_DIR.glob(f"*{slug}*.jpg")) + list(SCRAPED_DIR.glob("*.jpg"))
+    # Check local pre-scraped or asset files strictly matching this slug
+    local_candidates = list(SCRAPED_DIR.glob(f"*{slug}*.jpg"))
     gallery_local_paths: List[Path] = []
 
-    # Attempt safe HTTP request with realistic desktop headers
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
-    
-    req = urllib.request.Request(product_url, headers=headers)
+    # If the user passed a direct image URL as reference link
+    if any(product_url.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+        images = [product_url]
+
+    # If the user passed a Pinterest Pin URL
+    elif "pinterest.com/pin/" in product_url:
+        try:
+            req = urllib.request.Request(product_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                p_html = resp.read().decode("utf-8", errors="ignore")
+            og_match = re.search(r'<meta property="og:image" content="([^"]+)"', p_html)
+            if og_match:
+                images = [og_match.group(1).replace("/236x/", "/736x/")]
+            else:
+                found_p = re.findall(r'https://i\.pinimg\.com/(?:originals|\d+x)/[a-zA-Z0-9_\-\./]+\.jpg', p_html)
+                if found_p:
+                    images = [found_p[0].replace("/236x/", "/736x/")]
+        except Exception as pin_e:
+            print(f"  ℹ️ Pinterest link extraction notice: {pin_e}")
+
+    # 0. Check if Context.dev API is configured for cloud anti-bot scraping
     try:
-        with urllib.request.urlopen(req, timeout=12) as resp:
-            html = resp.read().decode("utf-8", errors="ignore")
+        from connectors.context_dev_scraper import ContextDevScraper
+        ctx_scraper = ContextDevScraper()
+        if ctx_scraper.is_configured:
+            print(f"  🌐 [Context.dev Engine] Cloud scraping {product_url}...")
+            ctx_data = ctx_scraper.extract_product_data(product_url)
+            if ctx_data.get("title") and ctx_data.get("source") != "offline_fallback":
+                title = ctx_data.get("title", title)
+                price = ctx_data.get("price", price)
+                if ctx_data.get("images"):
+                    images = ctx_data["images"]
+                print(f"  ✅ [Context.dev] Fetched: {title} ({price}) with {len(images)} images!")
+    except Exception:
+        pass
 
-        # 1. Title
-        title_m = re.search(r'<meta property="og:title" content="([^"]+)"', html)
-        if title_m:
-            raw_t = title_m.group(1).replace(" | Meesho", "").replace("Online at Best Price", "").strip()
-            if len(raw_t) > 3:
-                title = raw_t
+    if not images:
+        # Attempt safe HTTP request with realistic desktop headers
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+        
+        req = urllib.request.Request(product_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                html = resp.read().decode("utf-8", errors="ignore")
 
-        # 2. Price
-        price_m = re.search(r'₹\s*(\d{2,5})', html)
-        if price_m:
-            price = f"₹{price_m.group(1)}"
+            # 1. Title
+            title_m = re.search(r'<meta property="og:title" content="([^"]+)"', html)
+            if title_m:
+                raw_t = title_m.group(1).replace(" | Meesho", "").replace("Online at Best Price", "").strip()
+                if len(raw_t) > 3:
+                    title = raw_t
 
-        # 3. Genuine Gallery Images (Filtered for meesho.com/images/products/)
-        raw_images = re.findall(r'https://images\.meesho\.com/images/products/\d+/[a-zA-Z0-9_\.]+', html)
-        seen_img = set()
-        for u in raw_images:
-            # Upgrade resolution to 1024 or 512
-            hq_url = re.sub(r'/(256|512)/', '/1024/', u)
-            if hq_url not in seen_img and not any(k in hq_url for k in ["review", "customer", "avatar", "icon", "banner"]):
-                seen_img.add(hq_url)
-                images.append(hq_url)
+            # 2. Price
+            price_m = re.search(r'₹\s*(\d{2,5})', html)
+            if price_m:
+                price = f"₹{price_m.group(1)}"
 
-    except Exception as fetch_err:
-        print(f"  ℹ️ Direct HTTP notice: {fetch_err} (Using verified local dataset & template cache)")
+            # 3. Genuine Gallery Images (Filtered for meesho.com/images/products/)
+            raw_images = re.findall(r'https://images\.meesho\.com/images/products/\d+/[a-zA-Z0-9_\.]+', html)
+            seen_img = set()
+            for u in raw_images:
+                hq_url = re.sub(r'/(256|512)/', '/1024/', u)
+                if hq_url not in seen_img and not any(k in hq_url for k in ["review", "customer", "avatar", "icon", "banner"]):
+                    seen_img.add(hq_url)
+                    images.append(hq_url)
+        except Exception as fetch_err:
+            print(f"  ℹ️ Direct HTTP notice: {fetch_err}")
 
     # Save primary gallery image locally for Flow reference
     primary_img_path = SCRAPED_DIR / f"{slug}_primary_ref.jpg"
@@ -247,12 +286,11 @@ def fetch_product_details_and_images(product_url: str) -> Dict[str, Any]:
         except Exception as e:
             print(f"  ⚠️ Could not download remote image: {e}")
 
-    # Fallback to local high-res product asset if download failed
-    if not primary_img_path.exists():
-        if local_candidates:
-            import shutil
-            shutil.copy2(local_candidates[0], primary_img_path)
-            print(f"  ✅ Linked local product image reference: {primary_img_path.name}")
+    # Fallback ONLY to local file that matches the slug
+    if not primary_img_path.exists() and local_candidates:
+        import shutil
+        shutil.copy2(local_candidates[0], primary_img_path)
+        print(f"  ✅ Linked local product image reference: {primary_img_path.name}")
 
     return {
         "title": title,
@@ -270,26 +308,27 @@ def fetch_product_details_and_images(product_url: str) -> Dict[str, Any]:
 def generate_truthful_prompt_and_voiceover(product_data: Dict[str, Any]) -> Dict[str, str]:
     """
     Creates:
-    1. Master Google Flow / Veo 2 Prompt (Authentic Indian Creator Outfit Check, Mirror Selfie, 60fps 9:16)
+    1. Master Google Flow / Veo 2 Prompt with Dynamic Poses, Non-Repetitive Expressions & Exact Face Anchor
     2. Viral Google Trends & Instagram SEO Caption with Official Creator Affiliate Links
     """
     title = product_data.get("title", "Kashmira Elegant Outfit")
     price = product_data.get("price", "₹499")
 
-    # Master Verified 21yo Indian Creator Outfit-Check Prompt (Dual-Conditioned)
+    # Import dynamic pose library & facial blueprint
+    from connectors.genz_influencer_pose_library import GenZInfluencerPoseLibrary
+    from connectors.model_face_identity_trainer import ModelFaceIdentityTrainer
+
+    b = ModelFaceIdentityTrainer.EXACT_FACIAL_BLUEPRINT
+    pose_data = GenZInfluencerPoseLibrary.get_dynamic_pose_and_expression(category_hint=title)
+
     flow_prompt = (
         f"Authentic raw smartphone camera video of a 21yo Indian girl creator "
-        f"(youthful natural soft-oval face shape with gentle feminine jawline, smooth glowing cheeks and delicate sweet chin, "
-        f"large expressive warm honey-brown almond-shaped eyes with subtle natural tightline and softly arched dark brows, "
-        f"cute straight delicate nose with soft rounded tip and natural gentle bridge highlight, "
-        f"plump natural soft rose-pink lips with defined cupid's bow, signature tiny crisp round black bindi centered precisely above eyebrows, "
-        f"long voluminous dark espresso black wavy hair with effortless wispy strands and delicate curtain tendrils falling over forehead and cheeks, "
-        f"traditional silver oxidised bell-shaped jhumkas with stacked silver bangles, or delicate gold floral ear studs) "
-        f"doing a real outfit check in her bright sunlit aesthetic bedroom. "
-        f"Full-length mirror selfie perspective holding iPhone, wearing the fitted {title} shown in the second attached reference image "
-        f"in fitted stretch fabric with modern clean cut and flattering drape. "
-        f"Stepping back to showcase the floor-length drape, doing smooth natural poses, turning side-to-side to show the sculpted silhouette and sleeve fit, "
-        f"smiling naturally, genuine organic creator body language and fabric movement, soft daylight, "
+        f"({b['face_structure']}, {b['eyes']}, {b['nose']}, {b['lips']}, {b['skin']}, {b['bindi']}, {b['hair']}, {b['jewelery']}). "
+        f"Dynamic Facial Expression: {pose_data['expression']}. "
+        f"Pose & Action: Wearing the {title} shown in reference, {pose_data['description']} "
+        f"Camera & Angle: {pose_data['camera_angle']}. "
+        f"Lighting & Environment: {pose_data['lighting']}. "
+        f"Realistic fabric physics and genuine human motion, natural skin pores, "
         f"zero artificial plastic blur, zero text, zero overlays, zero watermarks, 60fps vertical 9:16 aspect ratio."
     )
 
@@ -303,9 +342,19 @@ def generate_truthful_prompt_and_voiceover(product_data: Dict[str, Any]) -> Dict
         f"🏷️ #MeeshoFinds #FashionHaul #OOTD #DressInspo #AffiliateFashion #ViralReels #TrendingFashion2026"
     )
 
+    # Dynamic Viral Voiceover Script (10-15s conversational Gen Z influencer voice)
+    import random
+    voiceover_options = [
+        f"Guys look at this gorgeous {title}! Literally got this for just {price} on Meesho and the quality is unreal. The fit is so flattering. Link bio me hai ya comment LINK to get direct access!",
+        f"Okay but this {title} is giving pure luxury aesthetic for just {price}! The fabric feels amazing and it hugs in all the right places. Direct creator link bio me pin kar diya hai!",
+        f"Viral Meesho fashion find alert! Ye {title} sirf {price} me mila and trust me fitting 10 on 10 hai. Jaldi check out karo link bio me hai!",
+        f"Totally obsessed with this {title}! Quality itni premium hai and price only {price}. Perfect for brunch or party wear. Grab it from the link in my bio!"
+    ]
+    voiceover_script = random.choice(voiceover_options)
+
     return {
         "flow_prompt": flow_prompt,
-        "voiceover_script": "",
+        "voiceover_script": voiceover_script,
         "caption_text": caption_text
     }
 
@@ -373,14 +422,23 @@ async def execute_google_flow_generation(
                     await asyncio.sleep(2.0)
                     print("  ✅ Reused Omni 1.1 Flash 9:16 settings!")
 
-            # 2. Attach Verified Reference Assets by Exact Identity
-            print(f"  [3/5] Verifying and attaching reference: {char_sheet_filename}...")
+            # 2. Attach Verified Reference Assets by Exact Identity (Dual Reference: Cloth + Model Face)
+            print(f"  [3/5] Attaching Dual References: Product Cloth + Model Character Sheet...")
             try:
                 from flow_reference_attachment_fix import remove_chip_by_filename, attach_flow_library_image
                 await remove_chip_by_filename(page, "OLD_CHARACTER_SHEET_FILENAME.jpg")
-                await attach_flow_library_image(page, char_sheet_filename)
+
+                # Reference 1: Scraped Cloth / Garment Reference Image
+                if product_img_path and Path(product_img_path).exists():
+                    print(f"    👗 [Ref 1/2] Attaching Garment Reference: {Path(product_img_path).name}...")
+                    await attach_flow_library_image(page, product_img_path)
+
+                # Reference 2: Model Character Face Sheet Anchor
+                char_path = CHAR_SHEET_PATH if CHAR_SHEET_PATH.exists() else char_sheet_filename
+                print(f"    👤 [Ref 2/2] Attaching Model Face Identity Anchor: {Path(char_path).name}...")
+                await attach_flow_library_image(page, char_path)
             except Exception as chip_err:
-                print(f"  ℹ️ Chip attachment notice: {chip_err}")
+                print(f"  ℹ️ Reference chip attachment notice: {chip_err}")
 
             # 3. Inject Polished Prompt
             print("  [4/5] Injecting polished video prompt into prompt box...")
@@ -406,20 +464,35 @@ async def execute_google_flow_generation(
 
             # 4. Trigger Generation
             print("  [5/5] Triggering Google Flow Generation...")
+            gen_start_time = time.time()
             await start_btn.click()
             print("  🚀 Flow generation started! Monitoring render queue...")
 
-            # Poll for completion
-            max_wait = 360
+            # Poll for completion (High-Speed Human-like Responsive Loop)
+            max_wait = 300
             elapsed = 0
-            poll_interval = 8
+            poll_interval = 3
             downloaded = False
 
-            # Wait 8s for new batch to register
-            await asyncio.sleep(8)
-            elapsed += 8
+            # Wait 2.5s for new batch to register
+            await asyncio.sleep(2.5)
+            elapsed += 3
 
             while elapsed < max_wait:
+                # Fast Error Detection: Check if Flow returned an error toast or failed card
+                err_locators = page.locator(
+                    '.batch-container:has-text("failed"), .batch-container:has-text("Error"), '
+                    '.batch-container:has-text("Try again"), mat-snack-bar-container:has-text("error"), '
+                    'mat-snack-bar-container:has-text("policy"), mat-snack-bar-container:has-text("failed"), '
+                    'div:has-text("Something went wrong"), div:has-text("Unable to generate")'
+                )
+                if await err_locators.count() > 0:
+                    err_msg = (await err_locators.first.inner_text()).replace("\n", " ").strip()
+                    print(f"\n  ❌ [Google Flow Error Detected]: {err_msg[:120]}")
+                    print("  ⚡ Aborting immediately without hanging. Zero stale videos will be sent.")
+                    await browser.close()
+                    return None
+
                 batches = await page.locator('.batch-container').all()
                 if batches:
                     top_batch = batches[0]
@@ -430,8 +503,8 @@ async def execute_google_flow_generation(
                     dl_btn = top_batch.locator('button[aria-label="Download batch"], button[aria-label*="Download"]').first
                     has_dl = await dl_btn.count() > 0
 
-                    if is_new_batch and "%" not in top_text and has_dl and elapsed >= 20:
-                        print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Downloading...")
+                    if is_new_batch and "%" not in top_text and has_dl and elapsed >= 10:
+                        print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Fast-downloading...")
                         try:
                             # Trigger download
                             async with page.expect_download(timeout=60000) as dl_info:
@@ -443,10 +516,14 @@ async def execute_google_flow_generation(
                             except Exception:
                                 pass
                             
-                            await asyncio.sleep(4)
-                            # Check for downloaded zip, crdownload or mp4
+                            await asyncio.sleep(2.5)
+                            # Strict check: ONLY candidate files created AFTER gen_start_time!
                             import zipfile
-                            candidates = list(VEO_DIR.glob("*.crdownload")) + list(VEO_DIR.glob("*.zip")) + [temp_file]
+                            raw_candidates = list(VEO_DIR.glob("*.crdownload")) + list(VEO_DIR.glob("*.zip")) + [temp_file]
+                            candidates = [
+                                c for c in raw_candidates
+                                if c.exists() and c.stat().st_mtime >= (gen_start_time - 3)
+                            ]
                             extracted = False
                             for cand in sorted(candidates, key=os.path.getmtime, reverse=True):
                                 if cand.exists() and cand.stat().st_size > 100000:
@@ -550,6 +627,13 @@ def process_single_item(
             product_img_path=product_data["primary_image_path"]
         ))
 
+        # STRICT LOCK CHECK: Google Flow MUST produce a fresh, genuine video in this run!
+        if not raw_video or not Path(raw_video).exists():
+            print("\n🛑 [STRICT LOCK ENGAGED] Google Flow did not render a fresh video in this run.")
+            print("   Strict policy: Zero old/cached/synthetic videos will ever be sent to Telegram.")
+            result["generation_status"] = "FAILED"
+            return result
+
         # Assemble high-fidelity master reel with luxury product card & chime
         print("  ⚡ Assembling high-fidelity master reel with luxury product card & chime...")
         from generate_master_affiliate_video import compose_master_10s_video, is_video_locked, register_sent_video
@@ -623,6 +707,9 @@ def process_single_item(
             print("\n❌ Generation error: Could not complete video generation.")
 
     return result
+
+
+process_single_product = process_single_item
 
 
 def process_csv_batch(csv_path: str, generate_video: bool = False) -> List[Dict[str, Any]]:

@@ -42,21 +42,42 @@ def inspect_and_crawl_pin(target_url_or_keyword: str, custom_title: str = "", co
             inferred_title = query_or_url.title()
 
     # 2. Extract Pinterest original CDN image URL via pinscrape
+    # 2. Extract Pinterest original CDN image URL
     cdn_image_url = ""
     gallery_images = []
 
-    try:
-        from pinscrape import Pinterest
-        p = Pinterest(proxies={}, sleep_time=1)
-        search_term = inferred_title if not query_or_url.startswith("http") else inferred_title
-        scraped_urls = p.search(search_term, 3)
-        if isinstance(scraped_urls, list) and len(scraped_urls) > 0:
-            cdn_image_url = scraped_urls[0]
-            gallery_images = scraped_urls[:3]
-    except Exception as exc:
-        print(f"Pinscrape notice: {exc}")
+    # A. If direct Pinterest Pin URL, extract the EXACT original product image from that pin
+    if "pinterest.com/pin/" in query_or_url:
+        try:
+            req = urllib.request.Request(query_or_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                html = resp.read().decode("utf-8", errors="ignore")
+            og_match = re.search(r'<meta property="og:image" content="([^"]+)"', html)
+            if og_match:
+                cdn_image_url = og_match.group(1).replace("/236x/", "/736x/")
+                gallery_images = [cdn_image_url]
+            else:
+                found_imgs = re.findall(r'https://i\.pinimg\.com/(?:originals|\d+x)/[a-zA-Z0-9_\-\./]+\.jpg', html)
+                if found_imgs:
+                    cdn_image_url = found_imgs[0].replace("/236x/", "/736x/")
+                    gallery_images = [cdn_image_url]
+        except Exception as pin_err:
+            print(f"Direct Pinterest pin scrape notice: {pin_err}")
 
-    # Fallback to direct image URL or high-speed CDN prompt if needed
+    # B. If not a direct pin or direct scrape failed, try Pinscrape API
+    if not cdn_image_url:
+        try:
+            from pinscrape import Pinterest
+            p = Pinterest(proxies={}, sleep_time=1)
+            search_term = inferred_title if not query_or_url.startswith("http") else inferred_title
+            scraped_urls = p.search(search_term, 3)
+            if isinstance(scraped_urls, list) and len(scraped_urls) > 0:
+                cdn_image_url = scraped_urls[0]
+                gallery_images = scraped_urls[:3]
+        except Exception as exc:
+            print(f"Pinscrape notice: {exc}")
+
+    # C. Fallback to direct image URL or search prompt if needed
     if not cdn_image_url:
         if "pinimg.com" in query_or_url or (query_or_url.startswith("http") and any(ext in query_or_url for ext in [".jpg", ".png", ".webp"])):
             cdn_image_url = query_or_url

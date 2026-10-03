@@ -32,10 +32,27 @@ root_dir = Path(__file__).resolve().parent.parent
 if str(root_dir) not in sys.path:
     sys.path.insert(0, str(root_dir))
 
-from core.logging_utils import get_logger
-from connectors.model_face_identity_trainer import ModelFaceIdentityTrainer
+try:
+    from core.logging_utils import get_logger
+    log = get_logger("universal_llm_visual_trainer")
+except Exception:
+    import logging
+    log = logging.getLogger("universal_llm_visual_trainer")
 
-log = get_logger("universal_llm_visual_trainer")
+try:
+    from connectors.model_face_identity_trainer import ModelFaceIdentityTrainer
+except Exception:
+    class ModelFaceIdentityTrainer:
+        EXACT_FACIAL_BLUEPRINT = {
+            "face_structure": "youthful natural soft-oval face shape with gentle feminine jawline",
+            "eyes": "large expressive warm honey-brown almond-shaped eyes",
+            "nose": "cute straight delicate nose with soft rounded tip",
+            "lips": "plump natural soft rose-pink lips",
+            "skin": "luminous dewy golden-olive skin with natural subtle cheek flush and authentic skin pores",
+            "bindi": "signature tiny crisp round black bindi centered precisely above eyebrows",
+            "hair": "long voluminous dark espresso black wavy hair with face-framing curtain tendrils",
+            "jewelery": "traditional silver oxidised bell-shaped jhumkas with stacked silver bangles"
+        }
 
 
 class UniversalLLMVisualTrainer:

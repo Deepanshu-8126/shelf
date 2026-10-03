@@ -60,29 +60,65 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=${extId}&utm_source=youtube_long_form&url=${encoded}`;
       }
 
-      // Collect all clean product CDN images
-      const allProductImgs = Array.from(document.querySelectorAll('img')).filter((img) => {
-        const src = (img.src || "").toLowerCase();
-        const alt = (img.alt || "").toLowerCase();
-        const w = img.naturalWidth || img.width || 0;
-        const h = img.naturalHeight || img.height || 0;
-        if (w < 80 || h < 80) return false;
-        if (JUNK_KEYWORDS.some(k => src.includes(k) || alt.includes(k))) return false;
-        if (src.includes("images.meesho.com") && !src.includes("/products/")) return false;
-        return true;
-      });
-
-      // Extract all high-res photos
+      // Comprehensive Real Product Image Extractor
       const highResPhotos = [];
       const seenPhotos = new Set();
-      allProductImgs.forEach(img => {
-        let src = img.srcset ? img.srcset.split(',').slice(-1)[0].split(' ')[0] : img.src;
-        if (!src) return;
-        const clean = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
+
+      function addPhoto(rawUrl) {
+        if (!rawUrl || typeof rawUrl !== "string") return;
+        let clean = rawUrl.trim().split('?')[0].split(' ')[0];
+        if (!clean.startsWith('http')) return;
+        if (JUNK_KEYWORDS.some(k => clean.toLowerCase().includes(k))) return;
+        // Upgrade resolution to 512 or 1024
+        clean = clean.replace(/width=\d+/, 'width=512')
+                     .replace(/\/(100|256|360)\//, '/512/')
+                     .replace(/\/236x\//, '/736x/');
         if (!seenPhotos.has(clean)) {
           seenPhotos.add(clean);
           highResPhotos.push(clean);
         }
+      }
+
+      // 1. Check meta tags (OG Image, Twitter Image, Image Src)
+      const ogMeta = document.querySelector('meta[property="og:image"], meta[name="og:image"], meta[property="twitter:image"], meta[name="twitter:image"]');
+      if (ogMeta && ogMeta.content) addPhoto(ogMeta.content);
+
+      const linkImg = document.querySelector('link[rel="image_src"]');
+      if (linkImg && linkImg.href) addPhoto(linkImg.href);
+
+      // 2. Check JSON-LD structured product data
+      document.querySelectorAll('script[type="application/ld+json"]').forEach(s => {
+        try {
+          const parsed = JSON.parse(s.textContent || '{}');
+          const imgs = parsed.image || (parsed['@graph'] && parsed['@graph'].find(g => g.image)?.image);
+          if (Array.isArray(imgs)) imgs.forEach(addPhoto);
+          else if (typeof imgs === 'string') addPhoto(imgs);
+        } catch (_) {}
+      });
+
+      // 3. Check Next.js Hydration State (__NEXT_DATA__)
+      const nextDataEl = document.getElementById('__NEXT_DATA__');
+      if (nextDataEl) {
+        try {
+          const nd = JSON.parse(nextDataEl.textContent || '{}');
+          const strData = JSON.stringify(nd);
+          const foundCdn = strData.match(/https:\/\/(?:images\.meesho\.com\/images\/products|i\.pinimg\.com)[^\s"'\\]+/g);
+          if (foundCdn) foundCdn.forEach(addPhoto);
+        } catch (_) {}
+      }
+
+      // 4. Collect from all DOM Image tags (checking src, data-src, srcset, currentSrc)
+      const allProductImgs = Array.from(document.querySelectorAll('img')).filter((img) => {
+        const src = (img.currentSrc || img.src || img.getAttribute('data-src') || '').toLowerCase();
+        const alt = (img.alt || '').toLowerCase();
+        if (JUNK_KEYWORDS.some(k => src.includes(k) || alt.includes(k))) return false;
+        if (src.includes('meesho.com') && !src.includes('/products/')) return false;
+        return true;
+      });
+
+      allProductImgs.forEach(img => {
+        const candidate = img.currentSrc || img.src || img.getAttribute('data-src') || (img.srcset ? img.srcset.split(',').slice(-1)[0].split(' ')[0] : '');
+        if (candidate) addPhoto(candidate);
       });
 
       // Extract available sizes from page
@@ -128,7 +164,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           parent.classList.add("shelf-scraped-highlight");
         });
 
-        // 1. Primary main product with full gallery array
+        // 1. Primary main product with full gallery array (Never fall back to fake pink top)
+        const primaryImage = highResPhotos.length > 0 ? highResPhotos[0] : (ogMeta?.content || window.location.href);
+
         items.push({
           id: `p-main-${extId}`,
           ext_id: extId,
@@ -139,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           costPrice: Math.max(149, price - 100),
           estimatedProfit: Math.max(80, Math.round(price * 0.4)),
           sizes: finalSizes,
-          image: highResPhotos[0] || "https://images.meesho.com/images/products/682813217/hbo6b_512.webp",
+          image: primaryImage,
           galleryImages: highResPhotos.slice(0, 8),
           colors: [detectedColor],
           primaryColor: detectedColor,
