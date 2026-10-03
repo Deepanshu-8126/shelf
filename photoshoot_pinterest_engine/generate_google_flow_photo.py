@@ -38,7 +38,7 @@ from photoshoot_pinterest_engine.cloud_photoshoot_runner import (
     is_photo_locked
 )
 
-from photoshoot_pinterest_engine.pinterest_editorial_aesthetic_library import get_pinterest_brand_prompt
+from connectors.universal_llm_visual_trainer import UniversalLLMVisualTrainer
 
 BRAVE_EXE = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 USER_DATA_DIR = str(PROJECT_ROOT / "data" / "browser_sessions" / "google_pro_permanent_profile")
@@ -56,11 +56,21 @@ async def generate_single_flow_photo(
     char_sheet_name: str = "model_character_sheet_v2.jpg",
     product_img_path: Path | None = None
 ) -> Path | None:
-    pose_name, prompt = get_pinterest_brand_prompt(product_title, fabric=fabric, pose_key=pose_key)
+    directive = UniversalLLMVisualTrainer.auto_direct_outfit(
+        product_title,
+        fabric=fabric,
+        price=price,
+        preferred_preset=pose_key
+    )
+    pose_name = directive["category_name"]
+    prompt = directive["master_photo_prompt"]
+    optical_recipe = directive["optical_recipe"]
 
     print("=" * 75)
     print(f"🚀 GENERATING GOOGLE FLOW BRAND EDITORIAL PHOTOSHOOT")
-    print(f"👗 Outfit: {product_title} ({price}) | Pose: {pose_name}")
+    print(f"👗 Outfit: {product_title} ({price}) | Preset: {pose_name}")
+    print(f"🎭 Expression: {directive['expression']}")
+    print(f"🔬 Optical Profile: {optical_recipe['skin_profile']}")
     print("=" * 75)
 
     out_photo = OUTPUT_DIR / f"FLOW_EDITORIAL_{int(time.time())}_{product_title.lower().replace(' ', '_')[:15]}.jpg"
@@ -91,11 +101,18 @@ async def generate_single_flow_photo(
                 await asyncio.sleep(2.0)
                 print("  ✅ Model configuration loaded!")
 
-        # 2. Attach Image Ingredients
-        print(f"  [3/5] Verifying Image Ingredients ({char_sheet_name})...")
+        # 2. Attach Dual Image Ingredients (Garment + Model Character Sheet)
+        print(f"  [3/5] Attaching Dual Ingredients: Garment Reference + Model Character Sheet ({char_sheet_name})...")
         try:
             from flow_reference_attachment_fix import attach_flow_library_image
-            await asyncio.wait_for(attach_flow_library_image(page, char_sheet_name), timeout=6.0)
+            # Ref 1: Garment reference if available
+            if product_img_path and Path(product_img_path).exists():
+                print(f"    👗 Attaching Garment Reference: {Path(product_img_path).name}...")
+                await asyncio.wait_for(attach_flow_library_image(page, product_img_path), timeout=8.0)
+            
+            # Ref 2: Model Face Identity Anchor
+            print(f"    👤 Attaching Model Face Anchor: {char_sheet_name}...")
+            await asyncio.wait_for(attach_flow_library_image(page, char_sheet_name), timeout=8.0)
         except Exception as e:
             print(f"  ℹ️ Attachment notice: {e}")
 
@@ -197,19 +214,27 @@ async def generate_single_flow_photo(
     if downloaded_photo and downloaded_photo.exists():
         print(f"\n✨ [Google Flow AI Photo Success]: {downloaded_photo.name} ({downloaded_photo.stat().st_size} bytes)")
         
-        # Natural Film Tone & Subtle Contrast Polish (No harsh artificial sharpening)
+        # Dynamic Optical Polish from LLM Director (Soft skin preserved, natural lighting)
         img = Image.open(downloaded_photo).convert("RGB")
-        img_color = ImageEnhance.Color(img).enhance(1.03)
-        img_contrast = ImageEnhance.Contrast(img_color).enhance(1.02)
-        img_contrast.save(downloaded_photo, "JPEG", quality=98)
+        col_enh = ImageEnhance.Color(img).enhance(optical_recipe.get("color_factor", 1.02))
+        cont_enh = ImageEnhance.Contrast(col_enh).enhance(optical_recipe.get("contrast_factor", 1.02))
+        sharp_enh = ImageEnhance.Sharpness(cont_enh).enhance(optical_recipe.get("sharpness_factor", 1.01))
+        
+        # Only apply micro-texture if explicitly enabled by LLM Director
+        if optical_recipe.get("unsharp_mask", {}).get("enabled", False):
+            um = optical_recipe["unsharp_mask"]
+            sharp_enh = sharp_enh.filter(ImageFilter.UnsharpMask(radius=um.get("radius", 1), percent=um.get("percent", 15), threshold=um.get("threshold", 6)))
+            
+        sharp_enh.save(downloaded_photo, "JPEG", quality=98)
 
         # Dispatch to Telegram
         caption = (
             f"📸 *PINTEREST BRAND EDITORIAL: {product_title.upper()}* ✨\n\n"
             f"🥻 *Model:* 21yo Indian Creator (Signature Bindi & Jhumkas)\n"
-            f"🎭 *Editorial Pose:* {pose_name}\n"
+            f"🎭 *Category & Pose:* {pose_name}\n"
             f"💰 *Deal Price:* `{price}`\n"
-            f"⭐ *Quality:* 8K Hasselblad Portra 400 • Real Skin Pores • Zero Phone in Hand\n\n"
+            f"🔬 *Optical Treatment:* {optical_recipe.get('skin_profile', 'Natural soft skin')}\n"
+            f"⭐ *Quality:* 8K Hasselblad Portra 400 • Real Skin Pores • Zero Digital Crunch\n\n"
             f"🛍️ *Product:* {product_title}\n"
             f"🏷️ #PinterestFashion #FashionEditorial #OOTD #SareeLookbook #HighFashion"
         )

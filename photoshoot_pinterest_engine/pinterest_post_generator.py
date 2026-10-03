@@ -22,6 +22,13 @@ import argparse
 from pathlib import Path
 from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # Root imports
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent
@@ -31,42 +38,46 @@ if str(PROJECT_ROOT) not in sys.path:
 OUTPUT_DIR = CURRENT_DIR / "rendered_posts"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Import pose library
+# Import Master LLM Vision Director & Pose Library
+try:
+    from connectors.universal_llm_visual_trainer import UniversalLLMVisualTrainer
+except ImportError:
+    UniversalLLMVisualTrainer = None
+
 try:
     from connectors.genz_influencer_pose_library import GenZInfluencerPoseLibrary
 except ImportError:
-    # Fallback definition if run standalone
-    class GenZInfluencerPoseLibrary:
-        @classmethod
-        def format_influencer_prompt(cls, outfit_name: str, pose_key: str = None) -> str:
-            return f"Hyper-realistic 4K GenZ AI Influencer photoshoot of 21yo Indian girl wearing {outfit_name} in aesthetic bedroom mirror selfie, Shot on iPhone 16 Pro."
+    GenZInfluencerPoseLibrary = None
 
 
 def remove_watermark_and_polish(
     img_path: Path,
     out_path: Path,
-    sharpness_factor: float = 1.35,
-    contrast_factor: float = 1.05,
+    sharpness_factor: float = 1.02,
+    contrast_factor: float = 1.02,
+    color_factor: float = 1.02,
+    optical_recipe: dict | None = None,
     add_price_tag: bool = False,
     price_text: str = "₹499",
     product_title: str = "Trendy Outfit"
 ) -> Path:
     """
     1. Erases Gemini/Watermark icons cleanly from corners.
-    2. Applies studio-grade sharpening and color calibration.
-    3. Optionally adds a luxury Pinterest shopping tag badge.
+    2. Preserves natural organic skin softness, pores, and natural lighting.
+    3. Dynamically respects LLM Director's optical recipe:
+       - Eliminates crunchy digital over-sharpening
+       - Preserves soft natural skin pores & fine facial texture
+       - Gentle film color calibration (Kodak Portra 400 warmth)
+    4. Optionally adds a luxury Pinterest shopping tag badge.
     """
     img = Image.open(img_path).convert("RGBA")
     w, h = img.size
 
-    # --- 1. Watermark Delogo / Corner Clean (Bottom Right & Top Right corners) ---
-    # Gemini watermark is typically in the bottom-right corner (approx 8-10% of width/height)
+    # --- 1. Watermark Delogo / Corner Clean (Bottom Right corner) ---
     logo_w = int(w * 0.12)
     logo_h = int(h * 0.08)
     
-    # Smooth blend / blur / patch bottom-right watermark area
     br_box = (w - logo_w - 10, h - logo_h - 10, w - 5, h - 5)
-    # Clone adjacent texture or apply soft gaussian blur patch
     patch = img.crop(br_box)
     patch = patch.filter(ImageFilter.GaussianBlur(radius=8))
     img.paste(patch, br_box)
@@ -74,18 +85,35 @@ def remove_watermark_and_polish(
     # Convert to RGB for enhancement
     rgb_img = img.convert("RGB")
 
-    # --- 2. 4K Micro-Sharpening & Crisp Clarity ---
+    # --- 2. Determine Optical Settings (From LLM Director or Safe Defaults) ---
+    if optical_recipe:
+        s_factor = optical_recipe.get("sharpness_factor", sharpness_factor)
+        c_factor = optical_recipe.get("contrast_factor", contrast_factor)
+        col_factor = optical_recipe.get("color_factor", color_factor)
+        unsharp_cfg = optical_recipe.get("unsharp_mask", {"enabled": False})
+    else:
+        s_factor = sharpness_factor
+        c_factor = contrast_factor
+        col_factor = color_factor
+        unsharp_cfg = {"enabled": False}
+
+    # Soft, organic natural clarity (Zero crunchy digital ringing)
     enhancer_sharpness = ImageEnhance.Sharpness(rgb_img)
-    sharpened = enhancer_sharpness.enhance(sharpness_factor)
+    sharpened = enhancer_sharpness.enhance(s_factor)
 
     enhancer_contrast = ImageEnhance.Contrast(sharpened)
-    contrasted = enhancer_contrast.enhance(contrast_factor)
+    contrasted = enhancer_contrast.enhance(c_factor)
 
     enhancer_color = ImageEnhance.Color(contrasted)
-    polished = enhancer_color.enhance(1.04)
+    polished = enhancer_color.enhance(col_factor)
 
-    # Unsharp mask for high-frequency fabric texture definition
-    polished = polished.filter(ImageFilter.UnsharpMask(radius=2, percent=130, threshold=3))
+    # Only apply micro-texture if explicitly enabled by LLM Director (e.g. for denim/streetwear)
+    # Never apply harsh 130% masks that ruin delicate skin pores
+    if unsharp_cfg.get("enabled", False):
+        radius = unsharp_cfg.get("radius", 1)
+        percent = min(unsharp_cfg.get("percent", 15), 25)  # Strict safety clamp to 25% max
+        threshold = unsharp_cfg.get("threshold", 6)
+        polished = polished.filter(ImageFilter.UnsharpMask(radius=radius, percent=percent, threshold=threshold))
 
     # --- 3. Optional Luxury Pinterest Price Tag Card ---
     if add_price_tag:
@@ -107,9 +135,19 @@ def remove_watermark_and_polish(
         polished = Image.alpha_composite(polished.convert("RGBA"), overlay).convert("RGB")
         draw = ImageDraw.Draw(polished)
 
-        try:
-            font = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 20)
-        except Exception:
+        font = None
+        for fpath in [
+            "C:/Windows/Fonts/arialbd.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf"
+        ]:
+            if Path(fpath).exists():
+                try:
+                    font = ImageFont.truetype(fpath, 20)
+                    break
+                except Exception:
+                    pass
+        if not font:
             font = ImageFont.load_default()
 
         tag_text = f"✨ {product_title[:18]}  •  {price_text}"
@@ -121,11 +159,44 @@ def remove_watermark_and_polish(
     return out_path
 
 
+def polish_with_llm_director(
+    img_path: Path,
+    out_path: Path,
+    product_title: str,
+    fabric: str = "",
+    price_text: str = "₹499",
+    add_price_tag: bool = False
+) -> Path:
+    """
+    Uses UniversalLLMVisualTrainer to automatically detect the garment type,
+    assign the exact optical recipe (soft skin vs denim clarity), and polish the image.
+    """
+    if UniversalLLMVisualTrainer:
+        directive = UniversalLLMVisualTrainer.auto_direct_outfit(product_title, fabric=fabric, price=price_text)
+        recipe = directive["optical_recipe"]
+    else:
+        recipe = {
+            "sharpness_factor": 1.02,
+            "contrast_factor": 1.02,
+            "color_factor": 1.02,
+            "unsharp_mask": {"enabled": False}
+        }
+
+    return remove_watermark_and_polish(
+        img_path=img_path,
+        out_path=out_path,
+        optical_recipe=recipe,
+        add_price_tag=add_price_tag,
+        price_text=price_text,
+        product_title=product_title
+    )
+
+
 def process_photoshoot_csv(csv_path: Path):
-    """Reads CSV and outputs photoshoot prompts & polished social post templates."""
-    print("=" * 70)
-    print(f"📸 PROCESSING PHOTOSHOOT POSTS FROM: {csv_path.name}")
-    print("=" * 70)
+    """Reads CSV and outputs photoshoot prompts & polished social post templates via LLM Vision Director."""
+    print("=" * 75)
+    print(f"📸 PROCESSING PHOTOSHOOT POSTS VIA LLM VISION DIRECTOR: {csv_path.name}")
+    print("=" * 75)
 
     if not csv_path.exists():
         print(f"❌ Error: CSV file not found at {csv_path}")
@@ -135,7 +206,6 @@ def process_photoshoot_csv(csv_path: Path):
     with open(csv_path, "r", encoding="utf-8", errors="ignore") as f:
         reader = csv.DictReader(f)
         if not reader.fieldnames or "url" not in [col.lower() for col in reader.fieldnames]:
-            # Simple list format
             f.seek(0)
             for line in f:
                 line = line.strip()
@@ -151,16 +221,38 @@ def process_photoshoot_csv(csv_path: Path):
         url = item.get("url") or item.get("URL") or item.get("link", "")
         title = item.get("title") or item.get("TITLE") or "Trendy Meesho Outfit"
         price = item.get("price") or item.get("PRICE") or "₹499"
+        fabric = item.get("fabric") or item.get("FABRIC") or "Premium Fabric"
 
-        prompt = GenZInfluencerPoseLibrary.format_influencer_prompt(title)
+        if UniversalLLMVisualTrainer:
+            directive = UniversalLLMVisualTrainer.auto_direct_outfit(title, fabric=fabric, price=price)
+            recipe = directive["optical_recipe"]
+            category = directive["category_name"]
+            preset = directive["preset_key"]
+            expr = directive["expression"]
+            prompt = directive["master_photo_prompt"]
+            veo_prompt = directive["veo_video_prompt"]
+        else:
+            prompt = f"Hyper-realistic 4K photoshoot of {title}."
+            veo_prompt = ""
+            category = "General Fashion"
+            preset = "DEFAULT"
+            expr = "candid natural smile"
+            recipe = {"sharpness_factor": 1.02, "unsharp_mask": {"enabled": False}, "skin_profile": "Natural soft skin"}
 
         print(f"[{idx}/{len(items)}] 👗 {title} ({price})")
         print(f"  🔗 URL: {url}")
-        print(f"  💡 Master Photoshoot Prompt:\n     \"{prompt}\"\n")
+        print(f"  🏷️ Auto-Detected Category : {category} [{preset}]")
+        print(f"  🎭 Dynamic Expression     : {expr}")
+        print(f"  🔬 Optical Treatment      : Sharpness={recipe.get('sharpness_factor', 1.02)}, UnsharpMask={recipe.get('unsharp_mask', {}).get('enabled', False)}")
+        print(f"  ✨ Skin Preservation      : {recipe.get('skin_profile', 'Natural soft skin')}")
+        print(f"  💡 Master 8K Photo Prompt :\n     \"{prompt}\"")
+        if veo_prompt:
+            print(f"  🎬 Veo 60fps Reel Prompt  :\n     \"{veo_prompt}\"")
+        print("-" * 75)
 
-    print("=" * 70)
-    print(f"✅ Ready! Put input images in '{CURRENT_DIR}/raw_photos' to auto-sharpen & remove watermarks.")
-    print("=" * 70)
+    print("=" * 75)
+    print(f"✅ Ready! Put input images in '{CURRENT_DIR}/raw_photos' to auto-polish with soft-skin preservation.")
+    print("=" * 75)
 
 
 if __name__ == "__main__":
@@ -169,3 +261,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     process_photoshoot_csv(Path(args.csv))
+
