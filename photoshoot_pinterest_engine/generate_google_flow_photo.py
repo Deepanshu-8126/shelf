@@ -47,6 +47,18 @@ PROJECT_URL = "https://flow.google.com/project/a399f8a2-c1a6-4150-b235-605a5a50c
 OUTPUT_DIR = CURRENT_DIR / "flow_generated_photos"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+STEALTH_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+)
+
+STEALTH_INIT_SCRIPT = """
+Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+window.chrome = { runtime: {}, app: {} };
+Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en', 'hi'] });
+Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+"""
+
 
 async def generate_single_flow_photo(
     product_title: str = "Classic Modern Wine Red Saree",
@@ -82,9 +94,15 @@ async def generate_single_flow_photo(
             accept_downloads=True,
             downloads_path=str(OUTPUT_DIR),
             executable_path=BRAVE_EXE if Path(BRAVE_EXE).exists() else None,
-            args=["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+            user_agent=STEALTH_USER_AGENT,
+            args=[
+                "--no-sandbox",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-dev-shm-usage"
+            ]
         )
         page = await browser.new_page()
+        await page.add_init_script(STEALTH_INIT_SCRIPT)
 
         print(f"  [1/5] Opening Flow Project: {PROJECT_URL}")
         await page.goto(PROJECT_URL, timeout=60000, wait_until="domcontentloaded")
