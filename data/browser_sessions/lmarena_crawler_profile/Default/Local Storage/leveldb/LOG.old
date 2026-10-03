@@ -1,0 +1,5 @@
+2026/10/03-21:32:14.190 180 Creating DB D:\facts_yt\data\browser_sessions\lmarena_crawler_profile\Default\Local Storage\leveldb since it was missing.
+2026/10/03-21:32:14.211 180 Reusing MANIFEST D:\facts_yt\data\browser_sessions\lmarena_crawler_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/03-21:33:14.235 180 Level-0 table #5: started
+2026/10/03-21:33:14.242 180 Level-0 table #5: 51075 bytes OK
+2026/10/03-21:33:14.244 180 Delete type=0 #3

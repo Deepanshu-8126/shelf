@@ -49,10 +49,16 @@ async def attach_flow_library_image(page: Page, image_path: Path or str):
     
     print(f"📎 [Flow Attachment] Attaching reference asset: {target_name} ({target_stem})...")
     
-    # 1. Open ingredients menu
-    add_btn = page.locator('button.add-menu-trigger, button[aria-label="Add ingredients to the prompt box"]').first
-    await add_btn.click()
-    await asyncio.sleep(2.0)
+    # 1. Open ingredients menu safely
+    add_btn = page.locator('button.add-menu-trigger, button[aria-label="Add ingredients to the prompt box"], button[aria-label*="ingredient" i]').first
+    if await add_btn.count() > 0 and await add_btn.is_visible():
+        try:
+            await add_btn.click(timeout=3000)
+            await asyncio.sleep(1.5)
+        except Exception as btn_err:
+            print(f"  ℹ️ Add button click notice: {btn_err}")
+    else:
+        print("  ℹ️ Ingredient menu trigger not visible or already set. Continuing...")
     
     # 2. Look for the asset in the overlay
     overlay = page.locator('.cdk-overlay-container')
