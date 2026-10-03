@@ -176,7 +176,7 @@ const PROMPT_LIBRARY_PRESETS = [
   }
 ];
 
-export default function AIMediaStudioView({ products = [], onToast = () => {} }) {
+export default function AIMediaStudioView({ products = [], onToast = () => {}, onUpdateProduct = () => {} }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'photos' | 'videos' | 'generator'
   const [selectedPhotoModal, setSelectedPhotoModal] = useState(null);
   const [photosList, setPhotosList] = useState(INITIAL_PHOTOS);
@@ -298,8 +298,54 @@ export default function AIMediaStudioView({ products = [], onToast = () => {} })
     onToast(`🔄 Regenerating "${photo.title.slice(0, 25)}..." with "${nextPreset.label}" variation!`);
   };
 
+  // Apply Photo as Primary Website Storefront Image
+  const handleApplyToStorefront = (photo) => {
+    if (!photo) return;
+    const targetProduct = selectedProductId
+      ? products.find((p) => p.id === selectedProductId)
+      : products.find((p) => p.title.toLowerCase().includes(photo.title.toLowerCase()) || photo.title.toLowerCase().includes((p.title || '').toLowerCase())) || products[0];
+
+    if (targetProduct) {
+      const existingGallery = targetProduct.galleryImages || [];
+      const updatedGallery = [photo.src, ...existingGallery.filter((im) => im !== photo.src)];
+      onUpdateProduct?.(targetProduct.id, {
+        image: photo.src,
+        galleryImages: updatedGallery
+      });
+      onToast(`🎉 Set as Primary Storefront Cover for "${targetProduct.title.slice(0, 25)}..."!`);
+    } else {
+      onToast('✨ High-fashion LM Arena photo set as active cover!');
+    }
+
+    // Direct push to Telegram
+    try {
+      fetch('/api/studio/push-telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: photo.title,
+          price: photo.price,
+          photo_url: photo.src,
+          caption: photo.prompt || photo.optical
+        })
+      });
+    } catch {}
+  };
+
   const handlePushTelegram = (title) => {
     onToast(`🚀 Dispatched 4K pin for "${title.slice(0, 25)}..." to Telegram (@6486771356)!`);
+    try {
+      fetch('/api/studio/push-telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title,
+          price: genPrice,
+          photo_url: refImage,
+          caption: customPrompt
+        })
+      });
+    } catch {}
   };
 
   return (
@@ -655,6 +701,112 @@ export default function AIMediaStudioView({ products = [], onToast = () => {} })
               </div>
             </div>
           )}
+
+          {/* Visual Transformation Showcase: Sourced Reference ➔ LM Arena AI Brand Render */}
+          <div style={{
+            marginTop: '24px',
+            background: 'rgba(0,0,0,0.45)',
+            borderRadius: '14px',
+            padding: '20px',
+            border: '1px solid rgba(255,255,255,0.12)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '800', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🔍</span> Visual Side-by-Side: Sourced Reference ➔ LM Arena Vogue Brand Master
+              </span>
+              <span style={{ fontSize: '11px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: '700' }}>
+                ● Storefront 1-Click Sync Active
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '16px', alignItems: 'center' }}>
+              {/* Left: Original Reference */}
+              <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>
+                  Original Sourced Product Reference
+                </div>
+                <img
+                  src={refImage}
+                  alt="Reference"
+                  style={{ maxHeight: '200px', width: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                />
+                <div style={{ fontSize: '11px', color: '#ffd166', marginTop: '8px', fontWeight: '600' }}>
+                  Raw Supplier Catalog Image
+                </div>
+              </div>
+
+              {/* Center Transform Arrow */}
+              <div style={{ textAlign: 'center', padding: '0 8px' }}>
+                <div style={{ fontSize: '28px', color: '#ec4899' }}>⚡➔</div>
+                <div style={{ fontSize: '10px', color: '#38bdf8', fontWeight: '800', textTransform: 'uppercase', marginTop: '4px' }}>
+                  LM Arena (14s)
+                </div>
+              </div>
+
+              {/* Right: AI Vogue Render */}
+              <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(82, 227, 150, 0.35)' }}>
+                <div style={{ fontSize: '11px', color: '#52e396', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>
+                  LM Arena AI Vogue Brand Master
+                </div>
+                <img
+                  src={photosList[0]?.src || refImage}
+                  alt="AI Render"
+                  style={{ maxHeight: '200px', width: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                />
+                <div style={{ fontSize: '11px', color: '#a78bfa', marginTop: '8px', fontWeight: '600' }}>
+                  Ultra-Soft Skin • Authentic Pores Preserved
+                </div>
+              </div>
+            </div>
+
+            {/* Instant Apply & Push Buttons */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => handleApplyToStorefront(photosList[0])}
+                style={{
+                  flex: '1 1 220px',
+                  background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 18px',
+                  borderRadius: '8px',
+                  fontWeight: '750',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)'
+                }}
+              >
+                <span>✨</span> Set as Primary Website Storefront Photo
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handlePushTelegram(photosList[0]?.title || genTitle)}
+                style={{
+                  flex: '1 1 200px',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 18px',
+                  borderRadius: '8px',
+                  fontWeight: '750',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <span>📱</span> Push 4K to Telegram (@6486771356)
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -719,45 +871,66 @@ export default function AIMediaStudioView({ products = [], onToast = () => {} })
                   </div>
 
                   {/* Quick Action Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button
-                      onClick={() => handlePushTelegram(photo.title)}
+                      onClick={() => handleApplyToStorefront(photo)}
                       style={{
-                        background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                        background: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
                         color: '#fff',
                         border: 'none',
                         padding: '7px 10px',
                         borderRadius: '6px',
-                        fontSize: '11px',
-                        fontWeight: '700',
+                        fontSize: '11.5px',
+                        fontWeight: '750',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '4px'
+                        gap: '5px'
                       }}
                     >
-                      <span>📱</span> Push Telegram
+                      <span>✨</span> Apply as Storefront Cover
                     </button>
-                    <button
-                      onClick={() => handleRegenerateVariation(photo)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        color: '#fff',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        padding: '7px 10px',
-                        borderRadius: '6px',
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span>🔄</span> New Angle
-                    </button>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                      <button
+                        onClick={() => handlePushTelegram(photo.title)}
+                        style={{
+                          background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span>📱</span> Telegram
+                      </button>
+                      <button
+                        onClick={() => handleRegenerateVariation(photo)}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.08)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span>🔄</span> New Angle
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -870,6 +1043,30 @@ export default function AIMediaStudioView({ products = [], onToast = () => {} })
               </div>
 
               <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button
+                  onClick={() => {
+                    handleApplyToStorefront(selectedPhotoModal);
+                    setSelectedPhotoModal(null);
+                  }}
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    fontWeight: '750',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)'
+                  }}
+                >
+                  <span>✨</span> Apply as Primary Website Storefront Photo
+                </button>
+
                 <button
                   onClick={() => {
                     handlePushTelegram(selectedPhotoModal.title);

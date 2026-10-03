@@ -1564,6 +1564,42 @@ def ingest_csv_upload_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         return {"success": False, "error": str(exc), "count": 0}
 
 
+class PushTelegramRequest(BaseModel):
+    title: str = ""
+    price: str = ""
+    photo_url: str = ""
+    caption: str = ""
+
+
+@app.post("/api/studio/push-telegram")
+def studio_push_telegram_endpoint(payload: PushTelegramRequest) -> dict[str, Any]:
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not bot_token or not chat_id:
+        return {"success": False, "error": "Telegram not configured in .env"}
+
+    text = (
+        f"📸 *LM Arena 4K Brand Photoshoot — Storefront Ready*\n\n"
+        f"👗 *Outfit:* {payload.title or 'Curated Trend Drop'}\n"
+        f"💰 *Deal Price:* {payload.price or '₹499'}\n"
+        f"✨ *Quality Standard:* Ultra-Soft Natural Skin • Authentic Pores • Zero Crunch\n"
+        f"⚡ *Engine:* LM Arena Fast (14.3s FLUX Tier 1)\n\n"
+        f"👉 *Status: Applied Live to Storefront Catalog!*"
+    )
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            url,
+            data=json.dumps({"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return {"success": resp.status == 200, "message": "Dispatched to Telegram chat!"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
 

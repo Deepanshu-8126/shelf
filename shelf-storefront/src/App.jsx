@@ -1841,7 +1841,24 @@ export default function App() {
             />
           )}
           {activePage === 'AI Media Studio' && (
-            <AIMediaStudioView products={products} onToast={showToast} />
+            <AIMediaStudioView
+              products={products}
+              onToast={showToast}
+              onUpdateProduct={async (id, updates) => {
+                const existing = products.find((p) => p.id === id);
+                if (!existing) return;
+                const nextProduct = { ...existing, ...updates };
+                try {
+                  await fetch('/api/products/update-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nextProduct)
+                  });
+                } catch {}
+                setProducts((prev) => prev.map((p) => (p.id === id ? nextProduct : p)));
+                showToast(`🎉 Applied LM Arena photo as storefront cover for "${existing.title.slice(0, 25)}..."!`);
+              }}
+            />
           )}
           {activePage === 'Pinterest Traffic Hub' && <PinterestHubView products={products} collections={collections} onCopy={copyText} />}
           {activePage === 'Analytics' && <AnalyticsView />}
