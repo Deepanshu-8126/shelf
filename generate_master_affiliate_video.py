@@ -290,7 +290,7 @@ def compose_master_10s_video(
     # 4. Master FFmpeg Filter Complex (Delogo + 8K Grade + Popup Card + Veo Voice/Chime Audio)
     if has_raw_audio:
         vf = (
-            "[0:v]delogo=x=540:y=1100:w=160:h=160:band=4:show=0,"
+            "[0:v]delogo=x=540:y=1100:w=160:h=160:show=0,"
             "scale=1080:1920:flags=lanczos,"
             "unsharp=5:5:0.7:5:5:0.0,"
             "eq=contrast=1.03:brightness=0.01:saturation=1.04,"
@@ -302,7 +302,7 @@ def compose_master_10s_video(
         )
     else:
         vf = (
-            "[0:v]delogo=x=540:y=1100:w=160:h=160:band=4:show=0,"
+            "[0:v]delogo=x=540:y=1100:w=160:h=160:show=0,"
             "scale=1080:1920:flags=lanczos,"
             "unsharp=5:5:0.7:5:5:0.0,"
             "eq=contrast=1.03:brightness=0.01:saturation=1.04,"

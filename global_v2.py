@@ -433,34 +433,46 @@ async def execute_google_flow_generation(
                     if is_new_batch and "%" not in top_text and has_dl and elapsed >= 20:
                         print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Downloading...")
                         try:
+                            # Trigger download
                             async with page.expect_download(timeout=60000) as dl_info:
                                 await dl_btn.click(force=True)
                             download = await dl_info.value
                             temp_file = VEO_DIR / download.suggested_filename
-                            await download.save_as(str(temp_file))
-                            print(f"    Saved downloaded file: {temp_file.name} ({temp_file.stat().st_size} bytes)")
-
+                            try:
+                                await download.save_as(str(temp_file))
+                            except Exception:
+                                pass
+                            
+                            await asyncio.sleep(4)
+                            # Check for downloaded zip, crdownload or mp4
                             import zipfile
-                            if temp_file.suffix.lower() == ".zip" or zipfile.is_zipfile(temp_file):
-                                with zipfile.ZipFile(temp_file, "r") as z:
-                                    for item in z.namelist():
-                                        if item.lower().endswith(".mp4"):
-                                            with open(output_mp4, "wb") as f_out, z.open(item) as f_in:
-                                                f_out.write(f_in.read())
-                                            print(f"    ✅ Extracted new MP4: {output_mp4.name} ({output_mp4.stat().st_size} bytes)")
+                            candidates = list(VEO_DIR.glob("*.crdownload")) + list(VEO_DIR.glob("*.zip")) + [temp_file]
+                            extracted = False
+                            for cand in sorted(candidates, key=os.path.getmtime, reverse=True):
+                                if cand.exists() and cand.stat().st_size > 100000:
+                                    if zipfile.is_zipfile(cand) or cand.suffix.lower() == ".zip":
+                                        with zipfile.ZipFile(cand) as z:
+                                            for item in z.namelist():
+                                                if item.lower().endswith(".mp4"):
+                                                    with open(output_mp4, "wb") as f_out, z.open(item) as f_in:
+                                                        f_out.write(f_in.read())
+                                                    print(f"    ✅ Extracted new MP4 from {cand.name}: {output_mp4.name} ({output_mp4.stat().st_size} bytes)")
+                                                    extracted = True
+                                                    break
+                                        if extracted:
+                                            cand.unlink(missing_ok=True)
                                             break
-                                temp_file.unlink(missing_ok=True)
-                            else:
-                                if output_mp4.exists():
-                                    output_mp4.unlink()
-                                temp_file.replace(output_mp4)
+                                    elif cand.suffix.lower() == ".mp4":
+                                        cand.replace(output_mp4)
+                                        extracted = True
+                                        break
 
-                            if output_mp4.exists() and output_mp4.stat().st_size > 10000:
-                                print(f"  ✅ Fresh Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
+                            if output_mp4.exists() and output_mp4.stat().st_size > 100000:
+                                print(f"  ✅ Fresh Google Flow Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
                                 downloaded = True
                                 break
                         except Exception as dl_err:
-                            print(f"    Download retry notice: {dl_err}")
+                            print(f"    Download handler notice: {dl_err}")
 
                 await asyncio.sleep(poll_interval)
                 elapsed += poll_interval
