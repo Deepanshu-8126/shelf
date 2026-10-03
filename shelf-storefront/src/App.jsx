@@ -9,6 +9,8 @@ import Storefront from './components/Storefront.jsx';
 import OwnerLogin from './components/OwnerLogin.jsx';
 import ImporterPanel from './components/ImporterPanel.jsx';
 import IngestInboxView from './components/IngestInboxView.jsx';
+import AdminCatalogView from './components/AdminCatalogView.jsx';
+import AdminBannersManager from './components/AdminBannersManager.jsx';
 import { AddCollectionModal, AddProductModal } from './components/Modals.jsx';
 import EarningScopeModal from './components/EarningScopeModal.jsx';
 import {
@@ -22,7 +24,8 @@ import {
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
   { label: 'Ingest Inbox', icon: 'download' },
-  { label: 'Products', icon: 'products' },
+  { label: 'Master Catalog', icon: 'products' },
+  { label: 'Storefront Banners', icon: 'sparkles' },
   { label: 'Collections', icon: 'collections' },
   { label: 'Pinterest Traffic Hub', icon: 'sparkles' },
   { label: 'Analytics', icon: 'analytics' },
@@ -1689,7 +1692,7 @@ export default function App() {
             >
               <Icon name={item.icon} size={18} />
               <span>{item.label}</span>
-              {item.label === 'Products' && (
+              {(item.label === 'Master Catalog' || item.label === 'Products') && (
                 <span className="nav-count">
                   {products.filter((p) => p.status !== 'pending_review' && p.status !== 'draft').length}
                 </span>
@@ -1818,22 +1821,25 @@ export default function App() {
             />
           )}
           {activePage === 'Collections' && <CollectionsView collections={collections} products={products} onAddCollection={() => setShowCollectionModal(true)} onOpenCollection={handleOpenCollection} />}
-          {activePage === 'Products' && (
-            <ProductsView
-              products={filteredProducts}
-              collections={collections}
-              storeFilter={storeFilter}
-              onStoreFilter={setStoreFilter}
-              categoryFilter={categoryFilter}
-              onCategoryFilter={setCategoryFilter}
-              collectionFilter={collectionFilter}
-              onCollectionFilter={setCollectionFilter}
-              query={query}
-              sort={sort}
-              onSort={setSort}
-              onAddProduct={openAddProduct}
-              onToggleSaved={toggleSaved}
-              onAddLink={openEditLink}
+          {(activePage === 'Master Catalog' || activePage === 'Products') && (
+            <AdminCatalogView
+              products={products}
+              onApproveProduct={handleApproveProduct}
+              onDeleteProduct={handleDeleteProduct}
+              onUpdateProduct={(id, updates) => {
+                setProducts((current) => current.map((p) => p.id === id ? { ...p, ...updates } : p));
+                showToast('Product updated successfully');
+              }}
+              onOpenAddProduct={openAddProduct}
+              onOpenEditProduct={openEditLink}
+            />
+          )}
+          {activePage === 'Storefront Banners' && (
+            <AdminBannersManager
+              products={products}
+              onSaveBanners={() => {
+                showToast('✨ Storefront hero & category banners saved live!');
+              }}
             />
           )}
           {activePage === 'Pinterest Traffic Hub' && <PinterestHubView products={products} collections={collections} onCopy={copyText} />}

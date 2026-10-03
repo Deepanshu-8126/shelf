@@ -8,7 +8,7 @@ import ProductDetailModal from './ProductDetailModal.jsx';
 import ProductPage from './ProductPage.jsx';
 import OutfitBuilderModal from './OutfitBuilderModal.jsx';
 import AIStylistModal from './AIStylistModal.jsx';
-import VirtualTryOnModal from './VirtualTryOnModal.jsx';
+import InteractiveShowroomModal from './InteractiveShowroomModal.jsx';
 import EarningScopeModal, { getProductEarning } from './EarningScopeModal.jsx';
 import GenZStudioModal from './GenZStudioModal.jsx';
 import { getProductClickUrl } from '../affiliate.js';
@@ -661,6 +661,16 @@ export default function Storefront({
           </div>
 
           <button 
+            className="ai-concierge-pill showroom-trigger-pill"
+            type="button"
+            onClick={() => setTryOnModalOpen(true)}
+            title="Open Interactive 3D Style Studio"
+          >
+            <span style={{ fontSize: '13px' }}>✨</span>
+            <span>3D Showroom</span>
+          </button>
+
+          <button 
             className="ai-concierge-pill"
             type="button"
             onClick={() => setStylistModalOpen(true)}
@@ -822,6 +832,15 @@ export default function Storefront({
             </div>
 
             <div className="mobile-dropdown-items">
+              <button 
+                type="button" 
+                className="mobile-nav-link"
+                onClick={() => { setTryOnModalOpen(true); setMobileMenuOpen(false); }}
+              >
+                <Icon name="sparkles" size={16} />
+                <span>3D Style Showroom</span>
+              </button>
+
               <button 
                 type="button" 
                 className="mobile-nav-link"
@@ -1355,9 +1374,13 @@ export default function Storefront({
       )}
 
       {tryOnModalOpen && (
-        <VirtualTryOnModal 
-          allProducts={shopProducts} 
+        <InteractiveShowroomModal 
+          products={shopProducts} 
           onClose={() => setTryOnModalOpen(false)} 
+          onOpenProduct={(p) => {
+            setActiveProductId(p.id);
+            setTryOnModalOpen(false);
+          }}
         />
       )}
 
