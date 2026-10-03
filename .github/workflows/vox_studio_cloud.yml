@@ -1,4 +1,4 @@
-name: Vox Studio 2.0 - Cinematic Cloud Production
+name: Vox Studio
 
 on:
   workflow_dispatch:

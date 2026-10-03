@@ -1,4 +1,4 @@
-name: YouTube Shorts - Channel 2 (Mysteries & History)
+name: Channel 2
 
 on:
   workflow_dispatch:
