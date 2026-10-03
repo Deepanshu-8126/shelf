@@ -6,26 +6,6 @@ const AFFILIATE_CREATOR_ID = "374453404";
 const CAMPAIGN_ID = "12492338";
 const SOURCE_PARAM = "youtube_long_form";
 
-const KNOWN_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
-
-function extractSizes(text = "") {
-  const found = [];
-  if (text.includes("SMLXL") || /S\s*M\s*L\s*XL/.test(text)) {
-    return ["S", "M", "L", "XL"];
-  }
-  for (const s of KNOWN_SIZES) {
-    const regex = new RegExp(`\\b${s}\\b`, 'i');
-    if (regex.test(text)) found.push(s);
-  }
-  return found.length > 0 ? found : ["S", "M", "L", "XL"];
-}
-
-function extractPrice(text = "") {
-  const match = text.match(/₹\s*(\d{2,5})/i);
-  if (match) return parseInt(match[1], 10);
-  return 245;
-}
-
 function buildAffiliateUrl(rawUrl = window.location.href) {
   if (!rawUrl) return "";
   const extMatch = rawUrl.match(/\/p\/([a-zA-Z0-9]+)/);
@@ -40,17 +20,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.id) return;
 
+  // Execute extraction & inject blinking highlighter on active page
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: () => {
-      const pageText = document.body.innerText || "";
-      const pageTitle = document.title.split("|")[0].split("-")[0].trim();
-      const currentUrl = window.location.href;
+      // 1. Inject Blinking Highlighter CSS on the real page
+      if (!document.getElementById("shelf-scraper-highlighter-style")) {
+        const style = document.createElement("style");
+        style.id = "shelf-scraper-highlighter-style";
+        style.innerHTML = `
+          @keyframes shelfBlink {
+            0% { outline: 3px solid #ec4899; box-shadow: 0 0 15px rgba(236,72,153,0.8); }
+            50% { outline: 3px solid #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.9); }
+            100% { outline: 3px solid #ec4899; box-shadow: 0 0 15px rgba(236,72,153,0.8); }
+          }
+          .shelf-scraped-highlight {
+            animation: shelfBlink 1.5s infinite alternate !important;
+            border-radius: 8px !important;
+            position: relative !important;
+            z-index: 9999 !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
 
-      // 1. Filter out junk banner images, logos, badges
+      // 2. Strict Filter for Genuine Fashion Garment Photos
       const JUNK_KEYWORDS = [
         "banner", "off", "icon", "logo", "badge", "avatar", "profile", "delivery",
-        "star", "rating", "svg", "static", "vector", "app_store", "play_store", "6 of"
+        "star", "rating", "svg", "static", "vector", "app_store", "play_store",
+        "google", "apple", "get it on", "available on", "footer", "download"
       ];
 
       const allImgs = Array.from(document.querySelectorAll('img')).filter((img) => {
@@ -59,80 +57,71 @@ document.addEventListener("DOMContentLoaded", async () => {
         const w = img.naturalWidth || img.width || 0;
         const h = img.naturalHeight || img.height || 0;
 
-        if (w < 120 || h < 120) return false;
+        // Must be substantial size and not square banner
+        if (w < 100 || h < 110) return false;
         if (JUNK_KEYWORDS.some(k => src.includes(k) || alt.includes(k))) return false;
+
+        // On Meesho, genuine product photos always live in images.meesho.com/images/products/
         if (src.includes("images.meesho.com") && !src.includes("/products/")) return false;
+
         return true;
       });
 
-      const uniqueImages = [];
+      const uniqueItems = [];
       const seenSrc = new Set();
 
-      allImgs.forEach((img) => {
+      allImgs.forEach((img, idx) => {
         let src = img.srcset ? img.srcset.split(',').slice(-1)[0].split(' ')[0] : img.src;
-        src = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
-        if (src && !seenSrc.has(src)) {
-          seenSrc.add(src);
-          uniqueImages.push(src);
+        if (!src) return;
+
+        // Upgrade to 512px crisp resolution
+        const cleanSrc = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
+        if (seenSrc.has(cleanSrc)) return;
+        seenSrc.add(cleanSrc);
+
+        // Add visual blink highlight to the element on the webpage!
+        const parentContainer = img.closest('a, div[class*="ProductCard"], div[class*="product"], div[role="listitem"]') || img;
+        parentContainer.classList.add("shelf-scraped-highlight");
+
+        // Try to get title & price from nearest text
+        const cardText = (parentContainer.innerText || img.alt || "").trim();
+        const priceMatch = cardText.match(/₹\s*(\d{2,5})/);
+        const price = priceMatch ? parseInt(priceMatch[1], 10) : 245;
+
+        let title = img.alt || document.title.split("|")[0].trim();
+        if (cardText.length > 5) {
+          const lines = cardText.split('\n').map(l => l.trim()).filter(l => l.length > 5 && !l.startsWith('₹') && !l.startsWith('★'));
+          if (lines.length > 0) title = lines[0];
         }
+
+        uniqueItems.push({
+          id: `p-clip-${idx}-${Date.now()}`,
+          title: title.slice(0, 50),
+          price: price,
+          sizes: ["S", "M", "L", "XL"],
+          image: cleanSrc,
+          productUrl: window.location.href,
+          affiliateUrl: buildAffiliateUrl(window.location.href),
+          category: "Gen Z Aesthetic & Streetwear"
+        });
       });
 
-      // 2. Extract Product Info
-      let detectedTitle = pageTitle;
-      const h1 = document.querySelector('h1, span[class*="ProductTitle"], div[class*="ProductTitle"]');
-      if (h1 && h1.innerText && h1.innerText.length > 5) {
-        detectedTitle = h1.innerText.trim();
-      }
-
-      // Check for price in page
-      const priceMatch = pageText.match(/₹\s*(\d{2,5})/);
-      const detectedPrice = priceMatch ? parseInt(priceMatch[1], 10) : 245;
-
-      // Check for sizes
-      let detectedSizes = ["S", "M", "L", "XL"];
-      if (pageText.includes("SMLXL") || /S\s*M\s*L\s*XL/.test(pageText)) {
-        detectedSizes = ["S", "M", "L", "XL"];
-      }
-
       return {
-        url: currentUrl,
-        title: detectedTitle,
-        price: detectedPrice,
-        sizes: detectedSizes,
-        images: uniqueImages.slice(0, 18),
-        pageText: pageText.slice(0, 1000)
+        url: window.location.href,
+        title: document.title,
+        items: uniqueItems.slice(0, 24)
       };
     }
   }, (output) => {
-    if (!output || !output[0] || !output[0].result) {
-      document.getElementById("scan-count").textContent = "No products detected on page.";
+    if (!output || !output[0] || !output[0].result || !output[0].result.items.length) {
+      document.getElementById("scan-count").textContent = "No clean fashion items detected.";
       return;
     }
 
     const res = output[0].result;
-    detectedProduct = res;
+    scannedItems = res.items;
 
-    // Show Hero Details
-    const heroCard = document.getElementById("hero-details");
-    if (heroCard && res.title) {
-      heroCard.style.display = "block";
-      document.getElementById("hero-title").textContent = res.title;
-      document.getElementById("hero-price").textContent = `₹${res.price}`;
-      document.getElementById("hero-sizes").textContent = `Sizes: ${res.sizes.join(", ")}`;
-    }
-
-    scannedItems = res.images.map((imgSrc, idx) => ({
-      id: `p-clip-${idx}-${Date.now()}`,
-      title: res.title || "Gen Z Trending Outfit",
-      price: res.price || 245,
-      sizes: res.sizes || ["S", "M", "L", "XL"],
-      image: imgSrc,
-      productUrl: res.url,
-      affiliateUrl: buildAffiliateUrl(res.url),
-      category: "Gen Z Aesthetic & Streetwear"
-    }));
-
-    document.getElementById("scan-count").textContent = `Found ${scannedItems.length} Clean Fashion Photos`;
+    document.getElementById("scan-count").textContent = `Found ${scannedItems.length} Clean Fashion Outfits`;
 
     const grid = document.getElementById("batch-grid");
     grid.innerHTML = "";
@@ -141,9 +130,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const card = document.createElement("div");
       card.className = "grid-item";
       card.innerHTML = `
-        <img src="${item.image}" alt="Variation ${index + 1}" loading="lazy" />
+        <img src="${item.image}" alt="${item.title}" loading="lazy" />
         <span class="check">✓</span>
-        <span class="category-tag">Var #${index + 1}</span>
+        <span class="category-tag">₹${item.price} • S-XL</span>
       `;
 
       card.addEventListener("click", () => {
@@ -185,7 +174,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("batch-publish-btn").addEventListener("click", async () => {
     const btn = document.getElementById("batch-publish-btn");
     btn.disabled = true;
-    btn.textContent = `🚀 Ingesting ${selectedIndexes.size} Variations to Inbox...`;
+    btn.textContent = `🚀 Ingesting ${selectedIndexes.size} Items to Inbox...`;
 
     const targetCollection = document.getElementById("target-collection").value;
     const itemsToPublish = Array.from(selectedIndexes).map(i => ({
@@ -204,12 +193,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       const toast = document.getElementById("toast");
       toast.style.display = "block";
-      toast.textContent = `✓ Ingested ${itemsToPublish.length} Variations to Admin Ingest Inbox!`;
+      toast.textContent = `✓ Ingested ${itemsToPublish.length} Items to Admin Ingest Inbox!`;
       btn.textContent = "✓ Ingested to Storefront!";
     } catch {
       const toast = document.getElementById("toast");
       toast.style.display = "block";
-      toast.textContent = `✓ Queued ${itemsToPublish.length} Variations to Admin Inbox!`;
+      toast.textContent = `✓ Queued ${itemsToPublish.length} Items to Admin Inbox!`;
       btn.textContent = "✓ Ingested to Storefront!";
     }
   });
@@ -238,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `meesho_curated_${Date.now()}.csv`);
+    link.setAttribute("download", `meesho_fashion_scrape_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -250,13 +239,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ACTION 3: Copy Creator Link
   document.getElementById("copy-link-btn").addEventListener("click", () => {
-    if (!detectedProduct || !detectedProduct.url) return;
-    const affLink = buildAffiliateUrl(detectedProduct.url);
+    const [tab] = chrome.tabs.query({ active: true, currentWindow: true });
+    const affLink = buildAffiliateUrl(window.location.href);
     navigator.clipboard.writeText(affLink);
 
     const toast = document.getElementById("toast");
     toast.style.display = "block";
-    toast.textContent = `🔗 Creator Affiliate Link Copied to Clipboard!`;
+    toast.textContent = `🔗 Creator Affiliate Link Copied!`;
     setTimeout(() => { toast.style.display = "none"; }, 2500);
   });
 });
@@ -265,5 +254,5 @@ function updatePublishButton() {
   const btn = document.getElementById("batch-publish-btn");
   const count = selectedIndexes.size;
   btn.disabled = count === 0;
-  btn.textContent = `🚀 Ingest Selected (${count} Photo${count === 1 ? '' : 's'}) to Storefront`;
+  btn.textContent = `🚀 Ingest Selected (${count} Outfit${count === 1 ? '' : 's'}) to Storefront`;
 }
