@@ -404,15 +404,26 @@ async def execute_google_flow_generation(
                 await browser.close()
                 return None
 
+            # Record baseline batches before trigger
+            init_batches = await page.locator('.batch-container').all()
+            init_batch_count = len(init_batches)
+            init_top_text = ""
+            if init_batches:
+                try:
+                    init_top_text = (await init_batches[0].inner_text()).replace("\n", " ")[:120]
+                except Exception:
+                    pass
+
             # 4. Trigger Generation
             print("  [5/5] Triggering Google Flow Generation...")
             await start_btn.click()
             print("  🚀 Flow generation started! Monitoring render queue...")
+            await asyncio.sleep(5.0)
 
             # Poll for completion
             max_wait = 360
-            elapsed = 0
-            poll_interval = 8
+            elapsed = 5
+            poll_interval = 6
             downloaded = False
 
             while elapsed < max_wait:
@@ -422,17 +433,29 @@ async def execute_google_flow_generation(
                 batches = await page.locator('.batch-container').all()
                 if batches:
                     top_batch = batches[0]
-                    top_text = (await top_batch.inner_text()).replace("\n", " ")
-                    print(f"    [{elapsed}s] Flow Status: {top_text[:80]}...")
+                    try:
+                        top_text = (await top_batch.inner_text()).replace("\n", " ")
+                    except Exception:
+                        top_text = ""
+                    
+                    status_snippet = top_text[:80] if top_text else "Rendering..."
+                    print(f"    [{elapsed}s] Flow Status: {status_snippet}...")
 
-                    dl_btn = top_batch.locator('button[aria-label*="Download"]').first
-                    if await dl_btn.count() > 0 and "%" not in top_text:
+                    # Verification conditions for newly finished video:
+                    # 1. Elapsed time >= 25s (Veo 2 renders take 30-90s)
+                    # 2. Contains download button
+                    # 3. Not in generating/queued/rendering or percentage % state
+                    is_rendering = any(kw in top_text.lower() for kw in ["%", "generating", "queued", "rendering", "progress"])
+                    dl_btn = top_batch.locator('button[aria-label*="Download"], mat-icon:has-text("download")').first
+                    has_dl = await dl_btn.count() > 0
+
+                    if elapsed >= 25 and has_dl and not is_rendering:
                         print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Downloading...")
                         try:
                             async with page.expect_download(timeout=60000) as dl_info:
-                                await dl_btn.click()
+                                await dl_btn.click(force=True)
                             download = await dl_info.value
-                            await asyncio.sleep(1.0)
+                            await asyncio.sleep(1.5)
                             dl_path = await download.path()
                             if dl_path and Path(dl_path).exists():
                                 import shutil
@@ -514,27 +537,27 @@ def process_single_item(
     # Step 4: Run Video Generation & Telegram Delivery if confirmed
     if generate_video:
         print("\n⚡ [Generate Mode Confirmed] Initiating Video Generation...")
-        video_out = asyncio.run(execute_google_flow_generation(
+        raw_video = asyncio.run(execute_google_flow_generation(
             prompt=creative_data["flow_prompt"],
             char_sheet_filename=CHAR_SHEET_FILENAME,
             product_img_path=product_data["primary_image_path"]
         ))
 
-        # Cloud runner / Fallback synthesis
-        if not video_out or not video_out.exists():
-            print("  ⚡ Assembling high-fidelity master reel with luxury product card & chime...")
-            from generate_master_affiliate_video import compose_master_10s_video
-            product_card_info = {
-                "title": result["title"][:28],
-                "price": result["price"],
-                "mrp": "₹1,499",
-                "discount": "67% OFF",
-                "rating": "4.8"
-            }
-            video_out = compose_master_10s_video(
-                product_info=product_card_info,
-                product_image=product_data["primary_image_path"]
-            )
+        # Assemble high-fidelity master reel with luxury product card & chime
+        print("  ⚡ Assembling high-fidelity master reel with luxury product card & chime...")
+        from generate_master_affiliate_video import compose_master_10s_video
+        product_card_info = {
+            "title": result["title"][:28],
+            "price": result["price"],
+            "mrp": "₹1,499",
+            "discount": "67% OFF",
+            "rating": "4.8"
+        }
+        video_out = compose_master_10s_video(
+            raw_video_path=raw_video,
+            product_info=product_card_info,
+            product_image=product_data["primary_image_path"]
+        )
 
         if video_out and Path(video_out).exists():
             result["video_path"] = str(video_out)

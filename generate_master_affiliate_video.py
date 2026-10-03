@@ -165,12 +165,47 @@ def compose_master_10s_video(
 
     # Auto-discover raw video if not provided or missing
     if not raw_video_path or not Path(raw_video_path).exists():
-        candidates = list(VEO_DIR.glob("*.mp4")) + list(ENHANCED_DIR.glob("*.mp4"))
+        search_dirs = [
+            VEO_DIR,
+            ENHANCED_DIR,
+            AFFILIATE_DATA_DIR / "veo_extracted_videos",
+            AFFILIATE_DATA_DIR / "enhanced_8k_videos",
+            AFFILIATE_DATA_DIR / "ugc_fashion_videos",
+            ROOT_DIR / "data" / "veo_extracted_videos",
+            ROOT_DIR / "data" / "enhanced_8k_videos",
+        ]
+        candidates = []
+        for s_dir in search_dirs:
+            if s_dir.exists():
+                for f in sorted(s_dir.glob("*.mp4"), key=os.path.getmtime, reverse=True):
+                    if "MASTER" not in f.name and "TELEGRAM" not in f.name:
+                        candidates.append(f)
+        if not candidates:
+            for s_dir in search_dirs:
+                if s_dir.exists():
+                    candidates.extend(sorted(s_dir.glob("*.mp4"), key=os.path.getmtime, reverse=True))
+
         if candidates:
             raw_video_path = candidates[0]
             print(f"  🎬 Using candidate base video: {raw_video_path.name}")
         else:
-            raise FileNotFoundError("No candidate base MP4 video found in VEO_DIR or ENHANCED_DIR.")
+            print("  ⚡ Synthesizing dynamic Ken-Burns 10s base runway video...")
+            base_synth = VEO_DIR / f"SYNTH_BASE_{int(time.time())}.mp4"
+            img_ref = product_image_path if (product_image_path and Path(product_image_path).exists()) else MODEL_REF
+            if not img_ref or not Path(img_ref).exists():
+                dummy_img = VEO_DIR / "dummy_base.jpg"
+                Image.new("RGB", (1080, 1920), (24, 26, 32)).save(dummy_img)
+                img_ref = dummy_img
+            
+            synth_cmd = [
+                "ffmpeg", "-y", "-loop", "1", "-i", str(img_ref),
+                "-t", "10",
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30",
+                str(base_synth)
+            ]
+            subprocess.run(synth_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            raw_video_path = base_synth
 
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     slug = product_title.lower().replace(" ", "_")[:30]
