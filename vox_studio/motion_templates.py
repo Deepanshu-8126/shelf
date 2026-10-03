@@ -297,52 +297,61 @@ def generate_vox_html(pkg: dict[str, Any], media_kit: dict[str, list[Path]], has
     const tl = gsap.timeline({{ paused: true }});
 
     // -------------------------------------------------------------
-    // SCENE 1: (0.0s - 4.5s) Full-Screen Map Zoom + Triangle Vector Draw
+    // SCENE 1: (0.0s - 12.0s) Full-Screen Map Zoom + Triangle Vector Draw
     // -------------------------------------------------------------
-    tl.set("#scene1", {{ autoAlpha: 1 }}, 0.0);
+    tl.set("#scene1", { autoAlpha: 1 }, 0.0);
     tl.fromTo("#s1-mapwrap", 
-      {{ scale: 1.0, rotation: 0 }}, 
-      {{ scale: 1.25, rotation: -2, duration: 4.5, ease: "power1.out" }}, 0.0);
+      { scale: 1.0, rotation: 0 }, 
+      { scale: 1.35, rotation: -2, duration: 12.0, ease: "power1.out" }, 0.0);
     
     // Draw Triangle Vector
-    tl.to("#tri-line", {{ strokeDashoffset: 0, duration: 1.8, ease: "power2.out" }}, 0.6);
-    tl.to("#tri-poly", {{ opacity: 0.6, duration: 1.0, ease: "power1.out" }}, 1.8);
+    tl.to("#tri-line", { strokeDashoffset: 0, duration: 3.5, ease: "power2.out" }, 0.8);
+    tl.to("#tri-poly", { opacity: 0.6, duration: 2.0, ease: "power1.out" }, 3.5);
     
     // Pop Pins
-    tl.to(["#pin-miami", "#pin-bermuda", "#pin-sanjuan"], {{ opacity: 1, scale: 1.1, stagger: 0.35, ease: "back.out(2)" }}, 0.8);
+    tl.to(["#pin-miami", "#pin-bermuda", "#pin-sanjuan"], { opacity: 1, scale: 1.1, stagger: 0.8, ease: "back.out(2)" }, 1.2);
 
     // Stamp Slam
-    tl.to("#s1-stamp", {{ opacity: 1, scale: 1.0, rotation: -12, duration: 0.25, ease: "power4.out" }}, 0.6);
+    tl.to("#s1-stamp", { opacity: 1, scale: 1.0, rotation: -12, duration: 0.4, ease: "power4.out" }, 0.8);
 
     // -------------------------------------------------------------
-    // SCENE 2: (4.5s - 8.5s) 3D Newspaper Fold & Highlighter Wipe
+    // SCENE 2: (12.0s - 24.0s) 3D Newspaper Fold & Highlighter Wipe
     // -------------------------------------------------------------
-    tl.to("#scene1", {{ autoAlpha: 0, duration: 0.35 }}, 4.5);
-    tl.set("#scene2", {{ autoAlpha: 1 }}, 4.5);
+    tl.to("#scene1", { autoAlpha: 0, duration: 0.5 }, 12.0);
+    tl.set("#scene2", { autoAlpha: 1 }, 12.0);
     tl.fromTo("#s2-paper",
-      {{ y: 300, scale: 0.8, rotateX: 25, opacity: 0 }},
-      {{ y: 0, scale: 1.0, rotateX: 10, opacity: 1, duration: 1.0, ease: "power3.out" }}, 4.5);
-    tl.to("#s2-marker", {{ scaleX: 1.0, duration: 1.4, ease: "power2.inOut" }}, 5.2);
+      { y: 300, scale: 0.8, rotateX: 25, opacity: 0 },
+      { y: 0, scale: 1.0, rotateX: 8, opacity: 1, duration: 1.5, ease: "power3.out" }, 12.0);
+    tl.to("#s2-marker", { scaleX: 1.0, duration: 2.5, ease: "power2.inOut" }, 13.5);
 
     // -------------------------------------------------------------
-    // SCENE 3: (8.5s - 12.0s) Historical Photo Ken Burns + Evidence Pins
+    // SCENE 3: (24.0s - 38.0s) Historical Photo Ken Burns + Evidence Pins
     // -------------------------------------------------------------
-    tl.to("#scene2", {{ autoAlpha: 0, duration: 0.35 }}, 8.5);
-    tl.set("#scene3", {{ autoAlpha: 1 }}, 8.5);
+    tl.to("#scene2", { autoAlpha: 0, duration: 0.5 }, 24.0);
+    tl.set("#scene3", { autoAlpha: 1 }, 24.0);
     tl.fromTo("#s3-img",
-      {{ scale: 1.0, x: 0 }},
-      {{ scale: 1.3, x: -30, duration: 3.5, ease: "power1.inOut" }}, 8.5);
-    tl.to("#s3-tag1", {{ opacity: 1, x: 15, duration: 0.4, ease: "power2.out" }}, 9.0);
-    tl.to("#s3-tag2", {{ opacity: 1, x: -15, duration: 0.4, ease: "power2.out" }}, 9.8);
+      { scale: 1.0, x: 0 },
+      { scale: 1.35, x: -40, duration: 14.0, ease: "power1.inOut" }, 24.0);
+    tl.to("#s3-tag1", { opacity: 1, x: 15, duration: 0.8, ease: "power2.out" }, 25.5);
+    tl.to("#s3-tag2", { opacity: 1, x: -15, duration: 0.8, ease: "power2.out" }, 28.0);
 
     // -------------------------------------------------------------
-    // SCENE 4: (12.0s - 15.0s) Climax Question
+    // SCENE 4: (38.0s - 48.0s) Dynamic Evidence Visuals
     // -------------------------------------------------------------
-    tl.to("#scene3", {{ autoAlpha: 0, duration: 0.35 }}, 12.0);
-    tl.set("#scene4", {{ autoAlpha: 1 }}, 12.0);
+    tl.to("#scene3", { autoAlpha: 0, duration: 0.5 }, 38.0);
+    tl.set("#scene1", { autoAlpha: 1 }, 38.0);
+    tl.fromTo("#s1-mapwrap",
+      { scale: 1.35, rotation: -2 },
+      { scale: 1.6, rotation: 3, duration: 10.0, ease: "sine.inOut" }, 38.0);
+
+    // -------------------------------------------------------------
+    // SCENE 5: (48.0s - 56.0s) Climax Question
+    // -------------------------------------------------------------
+    tl.to("#scene1", { autoAlpha: 0, duration: 0.5 }, 48.0);
+    tl.set("#scene4", { autoAlpha: 1 }, 48.0);
     tl.fromTo(".climax-box",
-      {{ scale: 0.85, opacity: 0 }},
-      {{ scale: 1.0, opacity: 1, duration: 0.6, ease: "back.out(1.5)" }}, 12.0);
+      { scale: 0.85, opacity: 0 },
+      { scale: 1.0, opacity: 1, duration: 1.0, ease: "back.out(1.5)" }, 48.0);
 
     // -------------------------------------------------------------
     // CAPTION SYNCHRONIZATION
@@ -353,8 +362,8 @@ def generate_vox_html(pkg: dict[str, Any], media_kit: dict[str, list[Path]], has
         const el = document.getElementById("capWord");
         if (el) {{
           el.innerText = c.text;
-          el.style.transform = "scale(1.15)";
-          setTimeout(() => {{ el.style.transform = "scale(1.0)"; }}, 160);
+          el.style.transform = "scale(1.12)";
+          setTimeout(() => {{ el.style.transform = "scale(1.0)"; }}, 220);
         }}
       }}, null, c.time);
     }});

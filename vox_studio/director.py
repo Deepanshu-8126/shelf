@@ -115,11 +115,11 @@ class StudioDirector:
         master_video = OUTPUT_DIR / f"VOX_{slug.upper()}_MASTER.mp4"
 
         filter_complex = (
-            "[1:a]adelay=200|200,volume=1.0[voice];"
-            "[2:a]volume=0.18[drone];"
-            "[3:a]adelay=600|600,volume=0.65[slam];"
-            "[4:a]adelay=5200|5200,volume=0.75[marker];"
-            "[voice][drone][slam][marker]amix=inputs=4:duration=first:dropout_transition=2[aout]"
+            "[1:a]adelay=200|200,volume=1.3[voice];"
+            "[2:a]volume=0.07[drone];"
+            "[3:a]adelay=800|800,volume=0.35[slam];"
+            "[4:a]adelay=13500|13500,volume=0.40[marker];"
+            "[voice][drone][slam][marker]amix=inputs=4:duration=first:dropout_transition=3[aout]"
         )
 
         composite_cmd = [

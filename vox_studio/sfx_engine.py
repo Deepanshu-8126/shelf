@@ -15,7 +15,7 @@ import random
 SAMPLE_RATE = 44100
 
 
-def generate_tension_drone(output_path: Path, duration_sec: float = 16.0):
+def generate_tension_drone(output_path: Path, duration_sec: float = 60.0):
     """Deep 50Hz sub-bass drone with pulsing dark dissonance."""
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
