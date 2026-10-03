@@ -28,9 +28,6 @@ permissions:
 jobs:
   generate_and_upload_ch2:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: factshorts-bot
 
     steps:
       - name: Checkout repository
@@ -48,19 +45,21 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r factshorts-bot/requirements.txt
+          pip install httpx
 
       - name: Setup YouTube Credentials (Channel 2)
         env:
           YT_TOKEN_CH2_B64: ${{ secrets.YT_TOKEN_CH2_B64 || secrets.YT_TOKEN_B64 }}
           YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
         run: |
-          mkdir -p credentials
-          [ -n "$YT_TOKEN_CH2_B64" ] && printf '%s' "$YT_TOKEN_CH2_B64" | base64 -d > credentials/token.json || true
-          [ -n "$YT_CLIENT_B64" ]    && printf '%s' "$YT_CLIENT_B64"    | base64 -d > credentials/client_secret.json || true
-          python3 -c "import json; json.load(open('credentials/token.json')); print('✅ token.json is valid JSON for Channel 2')" 2>/dev/null || echo "❌ token.json is NOT valid JSON"
+          mkdir -p factshorts-bot/credentials
+          [ -n "$YT_TOKEN_CH2_B64" ] && printf '%s' "$YT_TOKEN_CH2_B64" | base64 -d > factshorts-bot/credentials/token.json || true
+          [ -n "$YT_CLIENT_B64" ]    && printf '%s' "$YT_CLIENT_B64"    | base64 -d > factshorts-bot/credentials/client_secret.json || true
+          python3 -c "import json; json.load(open('factshorts-bot/credentials/token.json')); print('✅ token.json is valid JSON for Channel 2')" 2>/dev/null || echo "❌ token.json is NOT valid JSON"
 
       - name: Generate Short Video (Unsolved History & Mysteries Mode)
+        working-directory: factshorts-bot
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -87,6 +86,14 @@ jobs:
           echo "Executing: $CMD"
           eval $CMD || echo "⚠️ Generation/upload step ended with code $?"
 
+      - name: 📱 Send Video Directly to Telegram Phone
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
+        run: |
+          python send_to_telegram.py factshorts-bot/output || true
+
       - name: Save Rendered Video Artifact (Never Lose Video)
         if: always()
         uses: actions/upload-artifact@v4
@@ -100,6 +107,6 @@ jobs:
         run: |
           git config user.name  "factshorts-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -f data/factshorts.db 2>/dev/null || true
+          git add -f factshorts-bot/data/factshorts.db 2>/dev/null || true
           git commit -m "chore: topic memory update $(date -u +%F-%H%M)" || echo "nothing to commit"
           git push || echo "push skipped"
