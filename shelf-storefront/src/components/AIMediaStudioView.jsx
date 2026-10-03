@@ -268,6 +268,11 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
   const [isTelegramTesting, setIsTelegramTesting] = useState(false);
   const [telegramVerified, setTelegramVerified] = useState(true);
 
+  // Garment Clone Fidelity & Lighting Atmosphere Controls
+  const [cloneFidelity, setCloneFidelity] = useState('strict'); // 'strict' | 'creative'
+  const [lightingMood, setLightingMood] = useState('golden'); // 'golden' | 'zara_flash' | 'softbox' | 'amber'
+  const [showZaraWatermark, setShowZaraWatermark] = useState(true);
+
   // Custom Prompt Library State
   const [customLibrary, setCustomLibrary] = useState(() => {
     try {
@@ -385,6 +390,42 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
       return `${cleanPrev}, ${mod.replace('+', '').trim()}`;
     });
     onToast(`✨ Injected modifier: ${mod}`);
+  };
+
+  const handleToggleCloneFidelity = (mode) => {
+    setCloneFidelity(mode);
+    const strictTokens = '100% faithful garment clone, identical silhouette, exact embroidery patterns, matched necklines and hemline cuts, zero garment distortion, hyper-accurate textile weave';
+    if (mode === 'strict') {
+      setCustomPrompt((prev) => {
+        if (!prev.includes('100% faithful garment clone')) {
+          return `${prev.trim()}, ${strictTokens}`;
+        }
+        return prev;
+      });
+      onToast('🎯 99% Exact Garment Clone Mode Enabled (Zero Distortion)!');
+    } else {
+      setCustomPrompt((prev) => prev.replace(`, ${strictTokens}`, '').replace(strictTokens, '').trim());
+      onToast('🎨 85% Zara Creative Reimagination Mode Enabled!');
+    }
+  };
+
+  const handleApplyLightingMood = (mood) => {
+    setLightingMood(mood);
+    const moodPhrases = {
+      golden: 'warm Mediterranean sunset golden hour rim light, soft sun-dappled shadows',
+      zara_flash: '90s Zara direct camera flash aesthetic, high-contrast crisp shadows, raw editorial realism',
+      softbox: 'balanced softbox studio lighting, true-to-life color calibration, zero harsh shadows',
+      amber: 'warm candlelit amber illumination, cinematic shallow depth of field, moody luxury glow'
+    };
+    const phrase = moodPhrases[mood];
+    setCustomPrompt((prev) => {
+      let clean = prev;
+      Object.values(moodPhrases).forEach((p) => {
+        clean = clean.replace(`, ${p}`, '').replace(p, '');
+      });
+      return `${clean.trim()}, ${phrase}`;
+    });
+    onToast(`💡 Applied ${mood.replace('_', ' ').toUpperCase()} lighting physics!`);
   };
 
   // Test Telegram Ping
@@ -1108,6 +1149,71 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
                 </form>
               )}
 
+              {/* Garment Clone Fidelity & Lighting Atmosphere Row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                <div style={{ display: 'flex', gap: '4px', background: 'rgba(0,0,0,0.4)', padding: '2px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleCloneFidelity('strict')}
+                    style={{
+                      background: cloneFidelity === 'strict' ? 'linear-gradient(135deg, #10b981, #059669)' : 'transparent',
+                      border: 'none',
+                      color: '#fff',
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🎯 99% Exact Clone
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleCloneFidelity('creative')}
+                    style={{
+                      background: cloneFidelity === 'creative' ? 'linear-gradient(135deg, #ec4899, #8b5cf6)' : 'transparent',
+                      border: 'none',
+                      color: '#fff',
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🎨 85% Creative
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[
+                    { id: 'golden', label: '☀️ Golden' },
+                    { id: 'zara_flash', label: '📸 Flash' },
+                    { id: 'softbox', label: '💡 Softbox' },
+                    { id: 'amber', label: '🕯️ Amber' }
+                  ].map((lm) => (
+                    <button
+                      key={lm.id}
+                      type="button"
+                      onClick={() => handleApplyLightingMood(lm.id)}
+                      style={{
+                        background: lightingMood === lm.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.05)',
+                        border: lightingMood === lm.id ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
+                        color: lightingMood === lm.id ? '#38bdf8' : 'rgba(255,255,255,0.7)',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {lm.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Editable Textarea */}
               <textarea
                 rows={4}
@@ -1419,17 +1525,70 @@ export default function AIMediaStudioView({ products = [], onToast = () => {}, o
 
               {/* Right: AI Vogue Render */}
               <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(82, 227, 150, 0.35)' }}>
-                <div style={{ fontSize: '11px', color: '#52e396', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>
-                  LM Arena 8K Vogue Brand Master
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#52e396', fontWeight: '700', textTransform: 'uppercase' }}>
+                    LM Arena 8K Vogue Brand Master
+                  </div>
+                  <label style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={showZaraWatermark}
+                      onChange={(e) => setShowZaraWatermark(e.target.checked)}
+                    />
+                    <span>Zara Tag</span>
+                  </label>
                 </div>
-                <img
-                  src={photosList[0]?.src || refImage}
-                  alt="AI Render"
-                  style={{ maxHeight: '200px', width: '100%', objectFit: 'cover', borderRadius: '8px' }}
-                />
+                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+                  <img
+                    src={photosList[0]?.src || refImage}
+                    alt="AI Render"
+                    style={{ maxHeight: '200px', width: '100%', objectFit: 'cover' }}
+                  />
+                  {showZaraWatermark && (
+                    <>
+                      <div style={{ position: 'absolute', top: '8px', left: '8px', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '9px', fontWeight: '900', letterSpacing: '0.12em', color: '#fff', textTransform: 'uppercase' }}>
+                        ZARA EDITORIAL / DROP '26
+                      </div>
+                      <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(236,72,153,0.9)', backdropFilter: 'blur(4px)', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '800', color: '#fff' }}>
+                        {genPrice} LIMITED DROP
+                      </div>
+                    </>
+                  )}
+                </div>
                 <div style={{ fontSize: '11px', color: '#a78bfa', marginTop: '8px', fontWeight: '600' }}>
                   8K Ultra-Sharp • Authentic Pores Preserved
                 </div>
+              </div>
+            </div>
+
+            {/* Zara Brand Value Arbitrage Meter */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(16, 185, 129, 0.08))',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '10px',
+              padding: '10px 14px',
+              marginTop: '14px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>💰</span>
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: '800', color: '#fff' }}>
+                    Zara Brand Value Arbitrage Opportunity
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)' }}>
+                    Supplier Cost: <strong style={{ color: '#ffd166' }}>{genPrice}</strong> ➔ Zara-Grade Selling Price: <strong style={{ color: '#4ade80' }}>₹{Math.round((parseInt(genPrice.replace(/[^\d]/g, '') || '499')) * 2.4)}</strong>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '11.5px', background: 'rgba(34, 197, 94, 0.25)', color: '#4ade80', padding: '3px 10px', borderRadius: '20px', fontWeight: '800' }}>
+                  +140% NET PROFIT MARGIN
+                </span>
               </div>
             </div>
 
