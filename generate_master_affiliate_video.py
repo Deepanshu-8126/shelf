@@ -214,17 +214,12 @@ def compose_master_10s_video(
     # 1. Product card
     card_path = build_luxury_product_card(product_title, price, rating, product_image_path)
 
-    # 2. Voiceover
-    voice_path = AUDIO_DIR / f"voice_{slug}_{timestamp}.mp3"
-    synthesize_voiceover(product_title, voice_path)
-
-    # 3. Tring Chime
+    # 2. Tring Chime
     tring_path = AUDIO_DIR / "tring_sparkle.wav"
     if not tring_path.exists():
         create_default_tring_chime(tring_path)
 
-    # 4. Master FFmpeg Filter Complex
-    # Delogo handles Gemini 4-star watermark smoothly
+    # 3. Master FFmpeg Filter Complex (Clean Video + Luxury Popup Card + Chime)
     vf = (
         "[0:v]delogo=x=560:y=1120:w=80:h=80,"
         "scale=1080:1920:flags=lanczos,"
@@ -233,43 +228,39 @@ def compose_master_10s_video(
         "noise=alls=5:allf=t+u[base];"
         "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
         "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
-        "[2:a]volume=1.25[voice];"
-        "[3:a]adelay=1200|1200,volume=0.9[chime];"
-        "[voice][chime]amix=inputs=2:duration=first:dropout_transition=2[outa]"
+        "[2:a]adelay=1200|1200,volume=0.9[outa]"
     )
 
     cmd = [
         "ffmpeg", "-y",
         "-i", str(raw_video_path),
         "-loop", "1", "-i", str(card_path),
-        "-i", str(voice_path),
         "-i", str(tring_path),
         "-filter_complex", vf,
         "-map", "[outv]",
         "-map", "[outa]",
         "-c:v", "libx264",
-        "-crf", "16",
-        "-preset", "slow",
+        "-crf", "22",
+        "-preset", "fast",
         "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
         "-c:a", "aac",
-        "-b:a", "256k",
+        "-b:a", "128k",
         "-t", "10.0",
         str(out_master)
     ]
 
-    print("\n🎬 [Compositor] Rendering Master 10s UGC Video with FFmpeg...", flush=True)
+    print("\n🎬 [Compositor] Rendering Clean Master 10s UGC Video (No Voiceover)...", flush=True)
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(f"⚠️ FFmpeg error: {res.stderr[-300:]}")
-        # Simplified fallback without delogo if dimensions differ
         cmd_fb = [
             "ffmpeg", "-y",
             "-i", str(raw_video_path),
             "-loop", "1", "-i", str(card_path),
-            "-i", str(voice_path),
             "-filter_complex", "[0:v]scale=1080:1920[base];[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv]",
-            "-map", "[outv]", "-map", "2:a",
-            "-c:v", "libx264", "-crf", "18", "-t", "10.0", str(out_master)
+            "-map", "[outv]",
+            "-c:v", "libx264", "-crf", "23", "-preset", "fast", "-movflags", "+faststart", "-t", "10.0", str(out_master)
         ]
         subprocess.run(cmd_fb, check=True)
 
