@@ -44,72 +44,198 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.head.appendChild(style);
       }
 
-      // 2. Strict Filter for Genuine Fashion Garment Photos
+      const isProductPage = window.location.href.includes('/p/') || document.querySelector('h1, span[class*="ProductTitle"]');
       const JUNK_KEYWORDS = [
         "banner", "off", "icon", "logo", "badge", "avatar", "profile", "delivery",
         "star", "rating", "svg", "static", "vector", "app_store", "play_store",
         "google", "apple", "get it on", "available on", "footer", "download"
       ];
 
-      const allImgs = Array.from(document.querySelectorAll('img')).filter((img) => {
+      // Helper to build affiliate link
+      function toAffiliateLink(rawUrl) {
+        if (!rawUrl) return window.location.href;
+        const extMatch = rawUrl.match(/\/p\/([a-zA-Z0-9]+)/);
+        const extId = extMatch ? extMatch[1] : "item";
+        const encoded = encodeURIComponent(rawUrl);
+        return `https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=${extId}&utm_source=youtube_long_form&url=${encoded}`;
+      }
+
+      // Collect all clean product CDN images
+      const allProductImgs = Array.from(document.querySelectorAll('img')).filter((img) => {
         const src = (img.src || "").toLowerCase();
         const alt = (img.alt || "").toLowerCase();
         const w = img.naturalWidth || img.width || 0;
         const h = img.naturalHeight || img.height || 0;
-
-        // Must be substantial size and not square banner
-        if (w < 100 || h < 110) return false;
+        if (w < 80 || h < 80) return false;
         if (JUNK_KEYWORDS.some(k => src.includes(k) || alt.includes(k))) return false;
-
-        // On Meesho, genuine product photos always live in images.meesho.com/images/products/
         if (src.includes("images.meesho.com") && !src.includes("/products/")) return false;
-
         return true;
       });
 
-      const uniqueItems = [];
-      const seenSrc = new Set();
-
-      allImgs.forEach((img, idx) => {
+      // Extract all high-res photos
+      const highResPhotos = [];
+      const seenPhotos = new Set();
+      allProductImgs.forEach(img => {
         let src = img.srcset ? img.srcset.split(',').slice(-1)[0].split(' ')[0] : img.src;
         if (!src) return;
-
-        // Upgrade to 512px crisp resolution
-        const cleanSrc = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
-        if (seenSrc.has(cleanSrc)) return;
-        seenSrc.add(cleanSrc);
-
-        // Add visual blink highlight to the element on the webpage!
-        const parentContainer = img.closest('a, div[class*="ProductCard"], div[class*="product"], div[role="listitem"]') || img;
-        parentContainer.classList.add("shelf-scraped-highlight");
-
-        // Try to get title & price from nearest text
-        const cardText = (parentContainer.innerText || img.alt || "").trim();
-        const priceMatch = cardText.match(/₹\s*(\d{2,5})/);
-        const price = priceMatch ? parseInt(priceMatch[1], 10) : 245;
-
-        let title = img.alt || document.title.split("|")[0].trim();
-        if (cardText.length > 5) {
-          const lines = cardText.split('\n').map(l => l.trim()).filter(l => l.length > 5 && !l.startsWith('₹') && !l.startsWith('★'));
-          if (lines.length > 0) title = lines[0];
+        const clean = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
+        if (!seenPhotos.has(clean)) {
+          seenPhotos.add(clean);
+          highResPhotos.push(clean);
         }
-
-        uniqueItems.push({
-          id: `p-clip-${idx}-${Date.now()}`,
-          title: title.slice(0, 50),
-          price: price,
-          sizes: ["S", "M", "L", "XL"],
-          image: cleanSrc,
-          productUrl: window.location.href,
-          affiliateUrl: buildAffiliateUrl(window.location.href),
-          category: "Gen Z Aesthetic & Streetwear"
-        });
       });
+
+      // Extract available sizes from page
+      const detectedSizes = [];
+      const sizeElements = document.querySelectorAll('span[class*="Size"], button[class*="Size"], div[class*="Size"]');
+      sizeElements.forEach(el => {
+        const t = (el.innerText || "").trim().toUpperCase();
+        if (["XS", "S", "M", "L", "XL", "XXL", "3XL", "FREE SIZE"].includes(t) && !detectedSizes.includes(t)) {
+          detectedSizes.push(t);
+        }
+      });
+      const finalSizes = detectedSizes.length > 0 ? detectedSizes : ["S", "M", "L", "XL"];
+
+      // Extract details
+      const pageBodyText = document.body.innerText || "";
+      let detectedColor = "Trending Multi";
+      const colorMatch = pageBodyText.match(/Color\s*:?\s*([A-Za-z]+)/i);
+      if (colorMatch) detectedColor = colorMatch[1].trim();
+
+      let detectedFabric = "Cotton";
+      const fabricMatch = pageBodyText.match(/Fabric\s*:?\s*([A-Za-z\s]+)/i);
+      if (fabricMatch) detectedFabric = fabricMatch[1].trim().split('\n')[0].slice(0, 20);
+
+      const items = [];
+
+      // A. IF SINGLE PRODUCT PAGE:
+      if (isProductPage) {
+        let title = "";
+        const titleEl = document.querySelector('h1, span[class*="ProductTitle"], div[class*="ProductTitle"]');
+        if (titleEl) title = titleEl.innerText.trim();
+        if (!title || title.length < 5) title = document.title.split("|")[0].trim();
+
+        let price = 245;
+        const priceMatch = pageBodyText.match(/₹\s*(\d{2,5})/);
+        if (priceMatch) price = parseInt(priceMatch[1], 10);
+
+        const extMatch = window.location.href.match(/\/p\/([a-zA-Z0-9]+)/);
+        const extId = extMatch ? extMatch[1] : "prod";
+
+        // Highlight the main product & gallery
+        document.querySelectorAll('img[src*="images.meesho.com"]').forEach(img => {
+          const parent = img.closest('div[class*="Image"], div[class*="Product"], div[class*="Carousel"]') || img;
+          parent.classList.add("shelf-scraped-highlight");
+        });
+
+        // 1. Primary main product with full gallery array
+        items.push({
+          id: `p-main-${extId}`,
+          ext_id: extId,
+          title: title.slice(0, 55),
+          subtitle: `${detectedColor} · ${detectedFabric} · ${finalSizes.join(', ')} · Creator Pick`,
+          price: price,
+          oldPrice: Math.round(price * 1.35),
+          costPrice: Math.max(149, price - 100),
+          estimatedProfit: Math.max(80, Math.round(price * 0.4)),
+          sizes: finalSizes,
+          image: highResPhotos[0] || "https://images.meesho.com/images/products/682813217/hbo6b_512.webp",
+          galleryImages: highResPhotos.slice(0, 8),
+          colors: [detectedColor],
+          fabric: detectedFabric,
+          productUrl: window.location.href,
+          affiliateUrl: toAffiliateLink(window.location.href),
+          category: "Gen Z Aesthetic & Streetwear",
+          status: "pending_review"
+        });
+
+        // 2. Discover Color Variations / Similar Products links
+        const variationLinks = Array.from(document.querySelectorAll('a[href*="/p/"]')).filter(a => a.href !== window.location.href);
+        const seenVarUrls = new Set();
+        variationLinks.forEach((a, vIdx) => {
+          if (seenVarUrls.has(a.href) || items.length >= 12) return;
+          seenVarUrls.add(a.href);
+
+          const vImg = a.querySelector('img');
+          const vSrc = vImg ? (vImg.src.split('?')[0].replace('width=100', 'width=512')) : null;
+          if (!vSrc || !vSrc.includes('products/')) return;
+
+          a.classList.add("shelf-scraped-highlight");
+          const vExtMatch = a.href.match(/\/p\/([a-zA-Z0-9]+)/);
+          const vExtId = vExtMatch ? vExtMatch[1] : `var${vIdx}`;
+
+          items.push({
+            id: `p-var-${vExtId}`,
+            ext_id: vExtId,
+            title: `${title.slice(0, 40)} (Variation ${vIdx + 1})`,
+            subtitle: `Variant · ${detectedFabric} · ${finalSizes.join(', ')}`,
+            price: price,
+            oldPrice: Math.round(price * 1.35),
+            costPrice: Math.max(149, price - 100),
+            estimatedProfit: Math.max(80, Math.round(price * 0.4)),
+            sizes: finalSizes,
+            image: vSrc,
+            galleryImages: [vSrc],
+            colors: [`Variant #${vIdx + 1}`],
+            fabric: detectedFabric,
+            productUrl: a.href,
+            affiliateUrl: toAffiliateLink(a.href),
+            category: "Gen Z Aesthetic & Streetwear",
+            status: "pending_review"
+          });
+        });
+      }
+      // B. IF CATEGORY / LISTING PAGE:
+      else {
+        const seenSrc = new Set();
+        allProductImgs.forEach((img, idx) => {
+          let src = img.srcset ? img.srcset.split(',').slice(-1)[0].split(' ')[0] : img.src;
+          if (!src) return;
+          const cleanSrc = src.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512');
+          if (seenSrc.has(cleanSrc)) return;
+          seenSrc.add(cleanSrc);
+
+          const parent = img.closest('a, div[class*="ProductCard"], div[class*="product"], div[role="listitem"]') || img;
+          parent.classList.add("shelf-scraped-highlight");
+
+          const cardText = (parent.innerText || img.alt || "").trim();
+          const priceMatch = cardText.match(/₹\s*(\d{2,5})/);
+          const price = priceMatch ? parseInt(priceMatch[1], 10) : 245;
+
+          let title = img.alt || document.title.split("|")[0].trim();
+          if (cardText.length > 5) {
+            const lines = cardText.split('\n').map(l => l.trim()).filter(l => l.length > 5 && !l.startsWith('₹') && !l.startsWith('★'));
+            if (lines.length > 0) title = lines[0];
+          }
+
+          const itemLink = parent.getAttribute('href') || (parent.querySelector('a') ? parent.querySelector('a').getAttribute('href') : '') || window.location.href;
+          const fullProdUrl = itemLink.startsWith('http') ? itemLink : (itemLink.startsWith('/') ? `https://www.meesho.com${itemLink}` : window.location.href);
+
+          const extMatch = fullProdUrl.match(/\/p\/([a-zA-Z0-9]+)/);
+          const extId = extMatch ? extMatch[1] : `cat${idx}`;
+
+          items.push({
+            id: `p-clip-${extId}-${Date.now()}`,
+            ext_id: extId,
+            title: title.slice(0, 50),
+            price: price,
+            costPrice: Math.max(149, price - 100),
+            estimatedProfit: Math.max(80, Math.round(price * 0.4)),
+            sizes: ["XS", "S", "M", "L", "XL"],
+            image: cleanSrc,
+            galleryImages: [cleanSrc],
+            productUrl: fullProdUrl,
+            affiliateUrl: toAffiliateLink(fullProdUrl),
+            category: "Gen Z Aesthetic & Streetwear",
+            status: "pending_review"
+          });
+        });
+      }
 
       return {
         url: window.location.href,
-        title: document.title,
-        items: uniqueItems.slice(0, 24)
+        isProductPage: isProductPage,
+        items: items.slice(0, 24)
       };
     }
   }, (output) => {
@@ -121,7 +247,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = output[0].result;
     scannedItems = res.items;
 
-    document.getElementById("scan-count").textContent = `Found ${scannedItems.length} Clean Fashion Outfits`;
+    if (res.isProductPage) {
+      document.getElementById("scan-count").textContent = `✨ Product Page: ${scannedItems.length} Variations & Angles Ready`;
+    } else {
+      document.getElementById("scan-count").textContent = `Found ${scannedItems.length} Clean Fashion Outfits`;
+    }
 
     const grid = document.getElementById("batch-grid");
     grid.innerHTML = "";
@@ -129,10 +259,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     scannedItems.forEach((item, index) => {
       const card = document.createElement("div");
       card.className = "grid-item";
+      const totalPhotos = item.galleryImages ? item.galleryImages.length : 1;
       card.innerHTML = `
         <img src="${item.image}" alt="${item.title}" loading="lazy" />
         <span class="check">✓</span>
-        <span class="category-tag">₹${item.price} • S-XL</span>
+        <span class="category-tag">₹${item.price} • ${totalPhotos > 1 ? `📸 ${totalPhotos} Angles` : 'S-XXL'}</span>
       `;
 
       card.addEventListener("click", () => {
