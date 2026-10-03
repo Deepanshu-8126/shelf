@@ -400,52 +400,37 @@ async def execute_google_flow_generation(
                 await browser.close()
                 return None
 
-            # Record baseline batches before trigger
-            init_batches = await page.locator('.batch-container').all()
-            init_batch_count = len(init_batches)
-            init_top_text = ""
-            if init_batches:
-                try:
-                    init_top_text = (await init_batches[0].inner_text()).replace("\n", " ")[:120]
-                except Exception:
-                    pass
+            # Record baseline before triggering
+            init_batches = len(await page.locator('.batch-container').all())
+            init_top_text = (await page.locator('.batch-container').first.inner_text()).replace("\n", " ") if init_batches > 0 else ""
 
             # 4. Trigger Generation
             print("  [5/5] Triggering Google Flow Generation...")
             await start_btn.click()
             print("  🚀 Flow generation started! Monitoring render queue...")
-            await asyncio.sleep(5.0)
 
             # Poll for completion
             max_wait = 360
-            elapsed = 5
-            poll_interval = 6
+            elapsed = 0
+            poll_interval = 8
             downloaded = False
 
-            while elapsed < max_wait:
-                await asyncio.sleep(poll_interval)
-                elapsed += poll_interval
+            # Wait 8s for new batch to register
+            await asyncio.sleep(8)
+            elapsed += 8
 
+            while elapsed < max_wait:
                 batches = await page.locator('.batch-container').all()
                 if batches:
                     top_batch = batches[0]
-                    try:
-                        top_text = (await top_batch.inner_text()).replace("\n", " ")
-                    except Exception:
-                        top_text = ""
-                    
-                    status_snippet = top_text[:80] if top_text else "Rendering..."
-                    print(f"    [{elapsed}s] Flow Status: {status_snippet}...")
+                    top_text = (await top_batch.inner_text()).replace("\n", " ")
+                    print(f"    [{elapsed}s] Flow Status: {top_text[:80]}...")
 
-                    # Verification conditions for newly finished video:
-                    # 1. Elapsed time >= 25s (Veo 2 renders take 30-90s)
-                    # 2. Contains download button
-                    # 3. Not in generating/queued/rendering or percentage % state
-                    is_rendering = any(kw in top_text.lower() for kw in ["%", "generating", "queued", "rendering", "progress"])
+                    is_new_batch = len(batches) > init_batches or top_text != init_top_text
                     dl_btn = top_batch.locator('button[aria-label="Download batch"], button[aria-label*="Download"]').first
                     has_dl = await dl_btn.count() > 0
 
-                    if elapsed >= 25 and has_dl and not is_rendering:
+                    if is_new_batch and "%" not in top_text and has_dl and elapsed >= 20:
                         print(f"\n  🎉 NEW VIDEO FINISHED AT {elapsed}s! Downloading...")
                         try:
                             async with page.expect_download(timeout=60000) as dl_info:
@@ -476,6 +461,9 @@ async def execute_google_flow_generation(
                                 break
                         except Exception as dl_err:
                             print(f"    Download retry notice: {dl_err}")
+
+                await asyncio.sleep(poll_interval)
+                elapsed += poll_interval
 
             try:
                 await browser.close()
@@ -552,7 +540,7 @@ def process_single_item(
 
         # Assemble high-fidelity master reel with luxury product card & chime
         print("  ⚡ Assembling high-fidelity master reel with luxury product card & chime...")
-        from generate_master_affiliate_video import compose_master_10s_video
+        from generate_master_affiliate_video import compose_master_10s_video, is_video_locked, register_sent_video
         product_card_info = {
             "title": result["title"][:28],
             "price": result["price"],
@@ -570,6 +558,11 @@ def process_single_item(
             result["video_path"] = str(video_out)
             result["generation_status"] = "SUCCESS"
             print(f"\n🎉 Generation successful! Video file: {video_out}")
+
+            # Strict Lock Check - never send locked or old recycled videos
+            if is_video_locked(video_out):
+                print(f"🛑 [BLOCKED] Video {Path(video_out).name} is LOCKED in registry. Skipping duplicate Telegram dispatch.")
+                return result
 
             # Telegram Dispatch
             token = os.getenv("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN)
@@ -607,6 +600,8 @@ def process_single_item(
                         )
                         if t_resp.status_code == 200 and t_resp.json().get("ok"):
                             print("  ✅ Successfully delivered to Telegram!")
+                            register_sent_video(video_out)
+                            register_sent_video(upload_target)
                         else:
                             print(f"  ⚠️ Telegram response: {t_resp.text[:200]}")
                 except Exception as tg_err:

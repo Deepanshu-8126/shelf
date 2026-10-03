@@ -31,6 +31,83 @@ MODEL_REF = DATA_DIR / "model_face_reference.jpg"
 ENHANCED_DIR.mkdir(parents=True, exist_ok=True)
 VEO_DIR.mkdir(parents=True, exist_ok=True)
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
+MEMORY_DIR = DATA_DIR / "memory"
+MEMORY_DIR.mkdir(parents=True, exist_ok=True)
+REGISTRY_FILE = MEMORY_DIR / "sent_videos_registry.json"
+
+
+def get_file_hash(filepath: Path) -> str:
+    import hashlib
+    hasher = hashlib.md5()
+    try:
+        with open(filepath, "rb") as f:
+            buf = f.read(65536)
+            while len(buf) > 0:
+                hasher.update(buf)
+                buf = f.read(65536)
+        return hasher.hexdigest()
+    except Exception:
+        return ""
+
+
+def is_video_locked(video_path: Path | str) -> bool:
+    """Checks if a video has already been sent or is locked in historical registry."""
+    path = Path(video_path)
+    if not path.exists():
+        return False
+    if not REGISTRY_FILE.exists():
+        return False
+    try:
+        import json
+        with open(REGISTRY_FILE, "r", encoding="utf-8") as f:
+            reg = json.load(f)
+        locked_files = reg.get("locked_files", {})
+        sent_hashes = set(reg.get("sent_hashes", []))
+        sent_filenames = set(reg.get("sent_filenames", []))
+
+        if path.name in locked_files or path.name in sent_filenames:
+            return True
+        f_hash = get_file_hash(path)
+        if f_hash and f_hash in sent_hashes:
+            return True
+    except Exception as e:
+        print(f"⚠️ Registry check notice: {e}")
+    return False
+
+
+def register_sent_video(video_path: Path | str):
+    """Registers a newly sent video into the lock registry so it is never reused."""
+    path = Path(video_path)
+    if not path.exists():
+        return
+    try:
+        import json
+        reg = {"locked_files": {}, "sent_hashes": [], "sent_filenames": []}
+        if REGISTRY_FILE.exists():
+            with open(REGISTRY_FILE, "r", encoding="utf-8") as f:
+                reg = json.load(f)
+        
+        f_hash = get_file_hash(path)
+        f_size = path.stat().st_size
+        reg.setdefault("locked_files", {})[path.name] = {
+            "path": str(path),
+            "size": f_size,
+            "hash": f_hash,
+            "locked": True
+        }
+        hashes = set(reg.get("sent_hashes", []))
+        filenames = set(reg.get("sent_filenames", []))
+        if f_hash:
+            hashes.add(f_hash)
+        filenames.add(path.name)
+        reg["sent_hashes"] = list(hashes)
+        reg["sent_filenames"] = list(filenames)
+
+        with open(REGISTRY_FILE, "w", encoding="utf-8") as f:
+            json.dump(reg, f, indent=2)
+        print(f"🔒 [LOCKED] Video registered into sent registry: {path.name}")
+    except Exception as e:
+        print(f"⚠️ Failed to register video: {e}")
 
 
 def build_luxury_product_card(product_title: str = "Black Maxi Bodycon Dress", price: str = "₹599", rating: str = "4.8", image_crop: Path | None = None) -> Path:
@@ -246,11 +323,15 @@ def compose_master_10s_video(
 
 
 def send_to_telegram(video_path: Path, product_title: str = "Black Maxi Bodycon Dress", price: str = "₹599", link: str = "https://ekaro.in/example") -> bool:
-    """Delivers video to Telegram with ready-to-post Instagram/WhatsApp affiliate caption."""
+    """Delivers video to Telegram with ready-to-post Instagram/WhatsApp affiliate caption, strictly blocking locked/old videos."""
     import uuid
     import urllib.request
     import json
     
+    if is_video_locked(video_path):
+        print(f"🛑 [BLOCKED] Video {video_path.name} is LOCKED in sent_videos_registry. Will NOT send old/recycled video!")
+        return False
+
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY")
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "6486771356")
     
@@ -264,7 +345,7 @@ def send_to_telegram(video_path: Path, product_title: str = "Black Maxi Bodycon 
     )
 
     url = f"https://api.telegram.org/bot{bot_token}/sendVideo"
-    print(f"🚀 Sending 10s video to Telegram ({chat_id})...")
+    print(f"🚀 Sending fresh 10s video to Telegram ({chat_id})...")
 
     boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
     body = bytearray()
@@ -300,6 +381,7 @@ def send_to_telegram(video_path: Path, product_title: str = "Black Maxi Bodycon 
             resp_data = json.loads(response.read().decode("utf-8"))
             if resp_data.get("ok"):
                 print("✅ MASTER 10S VIDEO DELIVERED TO TELEGRAM SUCCESSFULLY!")
+                register_sent_video(video_path)
                 return True
             print(f"⚠️ Telegram returned: {resp_data}")
             return False
