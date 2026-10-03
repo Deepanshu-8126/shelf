@@ -570,7 +570,20 @@ def process_single_item(
             if token and chat_id:
                 try:
                     import requests
-                    print(f"🚀 Dispatching to Telegram (Chat ID: {chat_id})...")
+                    import subprocess
+                    print(f"🚀 Preparing & dispatching to Telegram (Chat ID: {chat_id})...")
+                    
+                    # Create faststart optimized copy for instant Telegram transmission
+                    tg_out = Path(video_out).parent / f"TG_{Path(video_out).name}"
+                    cmd_tg = [
+                        "ffmpeg", "-y", "-i", str(video_out),
+                        "-c:v", "libx264", "-crf", "22", "-preset", "fast",
+                        "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+                        str(tg_out)
+                    ]
+                    subprocess.run(cmd_tg, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    upload_target = tg_out if tg_out.exists() else video_out
+
                     caption_msg = (
                         f"✨ {result['title'].upper()} (Meesho)\n\n"
                         f"💰 Price: {result['price']} | ⭐ 4.8 Rating\n"
@@ -578,17 +591,17 @@ def process_single_item(
                         f"💳 EarnKaro Backup:\n{result['fallback_earnkaro_link']}\n\n"
                         f"🎙️ Voiceover:\n\"{creative_data['voiceover_script']}\""
                     )
-                    with open(video_out, "rb") as vf:
+                    with open(upload_target, "rb") as vf:
                         t_resp = requests.post(
                             f"https://api.telegram.org/bot{token}/sendVideo",
                             data={"chat_id": chat_id, "caption": caption_msg, "supports_streaming": "true"},
-                            files={"video": (Path(video_out).name, vf, "video/mp4")},
-                            timeout=90
+                            files={"video": (upload_target.name, vf, "video/mp4")},
+                            timeout=120
                         )
-                        if t_resp.json().get("ok"):
+                        if t_resp.status_code == 200 and t_resp.json().get("ok"):
                             print("  ✅ Successfully delivered to Telegram!")
                         else:
-                            print(f"  ⚠️ Telegram response: {t_resp.json()}")
+                            print(f"  ⚠️ Telegram response: {t_resp.text[:200]}")
                 except Exception as tg_err:
                     print(f"  ⚠️ Telegram dispatch notice: {tg_err}")
         else:
