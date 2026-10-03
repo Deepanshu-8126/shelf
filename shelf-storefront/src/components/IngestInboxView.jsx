@@ -179,7 +179,7 @@ export default function IngestInboxView({
           />
 
           <div className="crawler-action-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 type="button"
                 className="button button-dark crawler-submit-btn"
@@ -189,6 +189,40 @@ export default function IngestInboxView({
               >
                 <Icon name="sparkles" size={16} /> {crawling ? '🚀 Crawling & Extracting CDN Media...' : '⚡ Extract Variations & Add to Inbox'}
               </button>
+
+              <label style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontWeight: '500', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
+                <Icon name="upload" size={15} /> 📂 Batch Import from CSV
+                <input
+                  type="file"
+                  accept=".csv"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setCrawling(true);
+                    setCrawlNotice(`Reading ${file.name}...`);
+                    try {
+                      const text = await file.text();
+                      const res = await fetch('/api/ingest/csv-upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ csv_text: text })
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setCrawlNotice(`🎉 Successfully imported ${data.count} products from CSV with live images & affiliate links! Refreshing...`);
+                        setTimeout(() => window.location.reload(), 1500);
+                      } else {
+                        setCrawlNotice(data.error || 'Failed to import CSV');
+                      }
+                    } catch {
+                      setCrawlNotice('Network error uploading CSV');
+                    } finally {
+                      setCrawling(false);
+                    }
+                  }}
+                />
+              </label>
             </div>
             {crawlNotice && (
               <span className="crawler-notice-msg" style={{ fontSize: '12px', color: crawlNotice.includes('Successfully') ? '#4ade80' : '#f87171', background: 'rgba(0,0,0,0.4)', padding: '6px 12px', borderRadius: '8px' }}>

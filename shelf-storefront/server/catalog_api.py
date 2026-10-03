@@ -1418,7 +1418,94 @@ def ingest_smart_crawl_endpoint(payload: SmartCrawlRequest) -> dict[str, Any]:
         return {"success": False, "error": str(exc)}
 
 
+@app.post("/api/ingest/csv-upload")
+def ingest_csv_upload_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+    from smart_deep_importer import build_affiliate_route
+    raw_csv = payload.get("csv_text", "")
+    if not raw_csv:
+        return {"success": False, "count": 0, "error": "Empty CSV content"}
+
+    imported_count = 0
+    products_file = ROOT / "src" / "meesho-products.json"
+    catalog = []
+    if products_file.exists():
+        try:
+            with open(products_file, "r", encoding="utf-8") as f:
+                catalog = json.load(f)
+        except Exception:
+            catalog = []
+
+    try:
+        reader = csv.DictReader(io.StringIO(raw_csv))
+        for row in reader:
+            u1 = (row.get("web_scraper_start_url") or "").strip()
+            u2 = (row.get("item_page_link") or row.get("product_url") or "").strip()
+            prod_url = u2 if (u2 and "meesho.com" in u2) else u1
+            if not prod_url or "meesho.com" not in prod_url:
+                continue
+
+            title = (row.get("name_2") or row.get("name") or row.get("title") or row.get("item_page_title") or "Gen Z Curated Pick").replace("\n", " ").strip()
+            price_str = row.get("price") or row.get("price_1") or row.get("data") or "399"
+            digits = re.sub(r'\D', '', price_str)
+            price = int(digits) if digits else 399
+            img = (row.get("image") or row.get("image_1") or row.get("image2") or "https://images.meesho.com/images/products/682813217/hbo6b_512.webp").split('?')[0]
+            fabric = (row.get("product_fabric") or "Cotton").replace("Fabric :", "").strip()
+
+            ext_match = re.search(r'/p/([a-zA-Z0-9]+)', prod_url)
+            ext_id = ext_match.group(1) if ext_match else "item"
+
+            item = {
+                "id": f"p-csv-{ext_id}",
+                "ext_id": ext_id,
+                "title": title[:55],
+                "subtitle": f"Cotton · XS, S, M, L, XL · {fabric} Aesthetic",
+                "brand": "Meesho Verified Creator Pick",
+                "store": "Meesho",
+                "category": "Gen Z Aesthetic & Streetwear",
+                "collectionId": "meesho-genz-2026",
+                "tint": "peach",
+                "price": price,
+                "oldPrice": int(price * 1.3),
+                "costPrice": max(149, price - 120),
+                "estimatedProfit": min(300, max(80, int(price * 0.4))),
+                "rating": 4.3,
+                "ratingCount": 1200,
+                "image": img,
+                "galleryImages": [img],
+                "colors": ["Standard / Viral Palette"],
+                "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+                "inStock": True,
+                "productUrl": prod_url,
+                "affiliateUrl": build_affiliate_route(prod_url),
+                "status": "pending_review",
+                "isRealListing": True,
+                "source": "csv-batch-upload"
+            }
+
+            idx = next((i for i, p in enumerate(catalog) if p.get("id") == item["id"] or p.get("productUrl") == prod_url), None)
+            if idx is not None:
+                catalog[idx].update(item)
+            else:
+                catalog.insert(0, item)
+            imported_count += 1
+
+        with db() as connection:
+            for item in catalog[:imported_count]:
+                try:
+                    save_product(connection, item, insert_only=False)
+                except Exception:
+                    pass
+
+        with open(products_file, "w", encoding="utf-8") as f:
+            json.dump(catalog, f, indent=2)
+
+        return {"success": True, "count": imported_count}
+    except Exception as exc:
+        return {"success": False, "error": str(exc), "count": 0}
+
+
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("catalog_api:app", host="0.0.0.0", port=int(os.environ.get("API_PORT", "8787")), reload=False)
+
