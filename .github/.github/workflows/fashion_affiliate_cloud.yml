@@ -1,0 +1,86 @@
+name: Fashion Affiliate 1-Click Video Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_url:
+        description: 'Meesho Product URL to Generate Video For'
+        required: true
+        default: 'https://www.meesho.com/kashmira/p/hswwdx'
+      generate_video:
+        description: 'Generate Full Video & Dispatch to Telegram (true/false)'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  generate-affiliate-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies & FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python Requirements & Playwright with System Deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright requests beautifulsoup4 pillow pandas opencv-python-headless
+          playwright install --with-deps chromium
+
+      - name: Restore Google Flow Storage State (if secret exists)
+        env:
+          FLOW_STORAGE_STATE_B64: ${{ secrets.FLOW_STORAGE_STATE_B64 }}
+        run: |
+          mkdir -p ~/.config/google_flow_session
+          if [ -n "$FLOW_STORAGE_STATE_B64" ]; then
+            echo "$FLOW_STORAGE_STATE_B64" | base64 -d > ~/.config/google_flow_session/state.json
+            echo "✅ Restored Google Flow session state from secret."
+          fi
+
+      - name: Run Global V2 Affiliate Engine
+        env:
+          MEESHO_CREATOR_ID: ${{ secrets.MEESHO_CREATOR_ID || '374453404' }}
+          MEESHO_CAMPAIGN_ID: ${{ secrets.MEESHO_CAMPAIGN_ID || '12411179' }}
+          MEESHO_CAMPAIGN_SOURCE: ${{ secrets.MEESHO_CAMPAIGN_SOURCE || 'instagram_stories' }}
+          MEESHO_UTM_SOURCE: ${{ secrets.MEESHO_UTM_SOURCE || 'instagram_stories' }}
+          EARNKARO_USER_ID: ${{ secrets.EARNKARO_USER_ID || '3360368' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'AQ.Ab8RN6LtRRqymuNiOqWkYMXtKRwK8mTvottILOxu-l63e9QNIw' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
+        run: |
+          mkdir -p data/scraped_products data/veo_extracted_videos data/enhanced_8k_videos data/storefront data/memory
+          
+          if [ "${{ github.event.inputs.generate_video }}" = "true" ]; then
+            python global_v2.py "${{ github.event.inputs.product_url }}" --generate
+          else
+            python global_v2.py "${{ github.event.inputs.product_url }}"
+          fi
+
+      - name: Upload Generated Media to Cloud Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: affiliate-video-and-assets
+          path: |
+            data/enhanced_8k_videos/*.mp4
+            data/veo_extracted_videos/*.mp4
+            data/storefront/*.jpg
+            data/scraped_products/*
+          retention-days: 14
