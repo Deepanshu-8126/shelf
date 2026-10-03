@@ -38,6 +38,8 @@ from photoshoot_pinterest_engine.cloud_photoshoot_runner import (
     is_photo_locked
 )
 
+from photoshoot_pinterest_engine.pinterest_editorial_aesthetic_library import get_pinterest_brand_prompt
+
 BRAVE_EXE = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 USER_DATA_DIR = str(PROJECT_ROOT / "data" / "browser_sessions" / "google_pro_permanent_profile")
 PROJECT_URL = "https://flow.google.com/project/a399f8a2-c1a6-4150-b235-605a5a50c468"
@@ -47,30 +49,21 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def generate_single_flow_photo(
-    product_title: str = "Trendy Halter Neck Pink Top",
-    price: str = "₹399",
-    category: str = "Top",
+    product_title: str = "Classic Modern Wine Red Saree",
+    price: str = "₹551",
+    fabric: str = "Silk/Net",
+    pose_key: str | None = None,
     char_sheet_name: str = "model_character_sheet_v2.jpg",
     product_img_path: Path | None = None
 ) -> Path | None:
+    pose_name, prompt = get_pinterest_brand_prompt(product_title, fabric=fabric, pose_key=pose_key)
+
     print("=" * 75)
-    print(f"🚀 GENERATING GOOGLE FLOW DUAL-IMAGE AI PHOTOSHOOT")
-    print(f"👗 Outfit: {product_title} ({price})")
+    print(f"🚀 GENERATING GOOGLE FLOW BRAND EDITORIAL PHOTOSHOOT")
+    print(f"👗 Outfit: {product_title} ({price}) | Pose: {pose_name}")
     print("=" * 75)
 
-    prompt = (
-        f"Authentic raw 8K commercial fashion photoshoot of the exact same 21-year-old young Indian creator "
-        f"(youthful natural soft-oval face shape with gentle feminine jawline, smooth glowing warm honey skin, "
-        f"expressive warm honey-brown almond eyes with subtle dark tightline, delicate straight nose, "
-        f"plump soft rose-pink lips with natural sheen, signature crisp round black bindi centered above eyebrows, "
-        f"voluminous dark espresso black wavy hair styled with effortless wispy curtain strands, "
-        f"wearing traditional silver oxidised bell-shaped jhumkas and stacked silver bangles) "
-        f"wearing the {product_title} shown in the attached product image. "
-        f"Full-length candid mirror selfie perspective holding iPhone, standing in her bright sunlit modern aesthetic bedroom. "
-        f"Shot on Hasselblad 50mm / iPhone 16 Pro, authentic 35mm film grain, hyper-realistic fabric texture, 8K ultra-detailed, zero CGI."
-    )
-
-    out_photo = OUTPUT_DIR / f"FLOW_PHOTO_{int(time.time())}_{product_title.lower().replace(' ', '_')[:15]}.jpg"
+    out_photo = OUTPUT_DIR / f"FLOW_EDITORIAL_{int(time.time())}_{product_title.lower().replace(' ', '_')[:15]}.jpg"
 
     async with async_playwright() as p:
         browser = await p.chromium.launch_persistent_context(
@@ -204,22 +197,23 @@ async def generate_single_flow_photo(
     if downloaded_photo and downloaded_photo.exists():
         print(f"\n✨ [Google Flow AI Photo Success]: {downloaded_photo.name} ({downloaded_photo.stat().st_size} bytes)")
         
-        # Apply 4K Micro-Sharpening & Delogo
+        # Natural Film Tone & Subtle Contrast Polish (No harsh artificial sharpening)
         img = Image.open(downloaded_photo).convert("RGB")
-        img_sharp = ImageEnhance.Sharpness(img).enhance(1.35)
-        img_polished = img_sharp.filter(ImageFilter.UnsharpMask(radius=2, percent=140, threshold=2))
-        img_polished.save(downloaded_photo, "JPEG", quality=96)
+        img_color = ImageEnhance.Color(img).enhance(1.03)
+        img_contrast = ImageEnhance.Contrast(img_color).enhance(1.02)
+        img_contrast.save(downloaded_photo, "JPEG", quality=98)
 
         # Dispatch to Telegram
         caption = (
-            f"📸 *GOOGLE FLOW AI PHOTOSHOOT: {product_title.upper()}* ✨\n\n"
+            f"📸 *PINTEREST BRAND EDITORIAL: {product_title.upper()}* ✨\n\n"
             f"🥻 *Model:* 21yo Indian Creator (Signature Bindi & Jhumkas)\n"
+            f"🎭 *Editorial Pose:* {pose_name}\n"
             f"💰 *Deal Price:* `{price}`\n"
-            f"⭐ *Quality:* 8K Flow Image • Authentic Real Pores • Zero CGI\n\n"
+            f"⭐ *Quality:* 8K Hasselblad Portra 400 • Real Skin Pores • Zero Phone in Hand\n\n"
             f"🛍️ *Product:* {product_title}\n"
-            f"🏷️ #GoogleFlow #AIPhotoshoot #MeeshoFashion #OOTD #SareeLookbook"
+            f"🏷️ #PinterestFashion #FashionEditorial #OOTD #SareeLookbook #HighFashion"
         )
-        print(f"🚀 Dispatching genuine Google Flow AI photo to Telegram...")
+        print(f"🚀 Dispatching genuine Pinterest editorial AI photo to Telegram...")
         send_single_photo_to_telegram(downloaded_photo, caption)
         return downloaded_photo
 
@@ -229,8 +223,10 @@ async def generate_single_flow_photo(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Google Flow Dual-Image Photo Generator")
-    parser.add_argument("--title", type=str, default="Trendy Halter Neck Pink Top", help="Product Title")
-    parser.add_argument("--price", type=str, default="₹399", help="Product Price")
+    parser.add_argument("--title", type=str, default="Burgundy Lace Bodycon Maxi Evening Dress", help="Product Title")
+    parser.add_argument("--price", type=str, default="₹599", help="Product Price")
+    parser.add_argument("--fabric", type=str, default="Lace & Stretch Lycra", help="Fabric")
+    parser.add_argument("--pose", type=str, default="GRAND_STAIRCASE_ELEGANCE", help="Pose Key")
     args = parser.parse_args()
 
-    asyncio.run(generate_single_flow_photo(product_title=args.title, price=args.price))
+    asyncio.run(generate_single_flow_photo(product_title=args.title, price=args.price, fabric=args.fabric, pose_key=args.pose))
