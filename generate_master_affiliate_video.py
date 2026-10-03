@@ -272,17 +272,45 @@ def compose_master_10s_video(
     if not tring_path.exists():
         create_default_tring_chime(tring_path)
 
-    # 3. Master FFmpeg Filter Complex (Clean Video + Luxury Popup Card + Chime)
-    vf = (
-        "[0:v]delogo=x=560:y=1120:w=80:h=80,"
-        "scale=1080:1920:flags=lanczos,"
-        "unsharp=5:5:0.7:5:5:0.0,"
-        "eq=contrast=1.03:brightness=0.01:saturation=1.04,"
-        "noise=alls=5:allf=t+u[base];"
-        "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
-        "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
-        "[2:a]adelay=1200|1200,volume=0.9[outa]"
-    )
+    # 3. Check if raw video has audio stream (Veo native sound/voice)
+    has_raw_audio = False
+    try:
+        p_check = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(raw_video_path)],
+            capture_output=True, text=True
+        )
+        if "audio" in p_check.stdout:
+            has_raw_audio = True
+            print("  🔊 Detected native Veo audio stream! Preserving Veo voice + mixing with crystal chime...")
+        else:
+            print("  ℹ️ No audio stream in raw video; using crystal chime audio.")
+    except Exception:
+        pass
+
+    # 4. Master FFmpeg Filter Complex (Delogo + 8K Grade + Popup Card + Veo Voice/Chime Audio)
+    if has_raw_audio:
+        vf = (
+            "[0:v]delogo=x=540:y=1100:w=160:h=160:band=4:show=0,"
+            "scale=1080:1920:flags=lanczos,"
+            "unsharp=5:5:0.7:5:5:0.0,"
+            "eq=contrast=1.03:brightness=0.01:saturation=1.04,"
+            "noise=alls=4:allf=t+u[base];"
+            "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
+            "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
+            "[2:a]adelay=1200|1200,volume=0.35[chime];"
+            "[0:a][chime]amix=inputs=2:duration=first:dropout_transition=2[outa]"
+        )
+    else:
+        vf = (
+            "[0:v]delogo=x=540:y=1100:w=160:h=160:band=4:show=0,"
+            "scale=1080:1920:flags=lanczos,"
+            "unsharp=5:5:0.7:5:5:0.0,"
+            "eq=contrast=1.03:brightness=0.01:saturation=1.04,"
+            "noise=alls=4:allf=t+u[base];"
+            "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
+            "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
+            "[2:a]adelay=1200|1200,volume=0.85[outa]"
+        )
 
     cmd = [
         "ffmpeg", "-y",
@@ -303,17 +331,34 @@ def compose_master_10s_video(
         str(out_master)
     ]
 
-    print("\n🎬 [Compositor] Rendering Clean Master 10s UGC Video (No Voiceover)...", flush=True)
+    print("\n🎬 [Compositor] Rendering Clean Master 10s UGC Video (Delogo Watermark Removed + Veo Native Audio + 8K Polish)...", flush=True)
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
-        print(f"⚠️ FFmpeg error: {res.stderr[-300:]}")
+        print(f"⚠️ Delogo FFmpeg fallback notice: {res.stderr[-200:]}")
+        if has_raw_audio:
+            fb_filter = (
+                "[0:v]scale=1080:1920:flags=lanczos,unsharp=5:5:0.6[base];"
+                "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
+                "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
+                "[2:a]adelay=1200|1200,volume=0.35[chime];"
+                "[0:a][chime]amix=inputs=2:duration=first[outa]"
+            )
+        else:
+            fb_filter = (
+                "[0:v]scale=1080:1920:flags=lanczos,unsharp=5:5:0.6[base];"
+                "[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];"
+                "[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv];"
+                "[2:a]adelay=1200|1200,volume=0.85[outa]"
+            )
         cmd_fb = [
             "ffmpeg", "-y",
             "-i", str(raw_video_path),
             "-loop", "1", "-i", str(card_path),
-            "-filter_complex", "[0:v]scale=1080:1920[base];[1:v]format=rgba,fade=t=in:st=1.2:d=0.3:alpha=1,fade=t=out:st=9.2:d=0.3:alpha=1[card];[base][card]overlay=x=(W-w)/2:y=110:enable='between(t,1.2,9.5)'[outv]",
+            "-i", str(tring_path),
+            "-filter_complex", fb_filter,
             "-map", "[outv]",
-            "-c:v", "libx264", "-crf", "23", "-preset", "fast", "-movflags", "+faststart", "-t", "10.0", str(out_master)
+            "-map", "[outa]",
+            "-c:v", "libx264", "-crf", "22", "-preset", "fast", "-movflags", "+faststart", "-c:a", "aac", "-b:a", "128k", "-t", "10.0", str(out_master)
         ]
         subprocess.run(cmd_fb, check=True)
 
