@@ -155,37 +155,46 @@ async def generate_single_flow_photo(
                             await dl_btn.click(force=True)
                         download = await dl_info.value
                         temp_file = OUTPUT_DIR / download.suggested_filename
-                        await download.save_as(str(temp_file))
-                        print(f"    Saved downloaded asset: {temp_file.name}")
+                        try:
+                            await download.save_as(str(temp_file))
+                        except Exception:
+                            pass
+                        
+                        await asyncio.sleep(3)
 
-                        # Check if image or zip
+                        # Search for downloaded zip/tmp/photo in OUTPUT_DIR and Downloads folder
                         import zipfile
-                        if temp_file.suffix.lower() == ".zip" or zipfile.is_zipfile(temp_file):
-                            with zipfile.ZipFile(temp_file) as z:
-                                for name in z.namelist():
-                                    if name.lower().endswith((".jpg", ".png", ".webp", ".jpeg")):
-                                        with open(out_photo, "wb") as f_out, z.open(name) as f_in:
-                                            f_out.write(f_in.read())
-                                        downloaded_photo = out_photo
+                        scan_dirs = [OUTPUT_DIR, Path(r"C:\Users\Deepanshu\Downloads")]
+                        candidates = []
+                        for s_dir in scan_dirs:
+                            if s_dir.exists():
+                                candidates.extend(list(s_dir.glob("*.tmp")) + list(s_dir.glob("*.zip")) + list(s_dir.glob("*.crdownload")) + list(s_dir.glob("*.jpg")) + list(s_dir.glob("*.png")))
+
+                        for cand in sorted(candidates, key=os.path.getmtime, reverse=True):
+                            if cand.exists() and cand.stat().st_size > 50000:
+                                if zipfile.is_zipfile(cand) or cand.suffix.lower() == ".zip":
+                                    with zipfile.ZipFile(cand) as z:
+                                        for name in z.namelist():
+                                            if name.lower().endswith((".jpg", ".png", ".webp", ".jpeg")):
+                                                with open(out_photo, "wb") as f_out, z.open(name) as f_in:
+                                                    f_out.write(f_in.read())
+                                                downloaded_photo = out_photo
+                                                print(f"    ✅ Extracted fresh AI Photo: {out_photo.name} ({out_photo.stat().st_size} bytes)")
+                                                break
+                                    if downloaded_photo:
                                         break
-                                    elif name.lower().endswith(".mp4"):
-                                        # If video output, extract thumbnail / frame
-                                        import subprocess
-                                        mp4_temp = OUTPUT_DIR / "temp_flow.mp4"
-                                        with open(mp4_temp, "wb") as f_out, z.open(name) as f_in:
-                                            f_out.write(f_in.read())
-                                        cmd_frame = ["ffmpeg", "-y", "-i", str(mp4_temp), "-ss", "00:00:02", "-vframes", "1", "-q:v", "2", str(out_photo)]
-                                        subprocess.run(cmd_frame, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                                        mp4_temp.unlink(missing_ok=True)
-                                        downloaded_photo = out_photo
-                                        break
-                            temp_file.unlink(missing_ok=True)
-                        elif temp_file.suffix.lower() in [".jpg", ".png", ".webp", ".jpeg"]:
-                            temp_file.replace(out_photo)
-                            downloaded_photo = out_photo
-                        break
+                                elif cand.suffix.lower() in [".jpg", ".png", ".webp", ".jpeg"]:
+                                    import shutil
+                                    shutil.copy2(cand, out_photo)
+                                    downloaded_photo = out_photo
+                                    print(f"    ✅ Found fresh AI Photo: {out_photo.name} ({out_photo.stat().st_size} bytes)")
+                                    break
+
+                        if downloaded_photo and downloaded_photo.exists():
+                            break
                     except Exception as dl_err:
                         print(f"    Download notice: {dl_err}")
+                        break
 
             await asyncio.sleep(poll_interval)
             elapsed += poll_interval
