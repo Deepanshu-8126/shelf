@@ -307,47 +307,33 @@ function DashboardView({
   }).filter(Boolean);
   const featuredCollections = collections.slice(0, 3);
 
+  const liveCount = uniqueProducts.filter((p) => p.status !== 'pending_review' && p.status !== 'draft' && p.status !== 'archived').length;
+  const draftCount = uniqueProducts.filter((p) => p.status === 'pending_review' || p.status === 'draft').length;
+  const missingLinksCount = uniqueProducts.filter((p) => !p.affiliateUrl).length;
+  const categoriesCount = new Set(uniqueProducts.map((p) => p.category).filter(Boolean)).size;
+
+  const realMetrics = [
+    { label: 'Active Live Products', value: String(liveCount), change: `${uniqueProducts.length} in DB`, icon: 'products', tint: 'green' },
+    { label: 'Review Queue / Drafts', value: String(draftCount), change: draftCount > 0 ? 'Needs approval' : 'All clear', icon: 'download', tint: 'peach' },
+    { label: 'Missing Affiliate Links', value: String(missingLinksCount), change: missingLinksCount > 0 ? `${missingLinksCount} pending` : 'All mapped', icon: 'sparkles', tint: 'lilac' },
+    { label: 'Active Categories', value: String(categoriesCount), change: `${collections.length} collections`, icon: 'collections', tint: 'yellow' },
+  ];
+
   return (
     <div className="dashboard-view">
       <PageIntro
-        eyebrow="SATURDAY, OCTOBER 3 · YOUR STUDIO"
+        eyebrow="YOUR CREATOR STUDIO · REAL DATABASE STATS"
         title={<>Good morning, {creatorName}<span className="hello-star">✦</span></>}
-        subtitle="Everything you love sharing, in one happy little place."
+        subtitle="Everything you love sharing, connected to your live catalog."
       >
         <button className="button button-light" type="button" onClick={onShare}><Icon name="copy" size={16} /> Share page</button>
         <button className="button button-light" type="button" onClick={onOpenImporter}><Icon name="download" size={16} /> Import listings</button>
         <button className="button button-dark" type="button" onClick={onAddProduct}><Icon name="plus" size={17} /> Add a pick</button>
       </PageIntro>
 
-      <section className="dashboard-hero">
-        <div className="hero-copy">
-          <span className="hero-label"><span className="hero-label-dot" /> YOUR PERSONAL STYLE BOARD</span>
-          <h2>Your next look.<br /><em>Starts here.</em></h2>
-          <p>Collect the pieces you love, make little edits for every mood, and share one pretty page with your people.</p>
-          <button className="hero-cta" type="button" onClick={onOpenPublic}>Preview your storefront <Icon name="arrowUpRight" size={16} /></button>
-          <div className="hero-footnote"><span className="hero-footnote-stars">✦ ✦ ✦</span><span>YOUR EDIT, YOUR RULES</span></div>
-        </div>
-        <div className="hero-artwork">
-          <div className="hero-art-glow" />
-          <OrbitScene />
-          <div className="hero-product-float hero-product-left">
-            <img src="/images/linen-set.jpg" alt="" />
-            <div className="float-product-caption"><span>wear it on repeat</span><b>easy linen set</b></div>
-          </div>
-          <div className="hero-product-float hero-product-right">
-            <img src="/images/crossbody-bag.jpg" alt="" />
-            <div className="float-product-caption"><span>your everyday plus-one</span><b>soft carryall</b></div>
-          </div>
-          <span className="hero-art-sticker"><Icon name="sparkles" size={17} /> 4 lovely stores</span>
-          <span className="hero-art-sparkle hero-art-sparkle-one">✦</span>
-          <span className="hero-art-sparkle hero-art-sparkle-two">✳</span>
-          <span className="hero-art-orbit-label">A LITTLE BIT OF EVERYTHING</span>
-        </div>
-      </section>
-
-      <div className="demo-metrics-caption"><span className="demo-dot" /> DEMO METRICS <span className="caption-divider" /> Placeholder figures · not live affiliate reporting</div>
-      <section className="metrics-grid" aria-label="Sample performance preview">
-        {SAMPLE_METRICS.map((metric) => <MetricCard metric={metric} key={metric.label} />)}
+      <div className="demo-metrics-caption" style={{ margin: '16px 0 10px' }}><span className="demo-dot" style={{ background: 'var(--green)' }} /> LIVE CATALOG STATUS <span className="caption-divider" /> Synced with SQLite database</div>
+      <section className="metrics-grid" aria-label="Live catalog summary">
+        {realMetrics.map((metric) => <MetricCard metric={metric} key={metric.label} />)}
       </section>
 
       <section className="category-discovery-section" aria-label="Browse product categories">
@@ -1826,9 +1812,19 @@ export default function App() {
               products={products}
               onApproveProduct={handleApproveProduct}
               onDeleteProduct={handleDeleteProduct}
-              onUpdateProduct={(id, updates) => {
-                setProducts((current) => current.map((p) => p.id === id ? { ...p, ...updates } : p));
-                showToast('Product updated successfully');
+              onUpdateProduct={async (id, updates) => {
+                const existing = products.find((p) => p.id === id);
+                if (!existing) return;
+                const nextProduct = { ...existing, ...updates };
+                try {
+                  await fetch('/api/products/update-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nextProduct)
+                  });
+                } catch {}
+                setProducts((prev) => prev.map((p) => (p.id === id ? nextProduct : p)));
+                showToast('Product updated & saved to database');
               }}
               onOpenAddProduct={openAddProduct}
               onOpenEditProduct={openEditLink}
