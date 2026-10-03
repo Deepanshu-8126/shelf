@@ -1418,6 +1418,66 @@ def ingest_smart_crawl_endpoint(payload: SmartCrawlRequest) -> dict[str, Any]:
         return {"success": False, "error": str(exc)}
 
 
+class DeepScrapeUrlRequest(BaseModel):
+    url: str = Field(..., description="Meesho category, search, or product URL")
+    limit: int = Field(default=8, ge=1, le=50)
+    collectionId: str = Field(default="meesho-genz-2026")
+    margin_pct: float = Field(default=0.45)
+
+
+@app.post("/api/ingest/deep-scrape-url")
+def ingest_deep_scrape_url_endpoint(payload: DeepScrapeUrlRequest) -> dict[str, Any]:
+    from smart_deep_importer import deep_scrape_meesho_url
+    try:
+        products = deep_scrape_meesho_url(
+            target_url=payload.url.strip(),
+            max_items=payload.limit,
+            profit_margin_pct=payload.margin_pct,
+            collection_id=payload.collectionId
+        )
+        if not products:
+            return {"success": False, "error": "No products could be extracted from this URL", "count": 0, "products": []}
+
+        products_file = ROOT / "src" / "meesho-products.json"
+        catalog = []
+        if products_file.exists():
+            with open(products_file, "r", encoding="utf-8") as f:
+                try:
+                    catalog = json.load(f)
+                except Exception:
+                    catalog = []
+
+        added_items = []
+        for prod in products:
+            prod["status"] = "pending_review"
+            idx = next((i for i, p in enumerate(catalog) if p.get("id") == prod["id"] or (prod.get("productUrl") and p.get("productUrl") == prod["productUrl"])), None)
+            if idx is not None:
+                catalog[idx].update(prod)
+                added_items.append(catalog[idx])
+            else:
+                catalog.insert(0, prod)
+                added_items.append(prod)
+
+        with db() as connection:
+            for p in added_items:
+                try:
+                    save_product(connection, p, insert_only=False)
+                except Exception:
+                    pass
+
+        with open(products_file, "w", encoding="utf-8") as f:
+            json.dump(catalog, f, indent=2)
+
+        return {
+            "success": True,
+            "count": len(added_items),
+            "products": added_items,
+            "message": f"Successfully deep scraped {len(added_items)} items with variations & affiliate links!"
+        }
+    except Exception as exc:
+        return {"success": False, "error": str(exc), "count": 0, "products": []}
+
+
 @app.post("/api/ingest/csv-upload")
 def ingest_csv_upload_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
     from smart_deep_importer import build_affiliate_route

@@ -27,7 +27,10 @@ export default function IngestInboxView({
 }) {
   const [editingValues, setEditingValues] = useState({});
   const [busyIds, setBusyIds] = useState(new Set());
-  const [showCrawler, setShowCrawler] = useState(true);
+  const [crawlerMode, setCrawlerMode] = useState('autonomous'); // 'autonomous', 'paste', 'csv'
+  const [crawlUrl, setCrawlUrl] = useState('https://www.meesho.com/western-wear-women/pl/4aus');
+  const [crawlLimit, setCrawlLimit] = useState(8);
+  const [crawlCollection, setCrawlCollection] = useState('meesho-genz-2026');
   const [pasteText, setPasteText] = useState('');
   const [crawling, setCrawling] = useState(false);
   const [crawlNotice, setCrawlNotice] = useState('');
@@ -37,22 +40,35 @@ export default function IngestInboxView({
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState('');
 
-  // Filter based on active tab and search
-  const filteredProducts = products.filter((p) => {
-    const matchesTab =
-      activeTab === 'all'
-        ? true
-        : activeTab === 'pending'
-        ? p.status === 'pending_review' || p.status === 'draft'
-        : p.status === 'published';
-
-    const matchesSearch =
-      !searchQuery ||
-      (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesTab && matchesSearch;
-  });
+  // Autonomous URL Deep Scraper Handler
+  const handleAutonomousDeepScrape = async () => {
+    if (!crawlUrl.trim()) return;
+    setCrawling(true);
+    setCrawlNotice('🤖 Auto-crawling Meesho page, expanding lazy variations, extracting HD CDN photos & calculating margins...');
+    try {
+      const res = await fetch('/api/ingest/deep-scrape-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: crawlUrl.trim(),
+          limit: Number(crawlLimit) || 8,
+          collectionId: crawlCollection,
+          margin_pct: 0.45
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.products && data.products.length > 0) {
+        data.products.forEach(p => onAddIngestProduct?.(p));
+        setCrawlNotice(`🎉 Successfully deep-crawled & ingested ${data.products.length} outfits with full variation photos!`);
+      } else {
+        setCrawlNotice(data.error || 'Could not extract products from this URL. Try another category link or Smart Paste.');
+      }
+    } catch (err) {
+      setCrawlNotice('Network/API connection error. Ensure catalog backend is running.');
+    } finally {
+      setCrawling(false);
+    }
+  };
 
   const handleSmartCrawl = async () => {
     if (!pasteText.trim()) return;
@@ -78,6 +94,23 @@ export default function IngestInboxView({
       setCrawling(false);
     }
   };
+
+  // Filter based on active tab and search
+  const filteredProducts = products.filter((p) => {
+    const matchesTab =
+      activeTab === 'all'
+        ? true
+        : activeTab === 'pending'
+        ? p.status === 'pending_review' || p.status === 'draft'
+        : p.status === 'published';
+
+    const matchesSearch =
+      !searchQuery ||
+      (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
 
   const getVal = (id, field, fallback) => {
     if (editingValues[id] && editingValues[id][field] !== undefined) {
@@ -198,13 +231,13 @@ export default function IngestInboxView({
       <div className="inbox-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
         <div>
           <div className="inbox-title-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="inbox-title" style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>📊 Live Data Setup & Sourcing Studio</h1>
+            <h1 className="inbox-title" style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>🤖 Autonomous Multi-Scraper & Live Sourcing Studio</h1>
             <span className="inbox-count-badge" style={{ background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', border: '1px solid rgba(236, 72, 153, 0.4)', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '700' }}>
               {products.length} Total Sourced Products
             </span>
           </div>
           <p className="inbox-subtitle" style={{ color: 'rgba(255,255,255,0.65)', fontSize: '13px', marginTop: '6px' }}>
-            Full multi-variant catalog studio: View all angle variations, colors, sizes, wholesale pricing vs retail markup, and auto-generated Creator Affiliate links.
+            Next-Gen Autonomous Sourcing: Crawl Meesho categories, auto-scroll pages, extract multi-angle gallery variations, and auto-attach your Creator Affiliate Route (<code style={{ color: '#38bdf8' }}>374453404:12492338</code>).
           </p>
         </div>
 
@@ -253,87 +286,178 @@ export default function IngestInboxView({
         </div>
       </div>
 
-      {/* Smart Paste & Auto-Crawl Bar */}
-      {showCrawler && (
-        <div className="inbox-crawler-card" style={{ background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '16px', padding: '20px', marginBottom: '24px', backdropFilter: 'blur(20px)' }}>
-          <div className="crawler-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <div className="crawler-title" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <span className="crawler-icon" style={{ fontSize: '24px', background: 'rgba(236, 72, 153, 0.15)', padding: '10px', borderRadius: '12px', color: '#ec4899' }}>⚡</span>
-              <div>
-                <strong style={{ fontSize: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  Smart Fashion Ingest & Multi-Variant Sync Engine
-                  <span style={{ fontSize: '11px', background: '#22c55e20', color: '#4ade80', border: '1px solid #22c55e40', padding: '2px 8px', borderRadius: '999px' }}>Auto-Affiliate (374453404) Attached</span>
-                </strong>
-                <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', margin: '4px 0 0 0' }}>
-                  Paste any Meesho URL, Instagram Reel link, Pinterest Pin, or raw text (Ctrl+A &rarr; Ctrl+C). Python extracts real CDN images, sizes, pricing, and injects your official affiliate route.
-                </p>
-              </div>
-            </div>
+      {/* AUTONOMOUS MULTI-SCRAPER STUDIO CARD */}
+      <div className="inbox-crawler-card" style={{ background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '16px', padding: '20px', marginBottom: '24px', backdropFilter: 'blur(20px)' }}>
+        {/* Mode Selector Tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setCrawlerMode('autonomous')}
+              style={{ background: crawlerMode === 'autonomous' ? 'linear-gradient(135deg, #38bdf8 0%, #6366f1 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              🤖 Autonomous Category & Deep Scraper
+            </button>
+            <button
+              type="button"
+              onClick={() => setCrawlerMode('paste')}
+              style={{ background: crawlerMode === 'paste' ? 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              📋 Smart Paste (Ctrl+A &rarr; Ctrl+C)
+            </button>
+            <button
+              type="button"
+              onClick={() => setCrawlerMode('csv')}
+              style={{ background: crawlerMode === 'csv' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              📂 Batch CSV Upload
+            </button>
           </div>
 
-          <textarea
-            className="crawler-input-textarea"
-            rows={3}
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            placeholder="Paste Meesho Product URL (e.g. https://www.meesho.com/myali-brasil-rio-graphic-slim-fit-for-women/p/gy4v8f) or copied page text here..."
-            style={{ width: '100%', borderRadius: '12px', padding: '12px 16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px', resize: 'vertical' }}
-          />
+          <span style={{ fontSize: '11px', background: '#22c55e20', color: '#4ade80', border: '1px solid #22c55e40', padding: '4px 10px', borderRadius: '999px', fontWeight: '700' }}>
+            ● Live Affiliate Generator Active
+          </span>
+        </div>
 
-          <div className="crawler-action-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-            <div style={{ display: 'flex', gap: '10px' }}>
+        {/* MODE 1: Autonomous URL Scraper */}
+        {crawlerMode === 'autonomous' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'center' }}>
+              <input
+                type="text"
+                value={crawlUrl}
+                onChange={(e) => setCrawlUrl(e.target.value)}
+                placeholder="Enter Meesho Category / Search URL (e.g. https://www.meesho.com/western-wear-women/pl/4aus)"
+                style={{ borderRadius: '10px', padding: '12px 14px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px' }}
+              />
+              <select
+                value={crawlCollection}
+                onChange={(e) => setCrawlCollection(e.target.value)}
+                style={{ borderRadius: '10px', padding: '12px 10px', background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px' }}
+              >
+                <option value="meesho-genz-2026">Collection: Gen Z Streetwear &amp; Graphic</option>
+                <option value="brasilcore-edits">Collection: Brasilcore &amp; Baby Tees</option>
+                <option value="co-ord-sets">Collection: Y2K Co-ord Sets</option>
+                <option value="meesho-dresses-2026">Collection: Slinky Bodycon Dresses</option>
+                <option value="meesho-kurtis-2026">Collection: Ethnic Kurtis</option>
+              </select>
+              <select
+                value={crawlLimit}
+                onChange={(e) => setCrawlLimit(e.target.value)}
+                style={{ borderRadius: '10px', padding: '12px 10px', background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px' }}
+              >
+                <option value={5}>Limit: 5 Products</option>
+                <option value={8}>Limit: 8 Products</option>
+                <option value={15}>Limit: 15 Products</option>
+                <option value={25}>Limit: 25 Products</option>
+              </select>
               <button
                 type="button"
-                className="button button-dark crawler-submit-btn"
+                disabled={crawling || !crawlUrl.trim()}
+                onClick={handleAutonomousDeepScrape}
+                style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #6366f1 100%)', border: 'none', color: '#fff', fontWeight: '750', padding: '12px 24px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                {crawling ? '🤖 Scraping Live...' : '⚡ Run Autonomous Deep Scraper'}
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '11px', color: '#9ca3af' }}>Quick Targets:</span>
+              <button
+                type="button"
+                onClick={() => setCrawlUrl('https://www.meesho.com/women-tshirts/pl/3sc')}
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
+              >
+                Women T-shirts / Tops
+              </button>
+              <button
+                type="button"
+                onClick={() => setCrawlUrl('https://www.meesho.com/western-wear-women/pl/4aus')}
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
+              >
+                Western Wear / Y2K
+              </button>
+              <button
+                type="button"
+                onClick={() => setCrawlUrl('https://www.meesho.com/women-dresses/pl/3sv')}
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
+              >
+                Bodycon Dresses
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* MODE 2: Smart Paste */}
+        {crawlerMode === 'paste' && (
+          <div>
+            <textarea
+              className="crawler-input-textarea"
+              rows={3}
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              placeholder="Paste raw copied Meesho text (Ctrl+A &rarr; Ctrl+C on any product page) or single product link..."
+              style={{ width: '100%', borderRadius: '12px', padding: '12px 16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px', resize: 'vertical' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '10px' }}>
+              <button
+                type="button"
                 disabled={crawling || !pasteText.trim()}
                 onClick={handleSmartCrawl}
-                style={{ background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', border: 'none', color: '#fff', fontWeight: '600', padding: '10px 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                style={{ background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', border: 'none', color: '#fff', fontWeight: '700', padding: '10px 22px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
               >
-                <Icon name="sparkles" size={16} /> {crawling ? '🚀 Crawling & Syncing CDN Media...' : '⚡ Extract Variations & Add to Setup Table'}
+                <Icon name="sparkles" size={16} /> {crawling ? '🚀 Crawling & Syncing Variations...' : '⚡ Extract Variations & Add to Table'}
               </button>
-
-              <label style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontWeight: '500', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
-                <Icon name="upload" size={15} /> 📂 Batch Import from CSV
-                <input
-                  type="file"
-                  accept=".csv"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setCrawling(true);
-                    setCrawlNotice(`Reading ${file.name}...`);
-                    try {
-                      const text = await file.text();
-                      const res = await fetch('/api/ingest/csv-upload', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ csv_text: text })
-                      });
-                      const data = await res.json();
-                      if (data.success) {
-                        setCrawlNotice(`🎉 Successfully imported ${data.count} products from CSV with live images & affiliate links! Refreshing...`);
-                        setTimeout(() => window.location.reload(), 1500);
-                      } else {
-                        setCrawlNotice(data.error || 'Failed to import CSV');
-                      }
-                    } catch {
-                      setCrawlNotice('Network error uploading CSV');
-                    } finally {
-                      setCrawling(false);
-                    }
-                  }}
-                />
-              </label>
             </div>
-            {crawlNotice && (
-              <span className="crawler-notice-msg" style={{ fontSize: '12px', color: crawlNotice.includes('Successfully') ? '#4ade80' : '#f87171', background: 'rgba(0,0,0,0.4)', padding: '6px 12px', borderRadius: '8px' }}>
-                {crawlNotice}
-              </span>
-            )}
           </div>
-        </div>
-      )}
+        )}
+
+        {/* MODE 3: CSV Batch Upload */}
+        {crawlerMode === 'csv' && (
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <label style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontWeight: '600', padding: '12px 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
+              <Icon name="upload" size={16} /> Select Scraped Meesho .CSV File
+              <input
+                type="file"
+                accept=".csv"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setCrawling(true);
+                  setCrawlNotice(`Reading ${file.name}...`);
+                  try {
+                    const text = await file.text();
+                    const res = await fetch('/api/ingest/csv-upload', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ csv_text: text })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setCrawlNotice(`🎉 Successfully imported ${data.count} products from CSV! Refreshing...`);
+                      setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                      setCrawlNotice(data.error || 'Failed to import CSV');
+                    }
+                  } catch {
+                    setCrawlNotice('Network error uploading CSV');
+                  } finally {
+                    setCrawling(false);
+                  }
+                }}
+              />
+            </label>
+            <span style={{ fontSize: '12px', color: '#9ca3af' }}>Upload WebHarvy / Octoparse / WebScraper CSV dumps directly.</span>
+          </div>
+        )}
+
+        {/* Status Notice */}
+        {crawlNotice && (
+          <div style={{ marginTop: '12px', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', fontWeight: '600', color: crawlNotice.includes('🎉') || crawlNotice.includes('✨') ? '#4ade80' : (crawlNotice.includes('🤖') ? '#38bdf8' : '#f87171'), background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            {crawlNotice}
+          </div>
+        )}
+      </div>
 
       {/* DATA SETUP MASTER TABLE VIEW */}
       {viewMode === 'table' ? (

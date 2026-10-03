@@ -341,3 +341,89 @@ def parse_deep_listing(raw_text: str) -> dict:
         "saved": False,
         "priceCheckedAt": datetime.now().strftime("%Y-%m-%d")
     }
+
+
+def deep_scrape_meesho_url(target_url: str, max_items: int = 8, profit_margin_pct: float = 0.45, collection_id: str = None) -> list[dict]:
+    """Autonomous deep scraper for Meesho categories, searches, and product pages."""
+    import urllib.request
+    import urllib.error
+
+    if not target_url or "meesho.com" not in target_url:
+        raise ValueError("Please provide a valid meesho.com URL")
+
+    # If it's a single product URL (/p/...)
+    if "/p/" in target_url:
+        raw_text = f"{target_url}\n"
+        # Try fetching the page HTML for maximum detail
+        try:
+            req = urllib.request.Request(
+                target_url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                html = resp.read().decode("utf-8", errors="ignore")
+                raw_text += html
+        except Exception:
+            pass
+        product = parse_deep_listing(raw_text)
+        if collection_id:
+            product["collectionId"] = collection_id
+        return [product]
+
+    # If it's a category/search page, crawl and extract product links
+    product_urls = []
+    page_html = ""
+    try:
+        req = urllib.request.Request(
+            target_url,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+        )
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            page_html = resp.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        print(f"  ⚠️ Category fetch error: {e}")
+
+    # Extract all /p/ links
+    found_paths = re.findall(r'href="(/[a-zA-Z0-9-]+/p/([a-zA-Z0-9]+))"', page_html)
+    for p_path, p_ext in found_paths:
+        full_u = f"https://www.meesho.com{p_path}"
+        if full_u not in product_urls and not any(ign in full_u for ign in ["cart", "supplier", "account", "legal"]):
+            product_urls.append(full_u)
+
+    # Fallback to local catalog if no links discovered from raw HTML
+    if not product_urls:
+        csv_path = PROJECT_ROOT.parent / "photoshoot_pinterest_engine" / "meesho-com-2026-10-03.csv"
+        if csv_path.exists():
+            with open(csv_path, "r", encoding="utf-8", errors="replace") as cf:
+                reader = csv.DictReader(cf)
+                for row in reader:
+                    u = row.get("item_page_link") or row.get("web_scraper_start_url") or ""
+                    if u and "meesho.com" in u and "/p/" in u and u not in product_urls:
+                        product_urls.append(u)
+                        if len(product_urls) >= max_items:
+                            break
+
+    results = []
+    for p_url in product_urls[:max_items]:
+        try:
+            prod_text = f"{p_url}\n"
+            try:
+                p_req = urllib.request.Request(
+                    p_url,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+                )
+                with urllib.request.urlopen(p_req, timeout=8) as p_resp:
+                    p_html = p_resp.read().decode("utf-8", errors="ignore")
+                    prod_text += p_html
+            except Exception:
+                pass
+
+            item = parse_deep_listing(prod_text)
+            if collection_id:
+                item["collectionId"] = collection_id
+            results.append(item)
+        except Exception as e:
+            print(f"  ⚠️ Error parsing item {p_url}: {e}")
+
+    return results
+
