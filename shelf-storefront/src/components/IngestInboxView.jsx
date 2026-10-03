@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Icon from './Icon';
 
 const CATEGORY_CHOICES = [
+  'Gen Z Aesthetic & Streetwear',
+  'Y2K Trend Drops',
   'Tops & Baby Tees',
   'Co-ord Sets',
   'Women Dresses',
