@@ -337,6 +337,8 @@ async def execute_google_flow_generation(
             launch_args = {
                 "user_data_dir": USER_DATA_DIR,
                 "headless": True,
+                "accept_downloads": True,
+                "downloads_path": str(VEO_DIR),
                 "permissions": ["clipboard-read", "clipboard-write"],
                 "args": ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
             }
@@ -440,7 +442,7 @@ async def execute_google_flow_generation(
                     # 2. Contains download button
                     # 3. Not in generating/queued/rendering or percentage % state
                     is_rendering = any(kw in top_text.lower() for kw in ["%", "generating", "queued", "rendering", "progress"])
-                    dl_btn = top_batch.locator('button[aria-label*="Download"], mat-icon:has-text("download")').first
+                    dl_btn = top_batch.locator('button[aria-label="Download batch"], button[aria-label*="Download"]').first
                     has_dl = await dl_btn.count() > 0
 
                     if elapsed >= 25 and has_dl and not is_rendering:
@@ -449,16 +451,27 @@ async def execute_google_flow_generation(
                             async with page.expect_download(timeout=60000) as dl_info:
                                 await dl_btn.click(force=True)
                             download = await dl_info.value
-                            await asyncio.sleep(1.5)
-                            dl_path = await download.path()
-                            if dl_path and Path(dl_path).exists():
-                                import shutil
-                                shutil.copy2(dl_path, str(output_mp4))
+                            temp_file = VEO_DIR / download.suggested_filename
+                            await download.save_as(str(temp_file))
+                            print(f"    Saved downloaded file: {temp_file.name} ({temp_file.stat().st_size} bytes)")
+
+                            import zipfile
+                            if temp_file.suffix.lower() == ".zip" or zipfile.is_zipfile(temp_file):
+                                with zipfile.ZipFile(temp_file, "r") as z:
+                                    for item in z.namelist():
+                                        if item.lower().endswith(".mp4"):
+                                            with open(output_mp4, "wb") as f_out, z.open(item) as f_in:
+                                                f_out.write(f_in.read())
+                                            print(f"    ✅ Extracted new MP4: {output_mp4.name} ({output_mp4.stat().st_size} bytes)")
+                                            break
+                                temp_file.unlink(missing_ok=True)
                             else:
-                                await download.save_as(str(output_mp4))
+                                if output_mp4.exists():
+                                    output_mp4.unlink()
+                                temp_file.replace(output_mp4)
 
                             if output_mp4.exists() and output_mp4.stat().st_size > 10000:
-                                print(f"  ✅ Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
+                                print(f"  ✅ Fresh Video saved: {output_mp4} ({output_mp4.stat().st_size} bytes)")
                                 downloaded = True
                                 break
                         except Exception as dl_err:
