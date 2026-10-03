@@ -11,6 +11,7 @@ import ImporterPanel from './components/ImporterPanel.jsx';
 import IngestInboxView from './components/IngestInboxView.jsx';
 import AdminCatalogView from './components/AdminCatalogView.jsx';
 import AdminBannersManager from './components/AdminBannersManager.jsx';
+import AIMediaStudioView from './components/AIMediaStudioView.jsx';
 import { AddCollectionModal, AddProductModal } from './components/Modals.jsx';
 import EarningScopeModal from './components/EarningScopeModal.jsx';
 import {
@@ -23,6 +24,7 @@ import {
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
+  { label: 'AI Media Studio', icon: 'sparkles' },
   { label: 'Ingest Inbox', icon: 'download' },
   { label: 'Master Catalog', icon: 'products' },
   { label: 'Storefront Banners', icon: 'sparkles' },
@@ -1837,6 +1839,9 @@ export default function App() {
                 showToast('✨ Storefront hero & category banners saved live!');
               }}
             />
+          )}
+          {activePage === 'AI Media Studio' && (
+            <AIMediaStudioView products={products} onToast={showToast} />
           )}
           {activePage === 'Pinterest Traffic Hub' && <PinterestHubView products={products} collections={collections} onCopy={copyText} />}
           {activePage === 'Analytics' && <AnalyticsView />}
