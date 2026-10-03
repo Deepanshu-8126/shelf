@@ -52,7 +52,7 @@ BRAVE_EXE = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe
 
 async def launch_interactive_arena_login():
     """
-    Launches a visible, headful Brave browser on arena.ai / lmarena.ai.
+    Launches a visible, headful Brave browser on arena.ai/image.
     Allows user to log in or solve Cloudflare verification once.
     All session state & cookies are permanently saved to USER_DATA_DIR.
     """
@@ -78,19 +78,21 @@ async def launch_interactive_arena_login():
         browser = await p.chromium.launch_persistent_context(**launch_args)
         page = await browser.new_page()
 
-        print("  🔗 Opening LM Arena (https://arena.ai/?arena=image)...")
+        print("  🔗 Opening LM Arena Image Generation (https://arena.ai/image)...")
         try:
-            await page.goto("https://arena.ai/?arena=image", timeout=45000, wait_until="domcontentloaded")
-        except Exception:
-            try:
-                await page.goto("https://lmarena.ai/?arena=image", timeout=45000, wait_until="domcontentloaded")
-            except Exception as e:
-                print(f"  Notice during initial navigation: {e}")
+            await page.goto("https://arena.ai/image", timeout=45000, wait_until="domcontentloaded")
+            await asyncio.sleep(2)
+            # Auto-click terms Agree if present
+            agree_btn = page.locator('button:has-text("Agree")').first
+            if await agree_btn.count() > 0 and await agree_btn.is_visible():
+                await agree_btn.click()
+        except Exception as e:
+            print(f"  Notice during initial navigation: {e}")
 
         print("\n" + "=" * 80)
         print("👉 BROWSER WINDOW IS NOW OPEN ON YOUR SCREEN!")
-        print("👉 Please log in to your account or complete Cloudflare verification.")
-        print("👉 Once you are logged in, press ENTER in this terminal to save and exit.")
+        print("👉 Please click 'Log In' / 'Continue with Google' and complete your authentication.")
+        print("👉 Once you are logged in on arena.ai, press ENTER in this terminal to save and exit.")
         print("=" * 80 + "\n")
 
         # Wait for user confirmation in terminal
@@ -149,44 +151,26 @@ async def crawl_and_generate_arena_photo(
         browser = await p.chromium.launch_persistent_context(**launch_args)
         page = await browser.new_page()
 
-        print("  [1/4] Connecting to LMSYS / Arena.ai Playground...")
-        target_urls = [
-            "https://arena.ai/?arena=image",
-            "https://lmarena.ai/?arena=image",
-            "https://arena.ai/?arena=direct",
-            "https://lmarena.ai"
-        ]
-        
-        for url in target_urls:
-            try:
-                await page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                await asyncio.sleep(2)
-                break
-            except Exception:
-                continue
-
-        # 1. Switch to Image Tab if needed
-        print("  [2/4] Verifying Image Generation Mode...")
+        print("  [1/4] Connecting to LMSYS / Arena.ai Image Playground (https://arena.ai/image)...")
         try:
-            fast_tabs = [
-                'button:has-text("Image")',
-                'a:has-text("Image")',
-                '[role="tab"]:has-text("Image")',
-                'button:has-text("Direct")'
-            ]
-            for sel in fast_tabs:
-                tab = page.locator(sel).first
-                if await tab.count() > 0 and await tab.is_visible():
-                    await tab.click(timeout=2000, force=True)
-                    await asyncio.sleep(1.0)
-                    print(f"  ⚡ Image tab verified: {sel}")
-                    break
+            await page.goto("https://arena.ai/image", timeout=35000, wait_until="domcontentloaded")
+            await asyncio.sleep(2)
+        except Exception as e:
+            print(f"  Navigation warning: {e}")
+
+        # Check for Initial Terms Modal
+        try:
+            agree_btn = page.locator('button:has-text("Agree")').first
+            if await agree_btn.count() > 0 and await agree_btn.is_visible():
+                print("  📋 Accepting Terms of Use...")
+                await agree_btn.click()
+                await asyncio.sleep(1.0)
         except Exception:
             pass
 
         # 2. Check and bypass any existing Vote Lock
         try:
-            vote_btns = page.locator('button:has-text("Tie"), button:has-text("Model A is better"), button:has-text("Both are bad"), button:has-text("Clear")')
+            vote_btns = page.locator('button:has-text("Tie"), button:has-text("Model A is better"), button:has-text("Model B is better"), button:has-text("Both are bad"), button:has-text("Clear")')
             if await vote_btns.count() > 0:
                 first_vote = vote_btns.first
                 if await first_vote.is_visible():
@@ -197,8 +181,8 @@ async def crawl_and_generate_arena_photo(
             pass
 
         # 3. Enter Master Pinterest Prompt from LLM Director
-        print("  [3/4] Injecting Master LLM Editorial Prompt...")
-        prompt_box = page.locator('textarea, input[placeholder*="prompt" i], input[placeholder*="message" i], div.ProseMirror, [contenteditable="true"]').first
+        print("  [2/4] Injecting Master LLM Editorial Prompt...")
+        prompt_box = page.locator('textarea[placeholder*="Describe the image" i], textarea, div.ProseMirror, [contenteditable="true"]').first
 
         if await prompt_box.count() > 0:
             await prompt_box.click(timeout=3000)
@@ -206,20 +190,37 @@ async def crawl_and_generate_arena_photo(
             await asyncio.sleep(0.5)
 
             # Submit prompt
-            send_btn = page.locator('button:has-text("Generate"), button:has-text("Send"), button:has-text("Submit"), button[aria-label*="send" i], button.submit-btn').first
+            send_btn = page.locator('button:has(svg), button:has-text("Generate"), button:has-text("Send"), button[type="submit"]').last
             if await send_btn.count() > 0 and await send_btn.is_visible():
                 await send_btn.click(timeout=3000, force=True)
-                print("  🚀 Sent prompt via Fast Submit button!")
+                print("  🚀 Sent prompt via Submit button!")
             else:
                 await page.keyboard.press("Enter")
                 print("  🚀 Sent prompt via Enter key!")
+            await asyncio.sleep(2.0)
+
+            # Check if Terms appeared post-submit
+            agree_btn = page.locator('button:has-text("Agree")').first
+            if await agree_btn.count() > 0 and await agree_btn.is_visible():
+                print("  📋 Accepting Terms of Use post-submit...")
+                await agree_btn.click()
+                await asyncio.sleep(1.5)
+
+            # Check if Login Modal appeared
+            login_modal = page.locator('div:has-text("Log In or Create Account")').first
+            if await login_modal.count() > 0 and await login_modal.is_visible():
+                print("\n" + "!" * 80)
+                print("⚠️ [ARENA AUTHENTICATION REQUIRED]")
+                print("Arena.ai requires a one-time login to render images without restriction.")
+                print("To log in visibly, run: python lmarena_photoshoot_engine/lmarena_crawler.py --login")
+                print("!" * 80 + "\n")
         else:
-            print("  ⚠️ Prompt box selector not found on current page.")
+            print("  ⚠️ Prompt box selector not found on arena.ai/image.")
 
         # 4. Stream Capture
-        print("  [4/4] Monitoring Output Image Stream...")
+        print("  [3/4] Monitoring Output Image Stream...")
         elapsed = 0
-        max_wait = 45
+        max_wait = 35
         found_image = False
 
         while elapsed < max_wait:
@@ -227,7 +228,7 @@ async def crawl_and_generate_arena_photo(
             elapsed += 2.5
 
             try:
-                vote_popup = page.locator('button:has-text("Tie"), button:has-text("Model A is better")').first
+                vote_popup = page.locator('button:has-text("Tie"), button:has-text("Model A is better"), button:has-text("Model B is better")').first
                 if await vote_popup.count() > 0 and await vote_popup.is_visible():
                     await vote_popup.click(timeout=1000, force=True)
             except Exception:
@@ -260,7 +261,7 @@ async def crawl_and_generate_arena_photo(
 
     # Fallback to Google Flow if needed
     if not out_photo.exists() or out_photo.stat().st_size < 5000:
-        print("  ⚡ LM Arena busy or queuing, syncing with Google Flow Engine...")
+        print("\n  ⚡ LM Arena unauthenticated/queuing, instantly executing Google Flow Engine...")
         from photoshoot_pinterest_engine.generate_google_flow_photo import generate_single_flow_photo
         flow_res = await generate_single_flow_photo(
             product_title=product_title,
