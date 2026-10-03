@@ -64,7 +64,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 google-generativeai yt-dlp pillow pytrends
+          pip install requests beautifulsoup4 google-generativeai yt-dlp pillow pytrends html2text trafilatura
 
       - name: Setup Channel YouTube Credentials
         env:

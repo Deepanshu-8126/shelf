@@ -8,8 +8,15 @@ from __future__ import annotations
 import re
 from typing import Any
 from bs4 import BeautifulSoup
-import html2text
-import trafilatura
+try:
+    import html2text
+except ImportError:
+    html2text = None
+
+try:
+    import trafilatura
+except ImportError:
+    trafilatura = None
 
 
 def extract_metadata(html: str, url: str = "") -> dict[str, Any]:
@@ -73,18 +80,19 @@ def extract_clean_markdown(
     metadata = extract_metadata(html, url)
     
     # Method 1: Trafilatura (Industry standard for precision article extraction)
-    extracted_md = trafilatura.extract(
-        html,
-        url=url,
-        output_format="markdown",
-        include_links=include_links,
-        include_images=include_images,
-        include_tables=True,
-        favor_recall=True,
-    )
+    if trafilatura is not None:
+        extracted_md = trafilatura.extract(
+            html,
+            url=url,
+            output_format="markdown",
+            include_links=include_links,
+            include_images=include_images,
+            include_tables=True,
+            favor_recall=True,
+        )
 
-    if extracted_md and len(extracted_md.strip()) > 150:
-        return extracted_md.strip(), metadata
+        if extracted_md and len(extracted_md.strip()) > 150:
+            return extracted_md.strip(), metadata
 
     # Method 2: Fallback with BeautifulSoup cleaning + html2text
     soup = BeautifulSoup(html, "html.parser")
@@ -99,16 +107,17 @@ def extract_clean_markdown(
     for tag in soup.find_all(attrs={"id": re.compile(r"cookie|banner|ad-|advert|popup|modal|sidebar", re.I)}):
         tag.decompose()
 
-    # Convert to markdown via html2text
-    h2t = html2text.HTML2Text()
-    h2t.ignore_links = not include_links
-    h2t.ignore_images = not include_images
-    h2t.body_width = 0  # No hard wrapping
-    h2t.ignore_emphasis = False
-    h2t.mark_code = True
-    
-    fallback_md = h2t.handle(str(soup)).strip()
-    # Clean excessive newlines
-    fallback_md = re.sub(r"\n{3,}", "\n\n", fallback_md)
-    
-    return fallback_md, metadata
+    if html2text is not None:
+        # Convert to markdown via html2text
+        h2t = html2text.HTML2Text()
+        h2t.ignore_links = not include_links
+        h2t.ignore_images = not include_images
+        h2t.body_width = 0  # No hard wrapping
+        h2t.ignore_emphasis = False
+        h2t.mark_code = True
+        
+        fallback_md = h2t.handle(str(soup)).strip()
+        fallback_md = re.sub(r"\n{3,}", "\n\n", fallback_md)
+        return fallback_md, metadata
+
+    return soup.get_text(separator="\n", strip=True), metadata
