@@ -95,7 +95,7 @@ async def generate_single_flow_photo(
         print(f"  [3/5] Verifying Image Ingredients ({char_sheet_name})...")
         try:
             from flow_reference_attachment_fix import attach_flow_library_image
-            await attach_flow_library_image(page, char_sheet_name)
+            await asyncio.wait_for(attach_flow_library_image(page, char_sheet_name), timeout=6.0)
         except Exception as e:
             print(f"  ℹ️ Attachment notice: {e}")
 
