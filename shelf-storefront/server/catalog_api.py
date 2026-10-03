@@ -1569,33 +1569,122 @@ class PushTelegramRequest(BaseModel):
     price: str = ""
     photo_url: str = ""
     caption: str = ""
+    chat_id: str = ""
+    bot_token: str = ""
+    channel: str = "telegram"
+    include_specs: bool = True
+    include_buy_link: bool = True
 
 
 @app.post("/api/studio/push-telegram")
 def studio_push_telegram_endpoint(payload: PushTelegramRequest) -> dict[str, Any]:
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    bot_token = payload.bot_token or os.getenv("TELEGRAM_BOT_TOKEN") or "8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY"
+    chat_id = payload.chat_id or os.getenv("TELEGRAM_CHAT_ID") or "6486771356"
     if not bot_token or not chat_id:
-        return {"success": False, "error": "Telegram not configured in .env"}
+        return {"success": False, "error": "Telegram bot_token or chat_id missing"}
+
+    specs = "\n✨ *Quality Standard:* Ultra-Soft Natural Skin • Authentic Pores • Zero Crunch\n⚡ *Engine:* LM Arena Fast (14.3s FLUX Tier 1)" if payload.include_specs else ""
+    buy_link = "\n🛒 *Live Storefront:* [View Product Details](https://trendshelf.com)" if payload.include_buy_link else ""
 
     text = (
         f"📸 *LM Arena 4K Brand Photoshoot — Storefront Ready*\n\n"
         f"👗 *Outfit:* {payload.title or 'Curated Trend Drop'}\n"
-        f"💰 *Deal Price:* {payload.price or '₹499'}\n"
-        f"✨ *Quality Standard:* Ultra-Soft Natural Skin • Authentic Pores • Zero Crunch\n"
-        f"⚡ *Engine:* LM Arena Fast (14.3s FLUX Tier 1)\n\n"
+        f"💰 *Deal Price:* {payload.price or '₹499'}"
+        f"{specs}\n"
         f"👉 *Status: Applied Live to Storefront Catalog!*"
+        f"{buy_link}"
     )
+
+    # Check if local photo file exists for multipart sendPhoto
+    local_photo_candidates = []
+    if payload.photo_url:
+        clean_url = payload.photo_url.lstrip("/")
+        local_photo_candidates.extend([
+            Path(clean_url),
+            Path("public") / clean_url,
+            Path("shelf-storefront/public") / clean_url,
+            Path("d:/facts_yt/shelf-storefront/public") / clean_url,
+            Path("d:/affi;ate/trend-earning-system/shelf-storefront/public") / clean_url,
+        ])
+
+    photo_file = None
+    for cand in local_photo_candidates:
+        if cand.is_file() and cand.stat().st_size > 1000:
+            photo_file = cand
+            break
+
+    import urllib.request
+    import uuid
+
+    if photo_file:
+        try:
+            boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
+            body = bytearray()
+            body.extend(f"--{boundary}\r\nContent-Disposition: form-data; name=\"chat_id\"\r\n\r\n{chat_id}\r\n".encode("utf-8"))
+            body.extend(f"--{boundary}\r\nContent-Disposition: form-data; name=\"caption\"\r\n\r\n{text[:1024]}\r\n".encode("utf-8"))
+            body.extend(f"--{boundary}\r\nContent-Disposition: form-data; name=\"parse_mode\"\r\n\r\nMarkdown\r\n".encode("utf-8"))
+            body.extend(f"--{boundary}\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"{photo_file.name}\"\r\nContent-Type: image/jpeg\r\n\r\n".encode("utf-8"))
+            with open(photo_file, "rb") as f:
+                body.extend(f.read())
+            body.extend(f"\r\n--{boundary}--\r\n".encode("utf-8"))
+
+            req = urllib.request.Request(
+                f"https://api.telegram.org/bot{bot_token}/sendPhoto",
+                data=body,
+                headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}
+            )
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data.get("ok"):
+                    return {"success": True, "message": f"4K Photo sent to Telegram ({chat_id})!"}
+        except Exception:
+            pass
+
+    # Remote URL sendPhoto
+    if payload.photo_url and payload.photo_url.startswith("http"):
+        try:
+            url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+            req = urllib.request.Request(
+                url,
+                data=json.dumps({"chat_id": chat_id, "photo": payload.photo_url, "caption": text[:1024], "parse_mode": "Markdown"}).encode("utf-8"),
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data.get("ok"):
+                    return {"success": True, "message": f"Photo URL sent to Telegram ({chat_id})!"}
+        except Exception:
+            pass
+
+    # Fallback to formatted sendMessage
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     try:
-        import urllib.request
         req = urllib.request.Request(
             url,
             data=json.dumps({"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
-            return {"success": resp.status == 200, "message": "Dispatched to Telegram chat!"}
+            return {"success": resp.status == 200, "message": f"Dispatched text details to Telegram ({chat_id})!"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/studio/test-telegram")
+def studio_test_telegram_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+    bot_token = payload.get("bot_token") or os.getenv("TELEGRAM_BOT_TOKEN") or "8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY"
+    chat_id = payload.get("chat_id") or os.getenv("TELEGRAM_CHAT_ID") or "6486771356"
+    test_text = "⚡ *Shelf Storefront AI Studio: Telegram Connection Verified!* 🚀\n\nChannels: Photoshoot Studio • Storefront Sync • 4K Pin Delivery"
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{bot_token}/sendMessage",
+            data=json.dumps({"chat_id": chat_id, "text": test_text, "parse_mode": "Markdown"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return {"success": data.get("ok", False), "result": data.get("result", {})}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
