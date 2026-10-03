@@ -1,11 +1,26 @@
-name: YouTube Shorts Automation
+name: YouTube Shorts - Channel 1 (Space & Science Facts)
 
 on:
-  schedule:
-    # Runs twice a day: 8:00 AM IST and 7:30 PM IST
-    - cron: '30 2 * * *'  # 02:30 UTC = 8:00 AM IST
-    - cron: '0 14 * * *'  # 14:00 UTC = 7:30 PM IST
-  workflow_dispatch: # Allows you to run it manually with a button click
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Custom Video Topic (Leave empty for Auto-Selection)'
+        required: false
+        default: ''
+      auto_upload:
+        description: 'Upload to YouTube automatically?'
+        required: true
+        type: boolean
+        default: true
+      privacy:
+        description: 'Video Privacy'
+        required: true
+        type: choice
+        default: 'unlisted'
+        options:
+          - 'unlisted'
+          - 'public'
+          - 'private'
 
 permissions:
   contents: write
@@ -41,30 +56,43 @@ jobs:
           YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
         run: |
           mkdir -p credentials
-          # Decode base64-encoded JSON safely (no shell quoting issues)
           [ -n "$YT_TOKEN_B64" ]  && printf '%s' "$YT_TOKEN_B64"  | base64 -d > credentials/token.json || true
           [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > credentials/client_secret.json || true
-          # Verify token is valid JSON
           python3 -c "import json; json.load(open('credentials/token.json')); print('✅ token.json is valid JSON')" 2>/dev/null || echo "❌ token.json is NOT valid JSON"
 
-      - name: Generate and Upload Short (Story Mode)
+      - name: Generate Short Video
         env:
-          # API Keys from Secrets
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           FOOTAGE_PROVIDERS: pexels,pixabay,nasa,wikimedia,local
-          
-          # Configuration for US Channel (Pexels Fallback)
           LLM_PROVIDER: gemini
           VIDEO_MODE: story
           SCRIPT_LANGUAGE: english
           SCRIPT_STYLE: friendly
           VOICE_PROVIDER: edge
           VOICE: en-US-ChristopherNeural
-          
+          TOPIC_INPUT: ${{ github.event.inputs.topic }}
+          AUTO_UPLOAD: ${{ github.event.inputs.auto_upload }}
+          PRIVACY_OPT: ${{ github.event.inputs.privacy || 'unlisted' }}
         run: |
-          python main.py --generate --mode story --upload 1 --privacy unlisted
+          CMD="python main.py --generate --mode story"
+          if [ -n "$TOPIC_INPUT" ]; then
+            CMD="$CMD --topic \"$TOPIC_INPUT\""
+          fi
+          if [ "$AUTO_UPLOAD" = "true" ] || [ "$AUTO_UPLOAD" = "" ]; then
+            CMD="$CMD --upload 1 --privacy $PRIVACY_OPT"
+          fi
+          echo "Executing: $CMD"
+          eval $CMD || echo "⚠️ Generation/upload step ended with code $?"
+
+      - name: Save Rendered Video Artifact (Never Lose Video)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-1-rendered-videos
+          path: factshorts-bot/output/*.mp4
+          retention-days: 14
 
       - name: Keep topic memory (Never repeat topics or clips)
         if: always()

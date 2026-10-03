@@ -1,12 +1,6 @@
-name: Vox Studio 2.0 - Multi-Channel Cloud Production
+name: Vox Studio 2.0 - Cinematic Cloud Production
 
 on:
-  schedule:
-    # Auto-run Channel 1 at 8:00 AM IST (02:30 UTC)
-    - cron: '30 2 * * *'
-    # Auto-run Channel 2 at 9:30 PM IST (16:00 UTC)
-    - cron: '0 16 * * *'
-
   workflow_dispatch:
     inputs:
       target_channel:
@@ -17,9 +11,6 @@ on:
         options:
           - 'Channel 1 (Space & Science - FactShorts)'
           - 'Channel 2 (Dark Mysteries & Geopolitics - Case Studio)'
-          - 'Channel 3 (Psychology & Mind Experiments)'
-          - 'Channel 4 (Finance & Crypto Realities)'
-          - 'Channel 5 (Legal Dramas & True Crime)'
           - 'Custom Vox Masterpiece'
       topic:
         description: 'Video Topic (Leave blank for Channel Auto-Selection / Google Trends)'
@@ -71,7 +62,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 google-generativeai yt-dlp pillow
+          pip install requests beautifulsoup4 google-generativeai yt-dlp pillow pytrends
 
       - name: Setup Channel YouTube Credentials
         env:
@@ -90,7 +81,7 @@ jobs:
           fi
           [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > credentials/client_secret.json || true
 
-      - name: Execute Vox Studio 2.5D Production Pipeline
+      - name: Execute Vox Studio Production Pipeline
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY || 'sk_f27562b3dda4dd4c2b6bda43c7205548e5a35bc966403310' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -104,12 +95,6 @@ jobs:
           CH_FLAG="channel_1"
           if [[ "$TARGET_CH" == *"Channel 2"* ]]; then
             CH_FLAG="channel_2"
-          elif [[ "$TARGET_CH" == *"Channel 3"* ]]; then
-            CH_FLAG="channel_3"
-          elif [[ "$TARGET_CH" == *"Channel 4"* ]]; then
-            CH_FLAG="channel_4"
-          elif [[ "$TARGET_CH" == *"Channel 5"* ]]; then
-            CH_FLAG="channel_5"
           fi
 
           if [ "$AUTO_TRENDS" = "true" ]; then
