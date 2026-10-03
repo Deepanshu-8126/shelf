@@ -3,6 +3,7 @@ import Icon from './Icon';
 
 const CATEGORY_GROUPS = [
   'All Categories',
+  '📌 Pinterest Viral Drops',
   'Tops & Tunics',
   'Kurtis',
   'Dresses',
@@ -53,7 +54,15 @@ export default function AdminCatalogView({
       }
 
       // 2. Category
-      if (selectedCategory !== 'All Categories') {
+      if (selectedCategory === '📌 Pinterest Viral Drops') {
+        const isPin = Boolean(
+          p.isPinterestCombo || p.isTrending || (p.collectionId || '').includes('pinterest') ||
+          (p.title || '').toLowerCase().includes('jersey') || (p.title || '').toLowerCase().includes('spider') ||
+          (p.title || '').toLowerCase().includes('y2k') || (p.category || '').toLowerCase().includes('accessories') ||
+          (p.category || '').toLowerCase().includes('baby tees')
+        );
+        if (!isPin) return false;
+      } else if (selectedCategory !== 'All Categories') {
         const cat = (p.category || '').toLowerCase();
         const target = selectedCategory.toLowerCase();
         if (!cat.includes(target) && (target === 'dresses' ? !cat.includes('women dresses') : true)) {

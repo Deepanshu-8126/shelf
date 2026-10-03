@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         items.push({
           id: `p-main-${extId}`,
           ext_id: extId,
-          title: title.slice(0, 55),
+          title: title.slice(0, 60),
           subtitle: `${detectedColor} · ${detectedFabric} · ${finalSizes.join(', ')} · Creator Pick`,
           price: price,
           oldPrice: Math.round(price * 1.35),
@@ -142,33 +142,82 @@ document.addEventListener("DOMContentLoaded", async () => {
           image: highResPhotos[0] || "https://images.meesho.com/images/products/682813217/hbo6b_512.webp",
           galleryImages: highResPhotos.slice(0, 8),
           colors: [detectedColor],
+          primaryColor: detectedColor,
           fabric: detectedFabric,
           productUrl: window.location.href,
           affiliateUrl: toAffiliateLink(window.location.href),
           category: "Gen Z Aesthetic & Streetwear",
+          isPinterestCombo: true,
+          collectionId: "pinterest-genz",
+          isTrending: true,
           status: "pending_review"
         });
 
-        // 2. Discover Color Variations / Similar Products links
+        // 2. Discover Color Swatches on current product page
+        const swatchElements = Array.from(document.querySelectorAll('div[class*="Swatch"] img, div[class*="Color"] img, button[class*="Color"] img, div[class*="Thumbnail"] img, div[class*="variation"] img, div[class*="Variant"] img'));
+        const seenSwatchUrls = new Set();
+        if (highResPhotos[0]) seenSwatchUrls.add(highResPhotos[0]);
+
+        swatchElements.forEach((sImg, sIdx) => {
+          let sSrc = sImg.srcset ? sImg.srcset.split(',').slice(-1)[0].split(' ')[0] : sImg.src;
+          if (!sSrc) return;
+          const cleanSSrc = sSrc.split('?')[0].replace('width=100', 'width=512').replace('width=360', 'width=512').replace('width=64', 'width=512');
+          if (!cleanSSrc.includes('products/') || seenSwatchUrls.has(cleanSSrc) || items.length >= 16) return;
+          seenSwatchUrls.add(cleanSSrc);
+
+          sImg.classList.add("shelf-scraped-highlight");
+          const sAlt = (sImg.alt || sImg.getAttribute('title') || sImg.closest('button, div')?.getAttribute('aria-label') || '').replace(/image|product|photo|thumbnail/gi, '').trim();
+          const variantColor = sAlt && sAlt.length < 25 ? sAlt : `Color Variation ${sIdx + 1}`;
+
+          items.push({
+            id: `p-swatch-${extId}-${sIdx + 1}`,
+            ext_id: `${extId}_c${sIdx + 1}`,
+            title: `${title.slice(0, 42)} (${variantColor})`,
+            subtitle: `${variantColor} · ${detectedFabric} · ${finalSizes.join(', ')}`,
+            price: price,
+            oldPrice: Math.round(price * 1.35),
+            costPrice: Math.max(149, price - 100),
+            estimatedProfit: Math.max(80, Math.round(price * 0.4)),
+            sizes: finalSizes,
+            image: cleanSSrc,
+            galleryImages: [cleanSSrc, ...highResPhotos.slice(0, 3)],
+            colors: [variantColor],
+            primaryColor: variantColor,
+            fabric: detectedFabric,
+            productUrl: window.location.href,
+            affiliateUrl: toAffiliateLink(window.location.href),
+            category: "Gen Z Aesthetic & Streetwear",
+            isPinterestCombo: true,
+            collectionId: "pinterest-genz",
+            isTrending: true,
+            status: "pending_review"
+          });
+        });
+
+        // 3. Discover Color Variations / Similar Products links
         const variationLinks = Array.from(document.querySelectorAll('a[href*="/p/"]')).filter(a => a.href !== window.location.href);
         const seenVarUrls = new Set();
         variationLinks.forEach((a, vIdx) => {
-          if (seenVarUrls.has(a.href) || items.length >= 12) return;
+          if (seenVarUrls.has(a.href) || items.length >= 16) return;
           seenVarUrls.add(a.href);
 
           const vImg = a.querySelector('img');
           const vSrc = vImg ? (vImg.src.split('?')[0].replace('width=100', 'width=512')) : null;
-          if (!vSrc || !vSrc.includes('products/')) return;
+          if (!vSrc || !vSrc.includes('products/') || seenSwatchUrls.has(vSrc)) return;
+          seenSwatchUrls.add(vSrc);
 
           a.classList.add("shelf-scraped-highlight");
           const vExtMatch = a.href.match(/\/p\/([a-zA-Z0-9]+)/);
           const vExtId = vExtMatch ? vExtMatch[1] : `var${vIdx}`;
 
+          const vAlt = (vImg.alt || '').replace(/image|product|photo/gi, '').trim();
+          const vColor = vAlt && vAlt.length < 25 ? vAlt : `Color Variant ${vIdx + 1}`;
+
           items.push({
             id: `p-var-${vExtId}`,
             ext_id: vExtId,
-            title: `${title.slice(0, 40)} (Variation ${vIdx + 1})`,
-            subtitle: `Variant · ${detectedFabric} · ${finalSizes.join(', ')}`,
+            title: `${title.slice(0, 42)} (${vColor})`,
+            subtitle: `${vColor} · ${detectedFabric} · ${finalSizes.join(', ')}`,
             price: price,
             oldPrice: Math.round(price * 1.35),
             costPrice: Math.max(149, price - 100),
@@ -176,11 +225,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             sizes: finalSizes,
             image: vSrc,
             galleryImages: [vSrc],
-            colors: [`Variant #${vIdx + 1}`],
+            colors: [vColor],
+            primaryColor: vColor,
             fabric: detectedFabric,
             productUrl: a.href,
             affiliateUrl: toAffiliateLink(a.href),
             category: "Gen Z Aesthetic & Streetwear",
+            isPinterestCombo: true,
+            collectionId: "pinterest-genz",
+            isTrending: true,
             status: "pending_review"
           });
         });

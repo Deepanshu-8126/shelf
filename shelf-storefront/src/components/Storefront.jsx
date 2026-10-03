@@ -255,6 +255,15 @@ export default function Storefront({
     return counts;
   }, [shopProducts]);
 
+  const pinterestCount = useMemo(() => {
+    return shopProducts.filter((p) => Boolean(
+      p.isPinterestCombo || p.isTrending || (p.collectionId || '').includes('pinterest') ||
+      (p.title || '').toLowerCase().includes('jersey') || (p.title || '').toLowerCase().includes('spider') ||
+      (p.title || '').toLowerCase().includes('cargo') || (p.title || '').toLowerCase().includes('y2k') ||
+      (p.category || '').toLowerCase().includes('accessories') || (p.category || '').toLowerCase().includes('baby tees')
+    )).length;
+  }, [shopProducts]);
+
   const trendSuggestions = useMemo(() => {
     if (genderMode === 'men') {
       return ['Downtown Girl', 'Leather Bomber', 'Brasilcore', 'Ferrari Racing', 'Spider-Man Tees', 'Viral Jerseys', 'Under ₹599'];
@@ -445,7 +454,10 @@ export default function Storefront({
     let list = shopProducts.filter((product) => { 
       if (savedOnly && !savedIds.includes(product.id)) return false;
       const matchesStore = storeFilter === 'All stores' || product.store === storeFilter;
-      const matchesCategory = categoryFilter === 'All picks' || product.category === categoryFilter;
+      const matchesCategory = categoryFilter === 'All picks' || 
+        (categoryFilter === '📌 Pinterest Drops'
+          ? Boolean(product.isPinterestCombo || product.isTrending || (product.collectionId || '').includes('pinterest') || (product.title || '').toLowerCase().includes('jersey') || (product.title || '').toLowerCase().includes('spider') || (product.title || '').toLowerCase().includes('cargo') || (product.title || '').toLowerCase().includes('y2k') || (product.category || '').toLowerCase().includes('accessories') || (product.category || '').toLowerCase().includes('baby tees'))
+          : product.category === categoryFilter);
       const matchesCollection = collectionFilter === 'all' || product.collectionId === collectionFilter;
       
       const pPrice = Number(product.price) || 0;
@@ -1028,7 +1040,25 @@ export default function Storefront({
 
           {/* Unified Clean Category Filter Strip */}
           <div className="filter-row public-category-filter-row" aria-label="Filter by category">
-            {['All picks', ...availableCategories].map((category) => (
+            <button 
+              className={`filter-chip category-pill${categoryFilter === 'All picks' ? ' is-active' : ''}`} 
+              type="button" 
+              onClick={() => { setCategoryFilter('All picks'); setQuery(''); }}
+            >
+              <span>All picks</span>
+              <span className="pill-count">{shopProducts.length}</span>
+            </button>
+
+            <button 
+              className={`filter-chip category-pill pinterest-filter-pill${categoryFilter === '📌 Pinterest Drops' ? ' is-active' : ''}`} 
+              type="button" 
+              onClick={() => { setCategoryFilter('📌 Pinterest Drops'); setQuery(''); }}
+            >
+              <span>📌 Pinterest Drops</span>
+              <span className="pill-count">{pinterestCount}</span>
+            </button>
+
+            {availableCategories.map((category) => (
               <button 
                 key={category} 
                 className={`filter-chip category-pill${categoryFilter === category ? ' is-active' : ''}`} 
@@ -1043,6 +1073,23 @@ export default function Storefront({
               </button>
             ))}
           </div>
+
+          {categoryFilter === '📌 Pinterest Drops' && (
+            <div className="pinterest-vault-banner">
+              <div className="vault-banner-left">
+                <span className="vault-kicker">📌 PINTEREST 2026 DROPS · VIRAL AESTHETIC VAULT</span>
+                <h3>Viral Streetwear, Blokecore & Statement Accessories</h3>
+                <p>Curated exclusively from global Pinterest aesthetic boards. Blokecore jerseys, spider tees, baggy jorts & vintage jewelry.</p>
+              </div>
+              <button 
+                type="button" 
+                className="button button-dark vault-open-btn"
+                onClick={() => setGenzModalOpen(true)}
+              >
+                <span>Open Interactive Vault ✨</span>
+              </button>
+            </div>
+          )}
 
           {/* Clean Quick Filters & Color Swatches */}
           <div className="discovery-control-strip">
