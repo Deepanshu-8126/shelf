@@ -32,11 +32,27 @@ export default function IngestInboxView({
   const [crawling, setCrawling] = useState(false);
   const [crawlNotice, setCrawlNotice] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'pending', 'published'
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedId, setCopiedId] = useState('');
 
-  const pendingItems = products.filter(
-    (p) => p.status === 'pending_review' || p.status === 'draft'
-  );
+  // Filter based on active tab and search
+  const filteredProducts = products.filter((p) => {
+    const matchesTab =
+      activeTab === 'all'
+        ? true
+        : activeTab === 'pending'
+        ? p.status === 'pending_review' || p.status === 'draft'
+        : p.status === 'published';
+
+    const matchesSearch =
+      !searchQuery ||
+      (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
 
   const handleSmartCrawl = async () => {
     if (!pasteText.trim()) return;
@@ -109,8 +125,15 @@ export default function IngestInboxView({
     });
   };
 
+  const copyAffiliate = (id, url) => {
+    if (!url) return;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(''), 2000);
+  };
+
   const exportCSV = () => {
-    const items = pendingItems.length > 0 ? pendingItems : products;
+    const items = filteredProducts.length > 0 ? filteredProducts : products;
     if (!items.length) return;
 
     const rows = [
@@ -162,56 +185,71 @@ export default function IngestInboxView({
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === pendingItems.length) {
+    if (selectedIds.size === filteredProducts.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(pendingItems.map((p) => p.id)));
+      setSelectedIds(new Set(filteredProducts.map((p) => p.id)));
     }
   };
 
   return (
-    <div className="inbox-page" style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px' }}>
+    <div className="inbox-page" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 20px' }}>
       {/* Header */}
       <div className="inbox-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
         <div>
           <div className="inbox-title-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="inbox-title" style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>📊 Live Data Setup & Trend Ingest</h1>
+            <h1 className="inbox-title" style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>📊 Live Data Setup & Sourcing Studio</h1>
             <span className="inbox-count-badge" style={{ background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', border: '1px solid rgba(236, 72, 153, 0.4)', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '700' }}>
-              {pendingItems.length} Records Ready for Curation
+              {products.length} Total Sourced Products
             </span>
           </div>
           <p className="inbox-subtitle" style={{ color: 'rgba(255,255,255,0.65)', fontSize: '13px', marginTop: '6px' }}>
-            Multi-modal data setup table: Auto-attaches your Creator Affiliate ID, syncs live wholesale prices, calculates retail margins, and publishes with 1-click.
+            Full multi-variant catalog studio: View all angle variations, colors, sizes, wholesale pricing vs retail markup, and auto-generated Creator Affiliate links.
           </p>
         </div>
 
-        {/* View Mode & Action Buttons */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '3px', display: 'flex', gap: '2px', marginRight: '8px' }}>
+        {/* View Mode & Filter Tabs */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '3px', display: 'flex', gap: '2px' }}>
+            <button
+              type="button"
+              onClick={() => setActiveTab('all')}
+              style={{ background: activeTab === 'all' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              All Catalog ({products.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('pending')}
+              style={{ background: activeTab === 'pending' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              Pending Ingest ({products.filter(p => p.status === 'pending_review' || p.status === 'draft').length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('published')}
+              style={{ background: activeTab === 'published' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              Live Storefront ({products.filter(p => p.status === 'published').length})
+            </button>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '3px', display: 'flex', gap: '2px' }}>
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              style={{ background: viewMode === 'table' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              style={{ background: viewMode === 'table' ? '#3b82f6' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
             >
-              📊 Data Setup Table
+              📊 Table
             </button>
             <button
               type="button"
               onClick={() => setViewMode('grid')}
-              style={{ background: viewMode === 'grid' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              style={{ background: viewMode === 'grid' ? '#3b82f6' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
             >
-              🖼️ Visual Cards
+              🖼️ Grid
             </button>
           </div>
-
-          <button
-            type="button"
-            className="button button-sm button-light"
-            onClick={() => setShowCrawler((prev) => !prev)}
-            style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 14px', fontSize: '12px', cursor: 'pointer' }}
-          >
-            <Icon name="sparkles" size={14} /> {showCrawler ? 'Hide Setup Box' : '⚡ Smart Paste & Scraper'}
-          </button>
         </div>
       </div>
 
@@ -297,20 +335,28 @@ export default function IngestInboxView({
         </div>
       )}
 
-      {/* DATA SETUP MASTER TABLE VIEW (Matching User's Screenshot) */}
+      {/* DATA SETUP MASTER TABLE VIEW */}
       {viewMode === 'table' ? (
         <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px', padding: '20px', backdropFilter: 'blur(16px)' }}>
           {/* Table Header & Download Bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>Showing {pendingItems.length} records</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>Showing {filteredProducts.length} records</span>
               <button
                 type="button"
                 onClick={toggleSelectAll}
                 style={{ background: 'none', border: 'none', color: '#ec4899', fontSize: '12px', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
               >
-                {selectedIds.size === pendingItems.length ? 'Deselect All' : 'Select All'}
+                {selectedIds.size === filteredProducts.length ? 'Deselect All' : 'Select All'}
               </button>
+
+              <input
+                type="text"
+                placeholder="Search products, fabrics..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 12px', color: '#fff', fontSize: '12px', width: '200px' }}
+              />
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -340,7 +386,7 @@ export default function IngestInboxView({
                 onClick={onApproveAll}
                 style={{ background: '#0d9488', border: 'none', color: '#fff', padding: '8px 20px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                Continue / Publish All 🚀
+                Publish All 🚀
               </button>
             </div>
           </div>
@@ -350,92 +396,139 @@ export default function IngestInboxView({
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.15)', color: '#38bdf8', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '12px 8px', width: '40px' }}>✓</th>
-                  <th style={{ padding: '12px 8px', width: '70px' }}>Photo</th>
-                  <th style={{ padding: '12px 12px' }}>Product Title</th>
-                  <th style={{ padding: '12px 10px', width: '100px' }}>Wholesale</th>
-                  <th style={{ padding: '12px 10px', width: '110px' }}>Retail Est.</th>
-                  <th style={{ padding: '12px 10px', width: '110px' }}>Net Profit</th>
-                  <th style={{ padding: '12px 12px', width: '140px' }}>Sizes Available</th>
-                  <th style={{ padding: '12px 12px' }}>Creator Affiliate Link</th>
-                  <th style={{ padding: '12px 12px', width: '130px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '12px 8px', width: '35px' }}>✓</th>
+                  <th style={{ padding: '12px 8px', width: '110px' }}>Photo / Gallery</th>
+                  <th style={{ padding: '12px 12px' }}>Product Title & Variations</th>
+                  <th style={{ padding: '12px 10px', width: '95px' }}>Wholesale</th>
+                  <th style={{ padding: '12px 10px', width: '95px' }}>Retail Est.</th>
+                  <th style={{ padding: '12px 10px', width: '95px' }}>Net Profit</th>
+                  <th style={{ padding: '12px 12px', width: '130px' }}>Sizes Available</th>
+                  <th style={{ padding: '12px 12px', width: '180px' }}>Creator Affiliate Link</th>
+                  <th style={{ padding: '12px 12px', width: '120px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {pendingItems.length === 0 ? (
+                {filteredProducts.length === 0 ? (
                   <tr>
                     <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.5)' }}>
-                      ✨ No pending items. Use Smart Paste or CSV Upload above to add trending products!
+                      ✨ No products matching current tab. Use Smart Paste or CSV Upload above!
                     </td>
                   </tr>
                 ) : (
-                  pendingItems.map((item) => {
+                  filteredProducts.map((item) => {
                     const currentTitle = getVal(item.id, 'title', item.title || '');
                     const currentPrice = getVal(item.id, 'price', item.price || 245);
                     const costPrice = item.costPrice || Math.max(149, Number(currentPrice) - 100);
                     const retailEst = Math.round(Number(currentPrice) * 1.6);
                     const netMargin = retailEst - currentPrice;
                     const isSelected = selectedIds.has(item.id);
+                    const gallery = item.galleryImages || (item.gallery && item.gallery.length ? item.gallery : [item.image]);
+                    const currentCover = getVal(item.id, 'image', item.image);
 
                     return (
                       <tr key={item.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: isSelected ? 'rgba(236, 72, 153, 0.08)' : 'transparent' }}>
-                        <td style={{ padding: '10px 8px' }}>
+                        <td style={{ padding: '10px 8px', verticalAlign: 'top' }}>
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(item.id)}
-                            style={{ cursor: 'pointer', accentColor: '#ec4899' }}
+                            style={{ cursor: 'pointer', accentColor: '#ec4899', marginTop: '6px' }}
                           />
                         </td>
-                        <td style={{ padding: '8px' }}>
+                        <td style={{ padding: '8px', verticalAlign: 'top' }}>
                           <img
-                            src={getVal(item.id, 'image', item.image)}
+                            src={currentCover}
                             alt="preview"
-                            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+                            style={{ width: '56px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', display: 'block' }}
                           />
+                          {gallery.length > 1 && (
+                            <div style={{ display: 'flex', gap: '3px', marginTop: '4px', maxWidth: '85px', overflowX: 'auto' }}>
+                              {gallery.slice(0, 4).map((gImg, gIdx) => (
+                                <img
+                                  key={gIdx}
+                                  src={gImg}
+                                  alt="thumb"
+                                  onClick={() => setVal(item.id, 'image', gImg)}
+                                  title="Click to set as primary cover"
+                                  style={{ width: '18px', height: '22px', objectFit: 'cover', borderRadius: '3px', cursor: 'pointer', border: currentCover === gImg ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.2)' }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                          <span style={{ fontSize: '9.5px', color: '#9ca3af', display: 'block', marginTop: '2px' }}>
+                            📸 {gallery.length} Photos
+                          </span>
                         </td>
-                        <td style={{ padding: '10px 12px', fontWeight: '600', color: '#fff' }}>
-                          <div>{currentTitle}</div>
-                          <span style={{ fontSize: '11px', color: '#9ca3af' }}>{item.category || 'Gen Z Streetwear'}</span>
+                        <td style={{ padding: '10px 12px', fontWeight: '600', color: '#fff', verticalAlign: 'top' }}>
+                          <div style={{ fontSize: '13px', lineHeight: '1.3' }}>{currentTitle}</div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '10px', color: '#ec4899', background: 'rgba(236, 72, 153, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                              {item.category || 'Gen Z Streetwear'}
+                            </span>
+                            {item.colors && item.colors.length > 0 && (
+                              <span style={{ fontSize: '10px', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.12)', padding: '2px 6px', borderRadius: '4px' }}>
+                                🎨 {item.colors.slice(0, 2).join(', ')}
+                              </span>
+                            )}
+                            <span style={{ fontSize: '10px', color: '#4ade80' }}>
+                              ⭐ {item.rating || '4.2'} ({item.ratingCount || '1.2k'})
+                            </span>
+                          </div>
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#4ade80', fontWeight: '700' }}>
+                        <td style={{ padding: '10px 10px', color: '#4ade80', fontWeight: '700', verticalAlign: 'top' }}>
                           ₹{currentPrice}
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#38bdf8', fontWeight: '700' }}>
+                        <td style={{ padding: '10px 10px', color: '#38bdf8', fontWeight: '700', verticalAlign: 'top' }}>
                           ₹{retailEst}
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#facc15', fontWeight: '700' }}>
+                        <td style={{ padding: '10px 10px', color: '#facc15', fontWeight: '700', verticalAlign: 'top' }}>
                           +₹{netMargin}
                         </td>
-                        <td style={{ padding: '10px 12px' }}>
+                        <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
                           <span style={{ background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
                             {(item.sizes || ["S", "M", "L", "XL"]).join(', ')}
                           </span>
                         </td>
-                        <td style={{ padding: '10px 12px' }}>
-                          <a
-                            href={item.affiliateUrl || item.productUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: '#ec4899', fontSize: '11px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                            title={item.affiliateUrl}
-                          >
-                            🔗 {item.affiliateUrl ? 'Verified Creator Link' : 'Source Link'}
-                          </a>
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                        <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <a
+                              href={item.affiliateUrl || item.productUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: '#ec4899', fontSize: '11px', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '120px' }}
+                              title={item.affiliateUrl || item.productUrl}
+                            >
+                              🔗 Creator Route
+                            </a>
                             <button
                               type="button"
-                              onClick={() => handleApprove(item)}
-                              style={{ background: '#22c55e', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
+                              onClick={() => copyAffiliate(item.id, item.affiliateUrl || item.productUrl)}
+                              style={{ background: copiedId === item.id ? '#22c55e' : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', cursor: 'pointer' }}
                             >
-                              ✓ Publish
+                              {copiedId === item.id ? '✓ Copied' : '📋 Copy'}
                             </button>
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', verticalAlign: 'top' }}>
+                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                            {item.status !== 'published' ? (
+                              <button
+                                type="button"
+                                onClick={() => handleApprove(item)}
+                                style={{ background: '#22c55e', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
+                              >
+                                ✓ Publish
+                              </button>
+                            ) : (
+                              <span style={{ color: '#4ade80', fontSize: '11px', fontWeight: '700', padding: '4px 8px' }}>
+                                ● Live
+                              </span>
+                            )}
                             <button
                               type="button"
                               onClick={() => handleDelete(item.id)}
-                              style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', padding: '6px 10px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
+                              style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', padding: '6px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
+                              title="Discard Product"
                             >
                               🗑️
                             </button>
@@ -452,7 +545,7 @@ export default function IngestInboxView({
       ) : (
         /* Visual Cards Grid View */
         <div className="inbox-grid">
-          {pendingItems.map((item) => {
+          {filteredProducts.map((item) => {
             const currentTitle = getVal(item.id, 'title', item.title || '');
             const currentCat = getVal(item.id, 'category', item.category || 'Gen Z Aesthetic & Streetwear');
             const currentPrice = getVal(item.id, 'price', item.price || 245);
@@ -468,7 +561,9 @@ export default function IngestInboxView({
                     referrerPolicy="no-referrer"
                     loading="lazy"
                   />
-                  <span className="inbox-tag-status">⏳ Pending Review</span>
+                  <span className="inbox-tag-status">
+                    {item.status === 'published' ? '● Live' : '⏳ Pending'}
+                  </span>
                   <span className="inbox-tag-store">Meesho</span>
                 </div>
 
@@ -508,14 +603,16 @@ export default function IngestInboxView({
                   </div>
 
                   <div className="inbox-card-actions" style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      className="button button-sm button-dark"
-                      onClick={() => handleApprove(item)}
-                      style={{ flex: 1, background: '#22c55e', border: 'none', color: '#fff', padding: '8px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}
-                    >
-                      ✓ Publish to Storefront
-                    </button>
+                    {item.status !== 'published' && (
+                      <button
+                        type="button"
+                        className="button button-sm button-dark"
+                        onClick={() => handleApprove(item)}
+                        style={{ flex: 1, background: '#22c55e', border: 'none', color: '#fff', padding: '8px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        ✓ Publish to Storefront
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="button button-sm button-light button-danger-soft"
