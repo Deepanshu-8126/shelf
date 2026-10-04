@@ -54,12 +54,14 @@ OUTPUT_DIR = CURRENT_DIR / "rendered_arena_photos"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 USER_DATA_DIR = str(PROJECT_ROOT / "data" / "browser_sessions" / "lmarena_fast_profile")
+EDGE_EXE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 BRAVE_EXE = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+DEFAULT_BROWSER_EXE = EDGE_EXE if Path(EDGE_EXE).exists() else (BRAVE_EXE if Path(BRAVE_EXE).exists() else None)
 CHAR_SHEET = PROJECT_ROOT / "model_character_sheet_v2.jpg"
 
 STEALTH_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
 )
 
 STEALTH_INIT_SCRIPT = """
@@ -68,6 +70,58 @@ window.chrome = { runtime: {}, app: {} };
 Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en', 'hi'] });
 Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
 """
+
+
+async def auto_solve_cloudflare_turnstile(page: Page, timeout: float = 10.0) -> bool:
+    """
+    Detects and automatically solves Cloudflare Turnstile / Bot Verification challenge.
+    Eliminates 'This website uses a security service to protect against malicious bots' stalls.
+    """
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            content = await page.content()
+            title = await page.title()
+        except Exception:
+            break
+
+        is_cf = (
+            "Just a moment" in title
+            or "verify you are not a bot" in content.lower()
+            or "security service to protect" in content.lower()
+            or "challenges.cloudflare.com" in content
+        )
+
+        if not is_cf:
+            return True
+
+        print("  🛡️ [Cloudflare Detection] Bot verification screen active. Solving automatically...")
+        try:
+            for frame in page.frames:
+                if any(k in frame.url.lower() for k in ["cloudflare", "challenge", "turnstile"]):
+                    cb = frame.locator('input[type="checkbox"], #challenge-stage, .ctp-checkbox-label, span.mark')
+                    if await cb.count() > 0:
+                        box = await cb.first.bounding_box()
+                        if box:
+                            await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                        else:
+                            await cb.first.click(force=True)
+                        print("  ✅ Clicked Cloudflare Turnstile verification checkbox!")
+                        await asyncio.sleep(2)
+                        return True
+
+            cf_loc = page.locator('iframe[src*="cloudflare"], #cf-turnstile, #challenge-stage, input[type="checkbox"]')
+            if await cf_loc.count() > 0:
+                box = await cf_loc.first.bounding_box()
+                if box:
+                    await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+                    print("  ✅ Clicked Cloudflare container target!")
+                    await asyncio.sleep(2)
+        except Exception:
+            pass
+
+        await asyncio.sleep(0.6)
+    return False
 
 
 async def human_move_and_click(page: Page, locator: Locator) -> bool:
@@ -136,11 +190,12 @@ async def launch_interactive_arena_login():
             "--start-maximized"
         ]
     }
-    if Path(BRAVE_EXE).exists():
-        launch_args["executable_path"] = BRAVE_EXE
+    if DEFAULT_BROWSER_EXE and Path(DEFAULT_BROWSER_EXE).exists():
+        launch_args["executable_path"] = DEFAULT_BROWSER_EXE
 
     async with async_playwright() as p:
-        print("  🌐 Launching visible Brave browser window...")
+        b_name = "Edge" if "msedge" in str(DEFAULT_BROWSER_EXE).lower() else "Brave"
+        print(f"  🌐 Launching visible {b_name} browser window (Shield-free & Clean)...")
         browser = await p.chromium.launch_persistent_context(**launch_args)
         page = await browser.new_page()
         await page.add_init_script(STEALTH_INIT_SCRIPT)
@@ -148,7 +203,8 @@ async def launch_interactive_arena_login():
         print("  🔗 Opening LM Arena Image Generation (https://arena.ai/image)...")
         try:
             await page.goto("https://arena.ai/image", timeout=35000, wait_until="domcontentloaded")
-            await asyncio.sleep(2)
+            await asyncio.sleep(1.5)
+            await auto_solve_cloudflare_turnstile(page, timeout=8.0)
             agree_btn = page.locator('button:has-text("Agree")').first
             if await agree_btn.count() > 0 and await agree_btn.is_visible():
                 await agree_btn.click()
@@ -268,8 +324,8 @@ async def crawl_and_generate_arena_photo(
                     "--disable-web-security"
                 ]
             }
-            if Path(BRAVE_EXE).exists():
-                launch_args["executable_path"] = BRAVE_EXE
+            if DEFAULT_BROWSER_EXE and Path(DEFAULT_BROWSER_EXE).exists():
+                launch_args["executable_path"] = DEFAULT_BROWSER_EXE
 
             async with async_playwright() as p:
                 browser = await p.chromium.launch_persistent_context(**launch_args)
@@ -278,7 +334,8 @@ async def crawl_and_generate_arena_photo(
 
                 print("  [1/3] Connecting to LM Arena Image Playground (https://arena.ai/image)...")
                 try:
-                    await page.goto("https://arena.ai/image", timeout=18000, wait_until="domcontentloaded")
+                    await page.goto("https://arena.ai/image", timeout=25000, wait_until="domcontentloaded")
+                    await auto_solve_cloudflare_turnstile(page, timeout=8.0)
                 except Exception as nav_e:
                     print(f"  ℹ️ Fast nav notice: {nav_e}")
 

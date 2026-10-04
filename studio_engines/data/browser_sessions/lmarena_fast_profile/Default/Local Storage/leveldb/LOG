@@ -1,0 +1,11 @@
+2026/10/04-22:20:11.993 5174 Creating DB D:\affi;ate\shelf-storefront\studio_engines\data\browser_sessions\lmarena_fast_profile\Default\Local Storage\leveldb since it was missing.
+2026/10/04-22:20:12.010 5174 Reusing MANIFEST D:\affi;ate\shelf-storefront\studio_engines\data\browser_sessions\lmarena_fast_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/04-22:21:12.035 5174 Level-0 table #5: started
+2026/10/04-22:21:12.044 5174 Level-0 table #5: 90267 bytes OK
+2026/10/04-22:21:12.048 5174 Delete type=0 #3
+2026/10/04-22:24:40.082 5174 Level-0 table #7: started
+2026/10/04-22:24:40.088 5174 Level-0 table #7: 89886 bytes OK
+2026/10/04-22:24:40.090 5174 Delete type=0 #4
+2026/10/04-22:25:11.782 5174 Level-0 table #9: started
+2026/10/04-22:25:11.791 5174 Level-0 table #9: 89761 bytes OK
+2026/10/04-22:25:11.795 5174 Delete type=0 #6
