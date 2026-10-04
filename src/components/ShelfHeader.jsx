@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from './Icon.jsx';
 
 export default function ShelfHeader({
@@ -14,19 +14,44 @@ export default function ShelfHeader({
   onOpenCart,
   categories = ['All Picks', 'Kurtis', 'Women Dresses', 'Tops & Tunics', 'Winter']
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleCategoryClick = (cat) => {
+    if (onSelectCategory) onSelectCategory(cat);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className="shelf-header">
       <div className="shelf-header-inner">
-        {/* Left: Brand Logo: shelf. */}
-        <div className="shelf-brand-box" onClick={() => onSelectCategory && onSelectCategory('All Picks')}>
-          <svg className="shelf-leaf-logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-          </svg>
-          <span className="shelf-brand-title">shelf<span className="shelf-brand-period">.</span></span>
+        {/* Left: Mobile Menu Toggle + Brand Logo */}
+        <div className="shelf-header-left">
+          <button
+            type="button"
+            className="shelf-mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close category menu' : 'Open category menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={18} />
+          </button>
+
+          <div
+            className="shelf-brand-box"
+            onClick={() => handleCategoryClick('All Picks')}
+            role="button"
+            tabIndex={0}
+            aria-label="Shelf Home"
+          >
+            <svg className="shelf-leaf-logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <span className="shelf-brand-title">shelf<span className="shelf-brand-period">.</span></span>
+          </div>
         </div>
 
-        {/* Center: Minimal Category Navigation */}
+        {/* Center: Minimal Category Navigation (Desktop) */}
         <nav className="shelf-categories-nav" aria-label="Store categories">
           {categories.map((cat) => {
             const isActive = activeCategory === cat;
@@ -35,7 +60,7 @@ export default function ShelfHeader({
                 key={cat}
                 type="button"
                 className={`shelf-nav-pill ${isActive ? 'active' : ''}`}
-                onClick={() => onSelectCategory && onSelectCategory(cat)}
+                onClick={() => handleCategoryClick(cat)}
               >
                 {cat}
                 {isActive && <span className="shelf-nav-dot" />}
@@ -53,7 +78,7 @@ export default function ShelfHeader({
                 <Icon name="search" size={15} />
                 <input
                   type="text"
-                  placeholder="Search kurtis, dresses..."
+                  placeholder="Search catalog..."
                   value={searchQuery}
                   onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
                   autoFocus
@@ -99,8 +124,8 @@ export default function ShelfHeader({
             type="button"
             className="shelf-icon-button shelf-badge-wrapper"
             onClick={onOpenCart}
-            aria-label="Cart"
-            title="Shopping cart"
+            aria-label="Shopping bag"
+            title="Shopping bag"
           >
             <Icon name="bag" size={18} />
             {cartCount > 0 && (
@@ -109,6 +134,23 @@ export default function ShelfHeader({
           </button>
         </div>
       </div>
+
+      {/* Accessible Mobile Dropdown Navigation */}
+      {mobileMenuOpen && (
+        <div className="shelf-mobile-nav-panel" role="menu" aria-label="Mobile categories">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`shelf-mobile-nav-item ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => handleCategoryClick(cat)}
+            >
+              <span>{cat}</span>
+              {activeCategory === cat && <Icon name="check" size={14} />}
+            </button>
+          ))}
+        </div>
+      )}
     </header>
   );
 }

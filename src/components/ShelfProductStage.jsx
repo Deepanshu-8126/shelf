@@ -1,431 +1,360 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Icon from './Icon.jsx';
+import { getProductClickUrl } from '../affiliate.js';
 
 export default function ShelfProductStage({
   product,
-  onAddToCart,
   onToggleWishlist,
   isWishlisted = false,
   onOpenInstantOrder
 }) {
   if (!product) return null;
 
-  // Build authentic multi-angle gallery from product's real images
-  const gallery = useMemo(() => {
-    const rawImages = (Array.isArray(product.galleryImages) && product.galleryImages.length > 0)
-      ? product.galleryImages
-      : (Array.isArray(product.images) && product.images.length > 0)
-        ? product.images
-        : [product.image || product.main_image];
+  // 1. Strict Gallery Deduplication — Zero artificial padding
+  const uniqueImages = useMemo(() => {
+    const list = [
+      product.image,
+      product.main_image,
+      ...(Array.isArray(product.galleryImages) ? product.galleryImages : []),
+      ...(Array.isArray(product.images) ? product.images : []),
+      ...(Array.isArray(product.gallery) ? product.gallery : [])
+    ].filter(Boolean);
 
-    const uniqueImages = [...new Set(rawImages.filter(Boolean))];
-
-    if (uniqueImages.length >= 4) {
-      return uniqueImages.slice(0, 5);
-    }
-
-    const base = uniqueImages[0] || '/images/meesho-yellow-side-dori-top.webp';
-    return [
-      base,
-      uniqueImages[1] || base,
-      uniqueImages[2] || uniqueImages[1] || base,
-      uniqueImages[3] || base,
-    ];
+    // Filter out invalid/empty strings and deduplicate
+    return [...new Set(list.map((u) => String(u).trim()).filter((u) => u.length > 0))];
   }, [product]);
 
-  const [activeAngleIndex, setActiveAngleIndex] = useState(0);
-  const [selectedColor, setSelectedColor] = useState('Navy');
-  const [selectedSize, setSelectedSize] = useState('M');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(() => {
+    return Array.isArray(product.colors) && product.colors.length > 0 ? product.colors[0] : null;
+  });
+  const [selectedSize, setSelectedSize] = useState(() => {
+    return Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes[0] : null;
+  });
   const [activeAccordion, setActiveAccordion] = useState('details');
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [showSizeGuide, setShowSizeGuide] = useState(false);
-  const [addedAnimation, setAddedAnimation] = useState(false);
 
-  // Available Sizes
-  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-
-  // Available Colors
-  const colors = useMemo(() => {
-    if (Array.isArray(product.colors) && product.colors.length > 0) {
-      return product.colors.map(c => typeof c === 'string' ? { name: c, hex: getColorHex(c) } : c);
-    }
-    return [
-      { name: 'Navy', hex: '#1e293b' },
-      { name: 'Black', hex: '#111111' },
-      { name: 'Forest Green', hex: '#2d5a3f' },
-      { name: 'Warm Beige', hex: '#d4b996' }
-    ];
-  }, [product]);
-
+  // Reset state on product change
   useEffect(() => {
-    setActiveAngleIndex(0);
-    setSelectedSize('M');
-    if (colors.length > 0) setSelectedColor(colors[0].name);
-  }, [product?.id, colors]);
+    setActiveImageIndex(0);
+    setSelectedColor(Array.isArray(product.colors) && product.colors.length > 0 ? product.colors[0] : null);
+    setSelectedSize(Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes[0] : null);
+  }, [product.id, product.colors, product.sizes]);
 
-  const prevAngle = () => {
-    setActiveAngleIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+  const hasMultipleImages = uniqueImages.length > 1;
+  const currentImage = uniqueImages[activeImageIndex] || uniqueImages[0] || null;
+
+  const prevImage = () => {
+    if (!hasMultipleImages) return;
+    setActiveImageIndex((prev) => (prev - 1 + uniqueImages.length) % uniqueImages.length);
   };
 
-  const nextAngle = () => {
-    setActiveAngleIndex((prev) => (prev + 1) % gallery.length);
+  const nextImage = () => {
+    if (!hasMultipleImages) return;
+    setActiveImageIndex((prev) => (prev + 1) % uniqueImages.length);
   };
 
-  // Horizontal Mouse & Touch 360 Turntable Drag Scrubber
-  const handleDragStart = (e) => {
-    setIsDragging(true);
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    setStartX(clientX);
+  // Keyboard navigation for gallery accessibility
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') prevImage();
+    if (e.key === 'ArrowRight') nextImage();
   };
 
-  const handleDragMove = (e) => {
-    if (!isDragging) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const deltaX = clientX - startX;
-    const DRAG_THRESHOLD = 30;
+  // Real Pricing (Zero Manufactured Multipliers)
+  const realPrice = product.price != null && !isNaN(Number(product.price)) ? Number(product.price) : null;
+  const realOldPrice = (product.oldPrice != null && !isNaN(Number(product.oldPrice)))
+    ? Number(product.oldPrice)
+    : (product.originalPrice != null && !isNaN(Number(product.originalPrice)))
+      ? Number(product.originalPrice)
+      : null;
 
-    if (Math.abs(deltaX) > DRAG_THRESHOLD) {
-      if (deltaX > 0) {
-        prevAngle();
-      } else {
-        nextAngle();
-      }
-      setStartX(clientX);
-    }
-  };
+  const hasDiscount = realPrice != null && realOldPrice != null && realOldPrice > realPrice;
+  const discountPercent = hasDiscount
+    ? Math.round(((realOldPrice - realPrice) / realOldPrice) * 100)
+    : null;
 
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
+  // Real Ratings (Zero Default 4.5/4.7)
+  const realRating = product.rating != null && !isNaN(Number(product.rating)) ? Number(product.rating) : null;
+  const realReviewCount = product.ratingCount != null && !isNaN(Number(product.ratingCount))
+    ? Number(product.ratingCount)
+    : (product.reviewsCount != null && !isNaN(Number(product.reviewsCount)))
+      ? Number(product.reviewsCount)
+      : null;
 
-  const handleCartClick = () => {
-    setAddedAnimation(true);
-    if (onAddToCart) onAddToCart({ ...product, selectedColor, selectedSize });
-    setTimeout(() => setAddedAnimation(false), 1200);
-  };
+  // Real Variants
+  const realColors = Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : null;
+  const realSizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : null;
 
-  const displayPrice = Number(product.price || 999);
-  const displayOriginalPrice = Number(product.originalPrice || product.original_price || displayPrice * 1.3);
+  // Real Marketplace Affiliate URL
+  const marketplaceUrl = getProductClickUrl(product);
+  const storeName = product.store || 'Marketplace';
 
   return (
-    <section className="shelf-stage-wrap">
+    <section className="shelf-stage-wrap" onKeyDown={handleKeyDown} tabIndex={0} aria-label="Product details view">
       <div className="shelf-product-grid">
-        {/* Left Column: 60% Luxury 3D Gallery Stage */}
+        {/* Left Column: Media Gallery (approx 60% on desktop) */}
         <div className="shelf-gallery-column">
-          {/* Main 4/5 Viewport */}
-          <div
-            className={`shelf-viewport ${isDragging ? 'is-dragging' : ''}`}
-            onMouseDown={handleDragStart}
-            onMouseMove={handleDragMove}
-            onMouseUp={handleDragEnd}
-            onMouseLeave={handleDragEnd}
-            onTouchStart={handleDragStart}
-            onTouchMove={handleDragMove}
-            onTouchEnd={handleDragEnd}
-          >
-            {/* 3D Interactive Badge */}
-            <div className="shelf-badge-3d">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg>
-              <span>3D Interactive Viewer</span>
+          <div className="shelf-viewport" role="region" aria-label="Product image gallery">
+            {/* Honest Label: Gallery count or Photo */}
+            <div className="shelf-badge-gallery">
+              <Icon name="collections" size={13} />
+              <span>{hasMultipleImages ? `Photo ${activeImageIndex + 1} of ${uniqueImages.length}` : 'Listing Photo'}</span>
             </div>
 
-            {/* Left Nav Arrow */}
-            <button
-              type="button"
-              className="shelf-arrow-btn shelf-arrow-left"
-              onClick={(e) => { e.stopPropagation(); prevAngle(); }}
-              aria-label="Previous angle"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-            </button>
-
-            {/* Center Product Image */}
-            <div className="shelf-image-canvas">
-              <img
-                src={gallery[activeAngleIndex] || gallery[0]}
-                alt={`${product.title || 'Product'} - Angle ${activeAngleIndex + 1}`}
-                className="shelf-main-photo"
-                draggable={false}
-              />
-            </div>
-
-            {/* Right Nav Arrow */}
-            <button
-              type="button"
-              className="shelf-arrow-btn shelf-arrow-right"
-              onClick={(e) => { e.stopPropagation(); nextAngle(); }}
-              aria-label="Next angle"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </button>
-          </div>
-
-          {/* 4 Thumbnails Below (80x80) */}
-          <div className="shelf-thumbnails-row">
-            {gallery.map((imgUrl, idx) => {
-              const isActive = idx === activeAngleIndex;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`shelf-thumb-card ${isActive ? 'active' : ''}`}
-                  onClick={() => setActiveAngleIndex(idx)}
-                >
-                  <img src={imgUrl} alt={`Thumbnail ${idx + 1}`} />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3D Scrubber Hint Pill */}
-          <div className="shelf-scrub-hint">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-              <path d="M3 3v5h5" />
-              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-              <path d="M16 21h5v-5" />
-            </svg>
-            <span>Drag to rotate • Scroll to zoom</span>
-          </div>
-        </div>
-
-        {/* Right Column: 40% Minimal Product Details */}
-        <div className="shelf-details-column">
-          {/* Title */}
-          <h1 className="shelf-product-title">{product.title || 'Classic Embroidered Kurti'}</h1>
-
-          {/* Star Rating & Reviews */}
-          <div className="shelf-reviews-row">
-            <div className="shelf-stars">
-              {'★★★★★'.split('').map((s, i) => (
-                <span key={i} className="star-gold">{s}</span>
-              ))}
-            </div>
-            <span className="shelf-rating-val">{product.rating || '4.7'}</span>
-            <span className="shelf-review-count">({product.reviewsCount || product.reviews_count || 120} reviews)</span>
-          </div>
-
-          {/* Price Block */}
-          <div className="shelf-price-block">
-            <div className="shelf-price-row">
-              <span className="shelf-price-primary">Rs {displayPrice.toLocaleString('en-IN')}</span>
-              {displayOriginalPrice > displayPrice && (
-                <span className="shelf-price-strike">Rs {Math.round(displayOriginalPrice).toLocaleString('en-IN')}</span>
-              )}
-            </div>
-            <p className="shelf-price-tax-note">Inclusive of all taxes • Free shipping over Rs 1,999</p>
-          </div>
-
-          {/* Color Swatches */}
-          <div className="shelf-option-group">
-            <div className="shelf-option-label-row">
-              <span className="shelf-option-label">Color</span>
-              <span className="shelf-option-selected-name">{selectedColor}</span>
-            </div>
-            <div className="shelf-swatches-row">
-              {colors.map((c) => {
-                const isSelected = selectedColor === c.name;
-                return (
-                  <button
-                    key={c.name}
-                    type="button"
-                    className={`shelf-color-circle ${isSelected ? 'active' : ''}`}
-                    style={{ backgroundColor: c.hex }}
-                    onClick={() => setSelectedColor(c.name)}
-                    aria-label={c.name}
-                    title={c.name}
-                  >
-                    {isSelected && (
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke={c.hex === '#FFFFFF' ? '#111' : '#FFF'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Size Pills */}
-          <div className="shelf-option-group">
-            <div className="shelf-option-label-row">
-              <span className="shelf-option-label">Size</span>
+            {/* Previous Arrow Button (Only if multiple distinct images) */}
+            {hasMultipleImages && (
               <button
                 type="button"
-                className="shelf-size-guide-link"
-                onClick={() => setShowSizeGuide(!showSizeGuide)}
+                className="shelf-arrow-btn shelf-arrow-left"
+                onClick={prevImage}
+                aria-label="Previous photo"
               >
-                Size guide
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
               </button>
-            </div>
-            <div className="shelf-sizes-row">
-              {sizes.map((s) => {
-                const isSelected = selectedSize === s;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`shelf-size-pill ${isSelected ? 'active' : ''}`}
-                    onClick={() => setSelectedSize(s)}
-                  >
-                    {s}
-                  </button>
-                );
-              })}
+            )}
+
+            {/* Main Photo Canvas */}
+            <div className="shelf-image-canvas">
+              {currentImage ? (
+                <img
+                  src={currentImage}
+                  alt={`${product.title || 'Product photo'} - view ${activeImageIndex + 1}`}
+                  className="shelf-main-photo"
+                  loading="eager"
+                />
+              ) : (
+                <div className="shelf-photo-empty">
+                  <span>Photo not provided</span>
+                </div>
+              )}
             </div>
 
-            {/* Size Guide Drawer */}
-            {showSizeGuide && (
-              <div className="shelf-size-guide-box">
-                <table>
-                  <thead>
-                    <tr><th>Size</th><th>Bust (in)</th><th>Waist (in)</th><th>Length (in)</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>S</td><td>36</td><td>32</td><td>44</td></tr>
-                    <tr><td>M</td><td>38</td><td>34</td><td>44</td></tr>
-                    <tr><td>L</td><td>40</td><td>36</td><td>45</td></tr>
-                    <tr><td>XL</td><td>42</td><td>38</td><td>45</td></tr>
-                    <tr><td>XXL</td><td>44</td><td>40</td><td>46</td></tr>
-                  </tbody>
-                </table>
-              </div>
+            {/* Next Arrow Button (Only if multiple distinct images) */}
+            {hasMultipleImages && (
+              <button
+                type="button"
+                className="shelf-arrow-btn shelf-arrow-right"
+                onClick={nextImage}
+                aria-label="Next photo"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
             )}
           </div>
 
-          {/* Action CTAs */}
-          <div className="shelf-cta-stack">
-            {/* Primary Add to Cart */}
-            <button
-              type="button"
-              className={`shelf-btn-add-cart ${addedAnimation ? 'added' : ''}`}
-              onClick={handleCartClick}
-            >
-              {addedAnimation ? (
-                <>
-                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>Added to Bag</span>
-                </>
-              ) : (
-                <span>Add to Cart</span>
-              )}
-            </button>
+          {/* Thumbnails Row: ONLY distinct images rendered (1 thumb for 1 photo, 2 for 2, never padded) */}
+          {uniqueImages.length > 0 && (
+            <div className="shelf-thumbnails-row" role="tablist" aria-label="Gallery thumbnails">
+              {uniqueImages.map((imgUrl, idx) => {
+                const isActive = idx === activeImageIndex;
+                return (
+                  <button
+                    key={`${imgUrl}-${idx}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-label={`Show photo ${idx + 1}`}
+                    className={`shelf-thumb-card ${isActive ? 'active' : ''}`}
+                    onClick={() => setActiveImageIndex(idx)}
+                  >
+                    <img src={imgUrl} alt={`Thumbnail ${idx + 1}`} loading="lazy" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
-            {/* Secondary Wishlist */}
+        {/* Right Column: Verified Product Information (approx 40% on desktop) */}
+        <div className="shelf-details-column">
+          {/* Store / Category Breadcrumb */}
+          <div className="shelf-meta-breadcrumbs">
+            <span>{storeName}</span>
+            {product.category && (
+              <>
+                <span className="shelf-meta-sep">/</span>
+                <span>{product.category}</span>
+              </>
+            )}
+          </div>
+
+          {/* Real Product Title */}
+          <h1 className="shelf-product-title">{product.title || 'Untitled Listing'}</h1>
+
+          {/* Subtitle / Description note if present */}
+          {product.subtitle && (
+            <p className="shelf-product-subtitle">{product.subtitle}</p>
+          )}
+
+          {/* Real Ratings (Only rendered if sourced in catalog) */}
+          {realRating != null && (
+            <div className="shelf-reviews-row">
+              <span className="shelf-rating-badge">★ {realRating.toFixed(1)}</span>
+              {realReviewCount != null && (
+                <span className="shelf-review-count">({realReviewCount.toLocaleString('en-IN')} ratings)</span>
+              )}
+            </div>
+          )}
+
+          {/* Real Pricing Block */}
+          <div className="shelf-price-block">
+            {realPrice != null ? (
+              <div className="shelf-price-row">
+                <span className="shelf-price-primary">₹{realPrice.toLocaleString('en-IN')}</span>
+                {hasDiscount && (
+                  <>
+                    <del className="shelf-price-strike">₹{realOldPrice.toLocaleString('en-IN')}</del>
+                    {discountPercent != null && (
+                      <span className="shelf-discount-pill">{discountPercent}% OFF</span>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="shelf-price-row">
+                <span className="shelf-price-primary">Price on {storeName}</span>
+              </div>
+            )}
+            <p className="shelf-price-note">Verified listing on {storeName}</p>
+          </div>
+
+          {/* Real Color Variants (Rendered ONLY if data provides colors) */}
+          {realColors && (
+            <div className="shelf-option-group">
+              <div className="shelf-option-label-row">
+                <span className="shelf-option-label">Color</span>
+                {selectedColor && <span className="shelf-option-selected-name">{selectedColor}</span>}
+              </div>
+              <div className="shelf-variants-pill-row">
+                {realColors.map((colorName) => {
+                  const isSelected = selectedColor === colorName;
+                  return (
+                    <button
+                      key={colorName}
+                      type="button"
+                      className={`shelf-variant-pill ${isSelected ? 'active' : ''}`}
+                      onClick={() => setSelectedColor(colorName)}
+                    >
+                      {colorName}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Real Size Variants (Rendered ONLY if data provides sizes) */}
+          {realSizes && (
+            <div className="shelf-option-group">
+              <div className="shelf-option-label-row">
+                <span className="shelf-option-label">Available Sizes</span>
+                {selectedSize && <span className="shelf-option-selected-name">{selectedSize}</span>}
+              </div>
+              <div className="shelf-sizes-row">
+                {realSizes.map((sizeName) => {
+                  const isSelected = selectedSize === sizeName;
+                  return (
+                    <button
+                      key={sizeName}
+                      type="button"
+                      className={`shelf-size-pill ${isSelected ? 'active' : ''}`}
+                      onClick={() => setSelectedSize(sizeName)}
+                    >
+                      {sizeName}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Primary Action Buttons */}
+          <div className="shelf-cta-stack">
+            {/* Marketplace Direct Link */}
+            {marketplaceUrl ? (
+              <a
+                href={marketplaceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shelf-btn-primary"
+              >
+                <span>Shop this listing on {storeName}</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17 17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </a>
+            ) : (
+              <button type="button" className="shelf-btn-primary" disabled>
+                <span>Listing URL not available</span>
+              </button>
+            )}
+
+            {/* Wishlist Button */}
             <button
               type="button"
               className={`shelf-btn-wishlist ${isWishlisted ? 'wishlisted' : ''}`}
               onClick={() => onToggleWishlist && onToggleWishlist(product.id)}
+              aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
             >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill={isWishlisted ? '#111111' : 'none'} stroke="currentColor" strokeWidth="2">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-              </svg>
-              <span>{isWishlisted ? 'Wishlisted' : 'Wishlist'}</span>
+              <Icon name="heart" size={16} strokeWidth={isWishlisted ? 2.5 : 1.8} />
+              <span>{isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}</span>
             </button>
 
-            {/* Instant COD Order Button */}
+            {/* Direct Order Modal (Only if project owns checkout callback) */}
             {onOpenInstantOrder && (
               <button
                 type="button"
-                className="shelf-btn-cod"
+                className="shelf-btn-secondary"
                 onClick={() => onOpenInstantOrder(product)}
               >
-                <span>⚡ Instant COD / WhatsApp Order</span>
+                <Icon name="check" size={15} />
+                <span>Quick WhatsApp / COD Order</span>
               </button>
             )}
           </div>
 
-          {/* Trust Badges */}
-          <div className="shelf-trust-list">
-            <div className="shelf-trust-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="16" height="13" x="1" y="5" rx="2" />
-                <path d="M16 8h4l3 3v5h-7V8z" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
-              </svg>
-              <span>Free delivery • 3–5 business days</span>
-            </div>
-            <div className="shelf-trust-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
-              <span>30-day returns & easy exchanges</span>
-            </div>
-            <div className="shelf-trust-item">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-              <span>100% Authentic verified fabrics • Designed in India</span>
-            </div>
-          </div>
-
-          {/* Accordions */}
+          {/* Sourced Details Accordion */}
           <div className="shelf-accordions">
             <div className="shelf-acc-item">
               <button
                 type="button"
                 className="shelf-acc-header"
                 onClick={() => setActiveAccordion(activeAccordion === 'details' ? '' : 'details')}
+                aria-expanded={activeAccordion === 'details'}
               >
-                <span>Product Details</span>
+                <span>Listing Details</span>
                 <span className={`shelf-acc-arrow ${activeAccordion === 'details' ? 'open' : ''}`}>∨</span>
               </button>
               {activeAccordion === 'details' && (
                 <div className="shelf-acc-body">
-                  <p>
-                    {product.subtitle || 'Crafted from premium authentic natural fabrics. Tailored for breathable comfort, everyday luxury, and timeless silhouettes.'}
-                  </p>
-                  <ul>
-                    <li>Category: {product.category || 'Women Fashion'}</li>
-                    <li>Fit: Regular comfortable relaxed fit</li>
-                    <li>Care: Gentle machine wash or hand wash cold</li>
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div className="shelf-acc-item">
-              <button
-                type="button"
-                className="shelf-acc-header"
-                onClick={() => setActiveAccordion(activeAccordion === 'care' ? '' : 'care')}
-              >
-                <span>Fabric & Care</span>
-                <span className={`shelf-acc-arrow ${activeAccordion === 'care' ? 'open' : ''}`}>∨</span>
-              </button>
-              {activeAccordion === 'care' && (
-                <div className="shelf-acc-body">
-                  <p>100% Breathable fabric. Hand wash cold or gentle machine wash inside out. Warm iron on reverse. Do not bleach.</p>
-                </div>
-              )}
-            </div>
-
-            <div className="shelf-acc-item">
-              <button
-                type="button"
-                className="shelf-acc-header"
-                onClick={() => setActiveAccordion(activeAccordion === 'shipping' ? '' : 'shipping')}
-              >
-                <span>Shipping & Returns</span>
-                <span className={`shelf-acc-arrow ${activeAccordion === 'shipping' ? 'open' : ''}`}>∨</span>
-              </button>
-              {activeAccordion === 'shipping' && (
-                <div className="shelf-acc-body">
-                  <p>All orders dispatched within 24 hours. Express doorstep delivery across India. Free reverse pickups for exchange.</p>
+                  <dl className="shelf-details-list">
+                    <div>
+                      <dt>Store / Origin:</dt>
+                      <dd>{storeName}</dd>
+                    </div>
+                    {product.category && (
+                      <div>
+                        <dt>Category:</dt>
+                        <dd>{product.category}</dd>
+                      </div>
+                    )}
+                    {product.id && (
+                      <div>
+                        <dt>Listing ID:</dt>
+                        <dd>{String(product.id)}</dd>
+                      </div>
+                    )}
+                    {product.inStock != null && (
+                      <div>
+                        <dt>Availability:</dt>
+                        <dd>{product.inStock ? 'In stock' : 'Check marketplace'}</dd>
+                      </div>
+                    )}
+                  </dl>
                 </div>
               )}
             </div>
@@ -434,20 +363,4 @@ export default function ShelfProductStage({
       </div>
     </section>
   );
-}
-
-function getColorHex(name) {
-  const map = {
-    'Navy': '#1e293b',
-    'Black': '#111111',
-    'Forest Green': '#2d5a3f',
-    'Warm Beige': '#d4b996',
-    'White': '#ffffff',
-    'Red': '#dc2626',
-    'Yellow': '#eab308',
-    'Pink': '#ec4899',
-    'Peach': '#fb923c',
-    'Wine': '#831843'
-  };
-  return map[name] || '#334155';
 }

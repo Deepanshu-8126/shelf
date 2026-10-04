@@ -647,23 +647,27 @@ export default function Storefront({
   const [featuredProduct, setFeaturedProduct] = useState(null);
   const [cartCount, setCartCount] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('shelf_cart_count') || '1');
+      return JSON.parse(localStorage.getItem('shelf_cart_count') || '0');
     } catch {
-      return 1;
+      return 0;
     }
   });
   const [showSearch, setShowSearch] = useState(false);
 
-  // Active featured product: defaults to selected or first prominent Kurti/Dress
+  // Active featured product: matches URL activeProductId, selected featuredProduct, or first prominent piece
   const activeFeaturedProduct = useMemo(() => {
     if (featuredProduct) return featuredProduct;
+    if (activeProductId) {
+      const matched = shopProducts.find((p) => String(p.id) === String(activeProductId));
+      if (matched) return matched;
+    }
     const preferred = shopProducts.find((p) => {
       const cat = (p.category || '').toLowerCase();
       const title = (p.title || '').toLowerCase();
       return cat.includes('kurti') || cat.includes('dress') || title.includes('kurti') || title.includes('dress');
     });
     return preferred || shopProducts[0] || null;
-  }, [featuredProduct, shopProducts]);
+  }, [featuredProduct, activeProductId, shopProducts]);
 
   return (
     <div className="shelf-clean-storefront">
@@ -713,30 +717,44 @@ export default function Storefront({
         </div>
 
         <div className="shelf-cards-grid">
-          {visibleProducts.map((prod) => (
-            <article
-              key={prod.id}
-              className={`shelf-item-card ${activeFeaturedProduct?.id === prod.id ? 'is-active-item' : ''}`}
-              onClick={() => {
-                setFeaturedProduct(prod);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            >
-              <div className="shelf-item-img-box">
-                <span className="shelf-item-3d-tag">360°</span>
-                <img src={prod.image || prod.main_image} alt={prod.title} loading="lazy" />
-              </div>
-              <div className="shelf-item-info">
-                <h3 className="shelf-item-title">{prod.title}</h3>
-                <div className="shelf-item-price-row">
-                  <span className="shelf-item-price">Rs {Number(prod.price || 999).toLocaleString('en-IN')}</span>
-                  {prod.originalPrice && (
-                    <span className="shelf-item-mrp">Rs {Math.round(Number(prod.originalPrice)).toLocaleString('en-IN')}</span>
-                  )}
+          {visibleProducts.map((prod) => {
+            const hasRealPrice = prod.price != null && !isNaN(Number(prod.price));
+            const hasRealOldPrice = prod.originalPrice != null && !isNaN(Number(prod.originalPrice)) && Number(prod.originalPrice) > Number(prod.price);
+
+            return (
+              <article
+                key={prod.id}
+                className={`shelf-item-card ${activeFeaturedProduct?.id === prod.id ? 'is-active-item' : ''}`}
+                onClick={() => {
+                  setFeaturedProduct(prod);
+                  setActiveProductId(prod.id);
+                  try {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('product', prod.id);
+                    window.history.pushState({ product: prod.id }, '', url.pathname + url.search);
+                  } catch {}
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <div className="shelf-item-img-box">
+                  <img src={prod.image || prod.main_image} alt={prod.title || 'Product'} loading="lazy" />
                 </div>
-              </div>
-            </article>
-          ))}
+                <div className="shelf-item-info">
+                  <h3 className="shelf-item-title">{prod.title || 'Untitled Listing'}</h3>
+                  <div className="shelf-item-price-row">
+                    {hasRealPrice ? (
+                      <span className="shelf-item-price">₹{Number(prod.price).toLocaleString('en-IN')}</span>
+                    ) : (
+                      <span className="shelf-item-price">View price</span>
+                    )}
+                    {hasRealOldPrice && (
+                      <span className="shelf-item-mrp">₹{Math.round(Number(prod.originalPrice)).toLocaleString('en-IN')}</span>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

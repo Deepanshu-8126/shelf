@@ -25,22 +25,33 @@ export async function getCloudProducts() {
       return null;
     }
 
-    // Format products to match storefront schema
-    return data.map((item) => ({
-      id: item.id,
-      title: item.title,
-      category: item.category || 'Fashion',
-      price: Number(item.price),
-      originalPrice: item.original_price ? Number(item.original_price) : Number(item.price) * 1.3,
-      rating: Number(item.rating) || 4.5,
-      reviewsCount: item.reviews_count || 120,
-      image: item.main_image,
-      images: Array.isArray(item.images) ? item.images : [item.main_image],
-      variations: Array.isArray(item.variations) ? item.variations : [],
-      affiliateLink: item.affiliate_link || '',
-      store: item.store_name || 'Meesho',
-      isCloud: true,
-    }));
+    // Format products strictly from real database fields with ZERO manufactured fallbacks
+    return data.map((item) => {
+      const imagesList = Array.isArray(item.images) && item.images.length > 0
+        ? item.images
+        : (item.main_image ? [item.main_image] : []);
+
+      return {
+        id: String(item.id),
+        title: item.title || 'Untitled Listing',
+        category: item.category || null,
+        price: item.price != null ? Number(item.price) : null,
+        oldPrice: item.original_price != null ? Number(item.original_price) : null,
+        originalPrice: item.original_price != null ? Number(item.original_price) : null,
+        rating: item.rating != null ? Number(item.rating) : null,
+        ratingCount: item.reviews_count != null ? Number(item.reviews_count) : (item.rating_count != null ? Number(item.rating_count) : null),
+        reviewsCount: item.reviews_count != null ? Number(item.reviews_count) : (item.rating_count != null ? Number(item.rating_count) : null),
+        image: item.main_image || (imagesList[0] || null),
+        images: imagesList,
+        galleryImages: imagesList,
+        colors: Array.isArray(item.colors) ? item.colors : (Array.isArray(item.variations?.colors) ? item.variations.colors : null),
+        sizes: Array.isArray(item.sizes) ? item.sizes : (Array.isArray(item.variations?.sizes) ? item.variations.sizes : null),
+        affiliateUrl: item.affiliate_link || item.affiliate_url || '',
+        productUrl: item.product_url || '',
+        store: item.store_name || 'Meesho',
+        isCloud: true,
+      };
+    });
   } catch (err) {
     console.error('[Supabase] Network error:', err);
     return null;
