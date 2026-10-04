@@ -15,11 +15,10 @@ export default function InstantOrderModal({ product, onClose }) {
 
   if (!product) return null;
 
-  // Available Sizes & In-Stock Status
-  const allStandardSizes = ['S', 'M', 'L', 'XL', 'XXL'];
-  const productSizes = Array.isArray(product.sizes) && product.sizes.length ? product.sizes : allStandardSizes;
+  // Available Sizes & In-Stock Status (Strictly from product record)
+  const productSizes = Array.isArray(product.sizes) && product.sizes.length ? product.sizes : null;
   const productColors = Array.isArray(product.colors) && product.colors.length ? product.colors : [];
-  const price = product.price || 434;
+  const price = product.price != null && !isNaN(Number(product.price)) ? Number(product.price) : null;
 
   // Keyboard accessibility: Close on Escape key
   React.useEffect(() => {
@@ -187,8 +186,9 @@ export default function InstantOrderModal({ product, onClose }) {
               <img src={product.image} alt={product.title} className="order-preview-thumb" />
               <div className="order-preview-details">
                 <strong>{product.title}</strong>
-                <span className="order-price-tag">₹{price} {product.oldPrice && <del>₹{product.oldPrice}</del>}</span>
-                <span className="free-shipping-tag">Free Express Shipping & 7-Day Easy Exchange</span>
+                {price != null && (
+                  <span className="order-price-tag">₹{price.toLocaleString('en-IN')} {product.oldPrice && <del>₹{product.oldPrice}</del>}</span>
+                )}
               </div>
             </div>
 
@@ -207,25 +207,26 @@ export default function InstantOrderModal({ product, onClose }) {
               </div>
             )}
 
-            {/* Size Selector */}
-            <div className="order-field-group">
-              <div className="size-label-row">
-                <label className="field-label">Selected Size: <strong>{selectedSize}</strong></label>
-                <span className="size-guide-hint">True to size fit</span>
+            {/* Size Selector - Rendered strictly if catalog record provides sizes */}
+            {productSizes && productSizes.length > 0 && (
+              <div className="order-field-group">
+                <div className="size-label-row">
+                  <label className="field-label">Selected Size: <strong>{selectedSize}</strong></label>
+                </div>
+                <div className="size-selector-row">
+                  {productSizes.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={`size-btn${selectedSize === s ? ' is-active' : ''}`}
+                      onClick={() => setSelectedSize(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="size-selector-row">
-                {productSizes.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`size-btn${selectedSize === s ? ' is-active' : ''}`}
-                    onClick={() => setSelectedSize(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Color Swatch Selector if available */}
             {productColors.length > 1 && (

@@ -221,7 +221,7 @@ export default function VirtualTryOnModal({ allProducts = [], initialProduct = n
             <span className="tryon-gem">🪞</span>
             <div className="tryon-brand-meta">
               <div className="tryon-brand-title">
-                <strong>ATELIER AI VIRTUAL TRY-ON STUDIO</strong>
+                <strong>SHELF AI VIRTUAL TRY-ON STUDIO</strong>
                 <span className="tryon-engine-badge">IDM-VTON NEURAL ENGINE</span>
               </div>
               <p>Experience realistic fabric drape, silhouette contouring, and before-after comparison.</p>

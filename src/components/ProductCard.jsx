@@ -131,7 +131,7 @@ export default function ProductCard({
     event.currentTarget.style.setProperty('--shine-x', `${(x * 100).toFixed(0)}%`);
     event.currentTarget.style.setProperty('--shine-y', `${(y * 100).toFixed(0)}%`);
 
-    // Multi-angle 360 horizontal scrubbing on hover
+    // Multi-angle photo switching on hover if genuine multiple images exist
     if (imageSlides.length > 1) {
       const angleIdx = Math.min(imageSlides.length - 1, Math.floor(x * imageSlides.length));
       if (angleIdx !== activeImage) {
@@ -310,15 +310,15 @@ export default function ProductCard({
         {/* 3D Specular Reflection Shine Glare Layer */}
         <div className="card-shine-glare" />
 
-        {/* 3D Multi-Angle Stepper Badge */}
+        {/* Multi-Photo Stepper Badge */}
         {imageSlides.length > 1 && (
-          <span className="card-angle-stepper" title="Horizontal scrub 360° active">
+          <span className="card-angle-stepper" title={`Photo ${activeImage + 1} of ${imageSlides.length}`}>
             {activeImage + 1}/{imageSlides.length}
           </span>
         )}
 
-        {/* Floating 3D Showroom Trigger Pill */}
-        {onOpen3DView && (
+        {/* 3D Model Trigger Pill (Rendered ONLY if genuine 3D model exists) */}
+        {onOpen3DView && (product.modelUrl || product.is3DModel) && (
           <button
             type="button"
             className="card-3d-trigger-pill"
@@ -327,7 +327,7 @@ export default function ProductCard({
               e.preventDefault();
               onOpen3DView(product);
             }}
-            title="Open 3D Spatial Look Showroom"
+            title="Open 3D Model Viewer"
           >
             <span>🧊 3D View</span>
           </button>
