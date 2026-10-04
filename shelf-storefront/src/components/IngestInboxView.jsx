@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Icon from './Icon';
+import './AdminManagers.css';
 
 const CATEGORY_CHOICES = [
   'Gen Z Aesthetic & Streetwear',
@@ -335,8 +336,11 @@ export default function IngestInboxView({
   };
 
   const [minRating, setMinRating] = useState(0); // 0 (all), 3.8, 4.0, 4.5
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  // Filter based on active tab, search, and quality rating
+  // Filter based on active tab, search, category, and quality rating
   const filteredProducts = products.filter((p) => {
     const matchesTab =
       activeTab === 'all'
@@ -350,11 +354,33 @@ export default function IngestInboxView({
       (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.category || '').toLowerCase().includes(searchQuery.toLowerCase());
 
+    const matchesCategory =
+      categoryFilter === 'all' ||
+      (p.category || '').toLowerCase() === categoryFilter.toLowerCase();
+
     const itemRating = Number(p.rating || 4.2);
     const matchesRating = minRating === 0 || itemRating >= minRating;
 
-    return matchesTab && matchesSearch && matchesRating;
+    return matchesTab && matchesSearch && matchesCategory && matchesRating;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const paginatedItems = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const toggleSelectPage = () => {
+    const pageItemIds = paginatedItems.map(p => p.id);
+    const allSelected = pageItemIds.length > 0 && pageItemIds.every(id => selectedIds.has(id));
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (allSelected) {
+        pageItemIds.forEach(id => next.delete(id));
+      } else {
+        pageItemIds.forEach(id => next.add(id));
+      }
+      return next;
+    });
+  };
+
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
@@ -488,195 +514,218 @@ export default function IngestInboxView({
   };
 
   return (
-    <div className="inbox-page" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 20px' }}>
-      {/* Header */}
-      <div className="inbox-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+    <div className="ingest-inbox-page">
+      {/* Page Header */}
+      <header className="ingest-page-header">
         <div>
-          <div className="inbox-title-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="inbox-title" style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>🤖 Autonomous Multi-Scraper & Live Sourcing Studio</h1>
-            <span className="inbox-count-badge" style={{ background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', border: '1px solid rgba(236, 72, 153, 0.4)', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '700' }}>
-              {products.length} Total Sourced Products
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <h1>Ingest Inbox</h1>
+            <span className="ingest-count-badge">{products.length} Products</span>
           </div>
-          <p className="inbox-subtitle" style={{ color: 'rgba(255,255,255,0.65)', fontSize: '13px', marginTop: '6px' }}>
-            Next-Gen Autonomous Sourcing: Crawl Meesho categories, auto-scroll pages, extract multi-angle gallery variations, and auto-attach your Creator Affiliate Route (<code style={{ color: '#38bdf8' }}>374453404:12492338</code>).
+          <p>
+            Curate, review, and publish incoming product listings. Preview images, wholesale pricing, and verified affiliate routing before publishing live to your storefront.
           </p>
         </div>
 
-        {/* View Mode & Filter Tabs */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '3px', display: 'flex', gap: '2px' }}>
+        <div className="ingest-header-actions">
+          <div style={{ display: 'inline-flex', gap: '4px', background: 'var(--canvas, #f6f7f2)', padding: '3px', borderRadius: '999px', border: '1px solid var(--line, #e6eae3)' }}>
             <button
               type="button"
-              onClick={() => setActiveTab('all')}
-              style={{ background: activeTab === 'all' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              onClick={() => { setActiveTab('all'); setCurrentPage(1); }}
+              style={{
+                background: activeTab === 'all' ? 'var(--green-deep, #294638)' : 'transparent',
+                color: activeTab === 'all' ? '#fff' : 'var(--ink, #24372f)',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '5px 14px',
+                fontSize: '12px',
+                fontWeight: '750',
+                cursor: 'pointer'
+              }}
             >
               All Catalog ({products.length})
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('pending')}
-              style={{ background: activeTab === 'pending' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              onClick={() => { setActiveTab('pending'); setCurrentPage(1); }}
+              style={{
+                background: activeTab === 'pending' ? 'var(--green-deep, #294638)' : 'transparent',
+                color: activeTab === 'pending' ? '#fff' : 'var(--ink, #24372f)',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '5px 14px',
+                fontSize: '12px',
+                fontWeight: '750',
+                cursor: 'pointer'
+              }}
             >
-              Pending Ingest ({products.filter(p => p.status === 'pending_review' || p.status === 'draft').length})
+              Pending ({products.filter(p => p.status === 'pending_review' || p.status === 'draft').length})
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('published')}
-              style={{ background: activeTab === 'published' ? '#ec4899' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+              onClick={() => { setActiveTab('published'); setCurrentPage(1); }}
+              style={{
+                background: activeTab === 'published' ? 'var(--green-deep, #294638)' : 'transparent',
+                color: activeTab === 'published' ? '#fff' : 'var(--ink, #24372f)',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '5px 14px',
+                fontSize: '12px',
+                fontWeight: '750',
+                cursor: 'pointer'
+              }}
             >
               Live Storefront ({products.filter(p => p.status === 'published').length})
             </button>
           </div>
 
-          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '3px', display: 'flex', gap: '2px' }}>
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              style={{ background: viewMode === 'table' ? '#3b82f6' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-            >
-              📊 Table
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              style={{ background: viewMode === 'grid' ? '#3b82f6' : 'transparent', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-            >
-              🖼️ Grid
-            </button>
-          </div>
+          <button
+            type="button"
+            className="ingest-primary-action"
+            style={{ borderRadius: '9px', padding: '0 16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            onClick={onApproveAll}
+          >
+            🚀 Publish All ({filteredProducts.filter(p => p.status !== 'published').length})
+          </button>
         </div>
-      </div>
+      </header>
 
-      {/* AUTONOMOUS MULTI-SCRAPER STUDIO CARD */}
-      <div className="inbox-crawler-card" style={{ background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '16px', padding: '20px', marginBottom: '24px', backdropFilter: 'blur(20px)' }}>
-        {/* Mode Selector Tabs */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
+
+      {/* SOURCING PANEL */}
+      <section className="ingest-scrape-panel">
+        <div className="ingest-scrape-panel-header">
+          <div>
+            <h2>Import &amp; Sourcing Engine</h2>
+            <p>Single URL or category scraper, smart clipboard text parser, or CSV batch ingest with verified product images.</p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={() => setCrawlerMode('autonomous')}
-              style={{ background: crawlerMode === 'autonomous' ? 'linear-gradient(135deg, #38bdf8 0%, #6366f1 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{
+                background: crawlerMode === 'autonomous' ? 'var(--green-deep, #294638)' : 'var(--paper, #fff)',
+                color: crawlerMode === 'autonomous' ? '#fff' : 'var(--ink, #24372f)',
+                border: '1px solid var(--line, #e6eae3)',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
             >
-              🤖 Autonomous Category & Deep Scraper
+              🤖 Category &amp; URL Scraper
             </button>
             <button
               type="button"
               onClick={() => setCrawlerMode('paste')}
-              style={{ background: crawlerMode === 'paste' ? 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{
+                background: crawlerMode === 'paste' ? 'var(--green-deep, #294638)' : 'var(--paper, #fff)',
+                color: crawlerMode === 'paste' ? '#fff' : 'var(--ink, #24372f)',
+                border: '1px solid var(--line, #e6eae3)',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
             >
               📋 Smart Paste (Ctrl+A &rarr; Ctrl+C)
             </button>
             <button
               type="button"
               onClick={() => setCrawlerMode('csv')}
-              style={{ background: crawlerMode === 'csv' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255,255,255,0.08)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{
+                background: crawlerMode === 'csv' ? 'var(--green-deep, #294638)' : 'var(--paper, #fff)',
+                color: crawlerMode === 'csv' ? '#fff' : 'var(--ink, #24372f)',
+                border: '1px solid var(--line, #e6eae3)',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
             >
               📂 Batch CSV Upload
             </button>
           </div>
-
-          <span style={{ fontSize: '11px', background: '#22c55e20', color: '#4ade80', border: '1px solid #22c55e40', padding: '4px 10px', borderRadius: '999px', fontWeight: '700' }}>
-            ● Live Affiliate Generator Active
-          </span>
         </div>
 
-        {/* MODE 1: Autonomous URL Scraper */}
         {crawlerMode === 'autonomous' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="text"
-                value={crawlUrl}
-                onChange={(e) => setCrawlUrl(e.target.value)}
-                placeholder="Enter Meesho Category / Search URL (e.g. https://www.meesho.com/western-wear-women/pl/4aus)"
-                style={{ borderRadius: '10px', padding: '12px 14px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px' }}
-              />
-              <select
-                value={crawlCollection}
-                onChange={(e) => setCrawlCollection(e.target.value)}
-                style={{ borderRadius: '10px', padding: '12px 10px', background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px' }}
-              >
-                <option value="meesho-genz-2026">Collection: Gen Z Streetwear &amp; Graphic</option>
-                <option value="brasilcore-edits">Collection: Brasilcore &amp; Baby Tees</option>
-                <option value="co-ord-sets">Collection: Y2K Co-ord Sets</option>
-                <option value="meesho-dresses-2026">Collection: Slinky Bodycon Dresses</option>
-                <option value="meesho-kurtis-2026">Collection: Ethnic Kurtis</option>
-              </select>
-              <select
-                value={crawlLimit}
-                onChange={(e) => setCrawlLimit(e.target.value)}
-                style={{ borderRadius: '10px', padding: '12px 10px', background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px' }}
-              >
-                <option value={5}>Limit: 5 Products</option>
-                <option value={8}>Limit: 8 Products</option>
-                <option value={15}>Limit: 15 Products</option>
-                <option value={25}>Limit: 25 Products</option>
-              </select>
+            <div className="ingest-import-grid">
+              <label className="ingest-field">
+                <span>Target Meesho Category or Search URL</span>
+                <input
+                  type="text"
+                  value={crawlUrl}
+                  onChange={(e) => setCrawlUrl(e.target.value)}
+                  placeholder="https://www.meesho.com/western-wear-women/pl/4aus"
+                />
+              </label>
+              <label className="ingest-field">
+                <span>Collection Destination</span>
+                <select value={crawlCollection} onChange={(e) => setCrawlCollection(e.target.value)}>
+                  <option value="meesho-genz-2026">Gen Z Streetwear &amp; Graphic</option>
+                  <option value="brasilcore-edits">Brasilcore &amp; Baby Tees</option>
+                  <option value="co-ord-sets">Y2K Co-ord Sets</option>
+                  <option value="meesho-dresses-2026">Slinky Bodycon Dresses</option>
+                  <option value="meesho-kurtis-2026">Ethnic Kurtis</option>
+                </select>
+              </label>
+              <label className="ingest-field">
+                <span>Fetch Limit</span>
+                <select value={crawlLimit} onChange={(e) => setCrawlLimit(e.target.value)}>
+                  <option value={5}>5 Products</option>
+                  <option value={8}>8 Products</option>
+                  <option value={15}>15 Products</option>
+                  <option value={25}>25 Products</option>
+                </select>
+              </label>
               <button
                 type="button"
+                className="ingest-primary-action"
                 disabled={crawling || !crawlUrl.trim()}
                 onClick={handleAutonomousDeepScrape}
-                style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #6366f1 100%)', border: 'none', color: '#fff', fontWeight: '750', padding: '12px 24px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
-                {crawling ? '🤖 Scraping Live...' : '⚡ Run Autonomous Deep Scraper'}
+                {crawling ? 'Scraping Live...' : 'Run Scraper ⚡'}
               </button>
             </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '11px', color: '#9ca3af' }}>Quick Targets:</span>
-              <button
-                type="button"
-                onClick={() => setCrawlUrl('https://www.meesho.com/women-tshirts/pl/3sc')}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
-              >
-                Women T-shirts / Tops
-              </button>
-              <button
-                type="button"
-                onClick={() => setCrawlUrl('https://www.meesho.com/western-wear-women/pl/4aus')}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
-              >
-                Western Wear / Y2K
-              </button>
-              <button
-                type="button"
-                onClick={() => setCrawlUrl('https://www.meesho.com/women-dresses/pl/3sv')}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
-              >
-                Bodycon Dresses
-              </button>
+            <div className="ingest-quick-actions">
+              <span className="ingest-muted" style={{ fontWeight: 700 }}>Quick Targets:</span>
+              <button type="button" onClick={() => setCrawlUrl('https://www.meesho.com/women-tshirts/pl/3sc')}>Women T-shirts / Tops</button>
+              <button type="button" onClick={() => setCrawlUrl('https://www.meesho.com/western-wear-women/pl/4aus')}>Western Wear / Y2K</button>
+              <button type="button" onClick={() => setCrawlUrl('https://www.meesho.com/women-dresses/pl/3sv')}>Bodycon Dresses</button>
             </div>
           </div>
         )}
 
-        {/* MODE 2: Smart Paste */}
         {crawlerMode === 'paste' && (
           <div>
-            <textarea
-              className="crawler-input-textarea"
-              rows={3}
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-              placeholder="Paste raw copied Meesho text (Ctrl+A &rarr; Ctrl+C on any product page) or single product link..."
-              style={{ width: '100%', borderRadius: '12px', padding: '12px 16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '13px', resize: 'vertical' }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '10px' }}>
+            <label className="ingest-field">
+              <span>Paste copied Meesho text or product URL</span>
+              <textarea
+                rows={3}
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                placeholder="Paste raw copied Meesho text (Ctrl+A &rarr; Ctrl+C on any product page) or single product link..."
+              />
+            </label>
+            <div style={{ marginTop: '10px' }}>
               <button
                 type="button"
+                className="ingest-primary-action"
                 disabled={crawling || !pasteText.trim()}
                 onClick={handleSmartCrawl}
-                style={{ background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', border: 'none', color: '#fff', fontWeight: '700', padding: '10px 22px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
               >
-                <Icon name="sparkles" size={16} /> {crawling ? '🚀 Crawling & Syncing Variations...' : '⚡ Extract Variations & Add to Table'}
+                {crawling ? 'Extracting...' : 'Extract Variations & Add to Table ⚡'}
               </button>
             </div>
           </div>
         )}
 
-        {/* MODE 3: CSV Batch Upload */}
         {crawlerMode === 'csv' && (
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <label style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontWeight: '600', padding: '12px 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <label className="ingest-primary-action" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '0 16px' }}>
               <Icon name="upload" size={16} /> Select Scraped Meesho .CSV File
               <input
                 type="file"
@@ -702,7 +751,6 @@ export default function IngestInboxView({
                       setCrawlNotice(data.error || 'Failed to import CSV');
                     }
                   } catch {
-                    // Fallback to presets
                     handleLoadPresets();
                   } finally {
                     setCrawling(false);
@@ -713,135 +761,129 @@ export default function IngestInboxView({
             <button
               type="button"
               onClick={handleLoadPresets}
-              style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: '#fff', fontWeight: '700', padding: '12px 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}
+              style={{ minHeight: '42px', padding: '0 14px', borderRadius: '9px', border: '1px solid var(--line-strong, #d8dfd7)', background: '#fff', color: 'var(--green-deep, #294638)', fontWeight: 700, cursor: 'pointer' }}
             >
               ⚡ 1-Click Load Curated Web Scraper Catalog
             </button>
-            <span style={{ fontSize: '12px', color: '#9ca3af' }}>Upload WebHarvy / Octoparse / WebScraper CSV dumps directly.</span>
+            <span className="ingest-muted">Upload WebHarvy / Octoparse / WebScraper CSV dumps directly.</span>
           </div>
         )}
 
-        {/* Status Notice */}
         {crawlNotice && (
-          <div style={{ marginTop: '12px', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', fontWeight: '600', color: crawlNotice.includes('🎉') || crawlNotice.includes('✨') ? '#4ade80' : (crawlNotice.includes('🤖') ? '#38bdf8' : '#f87171'), background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div className="ingest-trust-note" style={{ marginTop: '12px', fontWeight: 600 }}>
             {crawlNotice}
           </div>
         )}
-      </div>
+
+        <div className="ingest-trust-note">
+          Verified Creator Affiliate Route active (<code style={{ color: '#294638', fontWeight: 700 }}>374453404:12492338</code>). Every ingested item receives automatic attribution and image integrity check before publishing live.
+        </div>
+      </section>
+
+      {/* FILTER PANEL */}
+      <section className="ingest-filter-panel">
+        <label className="ingest-field">
+          <span>Search products &amp; tags</span>
+          <input
+            type="search"
+            placeholder="Search by title, category, fabric..."
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+          />
+        </label>
+        <label className="ingest-field">
+          <span>Category Filter</span>
+          <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}>
+            <option value="all">All Categories</option>
+            {CATEGORY_CHOICES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </label>
+        <label className="ingest-field">
+          <span>Minimum Rating</span>
+          <select value={minRating} onChange={(e) => { setMinRating(Number(e.target.value)); setCurrentPage(1); }}>
+            <option value={0}>⭐ All Ratings</option>
+            <option value={3.8}>⭐ 3.8+ Stars</option>
+            <option value={4.0}>⭐ 4.0+ Stars</option>
+            <option value={4.3}>⭐ 4.3+ Stars</option>
+          </select>
+        </label>
+        <label className="ingest-field">
+          <span>Display Mode</span>
+          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)}>
+            <option value="table">📊 High-Density Table</option>
+            <option value="grid">🖼️ Visual Grid</option>
+          </select>
+        </label>
+      </section>
+
+      {/* SELECTION ACTIONS TOOLBAR */}
+      {selectedIds.size > 0 && (
+        <section className="ingest-selection-toolbar">
+          <div>
+            <strong>{selectedIds.size}</strong> product(s) selected
+          </div>
+          <div className="ingest-selection-actions">
+            <button
+              type="button"
+              onClick={handleBulkApprove}
+              className="ingest-primary-action"
+              style={{ minHeight: '34px', padding: '0 12px', fontSize: '12px', borderRadius: '7px' }}
+            >
+              ✓ Publish Selected ({selectedIds.size})
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              style={{ minHeight: '34px', padding: '0 12px', fontSize: '12px', borderRadius: '7px', background: '#fff2f0', color: '#b64d42', border: '1px solid #e5c1bc', cursor: 'pointer', fontWeight: 700 }}
+            >
+              🗑️ Discard ({selectedIds.size})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedIds(new Set())}
+              style={{ minHeight: '34px', padding: '0 12px', fontSize: '12px', borderRadius: '7px', background: '#fff', color: '#69766e', border: '1px solid #d8dfd7', cursor: 'pointer' }}
+            >
+              Clear
+            </button>
+          </div>
+        </section>
+      )}
+
 
       {/* DATA SETUP MASTER TABLE VIEW */}
       {viewMode === 'table' ? (
-        <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '16px', padding: '20px', backdropFilter: 'blur(16px)' }}>
-          {/* Table Header & Download Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '14px', fontWeight: '700', color: '#fff' }}>Showing {filteredProducts.length} records</span>
-              <button
-                type="button"
-                onClick={toggleSelectAll}
-                style={{ background: 'none', border: 'none', color: '#ec4899', fontSize: '12px', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                {selectedIds.size === filteredProducts.length ? 'Deselect All' : 'Select All'}
-              </button>
-
-              <input
-                type="text"
-                placeholder="Search products, fabrics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 12px', color: '#fff', fontSize: '12px', width: '180px' }}
-              />
-
-              {/* Quality & Rating Filter */}
-              <select
-                value={minRating}
-                onChange={(e) => setMinRating(Number(e.target.value))}
-                style={{ background: 'rgba(20,24,35,0.9)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 10px', color: '#facc15', fontSize: '12px', fontWeight: '600' }}
-              >
-                <option value={0}>⭐ All Ratings</option>
-                <option value={3.8}>⭐ 3.8+ Stars (Clean Filter)</option>
-                <option value={4.0}>⭐ 4.0+ Stars (High Quality)</option>
-                <option value={4.3}>⭐ 4.3+ Stars (Viral Gems)</option>
-              </select>
-
-              {/* Bulk Actions when selected */}
-              {selectedIds.size > 0 && (
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <button
-                    type="button"
-                    onClick={handleBulkDelete}
-                    style={{ background: 'rgba(239, 68, 68, 0.25)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#f87171', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    🗑️ Delete ({selectedIds.size})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleBulkApprove}
-                    style={{ background: 'rgba(34, 197, 94, 0.25)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#4ade80', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    ✓ Publish ({selectedIds.size})
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                type="button"
-                onClick={exportCSV}
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
-              >
-                📥 .CSV
-              </button>
-              <button
-                type="button"
-                onClick={exportCSV}
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
-              >
-                📊 .XLSX
-              </button>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                style={{ background: 'transparent', border: '1px solid #38bdf8', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                Re-generate 🔄
-              </button>
-              <button
-                type="button"
-                onClick={onApproveAll}
-                style={{ background: '#0d9488', border: 'none', color: '#fff', padding: '8px 20px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                Publish All 🚀
-              </button>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+        <section className="ingest-table-panel">
+          <div className="ingest-table-scroll">
+            <table className="ingest-products-table">
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.15)', color: '#38bdf8', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '12px 8px', width: '35px' }}>✓</th>
-                  <th style={{ padding: '12px 8px', width: '110px' }}>Photo / Gallery</th>
-                  <th style={{ padding: '12px 12px' }}>Product Title & Variations</th>
-                  <th style={{ padding: '12px 10px', width: '95px' }}>Wholesale</th>
-                  <th style={{ padding: '12px 10px', width: '95px' }}>Retail Est.</th>
-                  <th style={{ padding: '12px 10px', width: '95px' }}>Net Profit</th>
-                  <th style={{ padding: '12px 12px', width: '130px' }}>Sizes Available</th>
-                  <th style={{ padding: '12px 12px', width: '180px' }}>Creator Affiliate Link</th>
-                  <th style={{ padding: '12px 12px', width: '120px', textAlign: 'right' }}>Actions</th>
+                <tr>
+                  <th style={{ width: '42px', textAlign: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={paginatedItems.length > 0 && paginatedItems.every(p => selectedIds.has(p.id))}
+                      onChange={toggleSelectPage}
+                      aria-label="Select all on this page"
+                    />
+                  </th>
+                  <th style={{ width: '80px' }}>Thumbnail</th>
+                  <th style={{ width: '360px' }}>Product Title &amp; Details</th>
+                  <th style={{ width: '110px' }}>Wholesale</th>
+                  <th style={{ width: '110px' }}>Retail Est.</th>
+                  <th style={{ width: '110px' }}>Net Profit</th>
+                  <th style={{ width: '130px' }}>Sizes</th>
+                  <th style={{ width: '190px' }}>Creator Route</th>
+                  <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.length === 0 ? (
+                {paginatedItems.length === 0 ? (
                   <tr>
-                    <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.5)' }}>
-                      ✨ No products matching current tab. Use Smart Paste or CSV Upload above!
+                    <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--muted-dark, #69766e)' }}>
+                      ✨ No products match this filter. Try changing your search query or tab above.
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((item) => {
+                  paginatedItems.map((item) => {
                     const currentTitle = getVal(item.id, 'title', item.title || '');
                     const currentPrice = getVal(item.id, 'price', item.price || 245);
                     const costPrice = item.costPrice || Math.max(149, Number(currentPrice) - 100);
@@ -852,109 +894,144 @@ export default function IngestInboxView({
                     const currentCover = getVal(item.id, 'image', item.image);
 
                     return (
-                      <tr key={item.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: isSelected ? 'rgba(236, 72, 153, 0.08)' : 'transparent' }}>
-                        <td style={{ padding: '10px 8px', verticalAlign: 'top' }}>
+                      <tr key={item.id} style={{ background: isSelected ? '#eff5ef' : undefined }}>
+                        <td style={{ textAlign: 'center' }}>
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(item.id)}
-                            style={{ cursor: 'pointer', accentColor: '#ec4899', marginTop: '6px' }}
+                            aria-label={`Select ${currentTitle}`}
                           />
                         </td>
-                        <td style={{ padding: '8px', verticalAlign: 'top' }}>
-                          <img
-                            src={currentCover}
-                            alt="preview"
-                            style={{ width: '56px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', display: 'block' }}
-                          />
+                        <td>
+                          <div className="ingest-product-cell">
+                            <div className="ingest-product-thumb">
+                              <img
+                                src={currentCover}
+                                alt="cover"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/images/meesho-dress-ae6lv9.webp';
+                                }}
+                              />
+                            </div>
+                          </div>
                           {gallery.length > 1 && (
-                            <div style={{ display: 'flex', gap: '3px', marginTop: '4px', maxWidth: '85px', overflowX: 'auto' }}>
-                              {gallery.slice(0, 4).map((gImg, gIdx) => (
+                            <div style={{ display: 'flex', gap: '3px', marginTop: '4px', maxWidth: '70px', overflowX: 'auto' }}>
+                              {gallery.slice(0, 3).map((gImg, gIdx) => (
                                 <img
                                   key={gIdx}
                                   src={gImg}
-                                  alt="thumb"
+                                  alt="alt"
                                   onClick={() => setVal(item.id, 'image', gImg)}
-                                  title="Click to set as primary cover"
-                                  style={{ width: '18px', height: '22px', objectFit: 'cover', borderRadius: '3px', cursor: 'pointer', border: currentCover === gImg ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.2)' }}
+                                  title="Click to select this angle as primary cover"
+                                  style={{
+                                    width: '18px',
+                                    height: '22px',
+                                    objectFit: 'cover',
+                                    borderRadius: '3px',
+                                    cursor: 'pointer',
+                                    border: currentCover === gImg ? '1.5px solid var(--green-deep, #294638)' : '1px solid var(--line, #e6eae3)'
+                                  }}
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
                               ))}
                             </div>
                           )}
-                          <span style={{ fontSize: '9.5px', color: '#9ca3af', display: 'block', marginTop: '2px' }}>
-                            📸 {gallery.length} Photos
-                          </span>
                         </td>
-                        <td style={{ padding: '10px 12px', fontWeight: '600', color: '#fff', verticalAlign: 'top' }}>
-                          <div style={{ fontSize: '13px', lineHeight: '1.3' }}>{currentTitle}</div>
-                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '10px', color: '#ec4899', background: 'rgba(236, 72, 153, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-                              {item.category || 'Gen Z Streetwear'}
-                            </span>
+                        <td>
+                          <span className="ingest-product-title">{currentTitle}</span>
+                          <div className="ingest-product-meta">
+                            <span className="ingest-chip">{item.category || 'Fashion'}</span>
+                            {item.rating && (
+                              <span className="ingest-chip" style={{ color: '#276749' }}>
+                                ⭐ {item.rating} ({item.ratingCount || '500+'})
+                              </span>
+                            )}
                             {item.colors && item.colors.length > 0 && (
-                              <span style={{ fontSize: '10px', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.12)', padding: '2px 6px', borderRadius: '4px' }}>
+                              <span className="ingest-chip">
                                 🎨 {item.colors.slice(0, 2).join(', ')}
                               </span>
                             )}
-                            <span style={{ fontSize: '10px', color: '#4ade80' }}>
-                              ⭐ {item.rating || '4.2'} ({item.ratingCount || '1.2k'})
-                            </span>
                           </div>
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#4ade80', fontWeight: '700', verticalAlign: 'top' }}>
-                          ₹{currentPrice}
+                        <td>
+                          <span className="ingest-data-value" style={{ color: '#276749' }}>₹{currentPrice}</span>
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#38bdf8', fontWeight: '700', verticalAlign: 'top' }}>
-                          ₹{retailEst}
+                        <td>
+                          <span className="ingest-data-value">₹{retailEst}</span>
                         </td>
-                        <td style={{ padding: '10px 10px', color: '#facc15', fontWeight: '700', verticalAlign: 'top' }}>
-                          +₹{netMargin}
+                        <td>
+                          <span className="ingest-data-value" style={{ color: 'var(--green-deep, #294638)' }}>+₹{netMargin}</span>
                         </td>
-                        <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
-                          <span style={{ background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
-                            {(item.sizes || ["S", "M", "L", "XL"]).join(', ')}
-                          </span>
+                        <td>
+                          <span className="ingest-chip">{(item.sizes || ['S', 'M', 'L']).join(', ')}</span>
                         </td>
-                        <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                        <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <a
                               href={item.affiliateUrl || item.productUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              style={{ color: '#ec4899', fontSize: '11px', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '120px' }}
+                              className="ingest-status"
                               title={item.affiliateUrl || item.productUrl}
+                              style={{ textDecoration: 'none', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >
-                              🔗 Creator Route
+                              🔗 Route Live
                             </a>
                             <button
                               type="button"
                               onClick={() => copyAffiliate(item.id, item.affiliateUrl || item.productUrl)}
-                              style={{ background: copiedId === item.id ? '#22c55e' : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', cursor: 'pointer' }}
+                              style={{
+                                minHeight: '26px',
+                                padding: '0 7px',
+                                fontSize: '11px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--line, #e6eae3)',
+                                background: copiedId === item.id ? '#294638' : '#fff',
+                                color: copiedId === item.id ? '#fff' : 'var(--ink, #24372f)',
+                                cursor: 'pointer'
+                              }}
                             >
-                              {copiedId === item.id ? '✓ Copied' : '📋 Copy'}
+                              {copiedId === item.id ? '✓' : 'Copy'}
                             </button>
                           </div>
                         </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', verticalAlign: 'top' }}>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                        <td style={{ textAlign: 'right' }}>
+                          <div className="ingest-row-actions" style={{ justifyContent: 'flex-end' }}>
                             {item.status !== 'published' ? (
                               <button
                                 type="button"
                                 onClick={() => handleApprove(item)}
-                                style={{ background: '#22c55e', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
+                                disabled={busyIds.has(item.id)}
+                                style={{
+                                  background: 'var(--green-deep, #294638)',
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontWeight: 700,
+                                  cursor: 'pointer'
+                                }}
                               >
                                 ✓ Publish
                               </button>
                             ) : (
-                              <span style={{ color: '#4ade80', fontSize: '11px', fontWeight: '700', padding: '4px 8px' }}>
-                                ● Live
+                              <span className="ingest-status" style={{ fontSize: '11.5px' }}>
+                                ● Published
                               </span>
                             )}
                             <button
                               type="button"
                               onClick={() => handleDelete(item.id)}
-                              style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', padding: '6px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer' }}
-                              title="Discard Product"
+                              disabled={busyIds.has(item.id)}
+                              style={{
+                                background: '#fff2f0',
+                                color: '#b64d42',
+                                border: '1px solid #e5c1bc',
+                                borderRadius: '6px',
+                                cursor: 'pointer'
+                              }}
+                              title="Discard product"
                             >
                               🗑️
                             </button>
@@ -967,57 +1044,95 @@ export default function IngestInboxView({
               </tbody>
             </table>
           </div>
-        </div>
+
+          {/* Pagination Controls */}
+          <footer className="ingest-pagination">
+            <div>
+              Showing {filteredProducts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} items
+            </div>
+            <div className="ingest-pagination-controls">
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                Rows per page:
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </label>
+
+              <button
+                type="button"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              >
+                Previous
+              </button>
+
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                type="button"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </button>
+            </div>
+          </footer>
+        </section>
       ) : (
         /* Visual Cards Grid View */
-        <div className="inbox-grid">
-          {filteredProducts.map((item) => {
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+          {paginatedItems.map((item) => {
             const currentTitle = getVal(item.id, 'title', item.title || '');
             const currentCat = getVal(item.id, 'category', item.category || 'Gen Z Aesthetic & Streetwear');
             const currentPrice = getVal(item.id, 'price', item.price || 245);
             const costPrice = item.costPrice || Math.max(149, Number(currentPrice) - 100);
-            const estProfit = Math.max(0, Number(currentPrice) - costPrice);
 
             return (
-              <div key={item.id} className="inbox-card">
-                <div className="inbox-card-media">
+              <div key={item.id} className="ingest-scrape-panel" style={{ padding: '14px', margin: 0 }}>
+                <div style={{ position: 'relative', width: '100%', height: '220px', borderRadius: '9px', overflow: 'hidden', background: '#f2f3ef', marginBottom: '10px' }}>
                   <img
                     src={getVal(item.id, 'image', item.image)}
                     alt={currentTitle}
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={(e) => { e.currentTarget.src = '/images/meesho-dress-ae6lv9.webp'; }}
                   />
-                  <span className="inbox-tag-status">
+                  <span className="ingest-count-badge" style={{ position: 'absolute', top: '8px', left: '8px' }}>
                     {item.status === 'published' ? '● Live' : '⏳ Pending'}
                   </span>
-                  <span className="inbox-tag-store">Meesho</span>
                 </div>
 
-                <div className="inbox-card-content">
-                  <div className="inbox-field-group">
-                    <label className="inbox-label">Product Title</label>
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  <label className="ingest-field">
+                    <span>Title</span>
                     <input
                       type="text"
-                      className="inbox-input inbox-title-input"
                       value={currentTitle}
                       onChange={(e) => setVal(item.id, 'title', e.target.value)}
                     />
-                  </div>
+                  </label>
 
-                  <div className="inbox-field-row">
-                    <div className="inbox-field-group">
-                      <label className="inbox-label">Price (₹)</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <label className="ingest-field">
+                      <span>Price (₹)</span>
                       <input
                         type="number"
-                        className="inbox-input"
                         value={currentPrice}
                         onChange={(e) => setVal(item.id, 'price', e.target.value)}
                       />
-                    </div>
-                    <div className="inbox-field-group">
-                      <label className="inbox-label">Collection</label>
+                    </label>
+                    <label className="ingest-field">
+                      <span>Category</span>
                       <select
-                        className="inbox-select"
                         value={currentCat}
                         onChange={(e) => setVal(item.id, 'category', e.target.value)}
                       >
@@ -1025,25 +1140,24 @@ export default function IngestInboxView({
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
-                    </div>
+                    </label>
                   </div>
 
-                  <div className="inbox-card-actions" style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                     {item.status !== 'published' && (
                       <button
                         type="button"
-                        className="button button-sm button-dark"
+                        className="ingest-primary-action"
                         onClick={() => handleApprove(item)}
-                        style={{ flex: 1, background: '#22c55e', border: 'none', color: '#fff', padding: '8px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}
+                        style={{ flex: 1, minHeight: '36px', fontSize: '12px' }}
                       >
-                        ✓ Publish to Storefront
+                        ✓ Publish
                       </button>
                     )}
                     <button
                       type="button"
-                      className="button button-sm button-light button-danger-soft"
                       onClick={() => handleDelete(item.id)}
-                      style={{ background: 'rgba(239, 68, 68, 0.2)', border: 'none', color: '#f87171', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' }}
+                      style={{ background: '#fff2f0', border: '1px solid #e5c1bc', color: '#b64d42', padding: '0 12px', borderRadius: '8px', cursor: 'pointer' }}
                     >
                       🗑️
                     </button>
@@ -1055,5 +1169,6 @@ export default function IngestInboxView({
         </div>
       )}
     </div>
+
   );
 }

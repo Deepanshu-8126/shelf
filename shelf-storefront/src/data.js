@@ -450,14 +450,16 @@ export function detectStore(url = '') {
   if (value.includes('amazon.')) return 'Amazon';
   if (value.includes('flipkart.com')) return 'Flipkart';
   if (value.includes('myntra.com')) return 'Myntra';
+  if (value.includes('ajio.com')) return 'AJIO';
   return '';
 }
 
 export function storeSearchUrl(store, query) {
   const q = encodeURIComponent(query || 'popular picks');
-  if (store === 'Amazon') return `https://www.amazon.in/s?k=${q}`;
+  if (store === 'Amazon') return `https://www.amazon.in/s?k=${q}&i=apparel`;
   if (store === 'Flipkart') return `https://www.flipkart.com/search?q=${q}`;
-  if (store === 'Myntra') return `https://www.myntra.com/${q}`;
+  if (store === 'Myntra') return `https://www.myntra.com/search?q=${q}`;
+  if (store === 'AJIO') return `https://www.ajio.com/search/?text=${q}`;
   if (store === 'Meesho') return `https://www.meesho.com/search?q=${q}`;
   return 'https://www.meesho.com';
 }

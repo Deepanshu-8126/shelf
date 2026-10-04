@@ -112,44 +112,44 @@ export default function Storefront({
       const saved = localStorage.getItem('shelf_festive_config');
       if (saved) return JSON.parse(saved);
     } catch {}
-    const month = new Date().getMonth() + 1;
-    if (month === 10 || month === 11) {
-      return {
-        seasonKey: 'diwali',
-        title: 'Diwali & Festive Glam',
-        eyebrow: '🪔 FESTIVE CAPSULE 2026',
-        ticker: '🪔 Diwali & Festive Glam Capsule Live · Handpicked Outfits from ₹349',
-        theme: 'peach',
-        query: 'festive',
-        videoUrl: ''
-      };
-    }
-    if (month === 9) {
-      return {
-        seasonKey: 'navratri',
-        title: 'Navratri & Garba Edit',
-        eyebrow: '💃 GARBA NIGHTS 2026',
-        ticker: '💃 Navratri & Garba Outfits Live · Starting ₹279',
-        theme: 'lilac',
-        query: 'kurti',
-        videoUrl: ''
-      };
-    }
     return {
-      seasonKey: 'winter',
-      title: 'Winter Cold-Girl Era',
-      eyebrow: '❄️ WINTER CAPSULE 2026',
-      ticker: '❄️ Winter Cozy Layers & F1 Bombers Live · Under ₹999',
-      theme: 'blue',
-      query: 'winter',
+      enabled: true,
+      seasonKey: 'trending',
+      title: 'Trending Fits & Wardrobe Edits',
+      eyebrow: '✦ VIRAL FINDS 2026',
+      ticker: '✦ Fresh Aesthetic Drops & Curated Outfits · Handpicked from Top Creators',
+      theme: 'sage',
+      icon: '✦',
+      query: '',
       videoUrl: ''
     };
   });
 
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === 'shelf_festive_config') {
+        try {
+          if (e.newValue) setFestiveConfig(JSON.parse(e.newValue));
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('shelf_banner_update', () => {
+      try {
+        const saved = localStorage.getItem('shelf_festive_config');
+        if (saved) setFestiveConfig(JSON.parse(saved));
+      } catch {}
+    });
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('shelf_banner_update', () => {});
+    };
+  }, []);
+
   const activeSeason = useMemo(() => ({
-    tag: festiveConfig.eyebrow || 'WINTER & FESTIVE EDIT',
-    label: festiveConfig.title || 'Cozy knits, party bodycons & luxury layers',
-    pill: festiveConfig.ticker || '🪔 Diwali & Festive Collection Live'
+    tag: festiveConfig.eyebrow || '✦ TRENDING CAPSULE 2026',
+    label: festiveConfig.title || 'Curated fashion, daily aesthetic repeats & viral picks',
+    pill: festiveConfig.ticker || '✦ Fresh Wardrobe Drops Live'
   }), [festiveConfig]);
   const [savedIds, setSavedIds] = useState(() => {
     try {
@@ -766,6 +766,32 @@ export default function Storefront({
         {/* Mobile Action Controls (<768px) */}
         <div className="storefront-mobile-actions">
           <button 
+            className="theme-toggle-btn mobile-theme-btn"
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+            ) : (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            )}
+          </button>
+
+          <button 
             className={`wishlist-top-pill${savedOnly ? ' is-active' : ''}`}
             type="button"
             onClick={() => {
@@ -880,14 +906,16 @@ export default function Storefront({
                 <span>Pinterest Drops</span>
               </button>
 
-              <button 
-                type="button" 
-                className="mobile-nav-link"
-                onClick={() => { setEarningModalOpen(true); setMobileMenuOpen(false); }}
-              >
-                <Icon name="analytics" size={16} />
-                <span>Earnings Scope</span>
-              </button>
+              {isAdmin && (
+                <button 
+                  type="button" 
+                  className="mobile-nav-link"
+                  onClick={() => { setEarningModalOpen(true); setMobileMenuOpen(false); }}
+                >
+                  <Icon name="analytics" size={16} />
+                  <span>Earnings Scope</span>
+                </button>
+              )}
 
               {showStudioControls && onBack && (
                 <button 
@@ -980,23 +1008,27 @@ export default function Storefront({
           </div>
         </section>
 
-        {/* Live Floating Seasonal & Festive Trend Ticker (Myntra / Zara Style) */}
-        <div className="storefront-festive-ticker-wrap">
-          <button 
-            className="floating-festive-ticker" 
-            type="button"
-            onClick={() => {
-              setQuery(festiveConfig.query || 'festive');
-              setCategoryFilter('All picks');
-              setCollectionFilter('all');
-              document.getElementById('public-picks')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }}
-          >
-            <span className="ticker-sparkle">🪔</span>
-            <span className="ticker-title">{festiveConfig.ticker || 'Diwali & Festive Glam Capsule Live'}</span>
-            <span className="ticker-action">Explore Collection →</span>
-          </button>
-        </div>
+        {/* Live Floating Seasonal & Festive Trend Ticker (Google Trend Engine) */}
+        {festiveConfig.enabled !== false && festiveConfig.ticker && (
+          <div className="storefront-festive-ticker-wrap">
+            <button 
+              className="floating-festive-ticker" 
+              type="button"
+              onClick={() => {
+                if (festiveConfig.query) {
+                  setQuery(festiveConfig.query);
+                  setCategoryFilter('All picks');
+                  setCollectionFilter('all');
+                }
+                document.getElementById('public-picks')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              <span className="ticker-sparkle">{festiveConfig.icon || '✦'}</span>
+              <span className="ticker-title">{festiveConfig.ticker}</span>
+              <span className="ticker-action">Explore Drops →</span>
+            </button>
+          </div>
+        )}
 
         {publicCollections.length > 0 && <section className="public-collections-section">
           <div className="section-heading-row">

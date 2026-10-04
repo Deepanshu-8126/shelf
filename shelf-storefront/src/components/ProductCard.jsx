@@ -8,6 +8,45 @@ function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;
 }
 
+export function getColorHex(colorName = '') {
+  const c = String(colorName).toLowerCase().trim();
+  const MAP = {
+    black: '#18181b',
+    white: '#f8fafc',
+    peach: '#ffedd5',
+    pink: '#f472b6',
+    rose: '#fb7185',
+    red: '#dc2626',
+    maroon: '#881337',
+    wine: '#4c0519',
+    blue: '#3b82f6',
+    navy: '#1e3a8a',
+    sky: '#38bdf8',
+    green: '#16a34a',
+    olive: '#65a30d',
+    sage: '#a7f3d0',
+    mint: '#6ee7b7',
+    yellow: '#eab308',
+    mustard: '#ca8a04',
+    orange: '#ea580c',
+    rust: '#c2410c',
+    brown: '#78350f',
+    beige: '#f5f5dc',
+    cream: '#fef3c7',
+    lavender: '#c084fc',
+    purple: '#9333ea',
+    grey: '#94a3b8',
+    gray: '#94a3b8',
+    silver: '#cbd5e1',
+    gold: '#fbbf24',
+    teal: '#0d9488',
+  };
+  for (const [key, hex] of Object.entries(MAP)) {
+    if (c.includes(key)) return hex;
+  }
+  return '#cbd5e1';
+}
+
 export function cleanDisplayTitle(rawTitle) {
   if (!rawTitle) return 'Curated Find';
   let str = String(rawTitle).trim();
@@ -251,7 +290,7 @@ export default function ProductCard({
         />
         {discount > 0 && <span className="discount-chip">-{discount}%</span>}
         {product.festiveBadge && <span className="festive-badge-chip">{product.festiveBadge}</span>}
-        {product.isRealListing && <span className="live-listing-chip">LIVE LISTING</span>}
+        {!isPublic && product.isRealListing && <span className="live-listing-chip">VERIFIED</span>}
         <div className="product-image-topline">
           <StoreBadge store={product.store} compact />
           {onToggleSaved && (
@@ -311,9 +350,13 @@ export default function ProductCard({
         <div className="product-eyebrow-row">
           <span className="product-category">{product.seasonalTag ? 'WINTER EDIT' : product.category}</span>
           {product.colors && Array.isArray(product.colors) && product.colors.length > 1 ? (
-            <span className="colorway-badge" title={product.colors.join(', ')} style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: 650, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)' }} />
-              {product.colors.length} shades
+            <span className="colorway-badge" title={product.colors.join(', ')} style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span className="color-dots-preview" style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
+                {product.colors.slice(0, 3).map((col, idx) => (
+                  <span key={idx} style={{ display: 'inline-block', width: '7px', height: '7px', borderRadius: '50%', background: getColorHex(col), border: '1px solid rgba(0,0,0,0.15)' }} />
+                ))}
+              </span>
+              <span>{product.colors.length} shades</span>
             </span>
           ) : product.rating ? (
             <span className="rating-chip"><b>★</b> {product.rating}{ratingCount ? ` · ${ratingLabel}` : ''}</span>

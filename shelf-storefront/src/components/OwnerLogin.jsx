@@ -17,16 +17,12 @@ export default function OwnerLogin({ onLogin, onPublicPreview, configured = true
         <p className="eyebrow">CREATOR ACCESS</p>
         <h1>Your little corner,<br /><em>behind the scenes.</em></h1>
         <p className="owner-login-copy">Sign in to curate, import and publish your product edits. Shoppers can browse your public page without an account.</p>
-        {!configured ? (
-          <div className="owner-login-notice owner-login-notice-warning"><Icon name="lock" size={16} /><span>Owner access isn't configured yet. Set <code>OWNER_PASSWORD</code> in the Python API environment.</span></div>
-        ) : (
-          <form className="owner-login-form" onSubmit={submit}>
-            <label className="field-label" htmlFor="owner-password">Owner passphrase</label>
-            <input id="owner-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your private passphrase" required />
-            {error && <p className="owner-login-error" role="alert">{error}</p>}
-            <button className="button button-dark owner-login-submit" type="submit" disabled={busy || !password.trim()}>{busy ? 'Checking…' : 'Open my studio'} <Icon name="arrowRight" size={16} /></button>
-          </form>
-        )}
+        <form className="owner-login-form" onSubmit={submit}>
+          <label className="field-label" htmlFor="owner-password">Owner PIN / Passphrase</label>
+          <input id="owner-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your private PIN or passphrase" required />
+          {error && <p className="owner-login-error" role="alert">{error}</p>}
+          <button className="button button-dark owner-login-submit" type="submit" disabled={busy || !password.trim()}>{busy ? 'Verifying…' : 'Unlock Private Studio'} <Icon name="arrowRight" size={16} /></button>
+        </form>
         <button className="owner-public-link" type="button" onClick={onPublicPreview}><span>✦</span> Open the public shop preview <Icon name="arrowUpRight" size={14} /></button>
         <p className="owner-login-footnote"><Icon name="shield" size={13} /> Creator-only tools stay behind sign-in. Shopper pages are public.</p>
       </div>

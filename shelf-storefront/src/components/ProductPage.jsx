@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Icon from './Icon.jsx';
-import ProductCard from './ProductCard.jsx';
+import ProductCard, { getColorHex } from './ProductCard.jsx';
 import InstantOrderModal from './InstantOrderModal.jsx';
 
 function money(value) {
@@ -182,8 +182,10 @@ export default function ProductPage({
                         type="button"
                         className={`showcase-pill-opt${selectedColor === c ? ' is-active' : ''}`}
                         onClick={() => setSelectedColor(c)}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       >
-                        {c}
+                        <span style={{ display: 'inline-block', width: '9px', height: '9px', borderRadius: '50%', background: getColorHex(c), border: '1px solid rgba(0,0,0,0.15)' }} />
+                        <span>{c}</span>
                       </button>
                     ))}
                   </div>

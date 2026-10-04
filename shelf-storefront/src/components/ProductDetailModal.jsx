@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Icon from './Icon.jsx';
-import ProductCard from './ProductCard.jsx';
+import ProductCard, { getColorHex } from './ProductCard.jsx';
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;
@@ -130,8 +130,10 @@ export default function ProductDetailModal({ product: initialProduct, allProduct
                       type="button"
                       className={`detail-color-pill${selectedColor === c ? ' is-active' : ''}`}
                       onClick={() => setSelectedColor(c)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
-                      {c}
+                      <span style={{ display: 'inline-block', width: '9px', height: '9px', borderRadius: '50%', background: getColorHex(c), border: '1px solid rgba(0,0,0,0.15)' }} />
+                      <span>{c}</span>
                     </button>
                   ))}
                 </div>

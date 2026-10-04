@@ -62,6 +62,111 @@ export default function AdminBannersManager({ products = [], onSaveBanners }) {
     }
   });
 
+  const [trendCampaign, setTrendCampaign] = useState(() => {
+    try {
+      const saved = localStorage.getItem('shelf_festive_config');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      enabled: true,
+      seasonKey: 'trending',
+      title: 'Trending Fits & Wardrobe Edits',
+      eyebrow: '✦ VIRAL FINDS 2026',
+      ticker: '✦ Fresh Aesthetic Drops & Curated Outfits · Handpicked from Top Creators',
+      theme: 'sage',
+      icon: '✦',
+      query: ''
+    };
+  });
+
+  const TREND_PRESETS = [
+    {
+      key: 'spring_2026',
+      name: '🌸 Spring Drop 2026 (Floral Chiffon & Y2K Tops)',
+      title: 'Spring Blossom & Y2K Tops Edit',
+      eyebrow: '🌸 SPRING CAPSULE 2026',
+      ticker: '🌸 Spring Wardrobe Drops Live · Chiffon Tops, Ribbed Crops & Dresses from ₹299',
+      theme: 'sage',
+      icon: '🌸',
+      query: 'tops'
+    },
+    {
+      key: 'pinterest_viral',
+      name: '📌 Viral Pinterest & Gen-Z Aesthetic Drop',
+      title: 'Viral Aesthetic & Downtown Chic',
+      eyebrow: '📌 PINTEREST DROPS',
+      ticker: '📌 Viral Pinterest & Gen-Z Outfits Live · Streetwear, Bombers & Y2K from ₹399',
+      theme: 'lilac',
+      icon: '📌',
+      query: 'pinterest'
+    },
+    {
+      key: 'summer_vacay',
+      name: '☀️ Summer Vacation, Linen Sets & Chic Crops',
+      title: 'Summer Getaway & Linen Edit',
+      eyebrow: '☀️ SUMMER EDIT 2026',
+      ticker: '☀️ Summer Vacation & Linen Co-ord Sets Live · Handpicked from ₹449',
+      theme: 'peach',
+      icon: '☀️',
+      query: 'co-ord'
+    },
+    {
+      key: 'diwali_festive',
+      name: '🪔 Diwali & Festive Glam Capsule',
+      title: 'Diwali & Festive Glam',
+      eyebrow: '🪔 FESTIVE CAPSULE 2026',
+      ticker: '🪔 Diwali & Festive Glam Capsule Live · Handpicked Outfits from ₹349',
+      theme: 'peach',
+      icon: '🪔',
+      query: 'festive'
+    },
+    {
+      key: 'navratri_garba',
+      name: '💃 Navratri & Garba Ethnic Edit',
+      title: 'Navratri & Garba Ethnic Edit',
+      eyebrow: '💃 GARBA NIGHTS 2026',
+      ticker: '💃 Navratri & Garba Outfits Live · Designer Kurtis & Sets Starting ₹279',
+      theme: 'lilac',
+      icon: '💃',
+      query: 'kurti'
+    },
+    {
+      key: 'winter_cozy',
+      name: '❄️ Winter Cozy & Bomber Jackets',
+      title: 'Winter Cold-Girl Era',
+      eyebrow: '❄️ WINTER CAPSULE 2026',
+      ticker: '❄️ Winter Cozy Layers & F1 Bombers Live · Under ₹999',
+      theme: 'blue',
+      icon: '❄️',
+      query: 'winter'
+    }
+  ];
+
+  const handleApplyTrendPreset = (preset) => {
+    const updated = {
+      ...trendCampaign,
+      seasonKey: preset.key,
+      title: preset.title,
+      eyebrow: preset.eyebrow,
+      ticker: preset.ticker,
+      theme: preset.theme,
+      icon: preset.icon,
+      query: preset.query
+    };
+    setTrendCampaign(updated);
+    localStorage.setItem('shelf_festive_config', JSON.stringify(updated));
+    window.dispatchEvent(new Event('shelf_banner_update'));
+    setSaveNotice(`✓ Activated Google Trend Campaign: "${preset.title}"`);
+    setTimeout(() => setSaveNotice(''), 3000);
+  };
+
+  const handleSaveTrendCampaign = () => {
+    localStorage.setItem('shelf_festive_config', JSON.stringify(trendCampaign));
+    window.dispatchEvent(new Event('shelf_banner_update'));
+    setSaveNotice('✓ Header Trend Campaign updated & live on storefront!');
+    setTimeout(() => setSaveNotice(''), 3000);
+  };
+
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [editingSlide, setEditingSlide] = useState(null);
   const [previewDevice, setPreviewDevice] = useState('desktop'); // 'desktop' or 'mobile'
@@ -178,6 +283,102 @@ export default function AdminBannersManager({ products = [], onSaveBanners }) {
           {saveNotice}
         </div>
       )}
+
+      {/* Google Trend Engine & Header Campaign Control Bar */}
+      <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '16px', padding: '18px 20px', marginBottom: '22px', backdropFilter: 'blur(16px)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>🔥</span>
+              <strong style={{ fontSize: '15px', color: '#fff' }}>Google Trend Engine · Live Seasonal Header Campaign</strong>
+              <span style={{ fontSize: '11px', background: trendCampaign.enabled ? '#22c55e25' : '#ef444425', color: trendCampaign.enabled ? '#4ade80' : '#f87171', border: `1px solid ${trendCampaign.enabled ? '#22c55e50' : '#ef444450'}`, padding: '2px 8px', borderRadius: '99px', fontWeight: '700' }}>
+                {trendCampaign.enabled ? '● LIVE ON STOREFRONT' : '○ DISABLED'}
+              </span>
+            </div>
+            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginTop: '4px' }}>
+              Control the top animated announcement pill and seasonal curation. No out-of-date festivals appear unless you select them.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => {
+                const next = { ...trendCampaign, enabled: !trendCampaign.enabled };
+                setTrendCampaign(next);
+                localStorage.setItem('shelf_festive_config', JSON.stringify(next));
+                window.dispatchEvent(new Event('shelf_banner_update'));
+              }}
+              style={{ background: trendCampaign.enabled ? 'rgba(239, 68, 68, 0.2)' : 'rgba(34, 197, 94, 0.2)', border: `1px solid ${trendCampaign.enabled ? 'rgba(239, 68, 68, 0.4)' : 'rgba(34, 197, 94, 0.4)'}`, color: trendCampaign.enabled ? '#fca5a5' : '#86efac', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}
+            >
+              {trendCampaign.enabled ? 'Disable Ticker' : 'Enable Ticker'}
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveTrendCampaign}
+              style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.25)', color: '#fff', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}
+            >
+              Save Trend
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Presets Strip */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '10px', marginBottom: '14px' }}>
+          <span style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>Trend Presets:</span>
+          {TREND_PRESETS.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => handleApplyTrendPreset(preset)}
+              style={{
+                background: trendCampaign.seasonKey === preset.key ? 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' : 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '99px',
+                padding: '4px 12px',
+                color: '#fff',
+                fontSize: '11px',
+                fontWeight: '650',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.18s ease'
+              }}
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Campaign Input Fields */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: '600' }}>Header Eyebrow Tag</label>
+            <input
+              value={trendCampaign.eyebrow}
+              onChange={(e) => setTrendCampaign({ ...trendCampaign, eyebrow: e.target.value })}
+              placeholder="e.g. 🌸 SPRING CAPSULE 2026"
+              style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '12px' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: '600' }}>Live Announcement Ticker Text</label>
+            <input
+              value={trendCampaign.ticker}
+              onChange={(e) => setTrendCampaign({ ...trendCampaign, ticker: e.target.value })}
+              placeholder="e.g. 🌸 Spring Wardrobe Drops Live · Tops from ₹299"
+              style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '12px' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: '600' }}>Filter Query on Click</label>
+            <input
+              value={trendCampaign.query}
+              onChange={(e) => setTrendCampaign({ ...trendCampaign, query: e.target.value })}
+              placeholder="e.g. tops or kurti (leave blank for all)"
+              style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '12px' }}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Main 2-Column Studio Grid: Editor on Left, Live Mockup on Right */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', alignItems: 'start' }}>
