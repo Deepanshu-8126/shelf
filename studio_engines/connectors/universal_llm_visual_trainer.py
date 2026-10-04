@@ -243,6 +243,21 @@ class UniversalLLMVisualTrainer:
                 "skin_profile": "Clean lookbook skin, authentic pores, zero plastic blur",
                 "lighting_profile": "High-CRI commercial softbox"
             }
+        },
+        "ZARA_EDITORIAL_HIGH_FASHION": {
+            "category_name": "Zara Minimalist High-Fashion Editorial Lookbook",
+            "setting": "High-end Zara minimalist editorial campaign, clean seamless chalk-white studio cyclorama with sharp architectural daylight shadows and subtle concrete floor texture",
+            "pose": "Nonchalant Zara high-fashion posture, effortless front lean against minimalist white studio wall, hands tucked lightly in pockets or resting casually at hips, relaxed cool detached gaze looking slightly off-axis",
+            "lighting": "Crisp directional studio daylight strobe creating clean geometric shadow lines across the floor, soft natural contrast, zero harsh specular highlights",
+            "film_stock": "Shot on Hasselblad H6D-100c with 50mm f/2.8 lens, muted Scandinavian Zara color grading, authentic fine textile drape, Kodak Portra 160 grain, 8K ultra-editorial clarity",
+            "optical_recipe": {
+                "sharpness_factor": 1.02,
+                "contrast_factor": 1.03,
+                "color_factor": 1.01,
+                "unsharp_mask": {"enabled": False, "percent": 0, "radius": 0, "threshold": 0},
+                "skin_profile": "Clean Zara editorial skin, authentic matte finish, natural collarbone highlights, zero digital noise",
+                "lighting_profile": "Minimalist high-key studio daylight strobe (5600K)"
+            }
         }
     }
 
@@ -280,6 +295,10 @@ class UniversalLLMVisualTrainer:
         Intelligently classifies outfit into the ideal aesthetic preset.
         """
         text = f"{product_title} {fabric}".lower()
+
+        # 0. Zara / High-Fashion Editorial Lookbook
+        if any(w in text for w in ["zara", "lookbook", "bauhaus", "front lean", "editorial campaign", "minimalist white"]):
+            return "ZARA_EDITORIAL_HIGH_FASHION"
 
         # 1. Ethnic / Traditional
         if any(w in text for w in ["saree", "sari", "lehenga", "anarkali", "kurti", "ethnic", "chikankari", "banarasi", "kanjivaram", "dupatta", "jhumka", "sharara"]):

@@ -166,7 +166,7 @@ def send_media_group_to_telegram(photo_paths: list[Path], title: str, price: str
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
+        with urllib.request.urlopen(req, timeout=6) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             if res_data.get("ok"):
                 print(f"  ✅ Delivered Album ({len(valid_photos)} photos together) to Telegram!")
@@ -209,7 +209,7 @@ def send_single_photo_to_telegram(photo_path: Path, caption: str) -> bool:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=4) as response:
             res_data = json.loads(response.read().decode("utf-8"))
             if res_data.get("ok"):
                 print(f"  ✅ Delivered Single 4K Pin to Telegram: {photo_path.name}")
