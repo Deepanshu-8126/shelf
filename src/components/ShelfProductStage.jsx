@@ -62,7 +62,7 @@ export default function ShelfProductStage({
     setActiveAngleIndex(0);
     setSelectedSize('M');
     if (colors.length > 0) setSelectedColor(colors[0].name);
-  }, [product.id, colors]);
+  }, [product?.id, colors]);
 
   const prevAngle = () => {
     setActiveAngleIndex((prev) => (prev - 1 + gallery.length) % gallery.length);

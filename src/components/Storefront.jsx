@@ -657,17 +657,13 @@ export default function Storefront({
   // Active featured product: defaults to selected or first prominent Kurti/Dress
   const activeFeaturedProduct = useMemo(() => {
     if (featuredProduct) return featuredProduct;
-    if (activeProductId) {
-      const match = shopProducts.find((p) => String(p.id) === String(activeProductId));
-      if (match) return match;
-    }
     const preferred = shopProducts.find((p) => {
       const cat = (p.category || '').toLowerCase();
       const title = (p.title || '').toLowerCase();
       return cat.includes('kurti') || cat.includes('dress') || title.includes('kurti') || title.includes('dress');
     });
     return preferred || shopProducts[0] || null;
-  }, [featuredProduct, activeProductId, shopProducts]);
+  }, [featuredProduct, shopProducts]);
 
   return (
     <div className="shelf-clean-storefront">
