@@ -6,6 +6,8 @@ import CollectionCard from './CollectionCard.jsx';
 import InstantOrderModal from './InstantOrderModal.jsx';
 import ProductDetailModal from './ProductDetailModal.jsx';
 import ProductPage from './ProductPage.jsx';
+import ShelfHeader from './ShelfHeader.jsx';
+import ShelfProductStage from './ShelfProductStage.jsx';
 const OutfitBuilderModal = React.lazy(() => import('./OutfitBuilderModal.jsx'));
 const AIStylistModal = React.lazy(() => import('./AIStylistModal.jsx'));
 const InteractiveShowroomModal = React.lazy(() => import('./InteractiveShowroomModal.jsx'));
@@ -642,41 +644,118 @@ export default function Storefront({
     document.getElementById('public-picks')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  if (activeProductId) {
-    return (
-      <ProductPage 
-        productId={activeProductId}
-        allProducts={shopProducts}
-        onBack={() => {
-          setActiveProductId(null);
-          try {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('product');
-            url.searchParams.delete('view');
-            const cleanUrl = url.pathname + (url.search ? url.search : '');
-            if (window.history.state && window.history.state.product) {
-              window.history.back();
-            } else {
-              window.history.replaceState(null, '', cleanUrl);
-            }
-          } catch {
-            setActiveProductId(null);
-          }
-        }}
-        onSelectProduct={(id) => {
-          setActiveProductId(id);
-          try {
-            const url = new URL(window.location.href);
-            url.searchParams.set('product', id);
-            window.history.pushState({ product: id }, '', url.pathname + url.search);
-          } catch {}
-        }}
-        savedIds={savedIds}
-        onToggleSaved={toggleSave}
-      />
-    );
-  }
+  const [featuredProduct, setFeaturedProduct] = useState(null);
+  const [cartCount, setCartCount] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('shelf_cart_count') || '1');
+    } catch {
+      return 1;
+    }
+  });
+  const [showSearch, setShowSearch] = useState(false);
 
+  // Active featured product: defaults to selected or first prominent Kurti/Dress
+  const activeFeaturedProduct = useMemo(() => {
+    if (featuredProduct) return featuredProduct;
+    if (activeProductId) {
+      const match = shopProducts.find((p) => String(p.id) === String(activeProductId));
+      if (match) return match;
+    }
+    const preferred = shopProducts.find((p) => {
+      const cat = (p.category || '').toLowerCase();
+      const title = (p.title || '').toLowerCase();
+      return cat.includes('kurti') || cat.includes('dress') || title.includes('kurti') || title.includes('dress');
+    });
+    return preferred || shopProducts[0] || null;
+  }, [featuredProduct, activeProductId, shopProducts]);
+
+  return (
+    <div className="shelf-clean-storefront">
+      {/* 1. Minimal Editorial Header (shelf.) */}
+      <ShelfHeader
+        activeCategory={categoryFilter}
+        onSelectCategory={(cat) => {
+          setCategoryFilter(cat);
+          setCollectionFilter('all');
+          document.getElementById('public-picks')?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        searchQuery={query}
+        onSearchChange={setQuery}
+        showSearch={showSearch}
+        onToggleSearch={() => setShowSearch(!showSearch)}
+        wishlistCount={savedIds.length}
+        cartCount={cartCount}
+        onOpenWishlist={() => {
+          setSavedOnly(!savedOnly);
+          document.getElementById('public-picks')?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        onOpenCart={() => {
+          if (activeFeaturedProduct) setOrderModalProduct(activeFeaturedProduct);
+        }}
+      />
+
+      {/* 2. Luxury 2-Column Product Stage (60% Gallery / 40% Details) */}
+      <ShelfProductStage
+        product={activeFeaturedProduct}
+        onAddToCart={() => {
+          setCartCount((prev) => {
+            const next = prev + 1;
+            try { localStorage.setItem('shelf_cart_count', next); } catch {}
+            return next;
+          });
+        }}
+        onToggleWishlist={(id) => toggleSave(id)}
+        isWishlisted={savedIds.includes(activeFeaturedProduct?.id)}
+        onOpenInstantOrder={(prod) => setOrderModalProduct(prod)}
+      />
+
+      {/* 3. Clean Curated Collection Grid Below */}
+      <section className="shelf-collection-section" id="public-picks">
+        <div className="shelf-collection-heading">
+          <h2>{categoryFilter === 'All picks' ? 'Curated Collection' : categoryFilter}</h2>
+          <span className="shelf-collection-count">{visibleProducts.length} pieces</span>
+        </div>
+
+        <div className="shelf-cards-grid">
+          {visibleProducts.map((prod) => (
+            <article
+              key={prod.id}
+              className={`shelf-item-card ${activeFeaturedProduct?.id === prod.id ? 'is-active-item' : ''}`}
+              onClick={() => {
+                setFeaturedProduct(prod);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              <div className="shelf-item-img-box">
+                <span className="shelf-item-3d-tag">360°</span>
+                <img src={prod.image || prod.main_image} alt={prod.title} loading="lazy" />
+              </div>
+              <div className="shelf-item-info">
+                <h3 className="shelf-item-title">{prod.title}</h3>
+                <div className="shelf-item-price-row">
+                  <span className="shelf-item-price">Rs {Number(prod.price || 999).toLocaleString('en-IN')}</span>
+                  {prod.originalPrice && (
+                    <span className="shelf-item-mrp">Rs {Math.round(Number(prod.originalPrice)).toLocaleString('en-IN')}</span>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Direct Instant Order Modal (Saves to Supabase Cloud) */}
+      {orderModalProduct && (
+        <InstantOrderModal
+          product={orderModalProduct}
+          onClose={() => setOrderModalProduct(null)}
+          onSuccess={() => setOrderModalProduct(null)}
+        />
+      )}
+    </div>
+  );
+
+  // Legacy fallback (unreachable)
   return (
     <div className="storefront-page">
       <header className="storefront-topbar">
