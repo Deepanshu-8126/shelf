@@ -72,7 +72,7 @@ export default function ShelfProductStage({
     ? Math.round(((realOldPrice - realPrice) / realOldPrice) * 100)
     : null;
 
-  // Real Ratings (Zero Default 4.5/4.7)
+  // Real Ratings (Zero manufactured rating values)
   const realRating = product.rating != null && !isNaN(Number(product.rating)) ? Number(product.rating) : null;
   const realReviewCount = product.ratingCount != null && !isNaN(Number(product.ratingCount))
     ? Number(product.ratingCount)
