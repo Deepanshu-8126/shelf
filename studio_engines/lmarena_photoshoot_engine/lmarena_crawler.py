@@ -255,10 +255,12 @@ async def crawl_and_generate_arena_photo(
     # --------------------------------------------------------------------------
     # TIER 1: LM Arena Fast Stealth Runner (Bounded 25-Second Watchdog)
     # --------------------------------------------------------------------------
+    block_browser = os.environ.get("BLOCK_BROWSER_AUTOMATION", "1").strip().lower() in ("1", "true", "yes")
     if block_browser:
         print("🛡️ [LMArena] Chrome/Brave browser connection is PERMANENTLY BLOCKED by system policy.")
         print("⚡ [LMArena] Routing directly to Direct Neural Pipeline (FLUX / Gemini)...")
     else:
+
         try:
             launch_args = {
                 "user_data_dir": USER_DATA_DIR,

@@ -111,8 +111,9 @@ async def generate_single_flow_photo(
         except Exception as e:
             print(f"  Direct neural generation notice: {e}")
 
-    if not downloaded_photo:
+    if not downloaded_photo and not block_browser:
         async with async_playwright() as p:
+
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=USER_DATA_DIR,
                 headless=True,
