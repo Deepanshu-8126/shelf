@@ -25,6 +25,7 @@ import {
   STORE_CONFIG,
   detectStore,
 } from './data.js';
+import { getCloudProducts } from './services/supabaseClient.js';
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
@@ -1693,6 +1694,18 @@ export default function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [toast, setToast] = useState('');
   const [showEarningScope, setShowEarningScope] = useState(false);
+
+  // Live Supabase Cloud Sync (Online Database)
+  useEffect(() => {
+    let isMounted = true;
+    getCloudProducts().then((cloudItems) => {
+      if (isMounted && cloudItems && cloudItems.length > 0) {
+        console.log(`[Supabase Cloud] Loaded ${cloudItems.length} live products!`);
+        setProducts(cloudItems);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => { if (!isPublic) { try { window.localStorage.setItem('shelf-products-v10', JSON.stringify(products)); } catch { /* storage may be disabled */ } } }, [products, isPublic]);
   useEffect(() => { if (!isPublic) { try { window.localStorage.setItem('shelf-collections-v6', JSON.stringify(collections)); } catch { /* storage may be disabled */ } } }, [collections, isPublic]);
