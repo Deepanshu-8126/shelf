@@ -3430,6 +3430,7 @@ def enhance_image_to_8k_natural(source_path: Path) -> tuple[Path, str]:
     return enhanced_path, resolution_str
 
 
+@app.post("/api/studio/generate-photo")
 def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, Any]:
     import urllib.request
     import urllib.parse
@@ -3506,7 +3507,7 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
             f"Soft diffused 50mm f/1.8 lens portrait, neutral greige luxury studio backdrop, elegant relaxed Gen-Z posture, soft cinema lighting, 8k resolution, zero digital distortion.\n"
             f"Return ONLY the prompt string, no intro, no conversational text, no markdown."
         )
-        for m_vision in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.8-flash", "gemini-flash-latest"]:
+        for m_vision in ["gemini-2.5-flash", "gemini-flash-latest"]:
             try:
                 v_body = json.dumps({
                     "contents": [{
@@ -3518,14 +3519,14 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
                 }).encode("utf-8")
                 v_url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_vision}:generateContent?key={gemini_key}"
                 v_req = urllib.request.Request(v_url, data=v_body, headers={"Content-Type": "application/json"})
-                with urllib.request.urlopen(v_req, timeout=10) as v_resp:
+                with urllib.request.urlopen(v_req, timeout=3) as v_resp:
                     v_data = json.loads(v_resp.read().decode("utf-8"))
                     cand_parts = v_data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
                     if cand_parts and cand_parts[0].get("text"):
                         final_prompt = cand_parts[0]["text"].strip()
                         garment_analyzed = True
                         break
-            except Exception as _vis_err:
+            except Exception:
                 continue
 
     # Step 3: Text fallback if no reference image or vision failed
@@ -3539,12 +3540,12 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
                     f"Return ONLY the prompt string, no markdown, no intro."
                 )}]}]
             }).encode("utf-8")
-            for m_cand in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.8-flash", "gemini-flash-latest"]:
+            for m_cand in ["gemini-2.5-flash", "gemini-flash-latest"]:
                 try:
                     craft_url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_cand}:generateContent?key={gemini_key}"
                     craft_req = urllib.request.Request(craft_url, data=craft_body, headers={"Content-Type": "application/json"})
 
-                    with urllib.request.urlopen(craft_req, timeout=6) as resp:
+                    with urllib.request.urlopen(craft_req, timeout=3) as resp:
                         craft_data = json.loads(resp.read().decode("utf-8"))
                         parts = craft_data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
                         if parts and parts[0].get("text"):
