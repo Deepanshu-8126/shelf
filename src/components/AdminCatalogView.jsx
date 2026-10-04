@@ -269,7 +269,7 @@ export default function AdminCatalogView({
           const affUrl = row.affiliate_url || row.link || '';
 
           if (extId && affUrl) {
-            const matched = products.find(p => (p.ext_id && p.ext_id.toLowerCase() === extId.toLowerCase()) || (p.id && p.id.toLowerCase().includes(extId.toLowerCase())));
+            const matched = products.find(p => (p.ext_id && String(p.ext_id).toLowerCase() === extId.toLowerCase()) || (p.id && String(p.id).toLowerCase().includes(extId.toLowerCase())));
             if (matched) {
               await onUpdateProduct?.(matched.id, { affiliateUrl: affUrl });
               updatedCount++;

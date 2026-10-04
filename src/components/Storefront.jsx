@@ -229,21 +229,25 @@ export default function Storefront({
   const [sessionSeed] = useState(() => Math.floor(Math.random() * 1000));
 
   const shopProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
     const valid = products.filter((product) =>
+      product &&
       product.status !== 'pending_review' &&
       product.status !== 'draft' &&
-      Boolean(product.image) &&
+      Boolean(product.image || product.main_image) &&
       Boolean(getProductClickUrl(product)) &&
       !EXCLUDED_CATEGORIES.has(product.category)
     );
     return [...valid].sort((a, b) => {
-      const scoreA = (Number(a.rating || 4.2) * 10) + (a.sourceBatch ? 20 : 0);
-      const scoreB = (Number(b.rating || 4.2) * 10) + (b.sourceBatch ? 20 : 0);
+      const scoreA = (Number(a?.rating || 0) * 10) + (a?.sourceBatch ? 20 : 0);
+      const scoreB = (Number(b?.rating || 0) * 10) + (b?.sourceBatch ? 20 : 0);
       if (Math.abs(scoreA - scoreB) > 5) {
         return scoreB - scoreA;
       }
-      const hashA = (a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + sessionSeed) % 100;
-      const hashB = (b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + sessionSeed) % 100;
+      const strA = String(a?.id || '');
+      const strB = String(b?.id || '');
+      const hashA = (strA.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + sessionSeed) % 100;
+      const hashB = (strB.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + sessionSeed) % 100;
       return hashA - hashB;
     });
   }, [products, sessionSeed]);
@@ -290,7 +294,7 @@ export default function Storefront({
   }, [genderMode]);
   const imageKey = (image) => String(image || '').trim().split(/[?#]/)[0].toLowerCase();
   const usedCoverKeys = new Set();
-  const publicCollections = collections.map((collection) => {
+  const publicCollections = (Array.isArray(collections) ? collections : []).map((collection) => {
     const collectionProducts = shopProducts.filter((product) => product.collectionId === collection.id);
     if (!collectionProducts.length) return null;
 

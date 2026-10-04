@@ -73,7 +73,7 @@ export default class ErrorBoundary extends React.Component {
               An unexpected render fault was isolated safely by our Error Boundary without crashing your browser.
             </p>
 
-            {process.env.NODE_ENV !== 'production' && this.state.error && (
+            {this.state.error && (
               <pre style={{
                 textAlign: 'left',
                 background: 'rgba(0, 0, 0, 0.5)',
