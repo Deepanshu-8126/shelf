@@ -35,8 +35,10 @@ from PIL import Image, ImageEnhance, ImageFilter
 
 if sys.platform == "win32":
     try:
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stdout, "reconfigure"):
+            getattr(sys.stdout, "reconfigure")(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            getattr(sys.stderr, "reconfigure")(encoding="utf-8", errors="replace")
     except Exception:
         pass
 
@@ -121,12 +123,7 @@ async def launch_interactive_arena_login():
     print(f"📁 Session Storage: {USER_DATA_DIR}")
     print("=" * 80)
 
-    # PERMANENT POLICY: Block Chrome/Brave browser connection
-    block_browser = os.environ.get("BLOCK_BROWSER_AUTOMATION", "1").strip().lower() in ("1", "true", "yes")
-    if block_browser:
-        print("🛡️ [LMArena] Chrome/Brave browser connection is PERMANENTLY BLOCKED by system policy.")
-        print("⚡ [LMArena] Interactive browser login is disabled. Direct REST API pipeline is active.")
-        return
+    Path(USER_DATA_DIR).mkdir(parents=True, exist_ok=True)
 
     launch_args = {
         "user_data_dir": USER_DATA_DIR,
@@ -252,12 +249,10 @@ async def crawl_and_generate_arena_photo(
 
     arena_captured = False
 
-    # --------------------------------------------------------------------------
-    # TIER 1: LM Arena Fast Stealth Runner (Bounded 25-Second Watchdog)
-    # --------------------------------------------------------------------------
-    block_browser = os.environ.get("BLOCK_BROWSER_AUTOMATION", "1").strip().lower() in ("1", "true", "yes")
+    has_session = Path(USER_DATA_DIR).exists() and any(Path(USER_DATA_DIR).iterdir())
+    block_browser = os.environ.get("BLOCK_BROWSER_AUTOMATION", "0" if has_session else "1").strip().lower() in ("1", "true", "yes")
     if block_browser:
-        print("🛡️ [LMArena] Chrome/Brave browser connection is PERMANENTLY BLOCKED by system policy.")
+        print("🛡️ [LMArena] Browser connection bypassed (no saved session or BLOCK_BROWSER_AUTOMATION=1).")
         print("⚡ [LMArena] Routing directly to Direct Neural Pipeline (FLUX / Gemini)...")
     else:
 
