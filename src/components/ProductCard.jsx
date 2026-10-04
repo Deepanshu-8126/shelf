@@ -79,6 +79,7 @@ export default function ProductCard({
   onAddLink, 
   onInstantOrder, 
   onViewDetail,
+  onOpen3DView,
   onDeleteProduct,
   onTogglePublish,
   onEditProduct
@@ -108,7 +109,7 @@ export default function ProductCard({
     if (!isPublic || imageSlides.length < 2 || galleryPaused) return undefined;
     const timer = window.setInterval(() => {
       setActiveImage((current) => (current + 1) % imageSlides.length);
-    }, 3000);
+    }, 3500);
     return () => window.clearInterval(timer);
   }, [galleryPaused, imageSlides.length, isPublic]);
 
@@ -118,12 +119,25 @@ export default function ProductCard({
   };
 
   const handleTilt = (event) => {
-    if (isPublic) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    event.currentTarget.style.setProperty('--tilt-x', `${(0.5 - y) * 4}deg`);
-    event.currentTarget.style.setProperty('--tilt-y', `${(x - 0.5) * 5}deg`);
+    const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+
+    // Dynamic 3D perspective tilt
+    const tiltX = (0.5 - y) * 13;
+    const tiltY = (x - 0.5) * 15;
+    event.currentTarget.style.setProperty('--tilt-x', `${tiltX.toFixed(1)}deg`);
+    event.currentTarget.style.setProperty('--tilt-y', `${tiltY.toFixed(1)}deg`);
+    event.currentTarget.style.setProperty('--shine-x', `${(x * 100).toFixed(0)}%`);
+    event.currentTarget.style.setProperty('--shine-y', `${(y * 100).toFixed(0)}%`);
+
+    // Multi-angle 360 horizontal scrubbing on hover
+    if (imageSlides.length > 1) {
+      const angleIdx = Math.min(imageSlides.length - 1, Math.floor(x * imageSlides.length));
+      if (angleIdx !== activeImage) {
+        setActiveImage(angleIdx);
+      }
+    }
   };
 
   const resetTilt = (event) => {
@@ -292,6 +306,33 @@ export default function ProductCard({
             }
           }}
         />
+
+        {/* 3D Specular Reflection Shine Glare Layer */}
+        <div className="card-shine-glare" />
+
+        {/* 3D Multi-Angle Stepper Badge */}
+        {imageSlides.length > 1 && (
+          <span className="card-angle-stepper" title="Horizontal scrub 360° active">
+            {activeImage + 1}/{imageSlides.length}
+          </span>
+        )}
+
+        {/* Floating 3D Showroom Trigger Pill */}
+        {onOpen3DView && (
+          <button
+            type="button"
+            className="card-3d-trigger-pill"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onOpen3DView(product);
+            }}
+            title="Open 3D Spatial Look Showroom"
+          >
+            <span>🧊 3D View</span>
+          </button>
+        )}
+
         {discount > 0 && <span className="discount-chip">-{discount}%</span>}
         {product.festiveBadge && <span className="festive-badge-chip">{product.festiveBadge}</span>}
         {!isPublic && product.isRealListing && <span className="live-listing-chip">VERIFIED</span>}
@@ -355,10 +396,43 @@ export default function ProductCard({
           <span className="product-category">{product.seasonalTag ? 'WINTER EDIT' : product.category}</span>
           {product.colors && Array.isArray(product.colors) && product.colors.length > 1 ? (
             <span className="colorway-badge" title={product.colors.join(', ')} style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <span className="color-dots-preview" style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
-                {product.colors.slice(0, 3).map((col, idx) => (
-                  <span key={idx} style={{ display: 'inline-block', width: '7px', height: '7px', borderRadius: '50%', background: getColorHex(col), border: '1px solid rgba(0,0,0,0.15)' }} />
-                ))}
+              <span className="color-dots-preview" style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
+                {product.colors.slice(0, 4).map((col, idx) => {
+                  const matchingVar = Array.isArray(product.variations) 
+                    ? product.variations.find(v => (v.colorName || '').toLowerCase().includes(col.toLowerCase()))
+                    : null;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      className="card-swatch-dot-btn"
+                      title={`Switch to ${col}`}
+                      style={{
+                        display: 'inline-block',
+                        width: '9px',
+                        height: '9px',
+                        borderRadius: '50%',
+                        background: getColorHex(col),
+                        border: '1.5px solid rgba(255,255,255,0.7)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (matchingVar?.image) {
+                          const sIdx = imageSlides.indexOf(matchingVar.image);
+                          if (sIdx !== -1) setActiveImage(sIdx);
+                          else {
+                            imageSlides.unshift(matchingVar.image);
+                            setActiveImage(0);
+                          }
+                        }
+                      }}
+                    />
+                  );
+                })}
               </span>
               <span>{product.colors.length} shades</span>
             </span>

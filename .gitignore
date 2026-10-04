@@ -4,5 +4,19 @@ data/*.sqlite3
 data/*.sqlite3-shm
 data/*.sqlite3-wal
 __pycache__/
+*.pyc
 
+# Node & Build artifacts
+node_modules/
+dist/
 .vercel
+.vercel_python_packages/
+
+# Generated Media, Large Video Renders & Zips
+public/studio_media/
+data/audio/
+data/media_assets/
+data/model_face_dataset/
+video_engine/
+*.zip
+.stitch/

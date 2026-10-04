@@ -11,7 +11,25 @@ export default function ProductDetailModal({ product: initialProduct, allProduct
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState('Standard');
   const [selectedSize, setSelectedSize] = useState(() => initialProduct?.sizes?.[0] || 'M');
+  const [viewMode, setViewMode] = useState('2d'); // '2d' | '3d'
+  
+  // 3D Turntable Stage States
+  const [stageRotX, setStageRotX] = useState(6);
+  const [stageRotY, setStageRotY] = useState(0);
+  const [isDragging3D, setIsDragging3D] = useState(false);
+  const [autoSpin3D, setAutoSpin3D] = useState(false);
+  const [lightMode3D, setLightMode3D] = useState(0); // 0: Studio White, 1: Cyber Neon, 2: Noir Gold
+  const dragStartPos = useRef({ x: 0, y: 0 });
   const modalTopRef = useRef(null);
+
+  // Auto-Spin Animation
+  useEffect(() => {
+    if (!autoSpin3D || viewMode !== '3d') return undefined;
+    const interval = setInterval(() => {
+      setStageRotY((prev) => (prev + 1.2) % 360);
+    }, 25);
+    return () => clearInterval(interval);
+  }, [autoSpin3D, viewMode]);
 
   useEffect(() => {
     if (initialProduct) {
@@ -71,6 +89,43 @@ export default function ProductDetailModal({ product: initialProduct, allProduct
     modalTopRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 3D Turntable Drag Handlers
+  const handleStageMouseDown = (e) => {
+    setIsDragging3D(true);
+    setAutoSpin3D(false);
+    dragStartPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleStageMouseMove = (e) => {
+    if (!isDragging3D) return;
+    const deltaX = e.clientX - dragStartPos.current.x;
+    const deltaY = e.clientY - dragStartPos.current.y;
+    setStageRotY((prev) => prev + deltaX * 0.7);
+    setStageRotX((prev) => Math.max(-35, Math.min(35, prev - deltaY * 0.4)));
+    dragStartPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleStageMouseUp = () => {
+    setIsDragging3D(false);
+  };
+
+  const handleStageTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      setIsDragging3D(true);
+      setAutoSpin3D(false);
+      dragStartPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  };
+
+  const handleStageTouchMove = (e) => {
+    if (!isDragging3D || e.touches.length !== 1) return;
+    const deltaX = e.touches[0].clientX - dragStartPos.current.x;
+    const deltaY = e.touches[0].clientY - dragStartPos.current.y;
+    setStageRotY((prev) => prev + deltaX * 0.8);
+    setStageRotX((prev) => Math.max(-35, Math.min(35, prev - deltaY * 0.5)));
+    dragStartPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+
   return (
     <div className="modal-backdrop product-detail-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="modal-card product-detail-card" ref={modalTopRef} onClick={(e) => e.stopPropagation()}>
@@ -79,29 +134,132 @@ export default function ProductDetailModal({ product: initialProduct, allProduct
         </button>
 
         <div className="product-detail-layout">
-          {/* Left: Gallery Stage */}
+          {/* Left: Gallery & 3D Spatial Turntable Stage */}
           <div className="detail-media-column">
-            <div className="detail-main-image-wrap">
-              <img 
-                src={uniqueImages[activeImage] || product.image} 
-                alt={product.title} 
-                className="detail-main-img" 
-              />
-              {discount > 0 && <span className="detail-discount-chip">-{discount}% OFF</span>}
-              {!isInStock && <span className="detail-soldout-chip">Sold Out</span>}
+            {/* View Mode Segmented Control */}
+            <div className="detail-view-toggle-bar">
+              <button 
+                type="button" 
+                className={`detail-toggle-btn${viewMode === '2d' ? ' is-active' : ''}`}
+                onClick={() => setViewMode('2d')}
+              >
+                📸 Editorial Gallery
+              </button>
+              <button 
+                type="button" 
+                className={`detail-toggle-btn btn-3d${viewMode === '3d' ? ' is-active' : ''}`}
+                onClick={() => setViewMode('3d')}
+              >
+                🧊 3D Spatial Turntable
+              </button>
             </div>
-            {uniqueImages.length > 1 && (
-              <div className="detail-thumbnails-row">
-                {uniqueImages.map((img, idx) => (
-                  <button
-                    key={img + idx}
-                    type="button"
-                    className={`detail-thumb-btn${activeImage === idx ? ' is-active' : ''}`}
-                    onClick={() => setActiveImage(idx)}
-                  >
-                    <img src={img} alt="thumbnail" />
-                  </button>
-                ))}
+
+            {viewMode === '2d' ? (
+              <>
+                <div className="detail-main-image-wrap">
+                  <img 
+                    src={uniqueImages[activeImage] || product.image} 
+                    alt={product.title} 
+                    className="detail-main-img" 
+                  />
+                  {discount > 0 && <span className="detail-discount-chip">-{discount}% OFF</span>}
+                  {!isInStock && <span className="detail-soldout-chip">Sold Out</span>}
+                </div>
+                {uniqueImages.length > 1 && (
+                  <div className="detail-thumbnails-row">
+                    {uniqueImages.map((img, idx) => (
+                      <button
+                        key={img + idx}
+                        type="button"
+                        className={`detail-thumb-btn${activeImage === idx ? ' is-active' : ''}`}
+                        onClick={() => setActiveImage(idx)}
+                      >
+                        <img src={img} alt="thumbnail" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* ─── 3D SPATIAL TURNTABLE STAGE ─── */
+              <div 
+                className="detail-3d-turntable-stage"
+                onMouseDown={handleStageMouseDown}
+                onMouseMove={handleStageMouseMove}
+                onMouseUp={handleStageMouseUp}
+                onMouseLeave={handleStageMouseUp}
+                onTouchStart={handleStageTouchStart}
+                onTouchMove={handleStageTouchMove}
+                onTouchEnd={handleStageMouseUp}
+              >
+                {/* Glowing Ground Disk */}
+                <div 
+                  className="turntable-platform-disk" 
+                  style={{
+                    background: lightMode3D === 1 
+                      ? 'radial-gradient(ellipse at center, rgba(236,72,153,0.55) 0%, rgba(56,189,248,0.2) 50%, transparent 75%)'
+                      : lightMode3D === 2
+                      ? 'radial-gradient(ellipse at center, rgba(245,158,11,0.5) 0%, rgba(234,88,12,0.18) 50%, transparent 75%)'
+                      : 'radial-gradient(ellipse at center, rgba(59,130,246,0.45) 0%, rgba(236,72,153,0.2) 50%, transparent 75%)',
+                    boxShadow: lightMode3D === 1
+                      ? '0 0 40px rgba(236,72,153,0.5)'
+                      : lightMode3D === 2
+                      ? '0 0 35px rgba(245,158,11,0.45)'
+                      : '0 0 35px rgba(59,130,246,0.4)'
+                  }}
+                />
+
+                {/* 3D Rotating Garment Card */}
+                <div 
+                  className="turntable-garment-card"
+                  style={{
+                    transform: `rotateY(${stageRotY}deg) rotateX(${stageRotX}deg)`
+                  }}
+                >
+                  <img 
+                    src={uniqueImages[activeImage] || product.image} 
+                    alt={product.title} 
+                  />
+                  <div className="card-shine-glare" style={{ opacity: 0.8 }} />
+                </div>
+
+                {/* Stage Floating Action Controls */}
+                <div className="turntable-controls-bar">
+                  <div className="turntable-btn-group">
+                    <button
+                      type="button"
+                      className={`turntable-pill-btn${autoSpin3D ? ' is-active' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAutoSpin3D(!autoSpin3D);
+                      }}
+                    >
+                      {autoSpin3D ? '⏸ Pause' : '🔄 Auto-Spin'}
+                    </button>
+                    <button
+                      type="button"
+                      className="turntable-pill-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightMode3D((prev) => (prev + 1) % 3);
+                      }}
+                    >
+                      {lightMode3D === 1 ? '⚡ Cyber Neon' : lightMode3D === 2 ? '🌙 Noir Gold' : '💡 Studio Light'}
+                    </button>
+                    <button
+                      type="button"
+                      className="turntable-pill-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStageRotX(6);
+                        setStageRotY(0);
+                      }}
+                    >
+                      🎯 Center
+                    </button>
+                  </div>
+                  <span className="turntable-orbit-hint">Drag to orbit 360°</span>
+                </div>
               </div>
             )}
           </div>

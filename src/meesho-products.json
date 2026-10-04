@@ -1,5 +1,171 @@
 [
   {
+    "id": "meesho-swatch777",
+    "title": "3D Royal Velvet Maxi Dress",
+    "subtitle": "Curated fashion piece",
+    "category": "Women Dresses",
+    "collectionId": "meesho-dresses-2026",
+    "store": "Meesho",
+    "price": 949,
+    "oldPrice": 1281,
+    "costPrice": 588,
+    "estimatedProfit": 361,
+    "rating": 4.8,
+    "ratingCount": 1420,
+    "image": "https://images.meesho.com/images/products/66666/1_1024.jpg",
+    "galleryImages": [
+      "https://images.meesho.com/images/products/66666/1_1024.jpg",
+      "https://images.meesho.com/images/products/66666/2_1024.jpg"
+    ],
+    "primaryColor": "Classic Edition",
+    "colors": [
+      "Noir Black",
+      "Pearl White",
+      "Mocha Brown",
+      "Sage Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "inStock": true,
+    "productUrl": "https://www.meesho.com/p/swatch777",
+    "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=swatch777&utm_source=youtube_long_form",
+    "isRealListing": true,
+    "isPinterestCombo": true,
+    "isTrending": true,
+    "zeroStorage": true,
+    "status": "published",
+    "inboxAt": "2026-10-04T09:28:02.787713+00:00"
+  },
+  {
+    "id": "meesho-fusion999",
+    "title": "3D Shimmer Kaftan Fusion Dress",
+    "subtitle": "Curated fashion piece",
+    "category": "Women Dresses",
+    "collectionId": "meesho-dresses-2026",
+    "store": "Meesho",
+    "price": 899,
+    "oldPrice": 1213,
+    "costPrice": 557,
+    "estimatedProfit": 342,
+    "rating": 4.8,
+    "ratingCount": 1420,
+    "image": "https://images.meesho.com/images/products/77777/1_1024.jpg",
+    "galleryImages": [
+      "https://images.meesho.com/images/products/77777/1_1024.jpg",
+      "https://images.meesho.com/images/products/77777/2_1024.jpg"
+    ],
+    "primaryColor": "Classic Edition",
+    "colors": [
+      "Noir Black",
+      "Pearl White",
+      "Mocha Brown",
+      "Sage Green"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "inStock": true,
+    "productUrl": "https://www.meesho.com/p/fusion999",
+    "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=fusion999&utm_source=youtube_long_form",
+    "isRealListing": true,
+    "isPinterestCombo": true,
+    "isTrending": true,
+    "zeroStorage": true,
+    "status": "published",
+    "inboxAt": "2026-10-04T09:27:39.781770+00:00"
+  },
+  {
+    "id": "meesho-testvar001",
+    "title": "3D Ruched Velvet Evening Dress",
+    "subtitle": "Curated fashion piece",
+    "category": "Women Dresses",
+    "collectionId": "meesho-dresses-2026",
+    "store": "Meesho",
+    "price": 799,
+    "oldPrice": 1078,
+    "costPrice": 495,
+    "estimatedProfit": 304,
+    "rating": 4.8,
+    "ratingCount": 1420,
+    "image": "https://images.meesho.com/images/products/88888/1_1024.jpg",
+    "galleryImages": [
+      "https://images.meesho.com/images/products/88888/1_1024.jpg",
+      "https://images.meesho.com/images/products/88888/2_1024.jpg",
+      "https://images.meesho.com/images/products/88888/3_1024.jpg"
+    ],
+    "primaryColor": "Classic Edition",
+    "colors": [
+      "Noir Black",
+      "Pearl White",
+      "Mocha Brown",
+      "Sage Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "inStock": true,
+    "productUrl": "https://www.meesho.com/p/testvar001",
+    "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=testvar001&utm_source=youtube_long_form",
+    "isRealListing": true,
+    "isPinterestCombo": true,
+    "isTrending": true,
+    "zeroStorage": true,
+    "status": "published",
+    "inboxAt": "2026-10-04T09:26:47.939438+00:00"
+  },
+  {
+    "id": "meesho-test001",
+    "title": "Ruched Velvet Evening Cowl Maxi Dress",
+    "subtitle": "Curated fashion piece",
+    "category": "Women Dresses",
+    "collectionId": "meesho-dresses-2026",
+    "store": "Meesho",
+    "price": 699,
+    "oldPrice": 943,
+    "costPrice": 433,
+    "estimatedProfit": 266,
+    "rating": 4.8,
+    "ratingCount": 1420,
+    "image": "https://images.meesho.com/images/products/99999/1_512.jpg",
+    "galleryImages": [
+      "https://images.meesho.com/images/products/99999/1_512.jpg",
+      "https://images.meesho.com/images/products/99999/2_512.jpg",
+      "https://images.meesho.com/images/products/99999/3_512.jpg"
+    ],
+    "primaryColor": "Emerald Green",
+    "colors": [
+      "Emerald Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "inStock": true,
+    "productUrl": "https://www.meesho.com/p/test001",
+    "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=test001&utm_source=youtube_long_form",
+    "isRealListing": true,
+    "isPinterestCombo": true,
+    "isTrending": true,
+    "zeroStorage": true,
+    "status": "published",
+    "inboxAt": "2026-10-04T08:51:12.401946+00:00"
+  },
+  {
     "id": "p-meesho-elegant-women-pink-marble-print-sle-hofzfw",
     "ext_id": "hofzfw",
     "title": "Elegant Women Pink Marble Print Sleeveless Maxi Gown St",

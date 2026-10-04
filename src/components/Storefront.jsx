@@ -61,7 +61,8 @@ export default function Storefront({
   isAdmin = false,
   onDeleteProduct,
   onTogglePublish,
-  onEditProduct
+  onEditProduct,
+  onOpenWishlink
 }) {
   const [storeFilter, setStoreFilter] = useState('All stores');
   const [categoryFilter, setCategoryFilter] = useState('All picks');
@@ -92,6 +93,7 @@ export default function Storefront({
   const [tryOnModalOpen, setTryOnModalOpen] = useState(false);
   const [showroomModalOpen, setShowroomModalOpen] = useState(false);
   const [tryOnInitialProduct, setTryOnInitialProduct] = useState(null);
+  const [selectedShowroomProduct, setSelectedShowroomProduct] = useState(null);
   const [earningModalOpen, setEarningModalOpen] = useState(false);
   const [genzModalOpen, setGenzModalOpen] = useState(false);
   const [shopMenuOpen, setShopMenuOpen] = useState(false);
@@ -720,13 +722,16 @@ export default function Storefront({
           </button>
 
           <button 
-            className="ai-concierge-pill showroom-trigger-pill"
+            className="nav-3d-showroom-pill"
             type="button"
-            onClick={() => setShowroomModalOpen(true)}
-            title="Open Interactive 3D Style Studio"
+            onClick={() => {
+              setSelectedShowroomProduct(shopProducts[0] || null);
+              setShowroomModalOpen(true);
+            }}
+            title="Step into 3D Spatial Look Showroom"
           >
-            <span style={{ fontSize: '13px' }}>✨</span>
-            <span>3D Showroom</span>
+            <span style={{ fontSize: '13px' }}>🧊</span>
+            <span>3D Look Showroom</span>
           </button>
 
           <button 
@@ -746,6 +751,22 @@ export default function Storefront({
             title="Browse Viral Pinterest & Gen-Z Aesthetic Drops"
           >
             <span>📌 Pinterest Drops</span>
+          </button>
+
+          <button 
+            className="ai-concierge-pill wishlink-trigger-pill"
+            type="button"
+            onClick={onOpenWishlink || (() => { window.location.hash = '#wishlink'; })}
+            title="Open Meesho Creator Haul & Wishlink Hub"
+            style={{
+              background: 'linear-gradient(135deg, rgba(163, 72, 162, 0.14) 0%, rgba(238, 74, 115, 0.12) 100%)',
+              borderColor: 'rgba(163, 72, 162, 0.35)',
+              color: '#a348a2',
+              fontWeight: 700
+            }}
+          >
+            <span style={{ fontSize: '13px' }}>🌸</span>
+            <span>Wishlink Haul</span>
           </button>
 
           <button 
@@ -812,6 +833,23 @@ export default function Storefront({
 
         {/* Mobile Action Controls (<768px) */}
         <div className="storefront-mobile-actions">
+          <button 
+            className="ai-concierge-pill wishlink-mobile-btn"
+            type="button"
+            onClick={onOpenWishlink || (() => { window.location.hash = '#wishlink'; })}
+            title="Open Wishlink Haul"
+            style={{
+              padding: '6px 10px',
+              fontSize: '11.5px',
+              background: 'rgba(163, 72, 162, 0.12)',
+              borderColor: 'rgba(163, 72, 162, 0.3)',
+              color: '#a348a2',
+              fontWeight: 700
+            }}
+          >
+            <span>🌸 Wishlink</span>
+          </button>
+
           <button 
             className="theme-toggle-btn mobile-theme-btn"
             type="button"
@@ -1303,6 +1341,10 @@ export default function Storefront({
                   onTogglePublish={onTogglePublish}
                   onEditProduct={onEditProduct}
                   onToggleSaved={toggleSave}
+                  onOpen3DView={(prod) => {
+                    setSelectedShowroomProduct(prod);
+                    setShowroomModalOpen(true);
+                  }}
                   onInstantOrder={(prod) => setOrderModalProduct(prod)}
                   onViewDetail={(prod) => {
                     setActiveProductId(prod.id);
@@ -1549,10 +1591,15 @@ export default function Storefront({
         <React.Suspense fallback={null}>
           <InteractiveShowroomModal 
             products={shopProducts} 
-            onClose={() => setShowroomModalOpen(false)} 
+            initialProduct={selectedShowroomProduct}
+            onClose={() => {
+              setShowroomModalOpen(false);
+              setSelectedShowroomProduct(null);
+            }} 
             onOpenProduct={(p) => {
               setActiveProductId(p.id);
               setShowroomModalOpen(false);
+              setSelectedShowroomProduct(null);
             }}
           />
         </React.Suspense>

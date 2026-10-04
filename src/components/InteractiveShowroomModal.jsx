@@ -7,13 +7,19 @@ function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;
 }
 
-export default function InteractiveShowroomModal({ products = [], onClose, onOpenProduct }) {
+export default function InteractiveShowroomModal({ products = [], initialProduct = null, onClose, onOpenProduct }) {
   const mountRef = useRef(null);
-  const [selectedProduct, setSelectedProduct] = useState(() => products[0] || null);
-  const [stageColor, setStageColor] = useState('ivory'); // 'ivory', 'sage', 'sand'
+  const [selectedProduct, setSelectedProduct] = useState(() => initialProduct || products[0] || null);
+  const [stageColor, setStageColor] = useState('noir'); // 'noir', 'ivory', 'sage', 'sand'
   const [autoRotate, setAutoRotate] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [canvasReady, setCanvasReady] = useState(false);
+
+  useEffect(() => {
+    if (initialProduct) {
+      setSelectedProduct(initialProduct);
+    }
+  }, [initialProduct]);
 
   // Filter products for showroom
   const showroomItems = useMemo(() => {
@@ -42,11 +48,12 @@ export default function InteractiveShowroomModal({ products = [], onClose, onOpe
     // Scene
     const scene = new THREE.Scene();
     const bgColors = {
+      noir: 0x090a0f,
       ivory: 0xfbf9f5,
       sage: 0xf1f5ed,
       sand: 0xf8f4ec
     };
-    scene.background = new THREE.Color(bgColors[stageColor] || 0xfbf9f5);
+    scene.background = new THREE.Color(bgColors[stageColor] || 0x090a0f);
 
     // Camera
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
@@ -197,10 +204,33 @@ export default function InteractiveShowroomModal({ products = [], onClose, onOpe
       targetRotationY = currentRotY;
     };
 
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches.length === 1) {
+        isDragging = true;
+        prevMouseX = e.touches[0].clientX;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isDragging || !e.touches || e.touches.length !== 1) return;
+      const delta = e.touches[0].clientX - prevMouseX;
+      prevMouseX = e.touches[0].clientX;
+      currentRotY += delta * 0.015;
+      targetRotationY = currentRotY;
+    };
+
+    const handleTouchEnd = () => {
+      isDragging = false;
+      currentRotY = mannequinGroup.rotation.y;
+    };
+
     container.addEventListener('mousemove', handleMouseMove);
     container.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mousemove', handleMouseDrag);
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd);
 
     // Resize Observer
     const handleResize = () => {
@@ -242,6 +272,9 @@ export default function InteractiveShowroomModal({ products = [], onClose, onOpe
       container.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mousemove', handleMouseDrag);
+      container.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('resize', handleResize);
 
       // Disposal
@@ -274,6 +307,14 @@ export default function InteractiveShowroomModal({ products = [], onClose, onOpe
           <div className="showroom-stage-controls">
             <span className="stage-ctrl-label">Stage Ambience:</span>
             <div className="stage-palette-pills">
+              <button 
+                type="button" 
+                className={`stage-pill-btn${stageColor === 'noir' ? ' is-active' : ''}`}
+                onClick={() => setStageColor('noir')}
+                title="Deep Noir Cyber Studio"
+              >
+                <span className="palette-swatch" style={{ background: '#090A0F', border: '1px solid #3b82f6' }} /> Noir
+              </button>
               <button 
                 type="button" 
                 className={`stage-pill-btn${stageColor === 'ivory' ? ' is-active' : ''}`}

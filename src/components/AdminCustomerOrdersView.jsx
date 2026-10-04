@@ -16,6 +16,21 @@ export default function AdminCustomerOrdersView({ onToast }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  // Fetch real orders from backend database on mount
+  React.useEffect(() => {
+    fetch('/api/orders')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+          try {
+            localStorage.setItem('shelf_customer_orders', JSON.stringify(data.orders));
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const q = search.toLowerCase().trim();
@@ -31,22 +46,74 @@ export default function AdminCustomerOrdersView({ onToast }) {
     });
   }, [orders, search, statusFilter]);
 
-  const updateOrderStatus = (orderId, newStatus) => {
-    const updated = orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o));
+  const [selectedFulfillOrder, setSelectedFulfillOrder] = useState(null);
+  const [fulfillmentData, setFulfillmentData] = useState(null);
+  const [isFulfilling, setIsFulfilling] = useState(false);
+  const [copiedClipboard, setCopiedClipboard] = useState(false);
+
+  const handleOpenAiFulfill = async (order) => {
+    setSelectedFulfillOrder(order);
+    setIsFulfilling(true);
+    setFulfillmentData(null);
+    setCopiedClipboard(false);
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(order.id)}/ai-fulfill`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.success && data.fulfillment) {
+        setFulfillmentData(data.fulfillment);
+      } else {
+        const price = Number(order.price || 499);
+        const base = Number(order.base_cost || Math.round(price * 0.70));
+        const margin = Math.max(0, price - base);
+        setFulfillmentData({
+          order_id: order.id,
+          meesho_code: order.ext_id || '374453404',
+          meesho_url: order.ext_id ? `https://www.meesho.com/p/${order.ext_id}` : 'https://www.meesho.com',
+          financials: { customer_price: price, base_cost: base, reseller_margin: margin },
+          customer: { name: order.customer, phone: order.phone, address: { full_text: order.address, pincode: order.pincode } },
+          clipboard_text: `Customer: ${order.customer}\nPhone: ${order.phone}\nAddress: ${order.address}\nPincode: ${order.pincode}\nResell Order: YES\nCustomer COD: ₹${price}\nMargin: ₹${margin}`
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsFulfilling(false);
+    }
+  };
+
+  const updateOrderStatus = (orderId, newStatus, fulfillmentStatus) => {
+    const updated = orders.map((o) => (o.id === orderId ? { ...o, status: newStatus, ...(fulfillmentStatus ? { fulfillment_status: fulfillmentStatus } : {}) } : o));
     setOrders(updated);
     try {
       localStorage.setItem('shelf_customer_orders', JSON.stringify(updated));
     } catch {}
+
+    const patchBody = { status: newStatus };
+    if (fulfillmentStatus) patchBody.fulfillment_status = fulfillmentStatus;
+
+    fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patchBody)
+    }).catch(() => {});
+
     onToast?.(`Order ${orderId} marked as ${newStatus}`);
   };
 
   const deleteOrder = (orderId) => {
-    if (window.confirm(`Delete order ${orderId} from log?`)) {
+    if (window.confirm(`Delete order ${orderId} from database?`)) {
       const updated = orders.filter((o) => o.id !== orderId);
       setOrders(updated);
       try {
         localStorage.setItem('shelf_customer_orders', JSON.stringify(updated));
       } catch {}
+
+      fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+        method: 'DELETE'
+      }).catch(() => {});
+
       onToast?.(`Order ${orderId} removed`);
     }
   };
@@ -222,15 +289,36 @@ export default function AdminCustomerOrdersView({ onToast }) {
                       </td>
                       <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenAiFulfill(order)}
+                            style={{
+                              background: order.fulfillment_status === 'dispatched' ? 'rgba(34, 197, 94, 0.15)' : 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                              color: order.fulfillment_status === 'dispatched' ? '#16a34a' : '#fff',
+                              border: order.fulfillment_status === 'dispatched' ? '1px solid rgba(34, 197, 94, 0.3)' : 'none',
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '11.5px',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              boxShadow: order.fulfillment_status === 'dispatched' ? 'none' : '0 2px 8px rgba(99, 102, 241, 0.25)'
+                            }}
+                            title="Open 1-Click AI Auto-Fulfillment Assistant"
+                          >
+                            <span>🤖</span> {order.fulfillment_status === 'dispatched' ? '✓ Dispatched' : 'AI Auto-Fulfill'}
+                          </button>
                           {cleanPhone && (
                             <a
                               href={waChatUrl}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ background: '#22c55e', color: '#fff', borderRadius: '6px', padding: '6px 10px', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                              style={{ background: '#22c55e', color: '#fff', borderRadius: '8px', padding: '6px 10px', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                               title="Chat with customer on WhatsApp"
                             >
-                              <span>Chat WA</span> ↗
+                              <span>WA</span> ↗
                             </a>
                           )}
                           <button
@@ -248,6 +336,207 @@ export default function AdminCustomerOrdersView({ onToast }) {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── AI 1-Click Auto-Fulfillment Assistant Modal ── */}
+      {selectedFulfillOrder && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            padding: '20px'
+          }}
+          onClick={() => setSelectedFulfillOrder(null)}
+        >
+          <div
+            style={{
+              background: 'var(--paper, #ffffff)',
+              borderRadius: '24px',
+              maxWidth: '680px',
+              width: '100%',
+              padding: '28px',
+              boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.35)',
+              border: '1px solid var(--line, #e2e8f0)',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '11px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: '#fff', padding: '3px 8px', borderRadius: '6px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    🤖 AI Auto-Fulfillment Agent
+                  </span>
+                  <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600 }}>
+                    Order {selectedFulfillOrder.id}
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)' }}>
+                  1-Click Meesho Reseller Dispatch
+                </h2>
+                <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginTop: '2px' }}>
+                  AI calculates reseller margins and prepares automated shipping payload. You only verify and dispatch!
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedFulfillOrder(null)}
+                style={{ background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ink)' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {isFulfilling ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <span style={{ fontSize: '32px', display: 'block', marginBottom: '12px' }}>⚙️</span>
+                <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink)' }}>AI analyzing order &amp; calculating reseller margins...</p>
+              </div>
+            ) : fulfillmentData ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {/* Product & Code Strip */}
+                <div style={{ background: 'var(--canvas)', borderRadius: '14px', padding: '14px', border: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <strong style={{ fontSize: '13.5px', color: 'var(--ink)', display: 'block' }}>
+                      {selectedFulfillOrder.product}
+                    </strong>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px', fontSize: '11.5px', color: 'var(--muted)' }}>
+                      <span>Size: <strong style={{ color: 'var(--ink)' }}>{selectedFulfillOrder.size || 'M'}</strong></span>
+                      <span>·</span>
+                      <span>Color: <strong style={{ color: 'var(--ink)' }}>{selectedFulfillOrder.color || 'Standard'}</strong></span>
+                      <span>·</span>
+                      <span>Meesho Code: <strong style={{ color: 'var(--primary, #6366f1)' }}>{fulfillmentData.meesho_code}</strong></span>
+                    </div>
+                  </div>
+
+                  <a
+                    href={fulfillmentData.meesho_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ background: 'var(--ink)', color: '#fff', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    Open on Meesho ↗
+                  </a>
+                </div>
+
+                {/* Financial Margin Breakdown */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                  <div style={{ background: 'rgba(99, 102, 241, 0.08)', borderRadius: '12px', padding: '12px', border: '1px solid rgba(99, 102, 241, 0.2)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', fontWeight: 600 }}>Customer Collect (COD)</span>
+                    <strong style={{ fontSize: '18px', color: 'var(--ink)', marginTop: '2px', display: 'block' }}>
+                      {money(fulfillmentData.financials?.customer_price)}
+                    </strong>
+                  </div>
+
+                  <div style={{ background: 'var(--canvas)', borderRadius: '12px', padding: '12px', border: '1px solid var(--line)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', fontWeight: 600 }}>Meesho Wholesale Base</span>
+                    <strong style={{ fontSize: '18px', color: 'var(--muted)', marginTop: '2px', display: 'block' }}>
+                      {money(fulfillmentData.financials?.base_cost)}
+                    </strong>
+                  </div>
+
+                  <div style={{ background: 'rgba(34, 197, 94, 0.12)', borderRadius: '12px', padding: '12px', border: '1px solid rgba(34, 197, 94, 0.3)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: '#15803d', display: 'block', fontWeight: 700 }}>Your Reseller Net Profit</span>
+                    <strong style={{ fontSize: '18px', color: '#16a34a', marginTop: '2px', display: 'block' }}>
+                      +{money(fulfillmentData.financials?.reseller_margin)}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Shipping Delivery Details Box */}
+                <div style={{ background: 'var(--paper)', borderRadius: '14px', border: '1px solid var(--line)', padding: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      📦 Customer Shipping Address
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(fulfillmentData.clipboard_text);
+                        setCopiedClipboard(true);
+                        onToast?.('✓ Copied formatted address & margin for Meesho app!');
+                        setTimeout(() => setCopiedClipboard(false), 2500);
+                      }}
+                      style={{ background: 'none', border: 'none', color: 'var(--primary, #6366f1)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      {copiedClipboard ? '✓ Copied to Clipboard!' : '📋 Copy All Formatted Details'}
+                    </button>
+                  </div>
+
+                  <div style={{ fontSize: '13px', color: 'var(--ink)', lineHeight: 1.5 }}>
+                    <div><strong>Recipient:</strong> {fulfillmentData.customer?.name} (📞 +91 {fulfillmentData.customer?.phone})</div>
+                    <div><strong>Address:</strong> {fulfillmentData.customer?.address?.full_text || selectedFulfillOrder.address}</div>
+                    <div><strong>Pincode:</strong> {selectedFulfillOrder.pincode}</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateOrderStatus(selectedFulfillOrder.id, 'Dispatched', 'dispatched');
+                      setSelectedFulfillOrder(null);
+                      onToast?.(`🚀 Order ${selectedFulfillOrder.id} marked as Dispatched! Net profit +${money(fulfillmentData.financials?.reseller_margin)}`);
+                    }}
+                    style={{
+                      flex: '1 1 200px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                      color: '#fff',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 14px rgba(22, 163, 74, 0.3)'
+                    }}
+                  >
+                    <span>✓</span> Verify &amp; Confirm Dispatched
+                  </button>
+
+                  {fulfillmentData.whatsapp_notify_text && (
+                    <a
+                      href={`https://wa.me/91${fulfillmentData.customer?.phone}?text=${encodeURIComponent(fulfillmentData.whatsapp_notify_text)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        padding: '0 16px',
+                        height: '44px',
+                        borderRadius: '12px',
+                        background: '#22c55e',
+                        color: '#fff',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                      title="Send tracking message to customer on WhatsApp"
+                    >
+                      <span>💬 Notify Customer</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

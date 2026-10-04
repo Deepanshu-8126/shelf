@@ -89,22 +89,36 @@ export default function InstantOrderModal({ product, onClose }) {
       `📮 *Pincode:* ${pincode || 'Verified All-India Pin'}\n\n` +
       `✅ _Please confirm order booking & share dispatch tracking ID!_`;
 
-    // Persist order in local audit log for creator/admin
+    // Persist order in backend database & local audit log for creator/admin
+    const newOrderPayload = {
+      id: orderRef,
+      order_ref: orderRef,
+      product: product.title,
+      product_id: product.id || '',
+      ext_id: product.ext_id || '',
+      product_url: product.productUrl || product.affiliateUrl || '',
+      image: product.image || '',
+      price,
+      base_cost: product.base_cost || product.baseCost || 0,
+      size: selectedSize,
+      color: selectedColor,
+      customer: name.trim(),
+      phone: cleanPhone,
+      address: address.trim(),
+      pincode,
+      date: new Date().toISOString(),
+      paymentMethod
+    };
+
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrderPayload)
+    }).catch(() => {});
+
     try {
       const existing = JSON.parse(localStorage.getItem('shelf_customer_orders') || '[]');
-      existing.unshift({
-        id: orderRef,
-        product: product.title,
-        price,
-        size: selectedSize,
-        color: selectedColor,
-        customer: name.trim(),
-        phone: cleanPhone,
-        address: address.trim(),
-        pincode,
-        date: new Date().toISOString(),
-        paymentMethod
-      });
+      existing.unshift(newOrderPayload);
       localStorage.setItem('shelf_customer_orders', JSON.stringify(existing.slice(0, 100)));
     } catch {}
 
