@@ -39,7 +39,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-04T09:28:02.787713+00:00"
+    "inboxAt": "2026-10-04T09:28:02.787713+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-fusion999",
@@ -80,7 +82,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-04T09:27:39.781770+00:00"
+    "inboxAt": "2026-10-04T09:27:39.781770+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-testvar001",
@@ -123,7 +127,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-04T09:26:47.939438+00:00"
+    "inboxAt": "2026-10-04T09:26:47.939438+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-test001",
@@ -163,13 +169,15 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-04T08:51:12.401946+00:00"
+    "inboxAt": "2026-10-04T08:51:12.401946+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-elegant-women-pink-marble-print-sle-hofzfw",
     "ext_id": "hofzfw",
     "title": "Elegant Women Pink Marble Print Sleeveless Maxi Gown St",
-    "subtitle": "Fabric\u00a0:\u00a0Lycra \u00b7 XS, S, M, L, XL \u00b7 meesho-genz-2026 Viral Fit",
+    "subtitle": "Fabric : Lycra · XS, S, M, L, XL · meesho-genz-2026 Viral Fit",
     "brand": "Meesho Verified Creator Supplier",
     "store": "Meesho",
     "category": "Gen Z Aesthetic & Streetwear",
@@ -220,13 +228,15 @@
     "clicks": 0,
     "commission": "45%",
     "saved": false,
-    "priceCheckedAt": "2026-10-04"
+    "priceCheckedAt": "2026-10-04",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-women-maroon-bodycon-maxi-dress-wit-i69e0n",
     "ext_id": "i69e0n",
     "title": "Women Maroon Bodycon Maxi Dress with Peplum Waist, Slee",
-    "subtitle": "Fabric\u00a0:\u00a0Lycra \u00b7 XS, S, M, L, XL \u00b7 meesho-genz-2026 Viral Fit",
+    "subtitle": "Fabric : Lycra · XS, S, M, L, XL · meesho-genz-2026 Viral Fit",
     "brand": "Meesho Verified Creator Supplier",
     "store": "Meesho",
     "category": "Gen Z Aesthetic & Streetwear",
@@ -277,13 +287,15 @@
     "clicks": 0,
     "commission": "45%",
     "saved": false,
-    "priceCheckedAt": "2026-10-04"
+    "priceCheckedAt": "2026-10-04",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-shrastha-premium-women-s-220-gsm-ly-fflxkf",
     "ext_id": "fflxkf",
     "title": "SHRASTHA Premium Women's 220 GSM Lycra Fit and Flare Mi",
-    "subtitle": "Fabric\u00a0:\u00a0Lycra \u00b7 XS, S, M, L, XL \u00b7 meesho-genz-2026 Viral Fit",
+    "subtitle": "Fabric : Lycra · XS, S, M, L, XL · meesho-genz-2026 Viral Fit",
     "brand": "Meesho Verified Creator Supplier",
     "store": "Meesho",
     "category": "Gen Z Aesthetic & Streetwear",
@@ -334,13 +346,15 @@
     "clicks": 0,
     "commission": "45%",
     "saved": false,
-    "priceCheckedAt": "2026-10-04"
+    "priceCheckedAt": "2026-10-04",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-floral-printed-long-maxi-dress-for--htfszv",
     "ext_id": "htfszv",
     "title": "Floral Printed Long Maxi Dress for Women Trendy Bodycon",
-    "subtitle": "Fabric\u00a0:\u00a0Lycra \u00b7 XS, S, M, L, XL \u00b7 meesho-genz-2026 Viral Fit",
+    "subtitle": "Fabric : Lycra · XS, S, M, L, XL · meesho-genz-2026 Viral Fit",
     "brand": "Meesho Verified Creator Supplier",
     "store": "Meesho",
     "category": "Gen Z Aesthetic & Streetwear",
@@ -391,13 +405,15 @@
     "clicks": 0,
     "commission": "45%",
     "saved": false,
-    "priceCheckedAt": "2026-10-04"
+    "priceCheckedAt": "2026-10-04",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-trendy-halter-neck-stylish-top-pink-cld4vg",
     "ext_id": "cld4vg",
     "title": "Trendy Halter Neck Stylish Top Pink",
-    "subtitle": "Pink \u00b7 Cotton \u00b7 S, M, L, XL \u00b7 Gen Z Viral Fit",
+    "subtitle": "Pink · Cotton · S, M, L, XL · Gen Z Viral Fit",
     "brand": "Meesho Verified Creator Supplier",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -436,7 +452,9 @@
     "clicks": 0,
     "commission": "15%",
     "saved": false,
-    "priceCheckedAt": "2026-10-04"
+    "priceCheckedAt": "2026-10-04",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hd2yfj",
@@ -477,7 +495,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-03T17:02:55.538217+00:00"
+    "inboxAt": "2026-10-03T17:02:55.538217+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hd2yfk",
@@ -552,7 +572,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-03T17:02:55.513833+00:00"
+    "inboxAt": "2026-10-03T17:02:55.513833+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-7akb0m",
@@ -567,46 +589,9 @@
     "estimatedProfit": 285,
     "rating": 4.8,
     "ratingCount": 1420,
-    "image": "https://images.meesho.com/images/products/441006790/kwbun_512.webp?width=512",
+    "image": "/images/meesho-western-black-highneck.webp",
     "galleryImages": [
-      "https://images.meesho.com/images/products/441006790/kwbun_512.webp?width=512",
-      "https://images.meesho.com/images/products/1089727746/jkuej_512.webp?width=360",
-      "https://images.meesho.com/images/products/665875033/ft8sg_512.webp?width=360",
-      "https://images.meesho.com/images/products/1089720117/st8kr_512.webp?width=360",
-      "https://images.meesho.com/images/products/641746232/12sag_512.webp?width=360",
-      "https://images.meesho.com/images/products/990247913/0pq8z_512.webp?width=360",
-      "https://images.meesho.com/images/products/1104713275/rxmxo_512.webp?width=360",
-      "https://images.meesho.com/images/products/1089994578/orxts_512.webp?width=360",
-      "https://images.meesho.com/images/products/431223323/txzrc_512.webp?width=360",
-      "https://images.meesho.com/images/products/990252375/2hhpj_512.webp?width=360",
-      "https://images.meesho.com/images/products/1100058740/ecyr9_512.webp?width=360",
-      "https://images.meesho.com/images/products/1078827476/t39om_512.webp?width=360",
-      "https://images.meesho.com/images/products/1035927288/xwho4_512.webp?width=360",
-      "https://images.meesho.com/images/products/1049897936/1zvnk_512.webp?width=360",
-      "https://images.meesho.com/images/products/680750196/yjnqg_512.webp?width=360",
-      "https://images.meesho.com/images/products/1025305763/ehv4e_512.webp?width=360",
-      "https://images.meesho.com/images/products/1103131116/p19xi_512.webp?width=360",
-      "https://images.meesho.com/images/products/639474578/hnngg_512.webp?width=360",
-      "https://images.meesho.com/images/products/1090605797/ku5es_512.webp?width=360",
-      "https://images.meesho.com/images/products/1092966574/hnwg0_512.webp?width=360",
-      "https://images.meesho.com/images/products/1007164735/rmqxe_512.webp?width=360",
-      "https://videos.meesho.com/reviews/videos/ratings_reviews/1/795312856/a48ca08b6a364f24ada43302ec171323/thumbnail0000000000.jpeg",
-      "https://images.meesho.com/images/products/72806819/r1gzc_512.webp?width=360",
-      "https://images.meesho.com/images/products/1074712223/zrntu_512.webp?width=360",
-      "https://images.meesho.com/images/products/975499165/stncz_512.webp?width=360",
-      "https://images.meesho.com/images/products/1109162600/myxny_512.webp?width=360",
-      "https://images.meesho.com/images/products/1080378198/nvlke_512.webp?width=360",
-      "https://images.meesho.com/images/products/1101588484/lo5ur_512.webp?width=360",
-      "https://images.meesho.com/images/products/695032384/k5ofy_512.webp?width=360",
-      "https://images.meesho.com/images/products/635174031/xeoqj_512.webp?width=360",
-      "https://images.meesho.com/images/products/578090365/yppyu_512.webp?width=360",
-      "https://images.meesho.com/images/products/608634133/omaam_512.webp?width=360",
-      "https://images.meesho.com/images/products/1055655834/sza9n_512.webp?width=360",
-      "https://videos.meesho.com/reviews/videos/ratings_reviews/-1957404402/-1980727800/f5478db2a6db40c8936c0171e1095bfb/thumbnail0000000000.jpeg",
-      "https://images.meesho.com/images/products/1104713275/rxmxo_512.webp",
-      "https://images.meesho.com/images/products/1078827476/t39om_512.webp",
-      "https://images.meesho.com/images/products/441006790/kwbun_512.webp",
-      "https://images.meesho.com/images/products/641746232/12sag_512.webp"
+      "/images/meesho-western-black-highneck.webp"
     ],
     "primaryColor": "Heather Grey",
     "colors": [
@@ -631,7 +616,12 @@
     "zeroStorage": true,
     "status": "published",
     "inboxAt": "2026-10-03T16:45:57.373573+00:00",
-    "pricePrefix": "From"
+    "pricePrefix": "From",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-black-highneck.webp"
+    ]
   },
   {
     "id": "meesho-gy50r7",
@@ -648,20 +638,20 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1024792863/u47ko_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1024792863/u47ko_512.webp?width=360",
-      "https://images.meesho.com/images/products/1024792706/f11ok_512.webp?width=360",
-      "https://images.meesho.com/images/products/595890794/xldlp_512.webp?width=360",
-      "https://images.meesho.com/images/products/1024792765/ztg8w_512.webp?width=360",
-      "https://images.meesho.com/images/products/630769092/g6ttn_512.webp?width=360",
-      "https://images.meesho.com/images/products/920731117/k46tm_512.webp?width=360",
-      "https://images.meesho.com/images/products/1012595532/xfllg_512.webp?width=360",
-      "https://images.meesho.com/images/products/1085852315/16a1w_512.webp?width=360",
-      "https://images.meesho.com/images/products/1066908647/hz6c7_512.webp?width=360",
-      "https://images.meesho.com/images/products/919918236/4zhl2_512.webp?width=360",
-      "https://images.meesho.com/images/products/951407841/wys0i_512.webp?width=360",
-      "https://images.meesho.com/images/products/991645314/zoocm_512.webp?width=360",
-      "https://images.meesho.com/images/products/1101194868/4gs3a_512.webp?width=360",
-      "https://images.meesho.com/images/products/971779328/omp6x_512.webp?width=360"
+      "https://images.meesho.com/images/products/1024792863/u47ko_512.webp",
+      "https://images.meesho.com/images/products/1024792706/f11ok_512.webp",
+      "https://images.meesho.com/images/products/595890794/xldlp_512.webp",
+      "https://images.meesho.com/images/products/1024792765/ztg8w_512.webp",
+      "https://images.meesho.com/images/products/630769092/g6ttn_512.webp",
+      "https://images.meesho.com/images/products/920731117/k46tm_512.webp",
+      "https://images.meesho.com/images/products/1012595532/xfllg_512.webp",
+      "https://images.meesho.com/images/products/1085852315/16a1w_512.webp",
+      "https://images.meesho.com/images/products/1066908647/hz6c7_512.webp",
+      "https://images.meesho.com/images/products/919918236/4zhl2_512.webp",
+      "https://images.meesho.com/images/products/951407841/wys0i_512.webp",
+      "https://images.meesho.com/images/products/991645314/zoocm_512.webp",
+      "https://images.meesho.com/images/products/1101194868/4gs3a_512.webp",
+      "https://images.meesho.com/images/products/971779328/omp6x_512.webp"
     ],
     "primaryColor": "Classic Edition",
     "colors": [
@@ -685,7 +675,9 @@
     "isTrending": true,
     "zeroStorage": true,
     "status": "published",
-    "inboxAt": "2026-10-03T16:39:16.434371+00:00"
+    "inboxAt": "2026-10-03T16:39:16.434371+00:00",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-gt8sxn",
@@ -705,7 +697,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/439052889/mg47j_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/439052889/mg47j_512.webp?width=360"
+      "https://images.meesho.com/images/products/439052889/mg47j_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -723,7 +715,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=gt8sxn&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomens-cotton-blend-tie-dye-round-neck-regular-fit-t-shirt-pack-of-1%2Fp%2Fgt8sxn",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hvthq9",
@@ -743,7 +737,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/718080778/x1eb0_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/718080778/x1eb0_512.webp?width=360"
+      "https://images.meesho.com/images/products/718080778/x1eb0_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -761,7 +755,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hvthq9&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fblack-oversizedplus-sizeloose-t-shirt-for-women-half-sleeves-printed-t-shirt-for-women-s-oversized-t-shirt-loose-fit-baggy-t-shirt-for-women-shoulder-t-shirt-for-women%2Fp%2Fhvthq9",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-9wap4q",
@@ -781,7 +777,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/595890794/xldlp_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/595890794/xldlp_512.webp?width=360"
+      "https://images.meesho.com/images/products/595890794/xldlp_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -799,7 +795,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=9wap4q&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Furban-forge-women-black-white-striped-oversized-t-shirt-stylish-casual-wear-top-for-girls%2Fp%2F9wap4q",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-ffoy86",
@@ -819,7 +817,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1104430812/qvxgb_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1104430812/qvxgb_512.webp?width=360"
+      "https://images.meesho.com/images/products/1104430812/qvxgb_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -837,7 +835,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=ffoy86&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomen-oversize-t-shirt%2Fp%2Fffoy86",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hoi3ww",
@@ -857,7 +857,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/372064592/05qxl_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/372064592/05qxl_512.webp?width=360"
+      "https://images.meesho.com/images/products/372064592/05qxl_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -875,7 +875,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hoi3ww&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomen-regular-casual-printed-tshirt%2Fp%2Fhoi3ww",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hgfns6",
@@ -895,7 +897,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1085033922/a9knf_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1085033922/a9knf_512.webp?width=360"
+      "https://images.meesho.com/images/products/1085033922/a9knf_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -913,7 +915,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hgfns6&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fdensse-women-gym-t-shirt-for-gym-yoga-sports-running-women-gym-tshirts-gym-top-t-shirt%2Fp%2Fhgfns6",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-i9am25",
@@ -933,7 +937,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/721263220/ludtm_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/721263220/ludtm_512.webp?width=360"
+      "https://images.meesho.com/images/products/721263220/ludtm_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -951,7 +955,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=i9am25&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Ffancy-latest-design-women-t-shirt%2Fp%2Fi9am25",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-fo7cqp",
@@ -971,7 +977,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/962743543/cz813_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/962743543/cz813_512.webp?width=360"
+      "https://images.meesho.com/images/products/962743543/cz813_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -989,7 +995,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=fo7cqp&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Felviapremium-series-womens-printed-cotton-t-shirt%2Fp%2Ffo7cqp",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-bdlwag",
@@ -1009,7 +1017,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1068712133/n0ymz_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1068712133/n0ymz_512.webp?width=360"
+      "https://images.meesho.com/images/products/1068712133/n0ymz_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1027,7 +1035,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=bdlwag&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fcompression-tshirts-for-gym%2Fp%2Fbdlwag",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-h6fk9n",
@@ -1047,7 +1057,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/597736825/3obgq_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/597736825/3obgq_512.webp?width=360"
+      "https://images.meesho.com/images/products/597736825/3obgq_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1065,7 +1075,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=h6fk9n&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomens-black-white-striped-regular-fit-half-sleeve-casual-t-shirt-stylish-round-neck-top-for-college-shopping-travel-office-and-everyday-wear%2Fp%2Fh6fk9n",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-bviyoa",
@@ -1085,7 +1097,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1085030029/qfixu_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1085030029/qfixu_512.webp?width=360"
+      "https://images.meesho.com/images/products/1085030029/qfixu_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1103,7 +1115,9 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=bviyoa&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Ftrendy-elegant-women-tshirts-kshs%2Fp%2Fbviyoa",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hxechn",
@@ -1123,7 +1137,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/718308633/amkxo_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/718308633/amkxo_512.webp?width=360"
+      "https://images.meesho.com/images/products/718308633/amkxo_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1141,13 +1155,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hxechn&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomens-stylish-printed-cotton-blend-t-shirt-regular-fit-casual-top-for-everyday-wear%2Fp%2Fhxechn",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-com-2026-10-03-2.csv"
+    "source": "meesho-com-2026-10-03-2.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hcbl8r",
     "ext_id": "hcbl8r",
     "title": "Urbane Fashionista Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton Blend \u00b7 Pattern\u00a0:\u00a0Printed \u00b7 Apparel",
+    "subtitle": "Fabric : Cotton Blend · Pattern : Printed · Apparel",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -1161,7 +1177,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/991022523/biysj_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/991022523/biysj_512.webp?width=360"
+      "https://images.meesho.com/images/products/991022523/biysj_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1179,13 +1195,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hcbl8r&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fcombo-of-boatneck-cotton-blend-oversized-dtf-print-t-shirts%2Fp%2Fhcbl8r",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-cigc2n",
     "ext_id": "cigc2n",
     "title": "Comfy Graceful Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton \u00b7 Pattern\u00a0:\u00a0Printed \u00b7 Apparel",
+    "subtitle": "Fabric : Cotton · Pattern : Printed · Apparel",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -1199,7 +1217,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1107572963/ifjk3_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107572963/ifjk3_512.webp?width=360"
+      "https://images.meesho.com/images/products/1107572963/ifjk3_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1217,13 +1235,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=cigc2n&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2F77-girls-white-oversize-baggy-fit-trendy-for-girls-and-women%2Fp%2Fcigc2n",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-hnklyn",
     "ext_id": "hnklyn",
     "title": "Trendy Fabulous Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton Blend \u00b7 Pattern\u00a0:\u00a0Solid \u00b7 Top / Tee",
+    "subtitle": "Fabric : Cotton Blend · Pattern : Solid · Top / Tee",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1237,7 +1257,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/886840536/yb6ja_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/886840536/yb6ja_512.webp?width=360"
+      "https://images.meesho.com/images/products/886840536/yb6ja_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1255,13 +1275,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=hnklyn&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomens-red-half-sleeve-down-shoulder-round-neck-t-shirt-stylish-casual-relaxed-fit-t-shirt-for-girls%2Fp%2Fhnklyn",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-i3nevd",
     "ext_id": "i3nevd",
     "title": "Trendy Modern Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton \u00b7 Pattern\u00a0:\u00a0Printed \u00b7 Top / Tee",
+    "subtitle": "Fabric : Cotton · Pattern : Printed · Top / Tee",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1275,7 +1297,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1080385968/wy04u_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1080385968/wy04u_512.webp?width=360"
+      "https://images.meesho.com/images/products/1080385968/wy04u_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1293,13 +1315,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=i3nevd&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Foversized-t-shirt-women-oversized-t-shirt-print-t-shirt-baggy-t-shirt-korean-style-t-shirt-streetwear-t-shirt-casual-women-t-shirt-trendy-tee-cotton-t-shirt-summer-t-shirt%2Fp%2Fi3nevd",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-ffwba3",
     "ext_id": "ffwba3",
     "title": "Comfy Fashionable Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton Blend \u00b7 Pattern\u00a0:\u00a0Solid \u00b7 Top / Tee",
+    "subtitle": "Fabric : Cotton Blend · Pattern : Solid · Top / Tee",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1313,7 +1337,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1109210156/0d1kk_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1109210156/0d1kk_512.webp?width=360"
+      "https://images.meesho.com/images/products/1109210156/0d1kk_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1331,13 +1355,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=ffwba3&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomen-beige-dark-brown-solid-oversized-t-shirt-combo-pack-of-2-cotton-round-neck-half-sleeve-casual-loose-fit-korean-style-trendy-daily-wear-tees%2Fp%2Fffwba3",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-gwn1g5",
     "ext_id": "gwn1g5",
     "title": "Pretty Fabulous Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton Blend \u00b7 Pattern\u00a0:\u00a0Printed \u00b7 Top / Tee",
+    "subtitle": "Fabric : Cotton Blend · Pattern : Printed · Top / Tee",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1351,7 +1377,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/545245448/2wiup_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/545245448/2wiup_512.webp?width=360"
+      "https://images.meesho.com/images/products/545245448/2wiup_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1369,13 +1395,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=gwn1g5&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Fwomens-freedom-eagle-oversized-cotton-graphic-t-shirt-vintage-moon-print-drop-shoulder-streetwear-tee%2Fp%2Fgwn1g5",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "meesho-i9js9o",
     "ext_id": "i9js9o",
     "title": "Classy Glamorous Women Tshirts",
-    "subtitle": "Fabric\u00a0:\u00a0Cotton Blend \u00b7 Pattern\u00a0:\u00a0Printed \u00b7 Apparel",
+    "subtitle": "Fabric : Cotton Blend · Pattern : Printed · Apparel",
     "brand": "Meesho Verified Store",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -1389,7 +1417,7 @@
     "ratingCount": 1280,
     "image": "https://images.meesho.com/images/products/1099436122/n7by5_512.webp?width=360",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1099436122/n7by5_512.webp?width=360"
+      "https://images.meesho.com/images/products/1099436122/n7by5_512.webp"
     ],
     "colors": [
       "Classic Edition",
@@ -1407,13 +1435,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?p_id=542355935&ext_id=i9js9o&utm_source=youtube_long_form&url=https%3A%2F%2Fwww.meesho.com%2Freglan-women-taddy-print%2Fp%2Fi9js9o",
     "status": "published",
     "isRealListing": true,
-    "source": "3.csv"
+    "source": "3.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-8yqj09",
     "ext_id": "8yqj09",
     "title": "Sumeer net crop top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1445,13 +1475,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=8yqj09&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-3oid3q",
     "ext_id": "3oid3q",
     "title": "Square-neck printed long-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1483,13 +1515,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=3oid3q&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-5w5kd6",
     "ext_id": "5w5kd6",
     "title": "Black animal-print high-neck top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1521,13 +1555,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=5w5kd6&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-6fjd2s",
     "ext_id": "6fjd2s",
     "title": "Black off-shoulder top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1559,13 +1595,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=6fjd2s&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-60z2eh",
     "ext_id": "60z2eh",
     "title": "Lace-detail cut-out top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1597,13 +1635,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=60z2eh&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-91navc",
     "ext_id": "91navc",
     "title": "Party-wear top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1635,13 +1675,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=91navc&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-6ftmb2",
     "ext_id": "6ftmb2",
     "title": "Brown casual top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1673,13 +1715,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=6ftmb2&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7sr163",
     "ext_id": "7sr163",
     "title": "Hollow-out long-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1711,13 +1755,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7sr163&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7g8eff",
     "ext_id": "7g8eff",
-    "title": "Elegant women\u2019s top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "title": "Elegant women’s top",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1749,13 +1795,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7g8eff&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-37maln",
     "ext_id": "37maln",
     "title": "High-neck short-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1787,13 +1835,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=37maln&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i57vfs",
     "ext_id": "i57vfs",
     "title": "Floral-print sheer mesh top",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -1825,13 +1875,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i57vfs&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-8dlzq8",
     "ext_id": "8dlzq8",
-    "title": "Urbane modern women\u2019s top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "title": "Urbane modern women’s top",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1863,13 +1915,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=8dlzq8&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7wzhy7",
     "ext_id": "7wzhy7",
     "title": "Pretty fabulous long-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1901,13 +1955,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7wzhy7&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-6bw73t",
     "ext_id": "6bw73t",
     "title": "Off-shoulder ruffle-hem top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1939,13 +1995,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=6bw73t&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-8td8d8",
     "ext_id": "8td8d8",
     "title": "V-neck flared-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -1977,13 +2035,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=8td8d8&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-6pxx46",
     "ext_id": "6pxx46",
     "title": "Long-sleeve Korean-style top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2015,13 +2075,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=6pxx46&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-8n98vw",
     "ext_id": "8n98vw",
     "title": "Imported dori-style poncho top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2053,13 +2115,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=8n98vw&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-8ulbno",
     "ext_id": "8ulbno",
     "title": "Korean-inspired casual top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2091,13 +2155,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=8ulbno&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-6t8k9b",
     "ext_id": "6t8k9b",
     "title": "Canvas tote with a happy print",
-    "subtitle": "Accessories \u00b7 Authentic Meesho Pick",
+    "subtitle": "Accessories · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bags & Accessories",
@@ -2129,13 +2195,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=6t8k9b&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7ubl63",
     "ext_id": "7ubl63",
     "title": "Hot-pink cropped puffer jacket",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -2167,13 +2235,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7ubl63&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-5xcd6h",
     "ext_id": "5xcd6h",
     "title": "10-pair everyday earrings edit",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -2205,13 +2275,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=5xcd6h&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7ql4tg",
     "ext_id": "7ql4tg",
     "title": "Vidusha blue-print cotton kurti set",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -2243,13 +2315,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7ql4tg&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7gk5gy",
     "ext_id": "7gk5gy",
     "title": "Antique table lamp with jute shade",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -2281,13 +2355,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7gk5gy&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-a9tn1w",
     "ext_id": "a9tn1w",
     "title": "Black v-neck wool-blend cardigan",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -2319,13 +2395,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=a9tn1w&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-3b6toh",
     "ext_id": "3b6toh",
     "title": "Kashmiri-feel embroidered wool stole",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -2357,13 +2435,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=3b6toh&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-7kphk7",
     "ext_id": "7kphk7",
     "title": "Quilted puffer vest",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -2395,13 +2475,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=7kphk7&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hgyhrb",
     "ext_id": "hgyhrb",
     "title": "Daily-wear printed side-tie kurti",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -2415,7 +2497,7 @@
     "ratingCount": 266,
     "image": "https://images.meesho.com/images/products/1056408167/krjcw_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1056408167/krjcw_512.webp?width=512"
+      "https://images.meesho.com/images/products/1056408167/krjcw_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2433,13 +2515,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hgyhrb&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibkwbi",
     "ext_id": "ibkwbi",
     "title": "Peach botanical-print short kurti",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -2453,7 +2537,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1107841950/l5b9t_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107841950/l5b9t_512.webp?width=512"
+      "https://images.meesho.com/images/products/1107841950/l5b9t_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2471,13 +2555,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibkwbi&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i8bl8t",
     "ext_id": "i8bl8t",
     "title": "Beige floral tie-up top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2491,7 +2577,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1102368845/m39u8_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1102368845/m39u8_512.webp?width=512"
+      "https://images.meesho.com/images/products/1102368845/m39u8_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2509,13 +2595,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i8bl8t&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-icis10",
     "ext_id": "icis10",
     "title": "Magenta pink tiered V-neck top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2529,7 +2617,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1109422692/stvdk_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1109422692/stvdk_512.webp?width=512"
+      "https://images.meesho.com/images/products/1109422692/stvdk_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2547,13 +2635,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=icis10&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i5xnpq",
     "ext_id": "i5xnpq",
     "title": "Red gingham puff-sleeve peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2567,7 +2657,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1098359630/ugbhd_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1098359630/ugbhd_512.webp?width=512"
+      "https://images.meesho.com/images/products/1098359630/ugbhd_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2585,13 +2675,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i5xnpq&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-icbsva",
     "ext_id": "icbsva",
     "title": "White ribbed tie-front peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2605,7 +2697,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1109097190/xobxx_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1109097190/xobxx_512.webp?width=512"
+      "https://images.meesho.com/images/products/1109097190/xobxx_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2623,13 +2715,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=icbsva&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-d1ahvh",
     "ext_id": "d1ahvh",
     "title": "Pink sweetheart tie-up top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2643,7 +2737,7 @@
     "ratingCount": 19,
     "image": "https://images.meesho.com/images/products/788229629/dp5pd_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/788229629/dp5pd_512.webp?width=512"
+      "https://images.meesho.com/images/products/788229629/dp5pd_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2661,13 +2755,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=d1ahvh&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-81xddl",
     "ext_id": "81xddl",
     "title": "Mizo white collared top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2681,7 +2777,7 @@
     "ratingCount": 2858,
     "image": "https://images.meesho.com/images/products/486966009/uling_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/486966009/uling_512.webp?width=512"
+      "https://images.meesho.com/images/products/486966009/uling_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2699,13 +2795,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=81xddl&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hs9m2g",
     "ext_id": "hs9m2g",
     "title": "Imported Turkish mesh crop top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2719,7 +2817,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1075402744/qld3s_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1075402744/qld3s_512.webp?width=512"
+      "https://images.meesho.com/images/products/1075402744/qld3s_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2737,13 +2835,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hs9m2g&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hx9n0y",
     "ext_id": "hx9n0y",
     "title": "Pink gingham puff-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2757,7 +2857,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1083802066/h2ler_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1083802066/h2ler_512.webp?width=512"
+      "https://images.meesho.com/images/products/1083802066/h2ler_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2775,13 +2875,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hx9n0y&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-iah4lm",
     "ext_id": "iah4lm",
     "title": "Green western long-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2795,7 +2897,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1105986442/ebdek_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1105986442/ebdek_512.webp?width=512"
+      "https://images.meesho.com/images/products/1105986442/ebdek_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2813,13 +2915,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=iah4lm&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hswwdx",
     "ext_id": "hswwdx",
     "title": "Kashmira floral cotton top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2833,7 +2937,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1076489205/ufguh_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1076489205/ufguh_512.webp?width=512"
+      "https://images.meesho.com/images/products/1076489205/ufguh_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2851,13 +2955,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hswwdx&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i02chc",
     "ext_id": "i02chc",
     "title": "Seoul Stories floral peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2871,7 +2977,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1088500656/tobfr_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1088500656/tobfr_512.webp?width=512"
+      "https://images.meesho.com/images/products/1088500656/tobfr_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2889,13 +2995,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i02chc&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-iawjwy",
     "ext_id": "iawjwy",
     "title": "Yellow checked puff-sleeve top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2909,7 +3017,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1106706130/ryx9f_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1106706130/ryx9f_512.webp?width=512"
+      "https://images.meesho.com/images/products/1106706130/ryx9f_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2927,13 +3035,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=iawjwy&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hrc1q8",
     "ext_id": "hrc1q8",
     "title": "Beige floral tie-up short kurti",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -2947,7 +3057,7 @@
     "ratingCount": 47,
     "image": "https://images.meesho.com/images/products/1073836736/q6myp_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1073836736/q6myp_512.webp?width=512"
+      "https://images.meesho.com/images/products/1073836736/q6myp_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -2965,13 +3075,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hrc1q8&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i47gkn",
     "ext_id": "i47gkn",
     "title": "Black checked cotton top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -2985,7 +3097,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1095457703/zwmsd_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1095457703/zwmsd_512.webp?width=512"
+      "https://images.meesho.com/images/products/1095457703/zwmsd_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3003,13 +3115,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i47gkn&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-h9j1u0",
     "ext_id": "h9j1u0",
     "title": "Teal paisley embroidered crop shirt",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3023,7 +3137,7 @@
     "ratingCount": 35,
     "image": "https://images.meesho.com/images/products/1043930376/uk9u9_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1043930376/uk9u9_512.webp?width=512"
+      "https://images.meesho.com/images/products/1043930376/uk9u9_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3041,13 +3155,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=h9j1u0&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hgyjn7",
     "ext_id": "hgyjn7",
     "title": "Printed daily-wear short kurti",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3061,7 +3177,7 @@
     "ratingCount": 68,
     "image": "https://images.meesho.com/images/products/1056410611/31zvg_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1056410611/31zvg_512.webp?width=512"
+      "https://images.meesho.com/images/products/1056410611/31zvg_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3079,13 +3195,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hgyjn7&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hxzdqs",
     "ext_id": "hxzdqs",
     "title": "Red checked cotton crop top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3099,7 +3217,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1085003092/3fjfj_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1085003092/3fjfj_512.webp?width=512"
+      "https://images.meesho.com/images/products/1085003092/3fjfj_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3117,13 +3235,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hxzdqs&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hxi020",
     "ext_id": "hxi020",
     "title": "Plaid bow-front peplum shirt",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3137,7 +3257,7 @@
     "ratingCount": 9,
     "image": "https://images.meesho.com/images/products/1084192200/cxbcv_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1084192200/cxbcv_512.webp?width=512"
+      "https://images.meesho.com/images/products/1084192200/cxbcv_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3155,13 +3275,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hxi020&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibf8li",
     "ext_id": "ibf8li",
     "title": "Peach embroidered tunic top",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3175,7 +3297,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1107577926/8mdiz_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107577926/8mdiz_512.webp?width=512"
+      "https://images.meesho.com/images/products/1107577926/8mdiz_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3193,13 +3315,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibf8li&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hxa80s",
     "ext_id": "hxa80s",
     "title": "Blue checked puff-sleeve peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3213,7 +3337,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1083829276/jx6si_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1083829276/jx6si_512.webp?width=512"
+      "https://images.meesho.com/images/products/1083829276/jx6si_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3231,13 +3355,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hxa80s&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i9l5pc",
     "ext_id": "i9l5pc",
     "title": "Yellow floral side-dori top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3251,7 +3377,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1104494880/bzlxi_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1104494880/bzlxi_512.webp?width=512"
+      "https://images.meesho.com/images/products/1104494880/bzlxi_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3269,13 +3395,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i9l5pc&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hnhwha",
     "ext_id": "hnhwha",
     "title": "White chiffon sleeveless top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3289,7 +3417,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1067391406/0lnhe_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1067391406/0lnhe_512.webp?width=512"
+      "https://images.meesho.com/images/products/1067391406/0lnhe_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3307,13 +3435,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hnhwha&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i72g4z",
     "ext_id": "i72g4z",
     "title": "Beige floral V-neck top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3327,7 +3457,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1100262707/sjpxy_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1100262707/sjpxy_512.webp?width=512"
+      "https://images.meesho.com/images/products/1100262707/sjpxy_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3345,13 +3475,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i72g4z&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hsxhuc",
     "ext_id": "hsxhuc",
-    "title": "Kashmira floral cotton top \u00b7 BB",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "title": "Kashmira floral cotton top · BB",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3365,7 +3497,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1076517012/ccq43_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1076517012/ccq43_512.webp?width=512"
+      "https://images.meesho.com/images/products/1076517012/ccq43_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3383,13 +3515,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hsxhuc&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-g89cvl",
     "ext_id": "g89cvl",
     "title": "Maroon printed V-neck tunic top",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3403,7 +3537,7 @@
     "ratingCount": 73,
     "image": "https://images.meesho.com/images/products/981332337/d1slh_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/981332337/d1slh_512.webp?width=512"
+      "https://images.meesho.com/images/products/981332337/d1slh_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3421,13 +3555,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=g89cvl&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hvahpb",
     "ext_id": "hvahpb",
     "title": "Gingham puff-sleeve peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3441,7 +3577,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1080482591/ya56r_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1080482591/ya56r_512.webp?width=512"
+      "https://images.meesho.com/images/products/1080482591/ya56r_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3459,13 +3595,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hvahpb&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i1vg7j",
     "ext_id": "i1vg7j",
     "title": "Black printed corset-style tunic",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3479,7 +3617,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1091538127/v62jr_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1091538127/v62jr_512.webp?width=512"
+      "https://images.meesho.com/images/products/1091538127/v62jr_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3497,13 +3635,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i1vg7j&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i81kkl",
     "ext_id": "i81kkl",
     "title": "Purple floral printed top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3517,7 +3657,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1101901413/4aey9_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1101901413/4aey9_512.webp?width=512"
+      "https://images.meesho.com/images/products/1101901413/4aey9_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3535,13 +3675,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i81kkl&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibehh3",
     "ext_id": "ibehh3",
-    "title": "Jaipuri floral empire top \u00b7 blue",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "title": "Jaipuri floral empire top · blue",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3555,7 +3697,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1107542775/fszzn_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107542775/fszzn_512.webp?width=512"
+      "https://images.meesho.com/images/products/1107542775/fszzn_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3573,13 +3715,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibehh3&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibgu6i",
     "ext_id": "ibgu6i",
     "title": "Floral V-neck longline tunic",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3593,7 +3737,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1107652554/pqgk1_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107652554/pqgk1_512.webp?width=512"
+      "https://images.meesho.com/images/products/1107652554/pqgk1_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3611,13 +3755,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibgu6i&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i1x3qe",
     "ext_id": "i1x3qe",
     "title": "Cream full-sleeve corset-fit top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3631,7 +3777,7 @@
     "ratingCount": 7,
     "image": "https://images.meesho.com/images/products/1091615270/r6hfq_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1091615270/r6hfq_512.webp?width=512"
+      "https://images.meesho.com/images/products/1091615270/r6hfq_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3649,13 +3795,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i1x3qe&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i2opo7",
     "ext_id": "i2opo7",
     "title": "Printed short kurti",
-    "subtitle": "Kurti \u00b7 Authentic Meesho Pick",
+    "subtitle": "Kurti · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Kurtis",
@@ -3669,7 +3817,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1092903415/objtr_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1092903415/objtr_512.webp?width=512"
+      "https://images.meesho.com/images/products/1092903415/objtr_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3687,13 +3835,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i2opo7&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ga6wfd",
     "ext_id": "ga6wfd",
     "title": "Maroon floral V-neck top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3707,7 +3857,7 @@
     "ratingCount": 14,
     "image": "https://images.meesho.com/images/products/984576937/eh9xn_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/984576937/eh9xn_512.webp?width=512"
+      "https://images.meesho.com/images/products/984576937/eh9xn_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3725,13 +3875,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ga6wfd&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hzxq6a",
     "ext_id": "hzxq6a",
     "title": "Pink & blue striped top set",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3745,7 +3897,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1088285122/pzm58_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1088285122/pzm58_512.webp?width=512"
+      "https://images.meesho.com/images/products/1088285122/pzm58_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3763,13 +3915,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hzxq6a&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hz5oo6",
     "ext_id": "hz5oo6",
     "title": "Pink printed short top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3783,7 +3937,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1086976806/qh3qx_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1086976806/qh3qx_512.webp?width=512"
+      "https://images.meesho.com/images/products/1086976806/qh3qx_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3801,13 +3955,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hz5oo6&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-g59dds",
     "ext_id": "g59dds",
     "title": "Summer Turkish embroidered top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3821,7 +3977,7 @@
     "ratingCount": 56,
     "image": "https://images.meesho.com/images/products/976294144/zxte4_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/976294144/zxte4_512.webp?width=512"
+      "https://images.meesho.com/images/products/976294144/zxte4_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3839,13 +3995,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=g59dds&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i17z2m",
     "ext_id": "i17z2m",
     "title": "Green rayon A-line top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3859,7 +4017,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1090442830/hzjaq_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1090442830/hzjaq_512.webp?width=512"
+      "https://images.meesho.com/images/products/1090442830/hzjaq_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3877,13 +4035,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i17z2m&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i89ubp",
     "ext_id": "i89ubp",
     "title": "White double-side dori top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3897,7 +4057,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1102287301/gufai_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1102287301/gufai_512.webp?width=512"
+      "https://images.meesho.com/images/products/1102287301/gufai_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3915,13 +4075,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i89ubp&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hovc9u",
     "ext_id": "hovc9u",
     "title": "Yellow checked cotton peplum top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3935,7 +4097,7 @@
     "ratingCount": 8,
     "image": "https://images.meesho.com/images/products/1069698018/w4r2w_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1069698018/w4r2w_512.webp?width=512"
+      "https://images.meesho.com/images/products/1069698018/w4r2w_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3953,13 +4115,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hovc9u&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibf265",
     "ext_id": "ibf265",
-    "title": "Jaipuri floral empire top \u00b7 yellow",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "title": "Jaipuri floral empire top · yellow",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -3973,7 +4137,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1107569597/v5bya_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1107569597/v5bya_512.webp?width=512"
+      "https://images.meesho.com/images/products/1107569597/v5bya_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -3991,13 +4155,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibf265&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i9m3al",
     "ext_id": "i9m3al",
     "title": "Orange printed rayon top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4011,7 +4177,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1104538413/p6yyj_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1104538413/p6yyj_512.webp?width=512"
+      "https://images.meesho.com/images/products/1104538413/p6yyj_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -4029,13 +4195,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i9m3al&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i8b9kh",
     "ext_id": "i8b9kh",
     "title": "Beige floral side-tie top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4049,7 +4217,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1102353713/ya3gf_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1102353713/ya3gf_512.webp?width=512"
+      "https://images.meesho.com/images/products/1102353713/ya3gf_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -4067,13 +4235,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i8b9kh&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hy1coy",
     "ext_id": "hy1coy",
     "title": "Black Jaipuri floral-print top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4087,7 +4257,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1085095042/wcigi_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1085095042/wcigi_512.webp?width=512"
+      "https://images.meesho.com/images/products/1085095042/wcigi_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -4105,13 +4275,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hy1coy&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i0yzat",
     "ext_id": "i0yzat",
     "title": "Printed side-dori top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4125,7 +4297,7 @@
     "ratingCount": 1420,
     "image": "https://images.meesho.com/images/products/1090023221/hriue_512.webp?width=512",
     "galleryImages": [
-      "https://images.meesho.com/images/products/1090023221/hriue_512.webp?width=512"
+      "https://images.meesho.com/images/products/1090023221/hriue_512.webp"
     ],
     "colors": [
       "Noir Black",
@@ -4143,13 +4315,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i0yzat&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hhck2a",
     "ext_id": "hhck2a",
     "title": "Sheer Tube Dress / Bestseller Dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4181,13 +4355,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hhck2a&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i45j67",
     "ext_id": "i45j67",
     "title": "Maroon ruched bodycon maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4219,13 +4395,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i45j67&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ae6lv9",
     "ext_id": "ae6lv9",
     "title": "Coffee-tone one-shoulder maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4257,13 +4435,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ae6lv9&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hpi4lz",
     "ext_id": "hpi4lz",
     "title": "Stylish Ravishing maroon bodycon maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4295,13 +4475,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hpi4lz&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ibsnwj",
     "ext_id": "ibsnwj",
     "title": "White & pink floral bodycon maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4333,13 +4515,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ibsnwj&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i3vfc3",
     "ext_id": "i3vfc3",
     "title": "Multicolor net bodycon maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4371,13 +4555,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i3vfc3&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-i96qm1",
     "ext_id": "i96qm1",
     "title": "Black sequin bodycon dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4409,13 +4595,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=i96qm1&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-boevl2",
     "ext_id": "boevl2",
     "title": "Pink bodycon maxi dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4447,13 +4635,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=boevl2&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-bg1m56",
     "ext_id": "bg1m56",
     "title": "Black mesh-sleeve party maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4485,13 +4675,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=bg1m56&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-92vpfo",
     "ext_id": "92vpfo",
     "title": "Blue bodycon maxi dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4523,13 +4715,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=92vpfo&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-b38f6j",
     "ext_id": "b38f6j",
     "title": "White puff-sleeve fit-and-flare dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4561,13 +4755,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=b38f6j&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-59w9ha",
     "ext_id": "59w9ha",
     "title": "Blue self-design party dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4599,13 +4795,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=59w9ha&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hpi12q",
     "ext_id": "hpi12q",
     "title": "Black off-shoulder floral mini dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4637,13 +4835,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hpi12q&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-gpc4vn",
     "ext_id": "gpc4vn",
     "title": "Maroon velvet embellished maxi",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4675,13 +4875,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=gpc4vn&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-c4jdu0",
     "ext_id": "c4jdu0",
     "title": "Pink heavy-Lycra bodycon dress",
-    "subtitle": "Dress \u00b7 Authentic Meesho Pick",
+    "subtitle": "Dress · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Women Dresses",
@@ -4713,13 +4915,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=c4jdu0&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ffva6i",
     "ext_id": "ffva6i",
     "title": "Portugal CR7 Ice Wave Edition Football Jersey",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -4751,13 +4955,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ffva6i&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-hoorf4",
     "ext_id": "hoorf4",
     "title": "Mbappe #10 Real Madrid 24/25 3rd Kit Embroidery",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -4789,13 +4995,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=hoorf4&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-f9k9l6",
     "ext_id": "f9k9l6",
     "title": "Argentina Midnight Blue #10 Messi Phantom Edition",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -4827,13 +5035,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=f9k9l6&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ha4eb9",
     "ext_id": "ha4eb9",
     "title": "Manchester City Haaland #9 Sky Blue Jersey",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -4865,13 +5075,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ha4eb9&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-fb84d8",
     "ext_id": "fb84d8",
     "title": "Brazil 24/25 Neymar Jr #10 Iconic Home Jersey",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -4903,13 +5115,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=fb84d8&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-b8jiod",
     "ext_id": "b8jiod",
     "title": "FC Barcelona Lamine Yamal #10 Blaugrana Kit",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4941,13 +5155,15 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=b8jiod&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-ferrari99",
     "ext_id": "ferrari99",
     "title": "Vintage Ferrari F1 Embroidered Racing Bomber Jacket",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -4959,9 +5175,9 @@
     "estimatedProfit": 419,
     "rating": 4.6,
     "ratingCount": 1820,
-    "image": "https://image.pollinations.ai/prompt/Vintage%20Ferrari%20F1%20embroidered%20racing%20bomber%20jacket%20red%20and%20black%20with%20sponsor%20patches%20laid%20flat%20on%20minimalist%20concrete%20studio%20background%2C%20hyper%20detailed%20stitching%2C%208k%20lookbook%20photography?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-party-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Vintage%20Ferrari%20F1%20embroidered%20racing%20bomber%20jacket%20red%20and%20black%20with%20sponsor%20patches%20laid%20flat%20on%20minimalist%20concrete%20studio%20background%2C%20hyper%20detailed%20stitching%2C%208k%20lookbook%20photography?width=768&height=1024&nologo=true"
+      "/images/meesho-western-party-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -4979,13 +5195,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=ferrari99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-party-top.webp"
+    ]
   },
   {
     "id": "p-meesho-spdr88",
     "ext_id": "spdr88",
     "title": "Spider Aesthetic Heavyweight Oversized Graphic Tee",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -4997,9 +5218,9 @@
     "estimatedProfit": 192,
     "rating": 4.5,
     "ratingCount": 940,
-    "image": "https://image.pollinations.ai/prompt/Spider%20aesthetic%20heavyweight%20vintage%20off-white%20oversized%20graphic%20t-shirt%20hanging%20on%20wooden%20hanger%20with%20sunlight%20shadows%2C%20clean%20minimalist%20editorial%20fashion%20photography?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-square-print-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Spider%20aesthetic%20heavyweight%20vintage%20off-white%20oversized%20graphic%20t-shirt%20hanging%20on%20wooden%20hanger%20with%20sunlight%20shadows%2C%20clean%20minimalist%20editorial%20fashion%20photography?width=768&height=1024&nologo=true"
+      "/images/meesho-western-square-print-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5017,13 +5238,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=spdr88&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-square-print-top.webp"
+    ]
   },
   {
     "id": "p-meesho-rb99",
     "ext_id": "rb99",
     "title": "Red Bull F1 Motorsports Vintage Track Jacket",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -5035,9 +5261,9 @@
     "estimatedProfit": 402,
     "rating": 4.6,
     "ratingCount": 1120,
-    "image": "https://image.pollinations.ai/prompt/Vintage%20Red%20Bull%20racing%20embroidered%20navy%20blue%20jacket%20with%20sponsor%20patches%20laid%20flat%20studio%20lighting%2C%20hyper%20detailed%2C%20fashion%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-elegant-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Vintage%20Red%20Bull%20racing%20embroidered%20navy%20blue%20jacket%20with%20sponsor%20patches%20laid%20flat%20studio%20lighting%2C%20hyper%20detailed%2C%20fashion%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-western-elegant-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5055,13 +5281,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=rb99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-elegant-top.webp"
+    ]
   },
   {
     "id": "p-meesho-merc99",
     "ext_id": "merc99",
     "title": "Mercedes-Benz AMG Retro Leather Racing Jacket",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -5073,9 +5304,9 @@
     "estimatedProfit": 454,
     "rating": 4.7,
     "ratingCount": 870,
-    "image": "https://image.pollinations.ai/prompt/Mercedes%20AMG%20white%20and%20black%20vintage%20leather%20racing%20jacket%20with%20embroidered%20patches%20on%20mannequin%2C%20high-fashion%20editorial%20lighting?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-black-highneck.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Mercedes%20AMG%20white%20and%20black%20vintage%20leather%20racing%20jacket%20with%20embroidered%20patches%20on%20mannequin%2C%20high-fashion%20editorial%20lighting?width=768&height=1024&nologo=true"
+      "/images/meesho-western-black-highneck.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5093,13 +5324,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=merc99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-black-highneck.webp"
+    ]
   },
   {
     "id": "p-meesho-sphood99",
     "ext_id": "sphood99",
     "title": "Spider Venom Colorblock Full-Zip Streetwear Hoodie",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -5111,9 +5347,9 @@
     "estimatedProfit": 349,
     "rating": 4.5,
     "ratingCount": 1430,
-    "image": "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20black%20colorblock%20zip-up%20hoodie%20with%20spider%20chest%20graphics%20on%20minimalist%20hanger%2C%20soft%20ambient%20studio%20light?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-black-cardigan.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20black%20colorblock%20zip-up%20hoodie%20with%20spider%20chest%20graphics%20on%20minimalist%20hanger%2C%20soft%20ambient%20studio%20light?width=768&height=1024&nologo=true"
+      "/images/meesho-black-cardigan.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5131,13 +5367,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=sphood99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-black-cardigan.webp"
+    ]
   },
   {
     "id": "p-meesho-brhlt99",
     "ext_id": "brhlt99",
     "title": "Brasil Y2K Halter Neck Ruched Crop Top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -5149,9 +5390,9 @@
     "estimatedProfit": 136,
     "rating": 4.6,
     "ratingCount": 1420,
-    "image": "https://image.pollinations.ai/prompt/Chic%20young%20model%20wearing%20yellow%20and%20green%20Brasil%20halter%20neck%20crop%20top%20with%20baggy%20wide-leg%20denim%20jeans%2C%20Pinterest%20aesthetic%20streetwear%20fashion%20photography%2C%20sunlit%20clean%20studio%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-yellow-side-dori-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Chic%20young%20model%20wearing%20yellow%20and%20green%20Brasil%20halter%20neck%20crop%20top%20with%20baggy%20wide-leg%20denim%20jeans%2C%20Pinterest%20aesthetic%20streetwear%20fashion%20photography%2C%20sunlit%20clean%20studio%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-yellow-side-dori-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5169,13 +5410,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=brhlt99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-yellow-side-dori-top.webp"
+    ]
   },
   {
     "id": "p-meesho-brtee88",
     "ext_id": "brtee88",
     "title": "Brasil 90s Ribbed Fitted Baby Tee",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -5187,9 +5433,9 @@
     "estimatedProfit": 122,
     "rating": 4.5,
     "ratingCount": 2180,
-    "image": "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%2090s%20ribbed%20baby%20tee%20laid%20flat%20with%20vintage%20denim%20and%20sunglasses%2C%20aesthetic%20Pinterest%20flatlay%20photography%2C%20crisp%20lighting?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-sumeer-net-crop-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%2090s%20ribbed%20baby%20tee%20laid%20flat%20with%20vintage%20denim%20and%20sunglasses%2C%20aesthetic%20Pinterest%20flatlay%20photography%2C%20crisp%20lighting?width=768&height=1024&nologo=true"
+      "/images/meesho-sumeer-net-crop-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5207,13 +5453,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=brtee88&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-sumeer-net-crop-top.webp"
+    ]
   },
   {
     "id": "p-meesho-brcami77",
     "ext_id": "brcami77",
     "title": "Brasil Cami Strappy Bandeau Corset Tank",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -5225,9 +5476,9 @@
     "estimatedProfit": 129,
     "rating": 4.5,
     "ratingCount": 970,
-    "image": "https://image.pollinations.ai/prompt/Green%20and%20yellow%20Brasil%20strappy%20corset%20cami%20tank%20top%20on%20minimalist%20hanger%2C%20clean%20aesthetic%20studio%20shot?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-ruffle-tube-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Green%20and%20yellow%20Brasil%20strappy%20corset%20cami%20tank%20top%20on%20minimalist%20hanger%2C%20clean%20aesthetic%20studio%20shot?width=768&height=1024&nologo=true"
+      "/images/meesho-western-ruffle-tube-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5245,13 +5496,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=brcami77&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-ruffle-tube-top.webp"
+    ]
   },
   {
     "id": "p-meesho-argtop99",
     "ext_id": "argtop99",
     "title": "Argentina #10 Sky Blue Crop Shrug Jersey Top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -5263,9 +5519,9 @@
     "estimatedProfit": 157,
     "rating": 4.7,
     "ratingCount": 840,
-    "image": "https://image.pollinations.ai/prompt/Argentina%20sky%20blue%20and%20white%20striped%20crop%20jersey%20top%20with%20tie-front%20strings%20flatlay%2C%20Pinterest%20viral%20fashion%20aesthetic?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-floral-mesh.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Argentina%20sky%20blue%20and%20white%20striped%20crop%20jersey%20top%20with%20tie-front%20strings%20flatlay%2C%20Pinterest%20viral%20fashion%20aesthetic?width=768&height=1024&nologo=true"
+      "/images/meesho-western-floral-mesh.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5283,13 +5539,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=argtop99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-floral-mesh.webp"
+    ]
   },
   {
     "id": "p-meesho-leocors99",
     "ext_id": "leocors99",
     "title": "Y2K Leopard Print Asymmetric Halter Corset Top",
-    "subtitle": "Top / Tee \u00b7 Authentic Meesho Pick",
+    "subtitle": "Top / Tee · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Baby Tees",
@@ -5301,9 +5562,9 @@
     "estimatedProfit": 139,
     "rating": 4.4,
     "ratingCount": 1650,
-    "image": "https://image.pollinations.ai/prompt/Y2K%20leopard%20print%20halter%20neck%20corset%20top%20with%20pointed%20hem%20laid%20flat%2C%20aesthetic%20Pinterest%20lookbook%20shot?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-lace-cutout.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Y2K%20leopard%20print%20halter%20neck%20corset%20top%20with%20pointed%20hem%20laid%20flat%2C%20aesthetic%20Pinterest%20lookbook%20shot?width=768&height=1024&nologo=true"
+      "/images/meesho-western-lace-cutout.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5321,13 +5582,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=leocors99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-lace-cutout.webp"
+    ]
   },
   {
     "id": "p-meesho-shrug99",
     "ext_id": "shrug99",
     "title": "Off-Shoulder Distressed Knit Shrug & Denim Shorts Combo",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5339,9 +5605,9 @@
     "estimatedProfit": 206,
     "rating": 4.7,
     "ratingCount": 1640,
-    "image": "https://image.pollinations.ai/prompt/Beige%20distressed%20off-shoulder%20crochet%20knit%20shrug%20and%20denim%20micro%20shorts%20set%20flatlay%20on%20clean%20white%20studio%20background%2C%20Pinterest%20aesthetic%20clothing%20collage%2C%208k%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-korean-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Beige%20distressed%20off-shoulder%20crochet%20knit%20shrug%20and%20denim%20micro%20shorts%20set%20flatlay%20on%20clean%20white%20studio%20background%2C%20Pinterest%20aesthetic%20clothing%20collage%2C%208k%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-western-korean-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5359,13 +5625,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=shrug99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-korean-top.webp"
+    ]
   },
   {
     "id": "p-meesho-spdbod99",
     "ext_id": "spdbod99",
     "title": "Spider-Man Red & Blue Cutout Graphic Bodysuit",
-    "subtitle": "Apparel \u00b7 Authentic Meesho Pick",
+    "subtitle": "Apparel · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Tops & Tunics",
@@ -5377,9 +5648,9 @@
     "estimatedProfit": 174,
     "rating": 4.6,
     "ratingCount": 890,
-    "image": "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20blue%20webbed%20graphic%20cutout%20bodysuit%20flatlay%20on%20minimalist%20background%2C%20Pinterest%20fashion%20aesthetic%2C%20clean%20lighting?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-red-checked-crop-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20blue%20webbed%20graphic%20cutout%20bodysuit%20flatlay%20on%20minimalist%20background%2C%20Pinterest%20fashion%20aesthetic%2C%20clean%20lighting?width=768&height=1024&nologo=true"
+      "/images/meesho-red-checked-crop-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5397,13 +5668,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=spdbod99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-red-checked-crop-top.webp"
+    ]
   },
   {
     "id": "p-meesho-vanilla99",
     "ext_id": "vanilla99",
     "title": "Vanilla Girl Ribbed Cardigan & Wide-Leg Denim Set",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5415,9 +5691,9 @@
     "estimatedProfit": 227,
     "rating": 4.8,
     "ratingCount": 2340,
-    "image": "https://image.pollinations.ai/prompt/Vanilla%20girl%20cream%20ribbed%20cardigan%20with%20matching%20cami%20and%20wide-leg%20acid%20wash%20jeans%20flatlay%2C%20aesthetic%20Pinterest%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-plaid-bow-peplum-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Vanilla%20girl%20cream%20ribbed%20cardigan%20with%20matching%20cami%20and%20wide-leg%20acid%20wash%20jeans%20flatlay%2C%20aesthetic%20Pinterest%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-plaid-bow-peplum-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5435,13 +5711,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=vanilla99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-plaid-bow-peplum-top.webp"
+    ]
   },
   {
     "id": "p-meesho-brskirt99",
     "ext_id": "brskirt99",
     "title": "Brasil Halter Top & Pleated Tennis Skirt 2-Piece Set",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5453,9 +5734,9 @@
     "estimatedProfit": 192,
     "rating": 4.7,
     "ratingCount": 1780,
-    "image": "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%20halter%20top%20with%20pleated%20white%20tennis%20skirt%20set%20flatlay%2C%20clean%20studio%20lighting%2C%20Pinterest%20viral%20fashion%20collage?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-dori-poncho.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%20halter%20top%20with%20pleated%20white%20tennis%20skirt%20set%20flatlay%2C%20clean%20studio%20lighting%2C%20Pinterest%20viral%20fashion%20collage?width=768&height=1024&nologo=true"
+      "/images/meesho-western-dori-poncho.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5473,13 +5754,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=brskirt99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-dori-poncho.webp"
+    ]
   },
   {
     "id": "p-meesho-dtmocha99",
     "ext_id": "dtmocha99",
     "title": "Downtown Girl Mocha Knit Cardigan & Acid Denim Set",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5491,9 +5777,9 @@
     "estimatedProfit": 241,
     "rating": 4.8,
     "ratingCount": 2150,
-    "image": "https://image.pollinations.ai/prompt/Downtown%20girl%20aesthetic%20mocha%20brown%20chunky%20knit%20cardigan%2C%20black%20fitted%20cami%2C%20vintage%20acid%20wash%20wide%20leg%20jeans%2C%20baguette%20bag%20flatlay%20on%20white%20studio%20floor%2C%208k%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-brown-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Downtown%20girl%20aesthetic%20mocha%20brown%20chunky%20knit%20cardigan%2C%20black%20fitted%20cami%2C%20vintage%20acid%20wash%20wide%20leg%20jeans%2C%20baguette%20bag%20flatlay%20on%20white%20studio%20floor%2C%208k%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-western-brown-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5511,13 +5797,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=dtmocha99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-brown-top.webp"
+    ]
   },
   {
     "id": "p-meesho-biker99",
     "ext_id": "biker99",
     "title": "Oversized Faux Leather Biker Bomber & Cargo Combo",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5529,9 +5820,9 @@
     "estimatedProfit": 454,
     "rating": 4.7,
     "ratingCount": 1380,
-    "image": "https://image.pollinations.ai/prompt/Oversized%20black%20leather%20biker%20bomber%20jacket%20with%20white%20crop%20tank%20and%20distressed%20black%20wide-leg%20cargos%20with%20chain%20belt%20flatlay%2C%20Pinterest%20streetwear%20fashion%20photography?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-offshoulder-black.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Oversized%20black%20leather%20biker%20bomber%20jacket%20with%20white%20crop%20tank%20and%20distressed%20black%20wide-leg%20cargos%20with%20chain%20belt%20flatlay%2C%20Pinterest%20streetwear%20fashion%20photography?width=768&height=1024&nologo=true"
+      "/images/meesho-western-offshoulder-black.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5549,13 +5840,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=biker99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-offshoulder-black.webp"
+    ]
   },
   {
     "id": "p-meesho-mcq99",
     "ext_id": "mcq99",
     "title": "Lightning 95 Vintage Racing Graphic Hoodie Combo",
-    "subtitle": "Winterwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Winterwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Winter Outerwear",
@@ -5567,9 +5863,9 @@
     "estimatedProfit": 297,
     "rating": 4.6,
     "ratingCount": 990,
-    "image": "https://image.pollinations.ai/prompt/White%20Lightning%2095%20vintage%20racing%20oversized%20hoodie%20with%20white%20tank%20and%20black%20straight-leg%20pants%20flatlay%2C%20clean%20aesthetic%20Pinterest%20shot?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-korean-long-sleeve.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/White%20Lightning%2095%20vintage%20racing%20oversized%20hoodie%20with%20white%20tank%20and%20black%20straight-leg%20pants%20flatlay%2C%20clean%20aesthetic%20Pinterest%20shot?width=768&height=1024&nologo=true"
+      "/images/meesho-western-korean-long-sleeve.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5587,13 +5883,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=mcq99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-korean-long-sleeve.webp"
+    ]
   },
   {
     "id": "p-meesho-wind99",
     "ext_id": "wind99",
     "title": "Retro Colorblock Track Windbreaker & Parachute Pants",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5605,9 +5906,9 @@
     "estimatedProfit": 332,
     "rating": 4.7,
     "ratingCount": 1540,
-    "image": "https://image.pollinations.ai/prompt/Navy%20blue%20and%20white%20colorblock%20retro%20windbreaker%20jacket%20with%20black%20baby%20tee%20and%20baggy%20black%20parachute%20cargos%20flatlay%2C%20Pinterest%20lookbook?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-vneck-flare.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Navy%20blue%20and%20white%20colorblock%20retro%20windbreaker%20jacket%20with%20black%20baby%20tee%20and%20baggy%20black%20parachute%20cargos%20flatlay%2C%20Pinterest%20lookbook?width=768&height=1024&nologo=true"
+      "/images/meesho-western-vneck-flare.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5625,13 +5926,18 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=wind99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-vneck-flare.webp"
+    ]
   },
   {
     "id": "p-meesho-jorts99",
     "ext_id": "jorts99",
     "title": "Minimalist Black Baby Tee & Washed Denim Jorts Set",
-    "subtitle": "Bottomwear \u00b7 Authentic Meesho Pick",
+    "subtitle": "Bottomwear · Authentic Meesho Pick",
     "brand": "Meesho Verified Creator Pick",
     "store": "Meesho",
     "category": "Bottomwear & Skirts",
@@ -5643,9 +5949,9 @@
     "estimatedProfit": 192,
     "rating": 4.5,
     "ratingCount": 1180,
-    "image": "https://image.pollinations.ai/prompt/Fitted%20black%20cotton%20baby%20tee%20with%20dark%20washed%20baggy%20denim%20jorts%20shorts%2C%20Diesel%20style%20belt%20and%20white%20sneakers%20flatlay%2C%20Pinterest%20fashion%20collage?width=768&height=1024&nologo=true",
+    "image": "/images/meesho-western-hollowout-top.webp",
     "galleryImages": [
-      "https://image.pollinations.ai/prompt/Fitted%20black%20cotton%20baby%20tee%20with%20dark%20washed%20baggy%20denim%20jorts%20shorts%2C%20Diesel%20style%20belt%20and%20white%20sneakers%20flatlay%2C%20Pinterest%20fashion%20collage?width=768&height=1024&nologo=true"
+      "/images/meesho-western-hollowout-top.webp"
     ],
     "colors": [
       "Noir Black",
@@ -5663,6 +5969,11 @@
     "affiliateUrl": "https://www.meesho.com/af_invite/374453404:youtube_long_form:12492338?ext_id=jorts99&utm_source=youtube_long_form",
     "status": "published",
     "isRealListing": true,
-    "source": "meesho-products-with-links.csv"
+    "source": "meesho-products-with-links.csv",
+    "aiFlagged": false,
+    "aiFlagReason": "",
+    "images": [
+      "/images/meesho-western-hollowout-top.webp"
+    ]
   }
 ]

@@ -34,7 +34,9 @@
     "trendScore": 115.8,
     "galleryImages": [
       "/images/meesho-dress-i45j67.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-ae6lv9",
@@ -74,7 +76,9 @@
     "trendScore": 67.2,
     "galleryImages": [
       "/images/meesho-dress-ae6lv9.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-59w9ha",
@@ -113,7 +117,9 @@
     "trendScore": 67.2,
     "galleryImages": [
       "/images/meesho-dress-59w9ha.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-b38f6j",
@@ -153,7 +159,9 @@
     "trendScore": 66.8,
     "galleryImages": [
       "/images/meesho-dress-b38f6j.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-boevl2",
@@ -192,7 +200,9 @@
     "trendScore": 65.46,
     "galleryImages": [
       "/images/meesho-dress-boevl2.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-c4jdu0",
@@ -232,7 +242,9 @@
     "trendScore": 65.2,
     "galleryImages": [
       "/images/meesho-dress-c4jdu0.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-gpc4vn",
@@ -273,7 +285,9 @@
       "/images/meesho-dress-gpc4vn.webp"
     ],
     "festiveBadge": "🪔 Diwali Special",
-    "isFestiveTrending": true
+    "isFestiveTrending": true,
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-92vpfo",
@@ -312,7 +326,9 @@
     "trendScore": 59.17,
     "galleryImages": [
       "/images/meesho-dress-92vpfo.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-hhck2a",
@@ -349,7 +365,9 @@
     "trendScore": 57.8,
     "galleryImages": [
       "/images/meesho-dress-hhck2a.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-ibsnwj",
@@ -386,7 +404,9 @@
     "trendScore": 57.8,
     "galleryImages": [
       "/images/meesho-dress-ibsnwj.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-i3vfc3",
@@ -423,7 +443,9 @@
     "trendScore": 57.8,
     "galleryImages": [
       "/images/meesho-dress-i3vfc3.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-i96qm1",
@@ -460,7 +482,9 @@
     "trendScore": 57.8,
     "galleryImages": [
       "/images/meesho-dress-i96qm1.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-hpi12q",
@@ -499,7 +523,9 @@
     "trendScore": 56.91,
     "galleryImages": [
       "/images/meesho-dress-hpi12q.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-bg1m56",
@@ -538,7 +564,9 @@
     "trendScore": 56.64,
     "galleryImages": [
       "/images/meesho-dress-bg1m56.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   },
   {
     "id": "p-meesho-dress-hpi4lz",
@@ -577,6 +605,8 @@
     "trendScore": 55.52,
     "galleryImages": [
       "/images/meesho-dress-hpi4lz.webp"
-    ]
+    ],
+    "aiFlagged": false,
+    "aiFlagReason": ""
   }
 ]

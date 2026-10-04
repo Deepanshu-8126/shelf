@@ -37,7 +37,7 @@ export default function AdminCatalogView({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedStore, setSelectedStore] = useState('All Stores');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'published', 'draft', 'archived', 'missing_link', 'missing_image'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'published', 'draft', 'archived', 'missing_link', 'missing_image', 'ai_flagged'
   const [minRatingFilter, setMinRatingFilter] = useState(0);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [pageSize, setPageSize] = useState(15);
@@ -45,6 +45,8 @@ export default function AdminCatalogView({
   const [copiedId, setCopiedId] = useState('');
   const [bulkCategoryTarget, setBulkCategoryTarget] = useState('Tops & Tunics');
   const [confirmModal, setConfirmModal] = useState(null); // { title, message, count, onConfirm }
+  const [manageImagesProduct, setManageImagesProduct] = useState(null);
+  const [imageIndexMap, setImageIndexMap] = useState({});
   const [importNotice, setImportNotice] = useState('');
   const fileInputRef = useRef(null);
 
@@ -53,6 +55,7 @@ export default function AdminCatalogView({
   const draftCount = useMemo(() => products.filter(p => p.status === 'draft' || p.status === 'pending_review').length, [products]);
   const archivedCount = useMemo(() => products.filter(p => p.status === 'archived').length, [products]);
   const missingLinkCount = useMemo(() => products.filter(p => !p.affiliateUrl).length, [products]);
+  const aiFlaggedCount = useMemo(() => products.filter(p => p.aiFlagged).length, [products]);
 
   // Filtered dataset
   const filteredProducts = useMemo(() => {
@@ -108,6 +111,8 @@ export default function AdminCatalogView({
         if (p.affiliateUrl) return false;
       } else if (statusFilter === 'missing_image') {
         if (p.image && !p.image.includes('placeholder')) return false;
+      } else if (statusFilter === 'ai_flagged') {
+        if (!p.aiFlagged) return false;
       }
 
       // 5. Min Rating
@@ -416,6 +421,19 @@ export default function AdminCatalogView({
         >
           ⚠️ Missing Affiliate Link ({missingLinkCount})
         </button>
+        <button 
+          type="button" 
+          onClick={() => { setStatusFilter('ai_flagged'); setPage(1); }}
+          className={`filter-chip${statusFilter === 'ai_flagged' ? ' is-active' : ''}`}
+          style={aiFlaggedCount > 0 ? {
+            borderColor: '#ef4444',
+            color: statusFilter === 'ai_flagged' ? '#fff' : '#dc2626',
+            background: statusFilter === 'ai_flagged' ? '#dc2626' : 'rgba(239, 68, 68, 0.08)',
+            fontWeight: '700'
+          } : {}}
+        >
+          🚨 AI Flagged ({aiFlaggedCount})
+        </button>
       </div>
 
       {/* Filter Control Bar */}
@@ -548,7 +566,7 @@ export default function AdminCatalogView({
                   aria-label="Select page"
                 />
               </th>
-              <th style={{ padding: '12px 10px', width: '60px' }}>Image</th>
+              <th style={{ padding: '12px 10px', width: '88px' }}>Photos</th>
               <th style={{ padding: '12px 14px' }}>Product Title &amp; Details</th>
               <th style={{ padding: '12px 14px', width: '140px' }}>Category</th>
               <th style={{ padding: '12px 14px', width: '90px' }}>Price</th>
@@ -568,12 +586,22 @@ export default function AdminCatalogView({
               paginatedProducts.map((p) => {
                 const isSelected = selectedIds.has(p.id);
                 const hasAffiliate = Boolean(p.affiliateUrl);
+                const productImages = (Array.isArray(p.images) && p.images.length > 0)
+                  ? p.images
+                  : (Array.isArray(p.galleryImages) && p.galleryImages.length > 0)
+                    ? p.galleryImages
+                    : [p.image || '/images/meesho-dress-ae6lv9.webp'];
+                const activeImgIdx = (imageIndexMap[p.id] !== undefined)
+                  ? Math.min(imageIndexMap[p.id], productImages.length - 1)
+                  : 0;
+                const currentImg = productImages[activeImgIdx] || productImages[0];
+
                 return (
                   <tr
                     key={p.id}
                     style={{
                       borderBottom: '1px solid var(--line)',
-                      background: isSelected ? 'var(--green-pale)' : 'transparent',
+                      background: isSelected ? 'var(--green-pale)' : p.aiFlagged ? 'rgba(239, 68, 68, 0.03)' : 'transparent',
                       transition: 'background 0.15s ease'
                     }}
                   >
@@ -586,25 +614,140 @@ export default function AdminCatalogView({
                       />
                     </td>
                     <td style={{ padding: '10px' }}>
-                      <div style={{ width: '44px', height: '56px', borderRadius: '6px', overflow: 'hidden', background: 'var(--canvas)', border: '1px solid var(--line)' }}>
+                      <div style={{ position: 'relative', width: '56px', height: '70px', borderRadius: '8px', overflow: 'hidden', background: 'var(--canvas)', border: p.aiFlagged ? '2px solid #ef4444' : '1px solid var(--line)', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
                         <img
-                          src={p.image || '/images/meesho-dress-ae6lv9.webp'}
+                          src={currentImg}
                           alt={p.title}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           loading="lazy"
                         />
+                        {p.aiFlagged && (
+                          <span
+                            style={{
+                              position: 'absolute',
+                              top: '2px',
+                              left: '2px',
+                              background: '#ef4444',
+                              color: '#fff',
+                              fontSize: '8px',
+                              fontWeight: '800',
+                              padding: '1px 3px',
+                              borderRadius: '3px',
+                              letterSpacing: '0.02em',
+                              lineHeight: '1.2'
+                            }}
+                            title={p.aiFlagReason || 'AI Image Flagged'}
+                          >
+                            AI
+                          </span>
+                        )}
+                        {productImages.length > 1 && (
+                          <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1px 2px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', color: '#fff', fontSize: '9px', fontWeight: '700' }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setImageIndexMap(prev => ({
+                                  ...prev,
+                                  [p.id]: (activeImgIdx - 1 + productImages.length) % productImages.length
+                                }));
+                              }}
+                              style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 2px', fontSize: '11px', lineHeight: '1' }}
+                              title="Previous Photo Variation"
+                            >
+                              ‹
+                            </button>
+                            <span style={{ fontSize: '8px' }}>{activeImgIdx + 1}/{productImages.length}</span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setImageIndexMap(prev => ({
+                                  ...prev,
+                                  [p.id]: (activeImgIdx + 1) % productImages.length
+                                }));
+                              }}
+                              style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 2px', fontSize: '11px', lineHeight: '1' }}
+                              title="Next Photo Variation"
+                            >
+                              ›
+                            </button>
+                          </div>
+                        )}
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => setManageImagesProduct(p)}
+                        style={{
+                          marginTop: '4px',
+                          fontSize: '9.5px',
+                          padding: '2px 5px',
+                          background: 'var(--canvas)',
+                          border: '1px solid var(--line)',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          color: 'var(--ink)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                          fontWeight: '600',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title="Add or manage images / color variations"
+                      >
+                        <span>➕ {productImages.length > 1 ? `${productImages.length} Imgs` : 'Add'}</span>
+                      </button>
                     </td>
                     <td style={{ padding: '12px 14px' }}>
                       <strong style={{ display: 'block', color: 'var(--ink)', fontSize: '13px', lineHeight: '1.4' }}>
                         {p.title}
                       </strong>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', fontSize: '11px', color: 'var(--muted)' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', fontSize: '11px', color: 'var(--muted)', flexWrap: 'wrap' }}>
                         <span>Store: {p.store || 'Meesho'}</span>
                         <span>·</span>
                         <span>ID: {p.ext_id || p.id}</span>
                         {p.rating && <span>· ⭐ {p.rating}</span>}
+                        {productImages.length > 1 && (
+                          <span style={{ color: 'var(--green-deep)', fontWeight: '600' }}>
+                            · 📸 {productImages.length} Variations
+                          </span>
+                        )}
                       </div>
+                      {p.aiFlagged && (
+                        <div style={{
+                          marginTop: '6px',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(239, 68, 68, 0.08)',
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          color: '#dc2626',
+                          fontSize: '11px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          flexWrap: 'wrap'
+                        }}>
+                          <span style={{ fontWeight: '700' }}>🚨 AI / Low-Res Image Detected:</span>
+                          <span style={{ opacity: 0.9, fontSize: '10.5px' }}>{p.aiFlagReason || 'Pollinations.ai / Synthetic Watermark'}</span>
+                          <button
+                            type="button"
+                            onClick={() => setManageImagesProduct(p)}
+                            style={{
+                              marginLeft: 'auto',
+                              background: '#dc2626',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '2px 8px',
+                              fontSize: '10px',
+                              fontWeight: '700',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Replace Photo
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '12px 14px' }}>
                       <span style={{ display: 'inline-block', padding: '3px 8px', borderRadius: '6px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '11px', fontWeight: '600' }}>
@@ -741,6 +884,152 @@ export default function AdminCatalogView({
           </div>
         </div>
       )}
+
+      {/* Multi-Image Variation Management Modal */}
+      {manageImagesProduct && (
+        <ManageImagesModal
+          product={manageImagesProduct}
+          onClose={() => setManageImagesProduct(null)}
+          onSave={async (updatedProduct) => {
+            await onUpdateProduct?.(updatedProduct.id, updatedProduct);
+            setManageImagesProduct(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ManageImagesModal({ product, onClose, onSave }) {
+  const [urlsInput, setUrlsInput] = useState('');
+  const initialImages = (Array.isArray(product.images) && product.images.length > 0)
+    ? [...product.images]
+    : (Array.isArray(product.galleryImages) && product.galleryImages.length > 0)
+      ? [...product.galleryImages]
+      : [product.image || '/images/meesho-dress-ae6lv9.webp'];
+  const [imageList, setImageList] = useState(initialImages);
+  const [saving, setSaving] = useState(false);
+
+  const handleAddUrls = (e) => {
+    e.preventDefault();
+    const newItems = urlsInput
+      .split(/[\n,]+/)
+      .map(u => u.trim())
+      .filter(u => u.length > 5);
+    if (newItems.length > 0) {
+      setImageList(prev => [...prev, ...newItems]);
+      setUrlsInput('');
+    }
+  };
+
+  const handleRemoveImage = (index) => {
+    if (imageList.length <= 1) {
+      alert('A product must retain at least 1 image.');
+      return;
+    }
+    setImageList(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({
+        ...product,
+        images: imageList,
+        image: imageList[0],
+        aiFlagged: false,
+        aiFlagReason: ''
+      });
+      onClose();
+    } catch (err) {
+      alert(`Could not save images: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="modal-backdrop" style={{ zIndex: 10003 }} onClick={onClose}>
+      <div className="modal-card" style={{ maxWidth: '640px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h3 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--ink)' }}>
+              📸 Manage Product Images &amp; Variations
+            </h3>
+            <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '4px 0 0' }}>
+              {product.title}
+            </p>
+          </div>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--muted)' }}>✕</button>
+        </div>
+
+        {/* Existing Images Grid */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>
+            Current Photos ({imageList.length}) · Leftmost is Primary
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
+            {imageList.map((imgUrl, idx) => (
+              <div key={idx} style={{ position: 'relative', width: '100%', height: '115px', borderRadius: '8px', overflow: 'hidden', border: idx === 0 ? '2px solid var(--green)' : '1px solid var(--line)', background: 'var(--canvas)' }}>
+                <img src={imgUrl} alt={`Photo ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {idx === 0 && (
+                  <span style={{ position: 'absolute', bottom: '3px', left: '3px', right: '3px', textAlign: 'center', background: 'var(--green-deep)', color: '#fff', fontSize: '8.5px', fontWeight: '800', borderRadius: '3px', padding: '1px 0' }}>
+                    COVER
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(idx)}
+                  title="Remove this photo"
+                  style={{ position: 'absolute', top: '3px', right: '3px', background: 'rgba(220, 38, 38, 0.85)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'grid', placeItems: 'center', fontSize: '11px', cursor: 'pointer' }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Add New URLs Form */}
+        <div style={{ background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '12px', padding: '14px', marginBottom: '20px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--ink)', marginBottom: '6px' }}>
+            ➕ Add More Image URLs (Meesho / Myntra / Amazon variation links)
+          </label>
+          <textarea
+            rows={3}
+            value={urlsInput}
+            onChange={e => setUrlsInput(e.target.value)}
+            placeholder="Paste image URLs here (one per line or comma-separated)&#10;e.g. https://images.meesho.com/images/products/..."
+            style={{ width: '100%', padding: '8px 10px', fontSize: '12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--paper)', color: 'var(--ink)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+            <button
+              type="button"
+              onClick={handleAddUrls}
+              className="button button-light"
+              style={{ fontSize: '12px', padding: '6px 12px' }}
+            >
+              Add to Photos
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Actions */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button type="button" className="button button-light" onClick={onClose} disabled={saving}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="button button-dark"
+            onClick={handleSave}
+            disabled={saving}
+            style={{ padding: '8px 18px', fontSize: '13px' }}
+          >
+            {saving ? 'Saving...' : '💾 Save Photos & Clear AI Flag'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

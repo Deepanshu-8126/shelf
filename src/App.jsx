@@ -12,6 +12,7 @@ const IngestInboxView = React.lazy(() => import('./components/IngestInboxView.js
 const AdminCatalogView = React.lazy(() => import('./components/AdminCatalogView.jsx'));
 const AdminBannersManager = React.lazy(() => import('./components/AdminBannersManager.jsx'));
 const AIMediaStudioView = React.lazy(() => import('./components/AIMediaStudioView.jsx'));
+const VeoVideoStudioView = React.lazy(() => import('./components/VeoVideoStudioView.jsx'));
 const AdminCustomerOrdersView = React.lazy(() => import('./components/AdminCustomerOrdersView.jsx'));
 const WishlinkView = React.lazy(() => import('./components/WishlinkView.jsx'));
 const AdminWishlinkManager = React.lazy(() => import('./components/AdminWishlinkManager.jsx'));
@@ -30,6 +31,7 @@ import { getCloudProducts } from './services/supabaseClient.js';
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
   { label: 'Customer Orders', icon: 'check' },
+  { label: 'Veo Video Studio', icon: 'sparkles' },
   { label: 'AI Media Studio', icon: 'sparkles' },
   { label: 'Wishlink Haul', icon: 'link' },
   { label: 'Ingest Inbox', icon: 'download' },
@@ -1583,6 +1585,8 @@ const HASH_TO_PAGE = {
   '#admin/catalog': { page: 'Master Catalog', isPublic: false },
   '#admin/products': { page: 'Master Catalog', isPublic: false },
   '#admin/collections': { page: 'Collections', isPublic: false },
+  '#admin/veo': { page: 'Veo Video Studio', isPublic: false },
+  '#admin/video': { page: 'Veo Video Studio', isPublic: false },
   '#admin/studio': { page: 'AI Media Studio', isPublic: false },
   '#admin/wishlink': { page: 'Wishlink Haul', isPublic: false },
   '#admin/pinterest': { page: 'Pinterest Traffic Hub', isPublic: false },
@@ -1597,6 +1601,7 @@ const HASH_TO_PAGE = {
 const PAGE_TO_HASH = {
   'Overview': '#admin/overview',
   'Customer Orders': '#admin/orders',
+  'Veo Video Studio': '#admin/veo',
   'Ingest Inbox': '#admin/ingest',
   'Storefront Banners': '#admin/banners',
   'Master Catalog': '#admin/catalog',
@@ -2441,6 +2446,13 @@ export default function App() {
                   showToast(`⚠️ Could not save photo update: ${e.message}`);
                 }
               }}
+            />
+          )}
+          {activePage === 'Veo Video Studio' && (
+            <VeoVideoStudioView
+              products={products}
+              onToast={showToast}
+              onUpdateProduct={handleUpdateProduct}
             />
           )}
           {activePage === 'Wishlink Haul' && (

@@ -196,6 +196,12 @@ export default function ProductCard({
     >
       <div
         className={`product-image-shell tint-${product.tint || 'sage'}`}
+        style={{ cursor: isPublic && onViewDetail ? 'pointer' : 'default' }}
+        onClick={(e) => {
+          if (isPublic && onViewDetail && !e.target.closest('button') && !e.target.closest('a')) {
+            onViewDetail(product);
+          }
+        }}
         onMouseEnter={() => { if (isPublic && imageSlides.length > 1) setGalleryPaused(true); }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
