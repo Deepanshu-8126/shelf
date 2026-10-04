@@ -728,7 +728,8 @@ export default function AdminCatalogView({
                           flexWrap: 'wrap'
                         }}>
                           <span style={{ fontWeight: '700' }}>🚨 AI / Low-Res Image Detected:</span>
-                          <span style={{ opacity: 0.9, fontSize: '10.5px' }}>{p.aiFlagReason || 'Pollinations.ai / Synthetic Watermark'}</span>
+                          <span style={{ opacity: 0.9, fontSize: '10.5px' }}>{p.aiFlagReason || 'Synthetic AI Watermark'}</span>
+
                           <button
                             type="button"
                             onClick={() => setManageImagesProduct(p)}

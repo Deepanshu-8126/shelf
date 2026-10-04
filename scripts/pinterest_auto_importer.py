@@ -27,9 +27,9 @@ PINTEREST_VIRAL_STREETWEAR = [
         "costPrice": 650,
         "rating": 4.6,
         "ratingCount": 1820,
-        "image": "https://image.pollinations.ai/prompt/Vintage%20Ferrari%20F1%20embroidered%20racing%20bomber%20jacket%20red%20and%20black%20with%20sponsor%20patches%20laid%20flat%20on%20minimalist%20concrete%20studio%20background%2C%20hyper%20detailed%20stitching%2C%208k%20lookbook%20photography?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-black-cardigan.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Vintage%20Ferrari%20F1%20embroidered%20racing%20bomber%20jacket%20red%20and%20black%20with%20sponsor%20patches%20laid%20flat%20on%20minimalist%20concrete%20studio%20background%2C%20hyper%20detailed%20stitching%2C%208k%20lookbook%20photography?width=768&height=1024&nologo=true"
+            "/images/meesho-canvas-tote.webp"
         ],
         "sizes": ["M", "L", "XL", "XXL"],
         "colors": ["Scuderia Red", "Monochrome Black", "Pink Edition"],
@@ -47,9 +47,9 @@ PINTEREST_VIRAL_STREETWEAR = [
         "costPrice": 280,
         "rating": 4.5,
         "ratingCount": 940,
-        "image": "https://image.pollinations.ai/prompt/Spider%20aesthetic%20heavyweight%20vintage%20off-white%20oversized%20graphic%20t-shirt%20hanging%20on%20wooden%20hanger%20with%20sunlight%20shadows%2C%20clean%20minimalist%20editorial%20fashion%20photography?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-casual-beige-girls-top.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Spider%20aesthetic%20heavyweight%20vintage%20off-white%20oversized%20graphic%20t-shirt%20hanging%20on%20wooden%20hanger%20with%20sunlight%20shadows%2C%20clean%20minimalist%20editorial%20fashion%20photography?width=768&height=1024&nologo=true"
+            "/images/meesho-dress-i45j67.webp"
         ],
         "sizes": ["S", "M", "L", "XL", "XXL"],
         "colors": ["Vintage Off-White", "Washed Charcoal"],
@@ -67,9 +67,9 @@ PINTEREST_VIRAL_STREETWEAR = [
         "costPrice": 620,
         "rating": 4.6,
         "ratingCount": 1120,
-        "image": "https://image.pollinations.ai/prompt/Vintage%20Red%20Bull%20racing%20embroidered%20navy%20blue%20jacket%20with%20sponsor%20patches%20laid%20flat%20studio%20lighting%2C%20hyper%20detailed%2C%20fashion%20lookbook?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-elegant-casual-white-top.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Vintage%20Red%20Bull%20racing%20embroidered%20navy%20blue%20jacket%20with%20sponsor%20patches%20laid%20flat%20studio%20lighting%2C%20hyper%20detailed%2C%20fashion%20lookbook?width=768&height=1024&nologo=true"
+            "/images/meesho-floral-print-georgette-saree.webp"
         ],
         "sizes": ["M", "L", "XL", "XXL"],
         "colors": ["Navy Racing Blue", "Carbon Black"],
@@ -87,9 +87,9 @@ PINTEREST_VIRAL_STREETWEAR = [
         "costPrice": 690,
         "rating": 4.7,
         "ratingCount": 870,
-        "image": "https://image.pollinations.ai/prompt/Mercedes%20AMG%20white%20and%20black%20vintage%20leather%20racing%20jacket%20with%20embroidered%20patches%20on%20mannequin%2C%20high-fashion%20editorial%20lighting?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-oversized-boxy-fit-tshirt.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Mercedes%20AMG%20white%20and%20black%20vintage%20leather%20racing%20jacket%20with%20embroidered%20patches%20on%20mannequin%2C%20high-fashion%20editorial%20lighting?width=768&height=1024&nologo=true"
+            "/images/meesho-retro-square-sunglasses.webp"
         ],
         "sizes": ["M", "L", "XL", "XXL"],
         "colors": ["White & Black Two-Tone"],
@@ -107,9 +107,9 @@ PINTEREST_VIRAL_STREETWEAR = [
         "costPrice": 490,
         "rating": 4.5,
         "ratingCount": 1430,
-        "image": "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20black%20colorblock%20zip-up%20hoodie%20with%20spider%20chest%20graphics%20on%20minimalist%20hanger%2C%20soft%20ambient%20studio%20light?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-black-cardigan.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Spider-Man%20red%20and%20black%20colorblock%20zip-up%20hoodie%20with%20spider%20chest%20graphics%20on%20minimalist%20hanger%2C%20soft%20ambient%20studio%20light?width=768&height=1024&nologo=true"
+            "/images/meesho-canvas-tote.webp"
         ],
         "sizes": ["S", "M", "L", "XL", "XXL"],
         "colors": ["Crimson Red & Black", "Midnight Venom"],

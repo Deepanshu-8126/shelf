@@ -63,7 +63,7 @@ def scrape_pinterest_cdn_images(query_or_url: str, count: int = 3) -> list[str]:
     if not urls:
         clean_name = query_or_url if not query_or_url.startswith("http") else "pinterest viral streetwear"
         encoded = urllib.parse.quote(f"Authentic Pinterest aesthetic {clean_name} garment flatlay on concrete studio surface, 8k lookbook photography")
-        cdn_url = f"https://image.pollinations.ai/prompt/{encoded}?width=768&height=1024&nologo=true"
+        cdn_url = f"/images/meesho-black-cardigan.webp"
         urls = [cdn_url]
 
     return urls

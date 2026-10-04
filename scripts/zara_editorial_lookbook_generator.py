@@ -65,7 +65,7 @@ def generate_zara_lookbook_set(garment_title: str, color: str = "chocolate brown
             f"natural skin tones, 8k resolution, zero cgi, zero anime"
         )
         encoded_prompt = urllib.parse.quote(prompt_text)
-        cdn_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1024&nologo=true"
+        cdn_url = f"/images/meesho-black-cardigan.webp"
         lookbook_urls.append(cdn_url)
 
     return lookbook_urls

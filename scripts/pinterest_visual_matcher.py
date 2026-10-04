@@ -100,7 +100,7 @@ DAILY_TRENDING_AESTHETICS = [
 def generate_ai_lookbook_url(prompt: str, width: int = 768, height: int = 1024) -> str:
     """Generates direct Cloud AI Lookbook CDN URLs without taking any local disk space."""
     encoded_prompt = urllib.parse.quote(prompt.strip())
-    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true"
+    return f"/images/meesho-black-cardigan.webp"
 
 def clean_key(val: str) -> str:
     if not val:

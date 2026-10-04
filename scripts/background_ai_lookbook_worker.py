@@ -28,17 +28,17 @@ DRESSES_FILE = os.path.join(SRC_DIR, "meesho-dresses.json")
 
 # Verified High-Resolution Garment Flatlays & Editorial Assets
 VERIFIED_GARMENT_LOOKBOOKS = {
-    "ferrari": "https://image.pollinations.ai/prompt/Vintage%20Ferrari%20F1%20embroidered%20racing%20bomber%20jacket%20red%20and%20black%20with%20sponsor%20patches%20laid%20flat%20on%20minimalist%20concrete%20studio%20background%2C%20hyper%20detailed%20stitching%2C%20clean%20garment%20flatlay%20photography%2C%208k%20resolution?width=768&height=1024&nologo=true",
-    "redbull": "https://image.pollinations.ai/prompt/Vintage%20Red%20Bull%20racing%20embroidered%20navy%20blue%20jacket%20with%20sponsor%20patches%20laid%20flat%20on%20clean%20white%20studio%20floor%2C%20hyper%20detailed%20textile%20texture%2C%20flatlay%20product%20photography?width=768&height=1024&nologo=true",
-    "mercedes": "https://image.pollinations.ai/prompt/Mercedes%20AMG%20white%20and%20black%20vintage%20leather%20racing%20jacket%20with%20embroidered%20patches%20laid%20flat%20on%20minimalist%20studio%20surface%2C%20clean%20luxury%20product%20flatlay%20photography?width=768&height=1024&nologo=true",
-    "spider_hoodie": "https://image.pollinations.ai/prompt/Spider-Man%20black%20and%20crimson%20red%20colorblock%20zip-up%20hoodie%20with%20webbed%20spider%20graphics%20hanging%20on%20wooden%20hanger%2C%20clean%20minimalist%20editorial%20product%20photography?width=768&height=1024&nologo=true",
-    "spider_tee": "https://image.pollinations.ai/prompt/Spider%20aesthetic%20heavyweight%20vintage%20off-white%20oversized%20graphic%20t-shirt%20hanging%20on%20wooden%20hanger%20with%20sunlight%20shadows%2C%20clean%20minimalist%20editorial%20fashion%20photography?width=768&height=1024&nologo=true",
-    "brasil_halter": "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%20halter%20neck%20ribbed%20crop%20top%20laid%20flat%20with%20baggy%20wide-leg%20vintage%20denim%2C%20aesthetic%20Pinterest%20streetwear%20flatlay%20photography?width=768&height=1024&nologo=true",
-    "brasil_baby_tee": "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%2090s%20ribbed%20baby%20tee%20laid%20flat%20with%20vintage%20denim%20and%20sunglasses%2C%20aesthetic%20Pinterest%20flatlay%20photography%2C%20crisp%20lighting?width=768&height=1024&nologo=true",
-    "leopard_corset": "https://image.pollinations.ai/prompt/Y2K%20leopard%20print%20halter%20neck%20pointed%20hem%20corset%20top%20laid%20flat%20on%20minimalist%20linen%20fabric%2C%20Zara%20editorial%20clothing%20flatlay%20photography%2C%20crisp%20soft%20daylight?width=768&height=1024&nologo=true",
-    "lightning_95": "https://image.pollinations.ai/prompt/Vintage%20white%20and%20red%20Lightning%2095%20racing%20graphic%20hoodie%20laid%20flat%20with%20straight%20black%20streetwear%20pants%2C%20clean%20Pinterest%20flatlay%20fashion%20photography?width=768&height=1024&nologo=true",
-    "windbreaker": "https://image.pollinations.ai/prompt/Retro%20colorblock%20navy%20blue%20and%20white%20sport%20track%20windbreaker%20jacket%20laid%20flat%20on%20concrete%20studio%2C%20clean%20streetwear%20flatlay%20photography?width=768&height=1024&nologo=true",
-    "leather_bomber": "https://image.pollinations.ai/prompt/Oversized%20black%20distressed%20faux%20leather%20biker%20bomber%20jacket%20hanging%20on%20wooden%20hanger%2C%20warm%20ambient%20studio%20lighting%2C%20luxury%20Zara%20fashion%20editorial%20product%20photo?width=768&height=1024&nologo=true"
+    "ferrari": "/images/meesho-black-cardigan.webp",
+    "redbull": "/images/meesho-canvas-tote.webp",
+    "mercedes": "/images/meesho-casual-beige-girls-top.webp",
+    "spider_hoodie": "/images/meesho-dress-i45j67.webp",
+    "spider_tee": "/images/meesho-elegant-casual-white-top.webp",
+    "brasil_halter": "/images/meesho-floral-print-georgette-saree.webp",
+    "brasil_baby_tee": "/images/meesho-oversized-boxy-fit-tshirt.webp",
+    "leopard_corset": "/images/meesho-retro-square-sunglasses.webp",
+    "lightning_95": "/images/meesho-black-cardigan.webp",
+    "windbreaker": "/images/meesho-canvas-tote.webp",
+    "leather_bomber": "/images/meesho-casual-beige-girls-top.webp"
 }
 
 def run_worker_cycle():

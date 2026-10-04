@@ -29,9 +29,9 @@ BRASILCORE_VIRAL_DROP = [
         "costPrice": 190,
         "rating": 4.6,
         "ratingCount": 1420,
-        "image": "https://image.pollinations.ai/prompt/Chic%20young%20model%20wearing%20yellow%20and%20green%20Brasil%20halter%20neck%20crop%20top%20with%20baggy%20wide-leg%20denim%20jeans%2C%20Pinterest%20aesthetic%20streetwear%20fashion%20photography%2C%20sunlit%20clean%20studio%20lookbook?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-black-cardigan.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Chic%20young%20model%20wearing%20yellow%20and%20green%20Brasil%20halter%20neck%20crop%20top%20with%20baggy%20wide-leg%20denim%20jeans%2C%20Pinterest%20aesthetic%20streetwear%20fashion%20photography%2C%20sunlit%20clean%20studio%20lookbook?width=768&height=1024&nologo=true"
+            "/images/meesho-canvas-tote.webp"
         ],
         "sizes": ["XS", "S", "M", "L"],
         "colors": ["Canary Yellow & Green", "Forest Green & Yellow"],
@@ -49,9 +49,9 @@ BRASILCORE_VIRAL_DROP = [
         "costPrice": 175,
         "rating": 4.5,
         "ratingCount": 2180,
-        "image": "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%2090s%20ribbed%20baby%20tee%20laid%20flat%20with%20vintage%20denim%20and%20sunglasses%2C%20aesthetic%20Pinterest%20flatlay%20photography%2C%20crisp%20lighting?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-casual-beige-girls-top.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Yellow%20and%20green%20Brasil%2090s%20ribbed%20baby%20tee%20laid%20flat%20with%20vintage%20denim%20and%20sunglasses%2C%20aesthetic%20Pinterest%20flatlay%20photography%2C%20crisp%20lighting?width=768&height=1024&nologo=true"
+            "/images/meesho-dress-i45j67.webp"
         ],
         "sizes": ["S", "M", "L", "XL"],
         "colors": ["Canary Yellow", "Emerald Green"],
@@ -69,9 +69,9 @@ BRASILCORE_VIRAL_DROP = [
         "costPrice": 180,
         "rating": 4.5,
         "ratingCount": 970,
-        "image": "https://image.pollinations.ai/prompt/Green%20and%20yellow%20Brasil%20strappy%20corset%20cami%20tank%20top%20on%20minimalist%20hanger%2C%20clean%20aesthetic%20studio%20shot?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-elegant-casual-white-top.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Green%20and%20yellow%20Brasil%20strappy%20corset%20cami%20tank%20top%20on%20minimalist%20hanger%2C%20clean%20aesthetic%20studio%20shot?width=768&height=1024&nologo=true"
+            "/images/meesho-floral-print-georgette-saree.webp"
         ],
         "sizes": ["XS", "S", "M", "L"],
         "colors": ["Samba Green", "Canary Yellow"],
@@ -89,9 +89,9 @@ BRASILCORE_VIRAL_DROP = [
         "costPrice": 220,
         "rating": 4.7,
         "ratingCount": 840,
-        "image": "https://image.pollinations.ai/prompt/Argentina%20sky%20blue%20and%20white%20striped%20crop%20jersey%20top%20with%20tie-front%20strings%20flatlay%2C%20Pinterest%20viral%20fashion%20aesthetic?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-oversized-boxy-fit-tshirt.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Argentina%20sky%20blue%20and%20white%20striped%20crop%20jersey%20top%20with%20tie-front%20strings%20flatlay%2C%20Pinterest%20viral%20fashion%20aesthetic?width=768&height=1024&nologo=true"
+            "/images/meesho-retro-square-sunglasses.webp"
         ],
         "sizes": ["S", "M", "L"],
         "colors": ["Albiceleste Sky Blue"],
@@ -109,9 +109,9 @@ BRASILCORE_VIRAL_DROP = [
         "costPrice": 195,
         "rating": 4.4,
         "ratingCount": 1650,
-        "image": "https://image.pollinations.ai/prompt/Y2K%20leopard%20print%20halter%20neck%20corset%20top%20with%20pointed%20hem%20laid%20flat%2C%20aesthetic%20Pinterest%20lookbook%20shot?width=768&height=1024&nologo=true",
+        "image": "/images/meesho-black-cardigan.webp",
         "galleryImages": [
-            "https://image.pollinations.ai/prompt/Y2K%20leopard%20print%20halter%20neck%20corset%20top%20with%20pointed%20hem%20laid%20flat%2C%20aesthetic%20Pinterest%20lookbook%20shot?width=768&height=1024&nologo=true"
+            "/images/meesho-canvas-tote.webp"
         ],
         "sizes": ["S", "M", "L", "XL"],
         "colors": ["Classic Leopard", "Snow Leopard"],

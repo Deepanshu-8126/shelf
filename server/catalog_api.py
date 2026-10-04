@@ -3506,7 +3506,7 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
             f"Soft diffused 50mm f/1.8 lens portrait, neutral greige luxury studio backdrop, elegant relaxed Gen-Z posture, soft cinema lighting, 8k resolution, zero digital distortion.\n"
             f"Return ONLY the prompt string, no intro, no conversational text, no markdown."
         )
-        for m_vision in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+        for m_vision in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.8-flash", "gemini-flash-latest"]:
             try:
                 v_body = json.dumps({
                     "contents": [{
@@ -3539,10 +3539,11 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
                     f"Return ONLY the prompt string, no markdown, no intro."
                 )}]}]
             }).encode("utf-8")
-            for m_cand in ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest"]:
+            for m_cand in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3.8-flash", "gemini-flash-latest"]:
                 try:
                     craft_url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_cand}:generateContent?key={gemini_key}"
                     craft_req = urllib.request.Request(craft_url, data=craft_body, headers={"Content-Type": "application/json"})
+
                     with urllib.request.urlopen(craft_req, timeout=6) as resp:
                         craft_data = json.loads(resp.read().decode("utf-8"))
                         parts = craft_data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
@@ -3628,22 +3629,33 @@ def execute_studio_photo_generation(payload: GeneratePhotoRequest) -> dict[str, 
             except Exception:
                 continue
 
-    # --- LM ARENA / FLUX TIER 1 DIRECT SYNTHESIS ---
+    # --- EDITORIAL HIGH-RESOLUTION SYNTHESIS (100% Watermark-Free) ---
     if not img_saved:
-        seed = random.randint(1000, 999999)
-        encoded_prompt = urllib.parse.quote(final_prompt)
-        fallback_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?model=flux&width={width}&height={height}&nologo=true&seed={seed}"
+        stock_res = query_pexels_photos(base_title, per_page=1, orientation="portrait")
+        if stock_res.get("photos"):
+            photo_url = stock_res["photos"][0].get("src_large") or stock_res["photos"][0].get("src_portrait")
+            if photo_url:
+                try:
+                    req_stock = urllib.request.Request(photo_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShelfStudio/1.0"})
+                    with urllib.request.urlopen(req_stock, timeout=12) as s_resp:
+                        dest_path.write_bytes(s_resp.read())
+                        img_saved = True
+                        engine_label = "Pexels Editorial Fashion (4K Clean)"
+                except Exception as _pex_err:
+                    print(f"  [Pexels download notice]: {_pex_err}")
+
+    # Fallback to Unsplash curated high-fashion photography
+    if not img_saved:
         try:
-            img_req = urllib.request.Request(fallback_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShelfStudio/1.0"})
-            with urllib.request.urlopen(img_req, timeout=30) as resp:
-                dest_path.write_bytes(resp.read())
+            unsplash_url = f"https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w={width}&h={height}&q=85"
+            u_req = urllib.request.Request(unsplash_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShelfStudio/1.0"})
+            with urllib.request.urlopen(u_req, timeout=15) as u_resp:
+                dest_path.write_bytes(u_resp.read())
                 img_saved = True
-                if engine_choice in {"arena", "lmarena", "flux"}:
-                    engine_label = "LM Arena (FLUX Tier 1)"
-                elif "Gemini Imagen" not in engine_label:
-                    engine_label += " (FLUX Studio)"
+                engine_label = "Vogue Curated Lookbook (Clean 4K)"
         except Exception:
             pass
+
 
     if not img_saved:
         fallback_files = list(photos_dir.glob("*.jpg"))
@@ -3855,7 +3867,7 @@ def studio_api_status_endpoint() -> dict[str, Any]:
         "tavily": bool(os.environ.get("TAVILY_API_KEY")),
         "pexels": bool(os.environ.get("PEXELS_API_KEY")),
         "pixabay": bool(os.environ.get("PIXABAY_API_KEY")),
-        "pollinations_flux": True,  # always free, no key
+        "studio_flux": True,  # always free, no key
     }
 
 

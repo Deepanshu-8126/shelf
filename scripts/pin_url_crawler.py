@@ -84,7 +84,7 @@ def inspect_and_crawl_pin(target_url_or_keyword: str, custom_title: str = "", co
             gallery_images = [query_or_url]
         else:
             encoded = urllib.parse.quote(f"Authentic Pinterest aesthetic {inferred_title} flatlay on concrete studio surface, 8k photography")
-            cdn_image_url = f"https://image.pollinations.ai/prompt/{encoded}?width=768&height=1024&nologo=true"
+            cdn_image_url = f"/images/meesho-black-cardigan.webp"
             gallery_images = [cdn_image_url]
 
     # 3. Market Pricing Breakdown (INR)

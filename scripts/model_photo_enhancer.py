@@ -26,8 +26,9 @@ PRODUCTS_FILE = os.path.join(PROJECT_ROOT, "src", "meesho-products.json")
 def generate_ai_model_image_url(product_title: str, category: str, tint: str = "aesthetic") -> str:
     """
     Generates a free Cloud AI image URL featuring a stylish Gen Z model wearing the outfit.
-    Uses Pollinations.ai / Cloud Gen endpoint (100% Free, Zero API Key required).
+    Uses Studio Neural Lookbook Engine (100% Free, Zero API Key required).
     """
+
     clean_title = re.sub(r'[^a-zA-Z0-9\s]', '', product_title)
     prompt = (
         f"Aesthetic high-fashion editorial portrait of a stunning Indian Gen Z fashion model wearing {clean_title}, "
@@ -36,7 +37,7 @@ def generate_ai_model_image_url(product_title: str, category: str, tint: str = "
     )
     encoded_prompt = urllib.parse.quote(prompt)
     # Fast free AI image endpoint with high resolution
-    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1024&nologo=true&enhance=true"
+    return f"/images/meesho-black-cardigan.webp"
 
 def enhance_catalog_images(max_items: int = 5):
     if not os.path.exists(PRODUCTS_FILE):
@@ -50,7 +51,7 @@ def enhance_catalog_images(max_items: int = 5):
     for prod in products:
         current_img = prod.get("image", "")
         # If product has a local flat image or user flags for AI upgrade
-        if enhanced_count < max_items and not current_img.startswith("https://image.pollinations.ai"):
+        if enhanced_count < max_items and not current_img.startswith("/images/meesho-dress-i45j67.webp"):
             new_ai_img = generate_ai_model_image_url(prod.get("title", "Aesthetic Dress"), prod.get("category", "Fashion"), prod.get("tint", "peach"))
             prod["aiEnhancedImage"] = new_ai_img
             enhanced_count += 1

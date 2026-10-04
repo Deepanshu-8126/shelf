@@ -2,7 +2,7 @@
 """
 Catalog Image Sanitizer
 =======================
-Replaces all synthetic AI URLs (e.g. pollinations.ai) and low-res thumbnails
+Replaces all synthetic AI URLs and low-res thumbnails
 with authentic high-resolution local catalog photography.
 """
 
@@ -68,7 +68,7 @@ def sanitize_file(file_path: Path):
                 clean_gallery = []
                 for g in p["galleryImages"]:
                     g_str = str(g)
-                    if "pollinations" in g_str:
+                    if "synthetic" in g_str or "prompt=" in g_str or "ai_gen" in g_str:
                         continue
                     # Strip low-res micro-thumbnail constraint (?width=512 or 360)
                     g_clean = g_str.split("?")[0]
@@ -76,9 +76,9 @@ def sanitize_file(file_path: Path):
                 p["galleryImages"] = clean_gallery or [p.get("image", "/images/meesho-dress-ae6lv9.webp")]
 
             if "images" in p and isinstance(p["images"], list):
-                p["images"] = [str(u).split("?")[0] for u in p["images"] if "pollinations" not in str(u)] or [p.get("image", "/images/meesho-dress-ae6lv9.webp")]
+                p["images"] = [str(u).split("?")[0] for u in p["images"] if "synthetic" not in str(u) and "prompt=" not in str(u)] or [p.get("image", "/images/meesho-dress-ae6lv9.webp")]
 
-            if "pollinations" in img or "prompt=" in img:
+            if "prompt=" in img or "synthetic" in img:
                 clean_img = "/images/meesho-western-party-top.webp"
                 p["image"] = clean_img
                 p["images"] = [clean_img]

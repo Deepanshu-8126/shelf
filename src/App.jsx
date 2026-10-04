@@ -1030,7 +1030,7 @@ function PinterestHubView({ products = [], collections = [], onCopy }) {
         // Fallback demo inspection if server offline
         setCrawledResult({
           title: crawlTitleInput.trim() || 'Curated Pinterest Viral Drop',
-          image: crawlUrlInput.trim().startsWith('http') && crawlUrlInput.includes('.') ? crawlUrlInput.trim() : 'https://image.pollinations.ai/prompt/Authentic%20Pinterest%20streetwear%20fashion%20flatlay%20on%20minimalist%20concrete%20studio%2C%208k%20photography?width=768&height=1024&nologo=true',
+          image: crawlUrlInput.trim().startsWith('http') && crawlUrlInput.includes('.') ? crawlUrlInput.trim() : '/images/meesho-dress-i45j67.webp',
           price: 549,
           oldPrice: 1499,
           costPrice: 260,
@@ -1041,13 +1041,14 @@ function PinterestHubView({ products = [], collections = [], onCopy }) {
     } catch {
       setCrawledResult({
         title: crawlTitleInput.trim() || 'Curated Pinterest Viral Drop',
-        image: 'https://image.pollinations.ai/prompt/Authentic%20Pinterest%20streetwear%20fashion%20flatlay%20on%20minimalist%20concrete%20studio%2C%208k%20photography?width=768&height=1024&nologo=true',
+        image: '/images/meesho-dress-i45j67.webp',
         price: 549,
         oldPrice: 1499,
         costPrice: 260,
         estimatedProfit: 289,
         collectionId: crawlCollection
       });
+
     } finally {
       setIsCrawling(false);
     }

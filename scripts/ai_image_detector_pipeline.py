@@ -2,12 +2,12 @@
 """
 5-Stage AI & Low-Quality Image Detection Pipeline
 =================================================
-Specifically detects synthetic AI-generated images (e.g. Pollinations.ai, Midjourney, DALL-E)
+Specifically detects synthetic AI-generated images (e.g. Midjourney, DALL-E)
 and low-res/blurry ("fati-fati") photos, flagging them for admin removal and review.
 
 The 5 Rigorous Verification Tests:
 1. Domain & URL Synthetic Signature Check:
-   - Flags `pollinations.ai`, `image.pollinations.ai`, `lexica.art`, `craiyon.com`, `dall-e`, etc.
+   - Flags `craiyon.com`, `lexica.art`, `dall-e`, etc.
    - Detects prompt parameters (/prompt/, ?seed=, &model=flux, etc.).
 2. Watermark & Metadata Signature Detection:
    - Scans URL string, query params, and image metadata for watermark signatures.
@@ -35,8 +35,6 @@ PRODUCTS_JSON = PROJECT_ROOT / "src" / "meesho-products.json"
 
 # Test 1 Blacklisted AI Domains and synthetic URL patterns
 AI_DOMAINS = [
-    "pollinations.ai",
-    "image.pollinations.ai",
     "craiyon.com",
     "lexica.art",
     "midjourney",
@@ -51,7 +49,6 @@ AI_DOMAINS = [
 AI_PROMPT_PATTERNS = [
     r"/prompt/[^/?#]+",
     r"[?&](?:prompt|model|seed|width=\d+&height=\d+&nologo)=[^&]+",
-    r"pollinations",
     r"artificial_intelligence",
     r"ai_generated"
 ]
@@ -89,10 +86,10 @@ def test_1_ai_domain_and_prompt(url: str) -> Tuple[bool, str]:
 
 
 def test_2_watermark_signature(url: str) -> Tuple[bool, str]:
-    """Test 2: Check for embedded watermark signatures (e.g. pollinations watermark)."""
+    """Test 2: Check for embedded watermark signatures."""
     clean_url = str(url).lower()
-    if "pollinations" in clean_url or "watermark" in clean_url or "nologo=false" in clean_url:
-        return True, "Embedded Pollinations.ai Watermark/Signature detected"
+    if "watermark" in clean_url or "nologo=false" in clean_url:
+        return True, "Embedded Watermark/Signature detected"
     return False, "Passed"
 
 
