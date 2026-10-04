@@ -1,0 +1,25 @@
+{
+  "name": "shelf-affiliate-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "api:dev": "python3 -m uvicorn server.catalog_api:app --host 0.0.0.0 --port 8787",
+    "sync:meesho": "python3 scripts/sync_meesho_catalog.py",
+    "import:meesho": "python3 scripts/import_meesho_paste.py",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "puppeteer-core": "^25.12.0"
+  }
+}

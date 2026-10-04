@@ -1,0 +1,8 @@
+# Local secrets and runtime catalog database
+.env
+data/*.sqlite3
+data/*.sqlite3-shm
+data/*.sqlite3-wal
+__pycache__/
+
+.vercel

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "shelf. Universal Trend Clipper",
+  "version": "1.0.0",
+  "description": "1-Click Fashion Clipper: Clip viral Pinterest, Meesho, Savana & Instagram trends straight to shelf. storefront.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Clip to shelf."
+  },
+  "host_permissions": ["http://localhost:8787/*"]
+}

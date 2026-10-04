@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>shelf. Visual AI Multi-Modal Scraper & Clipper</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { width: 450px; max-height: 600px; overflow-y: auto; padding: 14px; background: #0b0d13; color: #f3f4f6; }
+    
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .brand-group { display: flex; align-items: baseline; gap: 6px; }
+    .brand { font-size: 18px; font-weight: 800; color: #ec4899; font-family: Georgia, serif; }
+    .brand-sub { font-size: 9px; font-weight: 800; letter-spacing: .08em; color: #9ca3af; }
+    .badge { font-size: 9px; font-weight: 700; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 3px 8px; border-radius: 99px; border: 1px solid rgba(34, 197, 94, 0.3); }
+
+    /* Live Blinking Indicator Banner */
+    .scanner-banner { background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(56, 189, 248, 0.15) 100%); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .scanner-text { font-size: 11px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .blink-dot { width: 8px; height: 8px; border-radius: 50%; background: #ec4899; box-shadow: 0 0 10px #ec4899; animation: pulse 1s infinite alternate; }
+    
+    @keyframes pulse { from { opacity: 0.4; transform: scale(0.8); } to { opacity: 1; transform: scale(1.2); } }
+
+    .control-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .select-input { flex: 1; min-height: 32px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); padding: 0 10px; font-size: 11px; background: #181b24; font-weight: 600; color: #fff; outline: none; }
+    
+    .stats-bar { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #9ca3af; font-weight: 600; margin-bottom: 8px; }
+    .select-all-btn { background: none; border: none; color: #ec4899; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+    /* Visual Grid */
+    .batch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; padding: 6px; background: #131620; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; margin-bottom: 10px; }
+    .grid-item { position: relative; aspect-ratio: 3/4; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: #1e222d; transition: transform .15s, border-color .15s; }
+    .grid-item:hover { transform: scale(1.02); border-color: #38bdf8; }
+    .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+    .grid-item.selected { border-color: #ec4899; box-shadow: 0 0 0 2px rgba(236, 72, 153, .4); }
+    .grid-item .check { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.6); color: #fff; display: grid; place-items: center; font-size: 10px; font-weight: 800; border: 1px solid #fff; }
+    .grid-item.selected .check { background: #ec4899; }
+    .grid-item .category-tag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 8.5px; font-weight: 700; padding: 3px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+
+    /* Action Controls */
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+    .btn-main { grid-column: span 2; min-height: 40px; border: none; border-radius: 10px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: #fff; font-size: 12px; font-weight: 750; cursor: pointer; transition: all .16s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-main:hover { opacity: 0.9; }
+    .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-sub { min-height: 34px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; background: rgba(255, 255, 255, 0.08); color: #f3f4f6; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-sub:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .toast { display: none; padding: 8px; border-radius: 8px; background: rgba(34, 197, 94, 0.15); color: #4ade80; font-size: 11px; font-weight: 700; text-align: center; margin-top: 8px; border: 1px solid rgba(34, 197, 94, 0.3); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand-group">
+      <span class="brand">shelf.</span>
+      <span class="brand-sub">VISUAL AI CLIPPER</span>
+    </div>
+    <span class="badge">● Live Auto-Sync</span>
+  </div>
+
+  <div class="scanner-banner">
+    <div class="scanner-text">
+      <span class="blink-dot"></span>
+      <span>Scraping Fashion Items (Blinking on Page)</span>
+    </div>
+    <span style="font-size: 10px; color: #ec4899; font-weight: 700;">PRO SCRAPER ACTIVE</span>
+  </div>
+
+  <div class="control-row">
+    <select id="target-collection" class="select-input">
+      <option value="meesho-genz-2026">Collection: Gen Z Streetwear &amp; Graphic Drops</option>
+      <option value="brasilcore-edits">Collection: Brasilcore &amp; Y2K Baby Tees</option>
+      <option value="co-ord-sets">Collection: Y2K Co-ord Sets &amp; Skirts</option>
+      <option value="meesho-dresses-2026">Collection: Slinky Bodycon Dresses</option>
+      <option value="meesho-kurtis-2026">Collection: Festive &amp; Ethnic Kurtis</option>
+      <option value="winter-2026">Collection: Winter Cold-Girl Puffers</option>
+    </select>
+  </div>
+
+  <div class="stats-bar">
+    <span id="scan-count">Detecting products...</span>
+    <button id="toggle-select-all" class="select-all-btn">Select All</button>
+  </div>
+
+  <div id="batch-grid" class="batch-grid">
+    <!-- Clean Fashion photos injected dynamically -->
+  </div>
+
+  <!-- 4 Action Controls -->
+  <div class="action-grid">
+    <button id="auto-scroll-btn" class="btn-main" style="background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%); margin-bottom: 4px;">🤖 Auto-Scroll & Deep Scrape Entire Page</button>
+    <button id="batch-publish-btn" class="btn-main" disabled>🚀 Ingest Selected (0 Items) to Storefront</button>
+    <button id="export-csv-btn" class="btn-sub">📥 Export Clean CSV</button>
+    <button id="copy-link-btn" class="btn-sub">🔗 Copy Creator Link</button>
+  </div>
+
+  <div id="toast" class="toast">✓ Successfully processed!</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
