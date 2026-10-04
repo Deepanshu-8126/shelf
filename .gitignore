@@ -20,3 +20,5 @@ data/model_face_dataset/
 video_engine/
 *.zip
 .stitch/
+**/data/browser_sessions/
+data/browser_sessions/
