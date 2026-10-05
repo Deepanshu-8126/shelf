@@ -733,8 +733,8 @@ export default function Storefront({
             }}
             title="Step into 3D Spatial Look Showroom"
           >
-            <span style={{ fontSize: '13px' }}>🧊</span>
-            <span>3D Look Showroom</span>
+            <span style={{ fontSize: '13px' }}>🏛️</span>
+            <span>Drape 3D Showroom</span>
           </button>
 
           <button 
