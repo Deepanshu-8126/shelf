@@ -91,7 +91,13 @@ export default function Storefront({
   const [outfitModalOpen, setOutfitModalOpen] = useState(false);
   const [stylistModalOpen, setStylistModalOpen] = useState(false);
   const [tryOnModalOpen, setTryOnModalOpen] = useState(false);
-  const [showroomModalOpen, setShowroomModalOpen] = useState(false);
+  const [showroomModalOpen, setShowroomModalOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      return p.get('view') === '3d' || p.get('showroom') === 'true' || p.get('3d') === '1';
+    }
+    return false;
+  });
   const [tryOnInitialProduct, setTryOnInitialProduct] = useState(null);
   const [selectedShowroomProduct, setSelectedShowroomProduct] = useState(null);
   const [earningModalOpen, setEarningModalOpen] = useState(false);
