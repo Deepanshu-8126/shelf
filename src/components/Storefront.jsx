@@ -94,9 +94,10 @@ export default function Storefront({
   const [showroomModalOpen, setShowroomModalOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
-      return p.get('view') === '3d' || p.get('showroom') === 'true' || p.get('3d') === '1';
+      if (p.get('view') === '2d' || p.get('view') === 'simple') return false;
+      return true; // Drape 3D Spatial Walkthrough is the default experience
     }
-    return false;
+    return true;
   });
   const [tryOnInitialProduct, setTryOnInitialProduct] = useState(null);
   const [selectedShowroomProduct, setSelectedShowroomProduct] = useState(null);

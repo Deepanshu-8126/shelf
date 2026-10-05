@@ -6148,3 +6148,47 @@ html {
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
+
+/* Custom Drape Cursor (Screen 1 & 2) */
+.drape-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #111111;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate3d(-100px, -100px, 0);
+  transition: transform 0.05s ease-out;
+}
+
+.drape-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(17, 17, 17, 0.45);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate3d(-100px, -100px, 0);
+  transition: width 0.2s ease-out, height 0.2s ease-out, border-color 0.2s ease-out, background-color 0.2s ease-out, transform 0.1s ease-out;
+}
+
+.drape-cursor-ring.is-hovered {
+  width: 54px;
+  height: 54px;
+  border-color: #2F6BFF;
+  background-color: rgba(47, 107, 255, 0.12);
+}
+
+@media (pointer: coarse) {
+  .drape-cursor-dot,
+  .drape-cursor-ring {
+    display: none !important;
+  }
+}
+

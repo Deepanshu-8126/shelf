@@ -19,6 +19,23 @@ export default function InteractiveShowroomModal({ products = [], initialProduct
   const [cartCount, setCartCount] = useState(1);
   const [isRotating, setIsRotating] = useState(false);
 
+  // Custom Drape Cursor Tracking
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [cursorHovered, setCursorHovered] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+      setIsTouchDevice(true);
+      return;
+    }
+    const handleMove = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
+
   // Seed catalog / products fallback matching the Stitch design
   const showroomProducts = useMemo(() => {
     if (products && products.length >= 4) {
@@ -446,10 +463,28 @@ export default function InteractiveShowroomModal({ products = [], initialProduct
   }, [activeView, selectedProductIndex, selectedColorIndex, bodyShape]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in select-none">
+    <div className="fixed inset-0 z-50 w-screen h-screen overflow-hidden flex flex-col select-none">
       
-      {/* Outer Viewport Canvas Modal */}
-      <div className={`relative w-full h-full max-w-7xl max-h-[96vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-white/20 transition-colors duration-500 ${
+      {/* Custom Drape Dynamic Cursor */}
+      {!isTouchDevice && (
+        <>
+          <div
+            className="drape-cursor-dot"
+            style={{
+              transform: `translate3d(${cursorPos.x - 4}px, ${cursorPos.y - 4}px, 0)`
+            }}
+          />
+          <div
+            className={`drape-cursor-ring ${cursorHovered ? 'is-hovered' : ''}`}
+            style={{
+              transform: `translate3d(${cursorPos.x - (cursorHovered ? 27 : 15)}px, ${cursorPos.y - (cursorHovered ? 27 : 15)}px, 0)`
+            }}
+          />
+        </>
+      )}
+
+      {/* Outer Viewport Canvas Fullscreen */}
+      <div className={`relative w-full h-full overflow-hidden flex flex-col transition-colors duration-500 ${
         activeView === 'mirror_hall' ? 'bg-[#FCEFED]' : 'bg-[#0F131A] text-white'
       }`}>
         
@@ -460,12 +495,15 @@ export default function InteractiveShowroomModal({ products = [], initialProduct
           <div className="flex items-center gap-3 pointer-events-auto">
             <button
               onClick={onClose}
+              onMouseEnter={() => setCursorHovered(true)}
+              onMouseLeave={() => setCursorHovered(false)}
               className={`flex items-center justify-center w-10 h-10 rounded-full shadow-md transition border ${
                 activeView === 'mirror_hall'
                   ? 'bg-white text-[#111111] hover:text-[#2F6BFF] border-[#C9CED8]/40'
                   : 'bg-[#1E2530] text-white hover:text-[#2F6BFF] border-white/10'
               }`}
-              aria-label="Back to store"
+              aria-label="Back to 2D store"
+              title="Return to 2D Storefront"
             >
               <Icon name="arrow-left" size={18} />
             </button>
@@ -491,17 +529,34 @@ export default function InteractiveShowroomModal({ products = [], initialProduct
             </span>
           </div>
 
-          {/* Right Controls: Simple view toggle, Cart, Profile */}
+          {/* Right Controls: Room Switcher, Simple view toggle, Cart, Profile */}
           <div className="flex items-center gap-3 pointer-events-auto">
             <button
               onClick={() => setActiveView(activeView === 'mirror_hall' ? 'rack' : 'mirror_hall')}
+              onMouseEnter={() => setCursorHovered(true)}
+              onMouseLeave={() => setCursorHovered(false)}
               className={`hidden md:flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full shadow-sm transition border ${
                 activeView === 'mirror_hall'
-                  ? 'bg-white text-[#6B7380] hover:text-[#2F6BFF] border-[#C9CED8]/40'
+                  ? 'bg-white text-[#111111] hover:text-[#2F6BFF] border-[#C9CED8]/40'
+                  : 'bg-[#1E2530] text-white hover:text-[#2F6BFF] border-white/10'
+              }`}
+              title="Switch 3D architectural room"
+            >
+              <span>{activeView === 'mirror_hall' ? '🗄️ Studio Rack' : '🪞 Mirror Hall'}</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              onMouseEnter={() => setCursorHovered(true)}
+              onMouseLeave={() => setCursorHovered(false)}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full shadow-sm transition border ${
+                activeView === 'mirror_hall'
+                  ? 'bg-white/90 text-[#6B7380] hover:text-[#2F6BFF] border-[#C9CED8]/40'
                   : 'bg-[#1E2530] text-white/70 hover:text-white border-white/10'
               }`}
+              title="Open 2D grid view"
             >
-              <span>{activeView === 'mirror_hall' ? 'Showroom Rack' : 'Simple view'}</span>
+              <span>Simple view</span>
             </button>
 
             <button
@@ -509,6 +564,8 @@ export default function InteractiveShowroomModal({ products = [], initialProduct
                 if (onOpenProduct) onOpenProduct(currentProduct);
                 else if (currentProduct.productUrl) window.open(getProductClickUrl(currentProduct), '_blank');
               }}
+              onMouseEnter={() => setCursorHovered(true)}
+              onMouseLeave={() => setCursorHovered(false)}
               className="flex items-center gap-2 bg-[#111111] text-white px-5 py-2.5 rounded-full shadow-md hover:bg-[#2F6BFF] transition text-xs font-bold"
             >
               <Icon name="bag" size={14} />
