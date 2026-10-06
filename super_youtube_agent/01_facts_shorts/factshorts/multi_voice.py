@@ -34,9 +34,9 @@ DEFAULT_MULTI_VOICES = {
         SpeakerVoice("Serious Climax", "hi-IN-MadhurNeural", "edge", "#FF3300"),   # Fiery Red
     ],
     "english": [
-        SpeakerVoice("Christopher", "en-US-ChristopherNeural", "edge", "#00E5FF"), # Electric Cyan
+        SpeakerVoice("Jenny", "en-US-JennyNeural", "edge", "#00E5FF"),             # Electric Cyan
         SpeakerVoice("Jenny", "en-US-JennyNeural", "edge", "#FFE600"),             # Cyber Yellow
-        SpeakerVoice("Guy", "en-US-GuyNeural", "edge", "#FF3300"),                 # Fiery Orange
+        SpeakerVoice("Jenny", "en-US-JennyNeural", "edge", "#FF3300"),             # Fiery Orange
     ]
 }
 

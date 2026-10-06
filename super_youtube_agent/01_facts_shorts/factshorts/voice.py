@@ -42,15 +42,16 @@ LOCAL_ENGINES = {"kokoro", "piper"}
 
 log = module_logger("voice")
 
-# Curated natural-sounding edge-tts voices per niche (variety = less "mass produced").
+# Curated natural-sounding female edge-tts voices (strictly female, zero random male mixup).
 VOICES: dict[str, list[str]] = {
-    "space": ["en-US-ChristopherNeural", "en-GB-RyanNeural", "en-US-EricNeural"],
-    "psychology": ["en-US-AriaNeural", "en-GB-SoniaNeural", "en-US-MichelleNeural"],
-    "history": ["en-GB-ThomasNeural", "en-US-GuyNeural", "en-AU-WilliamNeural"],
-    "science": ["en-US-JennyNeural", "en-US-BrandonNeural", "en-GB-LibbyNeural"],
-    "animals": ["en-US-AnaNeural", "en-US-SteffanNeural", "en-AU-NatashaNeural"],
+    "space": ["en-US-JennyNeural", "en-US-AriaNeural"],
+    "psychology": ["en-US-AriaNeural", "en-US-JennyNeural"],
+    "history": ["en-US-AriaNeural", "en-US-JennyNeural"],
+    "science": ["en-US-JennyNeural", "en-US-AriaNeural"],
+    "animals": ["en-US-JennyNeural", "en-US-AnaNeural"],
+    "coding": ["en-US-JennyNeural", "en-US-AriaNeural"],
 }
-DEFAULT_VOICES = ["en-US-AriaNeural", "en-US-GuyNeural", "en-GB-SoniaNeural"]
+DEFAULT_VOICES = ["en-US-JennyNeural", "en-US-AriaNeural"]
 
 # ElevenLabs pre-made voices available on every account (paste your own ID to override)
 ELEVENLABS_VOICES: dict[str, str] = {
@@ -141,7 +142,7 @@ def pick_voice(niche: str, cfg: Config | None = None) -> str:
         return cfg.elevenlabs_voice_id or random.choice(list(ELEVENLABS_VOICES.values()))
     if provider in LOCAL_ENGINES:
         return pick_local_voice(niche, provider, cfg)
-    return random.choice(VOICES.get(niche, DEFAULT_VOICES))
+    return VOICES.get(niche, DEFAULT_VOICES)[0]
 
 
 def elevenlabs_voice_name(voice_id: str) -> str:

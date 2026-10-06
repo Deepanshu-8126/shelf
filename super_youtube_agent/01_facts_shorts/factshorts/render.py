@@ -147,7 +147,7 @@ def _zoom_chain(idx: int, seg_len: float, cfg: Config) -> str:
         f"y='max(0, min(in_h-{cfg.height}, (in_h-{cfg.height})/2))',setsar=1"
     )
     
-    # Add 3D effects for coding/tech niche
+    # Add niche-specific visual enhancements
     if cfg.niche == "coding":
         # Add subtle 2D rotation that varies by segment index (in-plane spin)
         # Slow oscillation: -2 to +2 degrees
@@ -157,6 +157,37 @@ def _zoom_chain(idx: int, seg_len: float, cfg: Config) -> str:
         perspective_y = 0.03 * math.cos(idx * 0.3)  # Subtle vertical perspective shift
         # Add rotation and perspective to the chain
         return f"{base_chain},rotate={rotation_degree}*PI/180:fillcolor=black,perspective={perspective_x}:{perspective_y}"
+    elif cfg.niche == "history":
+        # Add subtle film-like enhancement for documentary/history content
+        # Very subtle color temperature shift that alternates warm/cool
+        # Simulates slight film stock variations for authentic documentary feel
+        temp_shift = 150.0 * math.sin(idx * 0.3)  # ±150K temperature shift
+        # Add slight vignette effect that varies slightly
+        vignette_amount = 0.02 + 0.01 * math.sin(idx * 0.7)  # 2-3% vignette
+        return f"{base_chain},curves=all='0/0 0.1/0.09 0.2/0.2 0.5/0.5 0.8/0.8 1/1':color=temperature={temp_shift}"
+    elif cfg.niche in ["space", "general"]:  # Channel 1 default/facts
+        # Add gentle pulse/bounce effect for friendly, engaging feel
+        # Subtle scale oscillation that creates a warm, welcoming pulse
+        pulse_scale = 0.005 * math.sin(idx * 0.4)  # ±0.5% scale pulse
+        # Apply pulse as a separate filter after the base zoom/pan
+        return f"{base_chain},scale={pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f})+1"
+    else:
+        return base_chain
+            scale_with_pulse = f"{scale_expr}+{pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f})"
+        else:
+            # Middle segments get pulse added to their zoom
+            base_zoom = "1+{z:.4f}*t/{max(seg_len, 0.1):.3f}" if direction == "in" else "{1 + z:.4f}-{z:.4f}*t/{max(seg_len, 0.1):.3f}"
+            scale_with_pulse = f"max(1.0, 1+({base_zoom})+{pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f}))"
+        
+        # Apply the pulsed scale to the base chain
+        pulsed_chain = (
+            f"scale=w='max({cfg.width}, trunc({cfg.width}*({scale_with_pulse})/2)*2)':"
+            f"h='max({cfg.height}, trunc({cfg.height}*({scale_with_pulse})/2)*2)':eval=frame:flags=bicubic,"
+            f"crop={cfg.width}:{cfg.height}:"
+            f"x='max(0, min(in_w-{cfg.width}, (in_w-{cfg.width})/2{drift}))':"
+            f"y='max(0, min(in_h-{cfg.height}, (in_h-{cfg.height})/2))',setsar=1"
+        )
+        return pulsed_chain
     else:
         return base_chain
 
@@ -428,7 +459,7 @@ async def _join_segments_glitch(segments: list[Path], workdir: Path, cfg: Config
         # Glitch effect: RGB split with displacement
         glitch_filter = (
             f"[{i-1}:v][{i}:v]xfade=transition=glitch:duration={d:.3f}:offset={offset:.3f}:"
-            f"params=0.5:rgb{5}[v{i}]"
+            f"params=0.5[v{i}]"
         )
         filter_parts.append(glitch_filter)
         current_label = f"[v{i}]"
@@ -502,12 +533,22 @@ async def _join_segments(segments: list[Path], workdir: Path, cfg: Config, total
         )
         return out
 
-    # Determine transition type - special handling for coding/tech niche
+    # Determine transition type - special handling for different niches
     if cfg.niche == "coding":
         # For coding/tech, use more dynamic transitions by default
         transition_type = cfg.transition
         if transition_type == "fade":  # Default to grid for coding if fade is set
             transition_type = "grid"
+    elif cfg.niche == "history":
+        # For history/documentary, use cinematic transitions by default
+        transition_type = cfg.transition
+        if transition_type == "fade":  # Default to wipe for history if fade is set
+            transition_type = "wipe"
+    elif cfg.niche in ["space", "general"]:  # Channel 1 default/facts
+        # For general/facts, use engaging transitions by default
+        transition_type = cfg.transition
+        if transition_type == "fade":  # Default to slide for facts if fade is set
+            transition_type = "slide"
     else:
         transition_type = cfg.transition
     

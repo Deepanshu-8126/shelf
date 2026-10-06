@@ -80,13 +80,13 @@ DEFAULT_PIPER_VOICE = "en_US-lessac-medium"
 
 # Kokoro voice ids often used for narration (any of the 54 in voices-v1.0.bin works).
 KOKORO_VOICES = {
-    "space": ["am_michael", "bm_george", "am_adam"],
-    "psychology": ["af_heart", "af_bella", "bf_emma"],
-    "history": ["bm_george", "am_michael", "bm_lewis"],
-    "science": ["af_bella", "af_nicole", "bf_isabella"],
-    "animals": ["af_nova", "af_sarah", "bf_alice"],
+    "space": ["af_heart", "af_bella", "af_sarah"],
+    "psychology": ["af_heart", "af_bella", "af_sarah"],
+    "history": ["af_heart", "af_bella", "af_sarah"],
+    "science": ["af_heart", "af_bella", "af_sarah"],
+    "animals": ["af_heart", "af_bella", "af_sarah"],
 }
-DEFAULT_KOKORO_VOICES = ["af_heart", "am_michael", "af_bella"]
+DEFAULT_KOKORO_VOICES = ["af_heart", "af_bella", "af_sarah"]
 
 
 # --------------------------------------------------------------------- helpers
