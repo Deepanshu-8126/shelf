@@ -29,9 +29,10 @@ def get_diagram_font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default()
 
 
-def render_dynamic_topic_diagram(topic_id: str, current_line_idx: int, width: int = 920, height: int = 270) -> Image.Image:
+def render_dynamic_topic_diagram(topic_or_lesson: Any, current_line_idx: int, width: int = 920, height: int = 270) -> Image.Image:
     """
     Renders an animated, state-aware visual box for the active coding topic.
+    Supports dynamic diagram_rows, diagram_title, and diagram_caption directly from any lesson.
     """
     img = Image.new("RGBA", (width, height), (255, 255, 255, 0))
     draw = ImageDraw.Draw(img)
@@ -41,12 +42,49 @@ def render_dynamic_topic_diagram(topic_id: str, current_line_idx: int, width: in
     f_val = get_diagram_font(22, bold=True)
     f_mono = get_diagram_font(17, bold=True)
 
+    # Extract topic_id and dynamic attributes if lesson object passed
+    if hasattr(topic_or_lesson, "id"):
+        topic_id = getattr(topic_or_lesson, "id", "custom_topic")
+        custom_title = getattr(topic_or_lesson, "diagram_title", "")
+        custom_rows = getattr(topic_or_lesson, "diagram_rows", [])
+        custom_caption = getattr(topic_or_lesson, "diagram_caption", "")
+    else:
+        topic_id = str(topic_or_lesson)
+        custom_title = ""
+        custom_rows = []
+        custom_caption = ""
+
     t_lower = topic_id.lower()
 
     # Outer border card
     draw.rounded_rectangle([0, 0, width, height], radius=24, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
 
+    # 1. If lesson provides custom dynamic diagram rows, render them dynamically!
+    if custom_rows:
+        d_title = custom_title or "State Visualizer: Execution State Flow"
+        draw.text((30, 18), d_title[:45], fill=(30, 58, 138), font=f_title)
+        
+        row_y = 56
+        row_h = min(48, max(36, (height - 120) // max(1, len(custom_rows))))
+        for r_i, row_str in enumerate(custom_rows[:4]):
+            ry = row_y + r_i * (row_h + 8)
+            is_active_row = (r_i == (current_line_idx % max(1, len(custom_rows))))
+            bg = (238, 242, 255) if is_active_row else (248, 250, 252)
+            outline_col = (129, 140, 248) if is_active_row else (226, 232, 240)
+            text_col = (67, 56, 202) if is_active_row else (30, 41, 59)
+            draw.rounded_rectangle([35, ry, width - 35, ry + row_h], radius=12, fill=bg, outline=outline_col, width=2)
+            
+            prefix = "▶ " if is_active_row else "• "
+            draw.text((50, ry + row_h // 2), f"{prefix}{row_str}"[:48], fill=text_col, font=f_mono, anchor="lm")
+        
+        cap = custom_caption or "[✓] STATE SYNCHRONIZATION OPTIMAL"
+        cap_y = height - 42
+        draw.rounded_rectangle([35, cap_y - 6, width - 35, height - 12], radius=10, fill=(220, 252, 231), outline=(74, 222, 128), width=1)
+        draw.text((width // 2, cap_y + 12), cap[:50], fill=(20, 83, 45), font=f_mono, anchor="mm")
+        return img
+
     if "sort" in t_lower:
+
         # QuickSort Interactive Array & Partitioning Visualizer
         draw.text((30, 18), "State Visualizer: Partitioning & Recursion Tree", fill=(30, 58, 138), font=f_title)
         tiles = [38, 27, 43, 3, 9, 82, 10]
@@ -149,8 +187,8 @@ def render_dynamic_topic_diagram(topic_id: str, current_line_idx: int, width: in
         draw.rounded_rectangle([40, 175, width - 40, height - 20], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((width // 2, 210), "[✓] MAX PROFIT: +5 • EXECUTED IN A SINGLE O(n) PASS", fill=(20, 83, 45), font=f_mono, anchor="mm")
 
-    else:
-        # Memory Bar Gauge (Generators / Default)
+    elif "gen" in t_lower or "memory" in t_lower:
+        # Memory Bar Gauge
         draw.text((30, 18), "State Visualizer: Memory Footprint Comparison", fill=(30, 58, 138), font=f_title)
         draw.rounded_rectangle([40, 60, width - 40, 110], radius=14, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
         draw.text((60, 85), "List Comprehension: 80,000,000 Bytes (RAM Spike [!])", fill=(185, 28, 28), font=f_mono)
@@ -160,5 +198,17 @@ def render_dynamic_topic_diagram(topic_id: str, current_line_idx: int, width: in
 
         draw.rounded_rectangle([40, 190, width - 40, height - 15], radius=12, fill=(241, 245, 249))
         draw.text((width // 2, 225), "[✓] O(1) CONSTANT BUFFER ALLOCATION VERIFIED", fill=(30, 41, 59), font=f_mono, anchor="mm")
+    else:
+        # Universal Dynamic Architecture & State Inspector Card
+        title_str = custom_title or f"State Visualizer: {topic_id.replace('_', ' ').title()}"
+        draw.text((30, 18), title_str[:45], fill=(30, 58, 138), font=f_title)
+        
+        draw.rounded_rectangle([40, 60, width - 40, 140], radius=14, fill=(241, 245, 249), outline=(203, 213, 225), width=2)
+        draw.text((60, 80), f"Active Execution Phase: Step {current_line_idx + 1}", fill=(15, 23, 42), font=f_mono)
+        draw.text((60, 108), "State Mutation: Clean in-memory scope verified", fill=(51, 65, 85), font=f_body)
+
+        draw.rounded_rectangle([40, 160, width - 40, height - 20], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((width // 2, 195), "[✓] ZERO RUNTIME REGRESSIONS • PRODUCTION ARCHITECTURE", fill=(20, 83, 45), font=f_mono, anchor="mm")
 
     return img
+

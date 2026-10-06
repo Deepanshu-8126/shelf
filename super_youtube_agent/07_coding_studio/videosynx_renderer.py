@@ -103,10 +103,13 @@ def render_anchored_frame(
         # =========================================================================
         # PAGE 1: PROBLEM SPECIFICATION & CHALLENGE HOOK
         # =========================================================================
+        # Determine episode display label
+        ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
         # Top Header
-        draw.text((80, 75), f"{lesson.series_name} • DAY {lesson.episode_num} OF 100", fill=(100, 116, 139), font=fonts["hud_label"])
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 660, 168], radius=14, fill=(238, 242, 255), outline=(199, 210, 254), width=2)
-        draw.text((370, 141), f"[DAY {lesson.episode_num}]  {lesson.badge_tag.upper()}", fill=(67, 56, 202), font=fonts["hud_badge"], anchor="mm")
+        badge_header = f"[{ep_label}]  {lesson.badge_tag.upper()}" if ("DAY" not in lesson.badge_tag.upper() and "EP" not in lesson.badge_tag.upper()) else f"{lesson.badge_tag.upper()}"
+        draw.text((370, 141), badge_header[:36], fill=(67, 56, 202), font=fonts["hud_badge"], anchor="mm")
         draw.text((80, 195), lesson.title, fill=(15, 23, 42), font=fonts["headline"])
 
         # Card 1: Problem Challenge Card
@@ -119,11 +122,12 @@ def render_anchored_frame(
         draw.ellipse([card_x + 36, c1_y + 24, card_x + 52, c1_y + 40], fill=(255, 95, 86))
         draw.ellipse([card_x + 62, c1_y + 24, card_x + 78, c1_y + 40], fill=(255, 189, 46))
         draw.ellipse([card_x + 88, c1_y + 24, card_x + 104, c1_y + 40], fill=(39, 201, 63))
-        draw.text((card_x + 130, c1_y + 32), f"LeetCode #{lesson.episode_num} • Problem Specification", fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
+        spec_title = getattr(lesson, "challenge_header", "") or f"{lesson.series_name} • Specification"
+        draw.text((card_x + 130, c1_y + 32), spec_title[:45], fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
         draw.line([(card_x + 20, c1_y + 64), (card_x + card_w - 20, c1_y + 64)], fill=(241, 245, 249), width=2)
 
         draw.text((card_x + 35, c1_y + 85), "[CHALLENGE SPECIFICATION]", fill=(30, 58, 138), font=fonts["section_title"])
-        prob_text = lesson.problem_statement or "Solve this LeetCode challenge with optimal time and space complexity."
+        prob_text = lesson.problem_statement or "Solve this challenge with optimal time and space complexity."
         prob_lines = wrap_text_lines(prob_text, max_chars=40)
         for p_idx, pl in enumerate(prob_lines[:3]):
             draw.text((card_x + 35, c1_y + 125 + p_idx * 34), pl, fill=(51, 65, 85), font=fonts["card_body"])
@@ -134,23 +138,25 @@ def render_anchored_frame(
         draw.text((card_x + 50, in_y + 24), "$ test_case_input:", fill=(148, 163, 184), font=fonts["term_mono"])
         in_text = lesson.input_example or "input_data = [ ... ]"
         draw.text((card_x + 50, in_y + 68), in_text[:46], fill=(74, 222, 128), font=fonts["card_mono"])
-        draw.text((card_x + 50, in_y + 115), "[*] Target: Solve in O(n) or better", fill=(129, 140, 248), font=fonts["term_mono"])
+        target_badge = f"[*] Target: {lesson.complexity_badge}"
+        draw.text((card_x + 50, in_y + 115), target_badge[:45], fill=(129, 140, 248), font=fonts["term_mono"])
 
-        # Card 2: The Junior Trap / Brute Force Pitfall
+        # Card 2: The Junior Trap / Naive Pitfall
         c2_y, c2_h = 750, 360
         for off, a in [(12, 12), (4, 20)]:
             draw.rounded_rectangle([card_x, c2_y + off, card_x + card_w, c2_y + c2_h + off], radius=24, fill=(0, 0, 0, a))
         draw.rounded_rectangle([card_x, c2_y, card_x + card_w, c2_y + c2_h], radius=24, fill=(254, 242, 242), outline=(248, 113, 113), width=2)
 
-        draw.text((card_x + 35, c2_y + 35), "[BRUTE FORCE PITFALL]", fill=(185, 28, 28), font=fonts["section_title"])
-        trap_text = lesson.naive_pitfall or "Nested loops O(n²) checks every possibility and causes TLE."
+        draw.text((card_x + 35, c2_y + 35), "[ANTI-PATTERN / NAIVE PITFALL]", fill=(185, 28, 28), font=fonts["section_title"])
+        trap_text = lesson.naive_pitfall or "Naive approach causes high overhead and fails production scale."
         trap_lines = wrap_text_lines(trap_text, max_chars=40)
         for t_idx, tl in enumerate(trap_lines[:2]):
             draw.text((card_x + 35, c2_y + 80 + t_idx * 34), tl, fill=(153, 27, 27), font=fonts["card_body"])
 
         # Warning banner pill
+        warn_text = getattr(lesson, "warning_banner", "") or "[!] INSUFFICIENT OR BUGGY PATTERN"
         draw.rounded_rectangle([card_x + 30, c2_y + 175, card_x + card_w - 30, c2_y + 265], radius=16, fill=(239, 68, 68))
-        draw.text((card_x + card_w // 2, c2_y + 220), "[!] TIME LIMIT EXCEEDED (TLE) ON 10⁵ SCALE", fill=(255, 255, 255), font=fonts["card_mono"], anchor="mm")
+        draw.text((card_x + card_w // 2, c2_y + 220), warn_text[:45], fill=(255, 255, 255), font=fonts["card_mono"], anchor="mm")
         draw.text((card_x + 35, c2_y + 300), "-> Next: Senior line-by-line optimal solution...", fill=(120, 53, 15), font=fonts["teach_title"])
 
         # Card 3: Senior Optimal Architecture Target
@@ -159,13 +165,14 @@ def render_anchored_frame(
             draw.rounded_rectangle([card_x, c3_y + off, card_x + card_w, c3_y + c3_h + off], radius=24, fill=(0, 0, 0, a))
         draw.rounded_rectangle([card_x, c3_y, card_x + card_w, c3_y + c3_h], radius=24, fill=(240, 253, 244), outline=(134, 239, 172), width=2)
 
-        draw.text((card_x + 35, c3_y + 35), "[SENIOR OPTIMAL PATTERN]", fill=(20, 83, 45), font=fonts["section_title"])
+        draw.text((card_x + 35, c3_y + 35), "[SENIOR PRODUCTION PATTERN]", fill=(20, 83, 45), font=fonts["section_title"])
         draw.text((card_x + 35, c3_y + 80), f"• Target Complexity: {lesson.complexity_badge}", fill=(22, 101, 52), font=fonts["card_body"])
         draw.text((card_x + 35, c3_y + 120), f"• Performance Benchmark: {lesson.benchmark_metric}", fill=(22, 101, 52), font=fonts["card_body"])
 
         # Strategy Pill
         draw.rounded_rectangle([card_x + 30, c3_y + 185, card_x + card_w - 30, c3_y + 265], radius=16, fill=(34, 197, 94))
         draw.text((card_x + card_w // 2, c3_y + 225), f"[OK] {lesson.badge_tag.upper()} • ZERO OVERHEAD", fill=(255, 255, 255), font=fonts["card_mono"], anchor="mm")
+
 
         # Card 4: Teacher Narration at Bottom
         t_y, t_h = 1510, 290
@@ -204,7 +211,8 @@ def render_anchored_frame(
                 break
 
         # Header
-        draw.text((80, 75), f"{lesson.series_name} • DAY {lesson.episode_num}", fill=(100, 116, 139), font=fonts["hud_label"])
+        ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 620, 168], radius=14, fill=(238, 242, 255), outline=(199, 210, 254), width=2)
         draw.text((350, 141), f"⚡ {lesson.badge_tag}", fill=(67, 56, 202), font=fonts["hud_badge"], anchor="mm")
         draw.text((80, 195), lesson.title, fill=(15, 23, 42), font=fonts["headline"])
@@ -228,7 +236,8 @@ def render_anchored_frame(
         draw.ellipse([card_x + 36, card_y + 24, card_x + 52, card_y + 40], fill=(255, 95, 86))
         draw.ellipse([card_x + 62, card_y + 24, card_x + 78, card_y + 40], fill=(255, 189, 46))
         draw.ellipse([card_x + 88, card_y + 24, card_x + 104, card_y + 40], fill=(39, 201, 63))
-        draw.text((card_x + 130, card_y + 32), f"{lesson.filename} • Python 3.11", fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
+        lang_label = getattr(lesson, "language", "python").title()
+        draw.text((card_x + 130, card_y + 32), f"{lesson.filename} • {lang_label}", fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
         draw.line([(card_x + 20, card_y + 64), (card_x + card_w - 20, card_y + 64)], fill=(241, 245, 249), width=2)
 
         # Render Code Lines with Spotlight Halo
@@ -298,7 +307,7 @@ def render_anchored_frame(
 
         # Dynamic State Visualizer Box
         diag_y = 1170
-        diag_img = render_dynamic_topic_diagram(lesson.id, current_line_idx, width=card_w, height=300)
+        diag_img = render_dynamic_topic_diagram(lesson, current_line_idx, width=card_w, height=300)
         img.paste(diag_img, (card_x, diag_y), diag_img)
 
         # Teacher Insight Box
@@ -323,7 +332,8 @@ def render_anchored_frame(
         # PAGE 3: LIVE SANDBOX EXECUTION & STDOUT DRY-RUN
         # =========================================================================
         # Header
-        draw.text((80, 75), f"{lesson.series_name} • DAY {lesson.episode_num}", fill=(100, 116, 139), font=fonts["hud_label"])
+        ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 680, 168], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((380, 141), "[RUN] LIVE DRY-RUN & SANDBOX EXECUTION", fill=(20, 83, 45), font=fonts["hud_badge"], anchor="mm")
         draw.text((80, 195), "Runtime Sandbox Verification", fill=(15, 23, 42), font=fonts["headline"])
@@ -334,7 +344,7 @@ def render_anchored_frame(
 
         # Top Card: Algorithm Final Solved State
         diag_y = 280
-        diag_img = render_dynamic_topic_diagram(lesson.id, len(lesson.lines), width=card_w, height=450)
+        diag_img = render_dynamic_topic_diagram(lesson, len(lesson.lines), width=card_w, height=450)
         img.paste(diag_img, (card_x, diag_y), diag_img)
 
         # Bottom Card: Live Terminal Box
@@ -347,7 +357,8 @@ def render_anchored_frame(
         draw.ellipse([card_x + 36, term_y + 24, card_x + 52, term_y + 40], fill=(255, 95, 86))
         draw.ellipse([card_x + 62, term_y + 24, card_x + 78, term_y + 40], fill=(255, 189, 46))
         draw.ellipse([card_x + 88, term_y + 24, card_x + 104, term_y + 40], fill=(39, 201, 63))
-        draw.text((card_x + 130, term_y + 32), f"$ python3 {lesson.filename} (Isolated Sandbox)", fill=(248, 250, 252), font=fonts["file_head"], anchor="lm")
+        lang_cmd = "python3" if getattr(lesson, "language", "python") == "python" else lesson.language
+        draw.text((card_x + 130, term_y + 32), f"$ {lang_cmd} {lesson.filename} (Isolated Sandbox)", fill=(248, 250, 252), font=fonts["file_head"], anchor="lm")
         draw.line([(card_x + 20, term_y + 64), (card_x + card_w - 20, term_y + 64)], fill=(30, 41, 59), width=2)
 
         # Streaming stdout lines
@@ -375,7 +386,7 @@ def render_anchored_frame(
         draw.text((card_x + 54, teach_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
         draw.text((card_x + 96, teach_y + 36), "AI TEACHER // EXECUTION VERIFICATION", fill=(20, 83, 45), font=fonts["teach_title"])
 
-        ver_txt = "Code ko execute karke real dry-run test karte hain. All assertions passing with optimal efficiency!"
+        ver_txt = f"{lesson.title} execution dry-run test verified. All assertions passing with optimal efficiency!"
         v_lines = wrap_text_lines(ver_txt, max_chars=44)
         for v_idx, vl in enumerate(v_lines[:3]):
             draw.text((card_x + 36, teach_y + 95 + v_idx * 40), vl, fill=(15, 23, 42), font=fonts["teach_body"])
@@ -385,10 +396,11 @@ def render_anchored_frame(
         # PAGE 4: COMPLEXITY MASTERY & UP NEXT PLAYLIST TEASER
         # =========================================================================
         # Top Header
-        draw.text((80, 75), f"{lesson.series_name} • DAY {lesson.episode_num} COMPLETED", fill=(100, 116, 139), font=fonts["hud_label"])
+        ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label} COMPLETED", fill=(100, 116, 139), font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 680, 168], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((380, 141), "[PASS] OPTIMAL SOLUTION ACCEPTED", fill=(20, 83, 45), font=fonts["hud_badge"], anchor="mm")
-        draw.text((80, 195), "Algorithm Mastered!", fill=(15, 23, 42), font=fonts["headline"])
+        draw.text((80, 195), "Mastery Complete!", fill=(15, 23, 42), font=fonts["headline"])
 
         # Progress Track Full
         bar_w = 920
@@ -414,8 +426,8 @@ def render_anchored_frame(
         # Left Box (Naive)
         draw.rounded_rectangle([card_x + 25, sub_box_y, card_x + 25 + box_w, sub_box_y + 240], radius=18, fill=(254, 242, 242), outline=(248, 113, 113), width=2)
         draw.text((card_x + 45, sub_box_y + 25), "[X] NAIVE APPROACH", fill=(185, 28, 28), font=fonts["section_title"])
-        draw.text((card_x + 45, sub_box_y + 70), "• O(n²) Slow Loops", fill=(153, 27, 27), font=fonts["card_body"])
-        draw.text((card_x + 45, sub_box_y + 110), "• High RAM Overhead", fill=(153, 27, 27), font=fonts["card_body"])
+        draw.text((card_x + 45, sub_box_y + 70), "• High Complexity Overhead", fill=(153, 27, 27), font=fonts["card_body"])
+        draw.text((card_x + 45, sub_box_y + 110), "• Excessive RAM Allocations", fill=(153, 27, 27), font=fonts["card_body"])
         draw.text((card_x + 45, sub_box_y + 150), "• Fails Scale Tests", fill=(153, 27, 27), font=fonts["card_body"])
 
         # Right Box (Senior Optimal)
@@ -436,19 +448,22 @@ def render_anchored_frame(
         draw.rounded_rectangle([card_x, c2_y, card_x + card_w, c2_y + c2_h], radius=24, fill=(238, 242, 255), outline=(199, 210, 254), width=2)
 
         draw.rounded_rectangle([card_x + 35, c2_y + 35, card_x + 440, c2_y + 85], radius=14, fill=(79, 70, 229))
-        draw.text((card_x + 237, c2_y + 60), "[UP NEXT] LEETCODE JOURNEY", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
+        draw.text((card_x + 237, c2_y + 60), f"[UP NEXT] {lesson.series_name.upper()[:22]}", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
 
-        next_preview = lesson.next_day_preview or f"Day {lesson.episode_num + 1} Walkthrough"
+        next_preview = lesson.next_day_preview or f"Next: Episode {lesson.episode_num + 1} Walkthrough"
         # Wrap title if long
         prev_lines = wrap_text_lines(next_preview, max_chars=32)
         for p_i, p_line in enumerate(prev_lines[:2]):
             draw.text((card_x + 35, c2_y + 115 + p_i * 45), p_line, fill=(15, 23, 42), font=fonts["section_title"])
-        draw.text((card_x + 35, c2_y + 215), "100 Days of LeetCode & Python Algorithms Series", fill=(71, 85, 105), font=fonts["card_body"])
+        sub_text = getattr(lesson, "series_subtitle", "") or f"{lesson.series_name} Series"
+        draw.text((card_x + 35, c2_y + 215), sub_text[:45], fill=(71, 85, 105), font=fonts["card_body"])
 
         # Call to Action Pill
         cta_y = c2_y + 280
+        cta_btn = getattr(lesson, "cta_button_text", "") or f">> FOLLOW & SAVE PLAYLIST FOR NEXT EPISODE <<"
         draw.rounded_rectangle([card_x + 35, cta_y, card_x + card_w - 35, cta_y + 110], radius=20, fill=(15, 23, 42))
-        draw.text((card_x + card_w // 2, cta_y + 55), f">> FOLLOW & SAVE PLAYLIST FOR DAY {lesson.episode_num + 1} <<", fill=(255, 255, 255), font=fonts["section_title"], anchor="mm")
+        draw.text((card_x + card_w // 2, cta_y + 55), cta_btn[:42], fill=(255, 255, 255), font=fonts["section_title"], anchor="mm")
+
 
         # Card 3: Spoken Outro Box
         t_y, t_h = 1510, 280
@@ -554,17 +569,19 @@ async def render_videosynx_short(query: str | None = None) -> Path:
     print(f"📦 File Size: {out_mp4.stat().st_size / (1024*1024):.2f} MB")
 
     # 4. Save YouTube Metadata
+    ep_label = getattr(lesson, "episode_label", "") or f"Ep {lesson.episode_num}"
     yt_meta = {
-        "title": f"{lesson.series_name} • Ep {lesson.episode_num}: {lesson.title} ⚡ #shorts",
+        "title": f"{lesson.series_name} • {ep_label}: {lesson.title} ⚡ #shorts",
         "description": (
-            f"🔥 Welcome to {lesson.series_name} (Episode {lesson.episode_num})!\n\n"
+            f"🔥 Welcome to {lesson.series_name} ({ep_label})!\n\n"
             f"Topic: {lesson.title}\n"
             f"Line-by-line explanation with real sandbox Python verification.\n\n"
             f"💡 Complexity: {lesson.complexity_badge}\n"
             f"⚡ Benchmark: {lesson.benchmark_metric}\n\n"
-            f"#coding #programming #python #dsa #softwareengineer #leetcode #shorts #developer"
+            f"#coding #programming #python #dsa #softwareengineer #tech #shorts #developer"
         ),
-        "tags": ["coding", "programming", "python", "dsa", "leetcode", "developer", "shorts"],
+        "tags": ["coding", "programming", "python", "softwareengineer", "developer", "shorts"],
+
         "category_id": "28"
     }
     meta_path = OUTPUT_DIR / f"{lesson.id}_metadata.json"

@@ -35,8 +35,17 @@ class AnchoredLesson:
     benchmark_metric: str = "160x Faster Execution"
     problem_statement: str = ""
     input_example: str = ""
-    naive_pitfall: str = "O(n²) Brute Force -> Time Limit Exceeded (TLE)"
+    naive_pitfall: str = "O(n²) Brute Force -> High Latency"
+    warning_banner: str = "[!] INSUFFICIENT OR BUGGY PATTERN"
+    challenge_header: str = ""
+    series_subtitle: str = ""
+    cta_button_text: str = ""
+    episode_label: str = ""
+    diagram_title: str = ""
+    diagram_rows: List[str] = field(default_factory=list)
+    diagram_caption: str = ""
     next_day_preview: str = ""
+
 
 
 # =========================================================================
@@ -712,4 +721,12 @@ def get_anchored_lesson(query: str | None) -> AnchoredLesson:
         if any(w in item.title.lower() for w in q.split()):
             return item
 
-    return DAY4_QUICKSORT
+    # If topic is not in static catalog, invoke AI Curriculum Generator dynamically!
+    try:
+        from ai_curriculum_generator import generate_ai_anchored_lesson
+        return generate_ai_anchored_lesson(query)
+    except Exception as e:
+        print(f"[!] [Catalog] AI Generator fallback error: {e}")
+        return DAY4_QUICKSORT
+
+
