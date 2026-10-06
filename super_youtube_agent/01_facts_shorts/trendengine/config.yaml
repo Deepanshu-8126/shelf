@@ -1,0 +1,55 @@
+# =============================================================================
+# Trend-Engine Configuration: Autonomous Self-Learning Shorts Pipeline
+# =============================================================================
+niche: "facts, science, space, psychology, technology"
+brand_voice: "casual, curious, slightly humorous, high-retention"
+audience: "18-35, Indian + global"
+language: "Hinglish"           # Hinglish | English
+
+# Autonomous schedule
+schedule: "every 6 hours"
+max_videos_per_day: 5
+quality_threshold: 7          # LLM self-critique score threshold (1-10)
+
+# Local LLM (Ollama)
+ollama_host: "http://localhost:11434"
+local_model: "qwen2.5:7b"     # qwen2.5:7b | qwen3:8b | llama3.2:3b | mistral
+
+# Trend Discovery Sources
+sources:
+  reddit:
+    enabled: true
+    subreddits:
+      - "space"
+      - "science"
+      - "interestingasfuck"
+      - "todayilearned"
+      - "damnthatsinteresting"
+    limit_per_sub: 15
+  google_trends:
+    enabled: true
+    geo: "IN"
+    categories: ["all", "science", "tech"]
+  youtube:
+    enabled: true
+    keywords: ["space mystery short", "crazy science fact short", "mind blowing facts"]
+  rss:
+    enabled: true
+    feeds:
+      - name: "NASA Breaking News"
+        url: "https://www.nasa.gov/rss/dyn/breaking_news.rss"
+      - name: "ScienceDaily"
+        url: "https://www.sciencedaily.com/rss/top/science.xml"
+      - name: "Phys.org"
+        url: "https://phys.org/rss-feed/space-news/"
+
+# Learning & Multi-Armed Bandit
+bandit:
+  exploration_rate: 0.15
+  arms:
+    hook_styles: ["pattern_interrupt", "paradox_question", "bold_shock_claim", "micro_story"]
+    cta_styles: ["loop_curiosity", "comment_debate", "follow_series", "save_for_later"]
+    niches: ["space", "psychology", "science", "history"]
+
+# Paths
+db_path: "data/trendengine.db"

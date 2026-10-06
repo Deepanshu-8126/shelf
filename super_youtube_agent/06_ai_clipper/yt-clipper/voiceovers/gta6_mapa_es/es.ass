@@ -1,0 +1,22 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Arial,99,&H00FFFFFF,&H0000E5FF,&H00101010,&H90000000,-1,0,0,0,100,100,0,0,1,7,2,2,80,80,576,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.10,0:00:01.32,Pop,,0,0,0,,{\fad(60,60)}{\k42}NADIE {\k19}ESTÁ {\k32}HABLANDO {\k11}DE
+Dialogue: 0,0:00:01.21,0:00:01.78,Pop,,0,0,0,,{\fad(60,60)}{\k45}ESTO.
+Dialogue: 0,0:00:02.46,0:00:03.59,Pop,,0,0,0,,{\fad(60,60)}{\k20}EL {\k24}MAPA {\k45}FILTRADO {\k8}EN
+Dialogue: 0,0:00:03.49,0:00:05.63,Pop,,0,0,0,,{\fad(60,60)}{\k75}2022 {\k42}COINCIDE {\k67}EXACTAMENTE {\k13}CON
+Dialogue: 0,0:00:05.52,0:00:06.54,Pop,,0,0,0,,{\fad(60,60)}{\k9}LA {\k22}TOMA {\k11}DEL {\k43}AEROPUERTO
+Dialogue: 0,0:00:06.44,0:00:07.48,Pop,,0,0,0,,{\fad(60,60)}{\k12}DEL {\k24}NUEVO {\k53}TRAILER.
+Dialogue: 0,0:00:08.16,0:00:09.91,Pop,,0,0,0,,{\fad(60,60)}{\k37}SON {\k22}TRES {\k33}FUENTES {\k67}INDEPENDIENTES
+Dialogue: 0,0:00:09.81,0:00:10.99,Pop,,0,0,0,,{\fad(60,60)}{\k46}APUNTANDO {\k2}A {\k8}LO {\k46}MISMO.

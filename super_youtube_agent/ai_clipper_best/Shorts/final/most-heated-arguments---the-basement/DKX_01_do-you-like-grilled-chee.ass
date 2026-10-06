@@ -1,0 +1,73 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Noto Sans Devanagari ExtraBold,119,&H00FFFFFF,&H0024E8FF,&H00101010,&HB0000000,-1,0,0,0,100,100,0,0,1,9,3,2,75,75,692,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.40,0:00:00.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}WHAT'S{\c&H00FFFFFF\fscx100\fscy100} WRONG WITH
+Dialogue: 0,0:00:00.64,0:00:00.92,Pop,,0,0,0,,{\fad(40,40)}WHAT'S {\c&H0024E8FF\fscx118\fscy118}WRONG{\c&H00FFFFFF\fscx100\fscy100} WITH
+Dialogue: 0,0:00:00.92,0:00:01.66,Pop,,0,0,0,,{\fad(40,40)}WHAT'S WRONG {\c&H0024E8FF\fscx118\fscy118}WITH{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:02.00,0:00:03.00,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} COCONUT LET
+Dialogue: 0,0:00:03.00,0:00:03.64,Pop,,0,0,0,,{\fad(40,40)}YOU {\c&H0024E8FF\fscx118\fscy118}COCONUT{\c&H00FFFFFF\fscx100\fscy100} LET
+Dialogue: 0,0:00:03.64,0:00:03.72,Pop,,0,0,0,,{\fad(40,40)}YOU COCONUT {\c&H0024E8FF\fscx118\fscy118}LET{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:03.72,0:00:03.84,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100} ASK YOU
+Dialogue: 0,0:00:03.84,0:00:04.00,Pop,,0,0,0,,{\fad(40,40)}ME {\c&H0024E8FF\fscx118\fscy118}ASK{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:04.00,0:00:04.12,Pop,,0,0,0,,{\fad(40,40)}ME ASK {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:04.12,0:00:04.44,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}SOMETHING{\c&H00FFFFFF\fscx100\fscy100} LET ME
+Dialogue: 0,0:00:04.44,0:00:04.56,Pop,,0,0,0,,{\fad(40,40)}SOMETHING {\c&H0024E8FF\fscx118\fscy118}LET{\c&H00FFFFFF\fscx100\fscy100} ME
+Dialogue: 0,0:00:04.56,0:00:04.72,Pop,,0,0,0,,{\fad(40,40)}SOMETHING LET {\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:04.72,0:00:04.84,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ASK{\c&H00FFFFFF\fscx100\fscy100} YOU CAN
+Dialogue: 0,0:00:04.84,0:00:05.00,Pop,,0,0,0,,{\fad(40,40)}ASK {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} CAN
+Dialogue: 0,0:00:05.00,0:00:05.12,Pop,,0,0,0,,{\fad(40,40)}ASK YOU {\c&H0024E8FF\fscx118\fscy118}CAN{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.12,0:00:05.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100} ASK YOU
+Dialogue: 0,0:00:05.24,0:00:05.36,Pop,,0,0,0,,{\fad(40,40)}I {\c&H0024E8FF\fscx118\fscy118}ASK{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:05.36,0:00:05.56,Pop,,0,0,0,,{\fad(40,40)}I ASK {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.56,0:00:05.96,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}SOMETHING{\c&H00FFFFFF\fscx100\fscy100} DO YOU
+Dialogue: 0,0:00:05.96,0:00:06.08,Pop,,0,0,0,,{\fad(40,40)}SOMETHING {\c&H0024E8FF\fscx118\fscy118}DO{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:06.08,0:00:06.16,Pop,,0,0,0,,{\fad(40,40)}SOMETHING DO {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:06.16,0:00:06.36,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}MIND{\c&H00FFFFFF\fscx100\fscy100} IF I
+Dialogue: 0,0:00:06.36,0:00:06.44,Pop,,0,0,0,,{\fad(40,40)}MIND {\c&H0024E8FF\fscx118\fscy118}IF{\c&H00FFFFFF\fscx100\fscy100} I
+Dialogue: 0,0:00:06.44,0:00:06.56,Pop,,0,0,0,,{\fad(40,40)}MIND IF {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:06.56,0:00:06.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ASK{\c&H00FFFFFF\fscx100\fscy100} YOU SOMETHING
+Dialogue: 0,0:00:06.72,0:00:06.88,Pop,,0,0,0,,{\fad(40,40)}ASK {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100} SOMETHING
+Dialogue: 0,0:00:06.88,0:00:07.36,Pop,,0,0,0,,{\fad(40,40)}ASK YOU {\c&H0024E8FF\fscx118\fscy118}SOMETHING{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:07.36,0:00:07.56,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ASK{\c&H00FFFFFF\fscx100\fscy100} ME YOU
+Dialogue: 0,0:00:07.56,0:00:08.08,Pop,,0,0,0,,{\fad(40,40)}ASK {\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:08.08,0:00:08.20,Pop,,0,0,0,,{\fad(40,40)}ASK ME {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:08.20,0:00:08.32,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}LIKE{\c&H00FFFFFF\fscx100\fscy100} GRILLED CHEESE
+Dialogue: 0,0:00:08.32,0:00:08.60,Pop,,0,0,0,,{\fad(40,40)}LIKE {\c&H0024E8FF\fscx118\fscy118}GRILLED{\c&H00FFFFFF\fscx100\fscy100} CHEESE
+Dialogue: 0,0:00:08.60,0:00:08.84,Pop,,0,0,0,,{\fad(40,40)}LIKE GRILLED {\c&H0024E8FF\fscx118\fscy118}CHEESE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:08.84,0:00:09.56,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}SANDWICHES{\c&H00FFFFFF\fscx100\fscy100} I DON'T
+Dialogue: 0,0:00:09.56,0:00:09.68,Pop,,0,0,0,,{\fad(40,40)}SANDWICHES {\c&H0024E8FF\fscx118\fscy118}I{\c&H00FFFFFF\fscx100\fscy100} DON'T
+Dialogue: 0,0:00:09.68,0:00:09.84,Pop,,0,0,0,,{\fad(40,40)}SANDWICHES I {\c&H0024E8FF\fscx118\fscy118}DON'T{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:09.84,0:00:10.48,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}MIND{\c&H00FFFFFF\fscx100\fscy100} THEM GIVE
+Dialogue: 0,0:00:10.48,0:00:11.48,Pop,,0,0,0,,{\fad(40,40)}MIND {\c&H0024E8FF\fscx118\fscy118}THEM{\c&H00FFFFFF\fscx100\fscy100} GIVE
+Dialogue: 0,0:00:11.48,0:00:11.60,Pop,,0,0,0,,{\fad(40,40)}MIND THEM {\c&H0024E8FF\fscx118\fscy118}GIVE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:11.60,0:00:11.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100} A YES
+Dialogue: 0,0:00:11.72,0:00:12.00,Pop,,0,0,0,,{\fad(40,40)}ME {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100} YES
+Dialogue: 0,0:00:12.00,0:00:12.63,Pop,,0,0,0,,{\fad(40,40)}ME A {\c&H0024E8FF\fscx118\fscy118}YES{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:12.64,0:00:12.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}GIVE{\c&H00FFFFFF\fscx100\fscy100} ME A
+Dialogue: 0,0:00:12.80,0:00:12.92,Pop,,0,0,0,,{\fad(40,40)}GIVE {\c&H0024E8FF\fscx118\fscy118}ME{\c&H00FFFFFF\fscx100\fscy100} A
+Dialogue: 0,0:00:12.92,0:00:13.08,Pop,,0,0,0,,{\fad(40,40)}GIVE ME {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:13.08,0:00:13.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}NO{\c&H00FFFFFF\fscx100\fscy100} DO YOU
+Dialogue: 0,0:00:13.88,0:00:14.04,Pop,,0,0,0,,{\fad(40,40)}NO {\c&H0024E8FF\fscx118\fscy118}DO{\c&H00FFFFFF\fscx100\fscy100} YOU
+Dialogue: 0,0:00:14.04,0:00:14.20,Pop,,0,0,0,,{\fad(40,40)}NO DO {\c&H0024E8FF\fscx118\fscy118}YOU{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:14.20,0:00:14.36,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}LIKE{\c&H00FFFFFF\fscx100\fscy100} GRILLED CHEESE
+Dialogue: 0,0:00:14.36,0:00:14.64,Pop,,0,0,0,,{\fad(40,40)}LIKE {\c&H0024E8FF\fscx118\fscy118}GRILLED{\c&H00FFFFFF\fscx100\fscy100} CHEESE
+Dialogue: 0,0:00:14.64,0:00:14.92,Pop,,0,0,0,,{\fad(40,40)}LIKE GRILLED {\c&H0024E8FF\fscx118\fscy118}CHEESE{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:14.92,0:00:15.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}SANDWICHES{\c&H00FFFFFF\fscx100\fscy100} YES WHAT'S
+Dialogue: 0,0:00:15.72,0:00:16.36,Pop,,0,0,0,,{\fad(40,40)}SANDWICHES {\c&H0024E8FF\fscx118\fscy118}YES{\c&H00FFFFFF\fscx100\fscy100} WHAT'S
+Dialogue: 0,0:00:16.36,0:00:16.52,Pop,,0,0,0,,{\fad(40,40)}SANDWICHES YES {\c&H0024E8FF\fscx118\fscy118}WHAT'S{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:16.52,0:00:16.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ON{\c&H00FFFFFF\fscx100\fscy100} A GRILLED
+Dialogue: 0,0:00:16.64,0:00:16.80,Pop,,0,0,0,,{\fad(40,40)}ON {\c&H0024E8FF\fscx118\fscy118}A{\c&H00FFFFFF\fscx100\fscy100} GRILLED
+Dialogue: 0,0:00:16.80,0:00:17.08,Pop,,0,0,0,,{\fad(40,40)}ON A {\c&H0024E8FF\fscx118\fscy118}GRILLED{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:17.08,0:00:17.82,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}CHEESE{\c&H00FFFFFF\fscx100\fscy100}

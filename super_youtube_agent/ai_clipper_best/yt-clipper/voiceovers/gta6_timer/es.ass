@@ -1,0 +1,24 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Arial,99,&H00FFFFFF,&H0000E5FF,&H00101010,&H90000000,-1,0,0,0,100,100,0,0,1,7,2,2,80,80,576,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.12,0:00:01.55,Pop,,0,0,0,,{\fad(60,60)}{\k44}NOBODY {\k41}NOTICED {\k42}THIS.
+Dialogue: 0,0:00:02.25,0:00:03.57,Pop,,0,0,0,,{\fad(60,60)}{\k15}IN {\k8}THE {\k34}GTA {\k58}6 TRAILER
+Dialogue: 0,0:00:03.46,0:00:04.25,Pop,,0,0,0,,{\fad(60,60)}{\k16}THERE {\k11}IS {\k4}A {\k31}TIMER
+Dialogue: 0,0:00:04.14,0:00:05.88,Pop,,0,0,0,,{\fad(60,60)}{\k46}COUNTING {\k24}DOWN {\k21}FROM {\k66}47
+Dialogue: 0,0:00:05.78,0:00:07.20,Pop,,0,0,0,,{\fad(60,60)}{\k53}SECONDS, {\k18}AND {\k8}IT {\k24}NEVER
+Dialogue: 0,0:00:07.09,0:00:07.72,Pop,,0,0,0,,{\fad(60,60)}{\k50}RESETS.
+Dialogue: 0,0:00:08.40,0:00:09.65,Pop,,0,0,0,,{\fad(60,60)}{\k50}ROCKSTAR {\k24}DOES {\k17}NOT {\k16}PUT
+Dialogue: 0,0:00:09.54,0:00:10.76,Pop,,0,0,0,,{\fad(60,60)}{\k15}DEAD {\k27}PROPS {\k9}ON {\k54}SCREEN.
+Dialogue: 0,0:00:11.44,0:00:12.73,Pop,,0,0,0,,{\fad(60,60)}{\k32}WATCH {\k6}THE {\k42}GARAGE {\k31}SCENE
+Dialogue: 0,0:00:12.62,0:00:13.21,Pop,,0,0,0,,{\fad(60,60)}{\k47}AGAIN.

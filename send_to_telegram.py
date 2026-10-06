@@ -16,13 +16,41 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8809830963:AAG22CFChal-D13uSkNLUmCo
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6486771356")
 
 
-def find_latest_video(search_dirs: list[str]) -> Path | None:
+import time
+
+
+def detect_channel_badge(path: Path | str) -> str:
+    """Identify the originating channel and return chan1/chan2/chan3... badge."""
+    env_badge = os.getenv("CHANNEL_BADGE")
+    if env_badge:
+        return env_badge
+    s = str(path).lower().replace("\\", "/")
+    if "03_dark" in s or "dark_sutra" in s or "/dark" in s:
+        return "chan3 (Dark Sutra)"
+    if "05_vox" in s or "vox_ledger" in s or "vox_studio" in s or "/vox" in s:
+        return "chan5 (The Global Ledger)"
+    if "02_story" in s or "story_studio" in s or "/story" in s:
+        return "chan2 (Story Studio)"
+    if "04_lofi" in s or "lofi" in s:
+        return "chan4 (Lofi Studio)"
+    if "06_ai_clipper" in s or "autoclip" in s or "clipper" in s:
+        return "chan6 (AI Clipper)"
+    # Default to Channel 1 (FunCous Facts)
+    return "chan1 (FunCous Facts)"
+
+
+def find_latest_video(search_dirs: list[str], max_age_minutes: int = 45) -> Path | None:
     all_videos = []
+    now = time.time()
+    max_age_sec = max_age_minutes * 60
     for sdir in search_dirs:
         for p in Path(sdir).glob("**/*.mp4"):
             if not p.name.startswith("tg_") and p.is_file() and p.stat().st_size > 100000:
-                all_videos.append(p)
+                age = now - p.stat().st_mtime
+                if age <= max_age_sec:
+                    all_videos.append(p)
     if not all_videos:
+        print(f"⚠️ No fresh video rendered within the last {max_age_minutes} minutes found (blocking stale video dispatch).")
         return None
     all_videos.sort(key=lambda x: x.stat().st_mtime, reverse=True)
     return all_videos[0]
@@ -109,7 +137,37 @@ def upload_multipart(url: str, fields: dict, file_field: str, file_path: Path) -
         return False
 
 
+def format_channel_header(channel_badge: str) -> str:
+    """Return a prominent, eye-catching visual banner for the channel."""
+    b_lower = channel_badge.lower()
+    if "chan2" in b_lower or "channel 2" in b_lower or "story" in b_lower or "mystery" in b_lower or "history" in b_lower:
+        icon = "🔴"
+        label = "CHANNEL 2 — STORY & MYSTERIES STUDIO"
+    elif "chan3" in b_lower or "channel 3" in b_lower or "vox" in b_lower or "dark" in b_lower or "ledger" in b_lower:
+        icon = "🟢"
+        label = "CHANNEL 3 — VOX & DOCUMENTARY STUDIO"
+    elif "chan4" in b_lower or "channel 4" in b_lower or "lofi" in b_lower:
+        icon = "🟣"
+        label = "CHANNEL 4 — LOFI STUDIO"
+    elif "chan5" in b_lower or "channel 5" in b_lower:
+        icon = "🟠"
+        label = "CHANNEL 5 — GLOBAL LEDGER"
+    elif "chan6" in b_lower or "channel 6" in b_lower or "clipper" in b_lower:
+        icon = "🟡"
+        label = "CHANNEL 6 — AI CLIPPER"
+    elif "chan7" in b_lower or "channel 7" in b_lower or "coding" in b_lower or "tech" in b_lower or "dev" in b_lower:
+        icon = "💻"
+        label = "CHANNEL 7 — CODING & TECH STUDIO"
+    else:
+        icon = "🔵"
+        label = "CHANNEL 1 — VIRAL FACTS SHORTS"
+
+    return f"{icon} <b>━━━━━━━━━━━━━━━━━━━━</b>\n{icon} <b>[{label}]</b>\n{icon} <b>━━━━━━━━━━━━━━━━━━━━</b>"
+
+
 def send_video(video_path: Path):
+    import html
+
     if not BOT_TOKEN or not CHAT_ID:
         print("❌ Telegram BOT_TOKEN or CHAT_ID missing. Skipping Telegram notification.")
         return False
@@ -121,19 +179,28 @@ def send_video(video_path: Path):
     seo = get_video_seo(video_path)
     title = seo.get("title") or video_path.stem.replace("-", " ").title()
     tags = seo.get("tags") or "#Shorts #Facts #Viral #YouTubeShorts"
+    channel_badge = detect_channel_badge(video_path)
+    header = format_channel_header(channel_badge)
+
+    safe_title = html.escape(title)
+    safe_filename = html.escape(video_path.name)
+    safe_tags = html.escape(tags)
+    safe_badge = html.escape(channel_badge)
 
     caption = (
-        f"🎬 *{title}*\n\n"
-        f"📁 *File:* `{video_path.name}`\n"
-        f"📊 *Size:* `{size_mb:.2f} MB`\n\n"
-        f"🏷️ *Tags:* {tags}\n\n"
-        f"✅ Video render complete! Ready to upload."
+        f"{header}\n\n"
+        f"🎬 <b>Title:</b> {safe_title}\n"
+        f"📺 <b>Target:</b> <code>{safe_badge}</code>\n"
+        f"📁 <b>File:</b> <code>{safe_filename}</code>\n"
+        f"📊 <b>Size:</b> <code>{size_mb:.2f} MB</code>\n\n"
+        f"🏷️ <b>Tags:</b> {safe_tags}\n\n"
+        f"✅ <b>Status:</b> Render complete &amp; ready!"
     )
 
     fields = {
         "chat_id": CHAT_ID,
         "caption": caption[:1024],
-        "parse_mode": "Markdown",
+        "parse_mode": "HTML",
         "supports_streaming": "true"
     }
 
@@ -170,7 +237,19 @@ if __name__ == "__main__":
             target_path = find_latest_video([str(arg_path)])
 
     if not target_path:
-        target_path = find_latest_video(["factshorts-bot/output", "vox_studio/output", "output", "."])
+        search_dirs = [
+            "super_youtube_agent/01_facts_shorts/output",
+            "super_youtube_agent/03_dark_sutra/output",
+            "super_youtube_agent/05_vox_ledger/output",
+            "super_youtube_agent/02_story_studio/output",
+            "super_youtube_agent/04_lofi_studio/output",
+            "super_youtube_agent/06_ai_clipper/output",
+            "factshorts-bot/output",
+            "vox_studio/output",
+            "output",
+            "."
+        ]
+        target_path = find_latest_video(search_dirs)
 
     if target_path and target_path.exists():
         send_video(target_path)

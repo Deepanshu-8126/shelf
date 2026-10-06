@@ -1,0 +1,976 @@
+{
+ "language": "en",
+ "text": "So here's the thing nobody tells you about the GTA 6 trailer. Everybody focused on the beach scene, but look at the top left corner. That timer is counting down from 47 seconds and it never resets. What if that's not a timer at all? What if it's a heist countdown? I went back through the 2025 footage frame by frame. And the biggest mistake people make is assuming it's pre rendered. It's actually running on the engine, you can see the draw distance pop. Here's why that matters for the release date. Rockstar never shows engine footage more than 18 months out. So the truth is, we're looking at a 2026 launch window, not 2027. Wait, it gets crazier. The map leak lines up perfectly with this shot. Listen, if you remember the 2022 leak, the airport was in the exact same spot. That's three independent sources pointing at the same thing. Insane. And nobody is talking about it. Drop a comment if you caught the second timer in the garage scene.",
+ "segments": [
+  {
+   "start": 0.0,
+   "end": 5.63,
+   "text": "So here's the thing nobody tells you about the GTA 6 trailer.",
+   "words": [
+    {
+     "word": "So",
+     "start": 0.0,
+     "end": 0.29
+    },
+    {
+     "word": "here's",
+     "start": 0.35,
+     "end": 0.86
+    },
+    {
+     "word": "the",
+     "start": 0.92,
+     "end": 1.265
+    },
+    {
+     "word": "thing",
+     "start": 1.325,
+     "end": 1.78
+    },
+    {
+     "word": "nobody",
+     "start": 1.84,
+     "end": 2.35
+    },
+    {
+     "word": "tells",
+     "start": 2.41,
+     "end": 2.865
+    },
+    {
+     "word": "you",
+     "start": 2.925,
+     "end": 3.27
+    },
+    {
+     "word": "about",
+     "start": 3.33,
+     "end": 3.785
+    },
+    {
+     "word": "the",
+     "start": 3.845,
+     "end": 4.19
+    },
+    {
+     "word": "GTA",
+     "start": 4.25,
+     "end": 4.595
+    },
+    {
+     "word": "6",
+     "start": 4.655,
+     "end": 4.89
+    },
+    {
+     "word": "trailer.",
+     "start": 4.95,
+     "end": 5.57
+    }
+   ]
+  },
+  {
+   "start": 5.98,
+   "end": 12.29,
+   "text": "Everybody focused on the beach scene, but look at the top left corner.",
+   "words": [
+    {
+     "word": "Everybody",
+     "start": 5.98,
+     "end": 6.655
+    },
+    {
+     "word": "focused",
+     "start": 6.715,
+     "end": 7.28
+    },
+    {
+     "word": "on",
+     "start": 7.34,
+     "end": 7.63
+    },
+    {
+     "word": "the",
+     "start": 7.69,
+     "end": 8.035
+    },
+    {
+     "word": "beach",
+     "start": 8.095,
+     "end": 8.55
+    },
+    {
+     "word": "scene,",
+     "start": 8.61,
+     "end": 9.12
+    },
+    {
+     "word": "but",
+     "start": 9.18,
+     "end": 9.525
+    },
+    {
+     "word": "look",
+     "start": 9.585,
+     "end": 9.985
+    },
+    {
+     "word": "at",
+     "start": 10.045,
+     "end": 10.335
+    },
+    {
+     "word": "the",
+     "start": 10.395,
+     "end": 10.74
+    },
+    {
+     "word": "top",
+     "start": 10.8,
+     "end": 11.145
+    },
+    {
+     "word": "left",
+     "start": 11.205,
+     "end": 11.605
+    },
+    {
+     "word": "corner.",
+     "start": 11.665,
+     "end": 12.23
+    }
+   ]
+  },
+  {
+   "start": 12.64,
+   "end": 18.435,
+   "text": "That timer is counting down from 47 seconds and it never resets.",
+   "words": [
+    {
+     "word": "That",
+     "start": 12.64,
+     "end": 13.04
+    },
+    {
+     "word": "timer",
+     "start": 13.1,
+     "end": 13.555
+    },
+    {
+     "word": "is",
+     "start": 13.615,
+     "end": 13.905
+    },
+    {
+     "word": "counting",
+     "start": 13.965,
+     "end": 14.585
+    },
+    {
+     "word": "down",
+     "start": 14.645,
+     "end": 15.045
+    },
+    {
+     "word": "from",
+     "start": 15.105,
+     "end": 15.505
+    },
+    {
+     "word": "47",
+     "start": 15.565,
+     "end": 15.855
+    },
+    {
+     "word": "seconds",
+     "start": 15.915,
+     "end": 16.48
+    },
+    {
+     "word": "and",
+     "start": 16.54,
+     "end": 16.885
+    },
+    {
+     "word": "it",
+     "start": 16.945,
+     "end": 17.235
+    },
+    {
+     "word": "never",
+     "start": 17.295,
+     "end": 17.75
+    },
+    {
+     "word": "resets.",
+     "start": 17.81,
+     "end": 18.375
+    }
+   ]
+  },
+  {
+   "start": 18.785,
+   "end": 25.06,
+   "text": "What if that's not a timer at all? What if it's a heist countdown?",
+   "words": [
+    {
+     "word": "What",
+     "start": 18.785,
+     "end": 19.185
+    },
+    {
+     "word": "if",
+     "start": 19.245,
+     "end": 19.535
+    },
+    {
+     "word": "that's",
+     "start": 19.595,
+     "end": 20.105
+    },
+    {
+     "word": "not",
+     "start": 20.165,
+     "end": 20.51
+    },
+    {
+     "word": "a",
+     "start": 20.57,
+     "end": 20.805
+    },
+    {
+     "word": "timer",
+     "start": 20.865,
+     "end": 21.32
+    },
+    {
+     "word": "at",
+     "start": 21.38,
+     "end": 21.67
+    },
+    {
+     "word": "all?",
+     "start": 21.73,
+     "end": 22.13
+    },
+    {
+     "word": "What",
+     "start": 22.19,
+     "end": 22.59
+    },
+    {
+     "word": "if",
+     "start": 22.65,
+     "end": 22.94
+    },
+    {
+     "word": "it's",
+     "start": 23.0,
+     "end": 23.4
+    },
+    {
+     "word": "a",
+     "start": 23.46,
+     "end": 23.695
+    },
+    {
+     "word": "heist",
+     "start": 23.755,
+     "end": 24.21
+    },
+    {
+     "word": "countdown?",
+     "start": 24.27,
+     "end": 25.0
+    }
+   ]
+  },
+  {
+   "start": 25.41,
+   "end": 30.175,
+   "text": "I went back through the 2025 footage frame by frame.",
+   "words": [
+    {
+     "word": "I",
+     "start": 25.41,
+     "end": 25.645
+    },
+    {
+     "word": "went",
+     "start": 25.705,
+     "end": 26.105
+    },
+    {
+     "word": "back",
+     "start": 26.165,
+     "end": 26.565
+    },
+    {
+     "word": "through",
+     "start": 26.625,
+     "end": 27.19
+    },
+    {
+     "word": "the",
+     "start": 27.25,
+     "end": 27.595
+    },
+    {
+     "word": "2025",
+     "start": 27.655,
+     "end": 28.055
+    },
+    {
+     "word": "footage",
+     "start": 28.115,
+     "end": 28.68
+    },
+    {
+     "word": "frame",
+     "start": 28.74,
+     "end": 29.195
+    },
+    {
+     "word": "by",
+     "start": 29.255,
+     "end": 29.545
+    },
+    {
+     "word": "frame.",
+     "start": 29.605,
+     "end": 30.115
+    }
+   ]
+  },
+  {
+   "start": 30.525,
+   "end": 36.245,
+   "text": "And the biggest mistake people make is assuming it's pre rendered.",
+   "words": [
+    {
+     "word": "And",
+     "start": 30.525,
+     "end": 30.87
+    },
+    {
+     "word": "the",
+     "start": 30.93,
+     "end": 31.275
+    },
+    {
+     "word": "biggest",
+     "start": 31.335,
+     "end": 31.9
+    },
+    {
+     "word": "mistake",
+     "start": 31.96,
+     "end": 32.525
+    },
+    {
+     "word": "people",
+     "start": 32.585,
+     "end": 33.095
+    },
+    {
+     "word": "make",
+     "start": 33.155,
+     "end": 33.555
+    },
+    {
+     "word": "is",
+     "start": 33.615,
+     "end": 33.905
+    },
+    {
+     "word": "assuming",
+     "start": 33.965,
+     "end": 34.585
+    },
+    {
+     "word": "it's",
+     "start": 34.645,
+     "end": 35.045
+    },
+    {
+     "word": "pre",
+     "start": 35.105,
+     "end": 35.45
+    },
+    {
+     "word": "rendered.",
+     "start": 35.51,
+     "end": 36.185
+    }
+   ]
+  },
+  {
+   "start": 36.595,
+   "end": 42.96,
+   "text": "It's actually running on the engine, you can see the draw distance pop.",
+   "words": [
+    {
+     "word": "It's",
+     "start": 36.595,
+     "end": 36.995
+    },
+    {
+     "word": "actually",
+     "start": 37.055,
+     "end": 37.675
+    },
+    {
+     "word": "running",
+     "start": 37.735,
+     "end": 38.3
+    },
+    {
+     "word": "on",
+     "start": 38.36,
+     "end": 38.65
+    },
+    {
+     "word": "the",
+     "start": 38.71,
+     "end": 39.055
+    },
+    {
+     "word": "engine,",
+     "start": 39.115,
+     "end": 39.68
+    },
+    {
+     "word": "you",
+     "start": 39.74,
+     "end": 40.085
+    },
+    {
+     "word": "can",
+     "start": 40.145,
+     "end": 40.49
+    },
+    {
+     "word": "see",
+     "start": 40.55,
+     "end": 40.895
+    },
+    {
+     "word": "the",
+     "start": 40.955,
+     "end": 41.3
+    },
+    {
+     "word": "draw",
+     "start": 41.36,
+     "end": 41.76
+    },
+    {
+     "word": "distance",
+     "start": 41.82,
+     "end": 42.44
+    },
+    {
+     "word": "pop.",
+     "start": 42.5,
+     "end": 42.9
+    }
+   ]
+  },
+  {
+   "start": 43.31,
+   "end": 47.32,
+   "text": "Here's why that matters for the release date.",
+   "words": [
+    {
+     "word": "Here's",
+     "start": 43.31,
+     "end": 43.82
+    },
+    {
+     "word": "why",
+     "start": 43.88,
+     "end": 44.225
+    },
+    {
+     "word": "that",
+     "start": 44.285,
+     "end": 44.685
+    },
+    {
+     "word": "matters",
+     "start": 44.745,
+     "end": 45.31
+    },
+    {
+     "word": "for",
+     "start": 45.37,
+     "end": 45.715
+    },
+    {
+     "word": "the",
+     "start": 45.775,
+     "end": 46.12
+    },
+    {
+     "word": "release",
+     "start": 46.18,
+     "end": 46.745
+    },
+    {
+     "word": "date.",
+     "start": 46.805,
+     "end": 47.26
+    }
+   ]
+  },
+  {
+   "start": 47.67,
+   "end": 52.875,
+   "text": "Rockstar never shows engine footage more than 18 months out.",
+   "words": [
+    {
+     "word": "Rockstar",
+     "start": 47.67,
+     "end": 48.29
+    },
+    {
+     "word": "never",
+     "start": 48.35,
+     "end": 48.805
+    },
+    {
+     "word": "shows",
+     "start": 48.865,
+     "end": 49.32
+    },
+    {
+     "word": "engine",
+     "start": 49.38,
+     "end": 49.89
+    },
+    {
+     "word": "footage",
+     "start": 49.95,
+     "end": 50.515
+    },
+    {
+     "word": "more",
+     "start": 50.575,
+     "end": 50.975
+    },
+    {
+     "word": "than",
+     "start": 51.035,
+     "end": 51.435
+    },
+    {
+     "word": "18",
+     "start": 51.495,
+     "end": 51.785
+    },
+    {
+     "word": "months",
+     "start": 51.845,
+     "end": 52.355
+    },
+    {
+     "word": "out.",
+     "start": 52.415,
+     "end": 52.815
+    }
+   ]
+  },
+  {
+   "start": 53.225,
+   "end": 59.26,
+   "text": "So the truth is, we're looking at a 2026 launch window, not 2027.",
+   "words": [
+    {
+     "word": "So",
+     "start": 53.225,
+     "end": 53.515
+    },
+    {
+     "word": "the",
+     "start": 53.575,
+     "end": 53.92
+    },
+    {
+     "word": "truth",
+     "start": 53.98,
+     "end": 54.435
+    },
+    {
+     "word": "is,",
+     "start": 54.495,
+     "end": 54.84
+    },
+    {
+     "word": "we're",
+     "start": 54.9,
+     "end": 55.355
+    },
+    {
+     "word": "looking",
+     "start": 55.415,
+     "end": 55.98
+    },
+    {
+     "word": "at",
+     "start": 56.04,
+     "end": 56.33
+    },
+    {
+     "word": "a",
+     "start": 56.39,
+     "end": 56.625
+    },
+    {
+     "word": "2026",
+     "start": 56.685,
+     "end": 57.085
+    },
+    {
+     "word": "launch",
+     "start": 57.145,
+     "end": 57.655
+    },
+    {
+     "word": "window,",
+     "start": 57.715,
+     "end": 58.28
+    },
+    {
+     "word": "not",
+     "start": 58.34,
+     "end": 58.685
+    },
+    {
+     "word": "2027.",
+     "start": 58.745,
+     "end": 59.2
+    }
+   ]
+  },
+  {
+   "start": 59.61,
+   "end": 65.92,
+   "text": "Wait, it gets crazier. The map leak lines up perfectly with this shot.",
+   "words": [
+    {
+     "word": "Wait,",
+     "start": 59.61,
+     "end": 60.065
+    },
+    {
+     "word": "it",
+     "start": 60.125,
+     "end": 60.415
+    },
+    {
+     "word": "gets",
+     "start": 60.475,
+     "end": 60.875
+    },
+    {
+     "word": "crazier.",
+     "start": 60.935,
+     "end": 61.555
+    },
+    {
+     "word": "The",
+     "start": 61.615,
+     "end": 61.96
+    },
+    {
+     "word": "map",
+     "start": 62.02,
+     "end": 62.365
+    },
+    {
+     "word": "leak",
+     "start": 62.425,
+     "end": 62.825
+    },
+    {
+     "word": "lines",
+     "start": 62.885,
+     "end": 63.34
+    },
+    {
+     "word": "up",
+     "start": 63.4,
+     "end": 63.69
+    },
+    {
+     "word": "perfectly",
+     "start": 63.75,
+     "end": 64.425
+    },
+    {
+     "word": "with",
+     "start": 64.485,
+     "end": 64.885
+    },
+    {
+     "word": "this",
+     "start": 64.945,
+     "end": 65.345
+    },
+    {
+     "word": "shot.",
+     "start": 65.405,
+     "end": 65.86
+    }
+   ]
+  },
+  {
+   "start": 66.27,
+   "end": 73.39,
+   "text": "Listen, if you remember the 2022 leak, the airport was in the exact same spot.",
+   "words": [
+    {
+     "word": "Listen,",
+     "start": 66.27,
+     "end": 66.835
+    },
+    {
+     "word": "if",
+     "start": 66.895,
+     "end": 67.185
+    },
+    {
+     "word": "you",
+     "start": 67.245,
+     "end": 67.59
+    },
+    {
+     "word": "remember",
+     "start": 67.65,
+     "end": 68.27
+    },
+    {
+     "word": "the",
+     "start": 68.33,
+     "end": 68.675
+    },
+    {
+     "word": "2022",
+     "start": 68.735,
+     "end": 69.135
+    },
+    {
+     "word": "leak,",
+     "start": 69.195,
+     "end": 69.65
+    },
+    {
+     "word": "the",
+     "start": 69.71,
+     "end": 70.055
+    },
+    {
+     "word": "airport",
+     "start": 70.115,
+     "end": 70.68
+    },
+    {
+     "word": "was",
+     "start": 70.74,
+     "end": 71.085
+    },
+    {
+     "word": "in",
+     "start": 71.145,
+     "end": 71.435
+    },
+    {
+     "word": "the",
+     "start": 71.495,
+     "end": 71.84
+    },
+    {
+     "word": "exact",
+     "start": 71.9,
+     "end": 72.355
+    },
+    {
+     "word": "same",
+     "start": 72.415,
+     "end": 72.815
+    },
+    {
+     "word": "spot.",
+     "start": 72.875,
+     "end": 73.33
+    }
+   ]
+  },
+  {
+   "start": 73.74,
+   "end": 78.76,
+   "text": "That's three independent sources pointing at the same thing.",
+   "words": [
+    {
+     "word": "That's",
+     "start": 73.74,
+     "end": 74.25
+    },
+    {
+     "word": "three",
+     "start": 74.31,
+     "end": 74.765
+    },
+    {
+     "word": "independent",
+     "start": 74.825,
+     "end": 75.61
+    },
+    {
+     "word": "sources",
+     "start": 75.67,
+     "end": 76.235
+    },
+    {
+     "word": "pointing",
+     "start": 76.295,
+     "end": 76.915
+    },
+    {
+     "word": "at",
+     "start": 76.975,
+     "end": 77.265
+    },
+    {
+     "word": "the",
+     "start": 77.325,
+     "end": 77.67
+    },
+    {
+     "word": "same",
+     "start": 77.73,
+     "end": 78.13
+    },
+    {
+     "word": "thing.",
+     "start": 78.19,
+     "end": 78.7
+    }
+   ]
+  },
+  {
+   "start": 79.11,
+   "end": 82.605,
+   "text": "Insane. And nobody is talking about it.",
+   "words": [
+    {
+     "word": "Insane.",
+     "start": 79.11,
+     "end": 79.675
+    },
+    {
+     "word": "And",
+     "start": 79.735,
+     "end": 80.08
+    },
+    {
+     "word": "nobody",
+     "start": 80.14,
+     "end": 80.65
+    },
+    {
+     "word": "is",
+     "start": 80.71,
+     "end": 81.0
+    },
+    {
+     "word": "talking",
+     "start": 81.06,
+     "end": 81.625
+    },
+    {
+     "word": "about",
+     "start": 81.685,
+     "end": 82.14
+    },
+    {
+     "word": "it.",
+     "start": 82.2,
+     "end": 82.545
+    }
+   ]
+  },
+  {
+   "start": 82.955,
+   "end": 89.045,
+   "text": "Drop a comment if you caught the second timer in the garage scene.",
+   "words": [
+    {
+     "word": "Drop",
+     "start": 82.955,
+     "end": 83.355
+    },
+    {
+     "word": "a",
+     "start": 83.415,
+     "end": 83.65
+    },
+    {
+     "word": "comment",
+     "start": 83.71,
+     "end": 84.275
+    },
+    {
+     "word": "if",
+     "start": 84.335,
+     "end": 84.625
+    },
+    {
+     "word": "you",
+     "start": 84.685,
+     "end": 85.03
+    },
+    {
+     "word": "caught",
+     "start": 85.09,
+     "end": 85.6
+    },
+    {
+     "word": "the",
+     "start": 85.66,
+     "end": 86.005
+    },
+    {
+     "word": "second",
+     "start": 86.065,
+     "end": 86.575
+    },
+    {
+     "word": "timer",
+     "start": 86.635,
+     "end": 87.09
+    },
+    {
+     "word": "in",
+     "start": 87.15,
+     "end": 87.44
+    },
+    {
+     "word": "the",
+     "start": 87.5,
+     "end": 87.845
+    },
+    {
+     "word": "garage",
+     "start": 87.905,
+     "end": 88.415
+    },
+    {
+     "word": "scene.",
+     "start": 88.475,
+     "end": 88.985
+    }
+   ]
+  }
+ ]
+}

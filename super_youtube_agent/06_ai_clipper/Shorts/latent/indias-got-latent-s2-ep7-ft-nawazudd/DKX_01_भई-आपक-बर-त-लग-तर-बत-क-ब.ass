@@ -1,0 +1,148 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Noto Sans Devanagari ExtraBold,119,&H00FFFFFF,&H0024E8FF,&H00101010,&HB0000000,-1,0,0,0,100,100,0,0,1,9,3,2,75,75,692,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.00,0:00:00.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}भाई{\c&H00FFFFFF\fscx100\fscy100} आपको बुरा
+Dialogue: 0,0:00:00.24,0:00:00.48,Pop,,0,0,0,,{\fad(40,40)}भाई {\c&H0024E8FF\fscx118\fscy118}आपको{\c&H00FFFFFF\fscx100\fscy100} बुरा
+Dialogue: 0,0:00:00.48,0:00:00.72,Pop,,0,0,0,,{\fad(40,40)}भाई आपको {\c&H0024E8FF\fscx118\fscy118}बुरा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:00.72,0:00:00.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तो{\c&H00FFFFFF\fscx100\fscy100} लगा। तेरी
+Dialogue: 0,0:00:00.88,0:00:01.76,Pop,,0,0,0,,{\fad(40,40)}तो {\c&H0024E8FF\fscx118\fscy118}लगा।{\c&H00FFFFFF\fscx100\fscy100} तेरी
+Dialogue: 0,0:00:01.76,0:00:02.00,Pop,,0,0,0,,{\fad(40,40)}तो लगा। {\c&H0024E8FF\fscx118\fscy118}तेरी{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:02.00,0:00:02.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}बातों{\c&H00FFFFFF\fscx100\fscy100} को बुरा
+Dialogue: 0,0:00:02.24,0:00:02.32,Pop,,0,0,0,,{\fad(40,40)}बातों {\c&H0024E8FF\fscx118\fscy118}को{\c&H00FFFFFF\fscx100\fscy100} बुरा
+Dialogue: 0,0:00:02.32,0:00:02.56,Pop,,0,0,0,,{\fad(40,40)}बातों को {\c&H0024E8FF\fscx118\fscy118}बुरा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:02.56,0:00:02.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}लग{\c&H00FFFFFF\fscx100\fscy100} के क्या
+Dialogue: 0,0:00:02.72,0:00:02.88,Pop,,0,0,0,,{\fad(40,40)}लग {\c&H0024E8FF\fscx118\fscy118}के{\c&H00FFFFFF\fscx100\fscy100} क्या
+Dialogue: 0,0:00:02.88,0:00:03.04,Pop,,0,0,0,,{\fad(40,40)}लग के {\c&H0024E8FF\fscx118\fscy118}क्या{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:03.04,0:00:04.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}फायदा?{\c&H00FFFFFF\fscx100\fscy100} बुरा क्यों
+Dialogue: 0,0:00:04.08,0:00:04.48,Pop,,0,0,0,,{\fad(40,40)}फायदा? {\c&H0024E8FF\fscx118\fscy118}बुरा{\c&H00FFFFFF\fscx100\fscy100} क्यों
+Dialogue: 0,0:00:04.48,0:00:04.64,Pop,,0,0,0,,{\fad(40,40)}फायदा? बुरा {\c&H0024E8FF\fscx118\fscy118}क्यों{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:04.64,0:00:04.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नहीं{\c&H00FFFFFF\fscx100\fscy100} लग रहा
+Dialogue: 0,0:00:04.80,0:00:04.88,Pop,,0,0,0,,{\fad(40,40)}नहीं {\c&H0024E8FF\fscx118\fscy118}लग{\c&H00FFFFFF\fscx100\fscy100} रहा
+Dialogue: 0,0:00:04.88,0:00:05.04,Pop,,0,0,0,,{\fad(40,40)}नहीं लग {\c&H0024E8FF\fscx118\fscy118}रहा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.04,0:00:05.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}आपको{\c&H00FFFFFF\fscx100\fscy100} यार? भाई
+Dialogue: 0,0:00:05.20,0:00:05.44,Pop,,0,0,0,,{\fad(40,40)}आपको {\c&H0024E8FF\fscx118\fscy118}यार?{\c&H00FFFFFF\fscx100\fscy100} भाई
+Dialogue: 0,0:00:05.44,0:00:05.60,Pop,,0,0,0,,{\fad(40,40)}आपको यार? {\c&H0024E8FF\fscx118\fscy118}भाई{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:05.60,0:00:06.04,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तेरे{\c&H00FFFFFF\fscx100\fscy100} [हंसी]
+Dialogue: 0,0:00:06.04,0:00:06.78,Pop,,0,0,0,,{\fad(40,40)}तेरे {\c&H0024E8FF\fscx118\fscy118}[हंसी]{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:07.44,0:00:07.68,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तो{\c&H00FFFFFF\fscx100\fscy100} मैं कह
+Dialogue: 0,0:00:07.68,0:00:07.92,Pop,,0,0,0,,{\fad(40,40)}तो {\c&H0024E8FF\fscx118\fscy118}मैं{\c&H00FFFFFF\fscx100\fscy100} कह
+Dialogue: 0,0:00:07.92,0:00:08.08,Pop,,0,0,0,,{\fad(40,40)}तो मैं {\c&H0024E8FF\fscx118\fscy118}कह{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:08.08,0:00:08.24,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}रहा{\c&H00FFFFFF\fscx100\fscy100} था अगर
+Dialogue: 0,0:00:08.24,0:00:08.48,Pop,,0,0,0,,{\fad(40,40)}रहा {\c&H0024E8FF\fscx118\fscy118}था{\c&H00FFFFFF\fscx100\fscy100} अगर
+Dialogue: 0,0:00:08.48,0:00:08.72,Pop,,0,0,0,,{\fad(40,40)}रहा था {\c&H0024E8FF\fscx118\fscy118}अगर{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:08.72,0:00:08.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}मैं{\c&H00FFFFFF\fscx100\fscy100} आपको अभी
+Dialogue: 0,0:00:08.88,0:00:09.04,Pop,,0,0,0,,{\fad(40,40)}मैं {\c&H0024E8FF\fscx118\fscy118}आपको{\c&H00FFFFFF\fscx100\fscy100} अभी
+Dialogue: 0,0:00:09.04,0:00:09.28,Pop,,0,0,0,,{\fad(40,40)}मैं आपको {\c&H0024E8FF\fscx118\fscy118}अभी{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:09.28,0:00:09.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100} कर दूं।
+Dialogue: 0,0:00:09.60,0:00:09.76,Pop,,0,0,0,,{\fad(40,40)}नंगा {\c&H0024E8FF\fscx118\fscy118}कर{\c&H00FFFFFF\fscx100\fscy100} दूं।
+Dialogue: 0,0:00:09.76,0:00:10.50,Pop,,0,0,0,,{\fad(40,40)}नंगा कर {\c&H0024E8FF\fscx118\fscy118}दूं।{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:10.72,0:00:10.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ठीक{\c&H00FFFFFF\fscx100\fscy100} है?
+Dialogue: 0,0:00:10.80,0:00:11.54,Pop,,0,0,0,,{\fad(40,40)}ठीक {\c&H0024E8FF\fscx118\fscy118}है?{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:12.08,0:00:12.40,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तो{\c&H00FFFFFF\fscx100\fscy100} क्या मैजिक
+Dialogue: 0,0:00:12.40,0:00:12.64,Pop,,0,0,0,,{\fad(40,40)}तो {\c&H0024E8FF\fscx118\fscy118}क्या{\c&H00FFFFFF\fscx100\fscy100} मैजिक
+Dialogue: 0,0:00:12.64,0:00:12.96,Pop,,0,0,0,,{\fad(40,40)}तो क्या {\c&H0024E8FF\fscx118\fscy118}मैजिक{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:12.96,0:00:13.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}बचा{\c&H00FFFFFF\fscx100\fscy100} फिर आपके
+Dialogue: 0,0:00:13.20,0:00:13.44,Pop,,0,0,0,,{\fad(40,40)}बचा {\c&H0024E8FF\fscx118\fscy118}फिर{\c&H00FFFFFF\fscx100\fscy100} आपके
+Dialogue: 0,0:00:13.44,0:00:13.60,Pop,,0,0,0,,{\fad(40,40)}बचा फिर {\c&H0024E8FF\fscx118\fscy118}आपके{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:13.60,0:00:14.00,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}पास?{\c&H00FFFFFF\fscx100\fscy100} आपका मैजिक
+Dialogue: 0,0:00:14.00,0:00:14.32,Pop,,0,0,0,,{\fad(40,40)}पास? {\c&H0024E8FF\fscx118\fscy118}आपका{\c&H00FFFFFF\fscx100\fscy100} मैजिक
+Dialogue: 0,0:00:14.32,0:00:14.72,Pop,,0,0,0,,{\fad(40,40)}पास? आपका {\c&H0024E8FF\fscx118\fscy118}मैजिक{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:14.72,0:00:14.88,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तो{\c&H00FFFFFF\fscx100\fscy100} इसी में
+Dialogue: 0,0:00:14.88,0:00:15.12,Pop,,0,0,0,,{\fad(40,40)}तो {\c&H0024E8FF\fscx118\fscy118}इसी{\c&H00FFFFFF\fscx100\fscy100} में
+Dialogue: 0,0:00:15.12,0:00:15.28,Pop,,0,0,0,,{\fad(40,40)}तो इसी {\c&H0024E8FF\fscx118\fscy118}में{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:15.28,0:00:15.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}अंडे{\c&H00FFFFFF\fscx100\fscy100} में, कुछ
+Dialogue: 0,0:00:15.60,0:00:16.08,Pop,,0,0,0,,{\fad(40,40)}अंडे {\c&H0024E8FF\fscx118\fscy118}में,{\c&H00FFFFFF\fscx100\fscy100} कुछ
+Dialogue: 0,0:00:16.08,0:00:16.40,Pop,,0,0,0,,{\fad(40,40)}अंडे में, {\c&H0024E8FF\fscx118\fscy118}कुछ{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:16.40,0:00:16.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ग्लास{\c&H00FFFFFF\fscx100\fscy100} में या
+Dialogue: 0,0:00:16.80,0:00:18.00,Pop,,0,0,0,,{\fad(40,40)}ग्लास {\c&H0024E8FF\fscx118\fscy118}में{\c&H00FFFFFF\fscx100\fscy100} या
+Dialogue: 0,0:00:18.00,0:00:18.48,Pop,,0,0,0,,{\fad(40,40)}ग्लास में {\c&H0024E8FF\fscx118\fscy118}या{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:18.48,0:00:18.80,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}उसके{\c&H00FFFFFF\fscx100\fscy100} बिना भी
+Dialogue: 0,0:00:18.80,0:00:19.12,Pop,,0,0,0,,{\fad(40,40)}उसके {\c&H0024E8FF\fscx118\fscy118}बिना{\c&H00FFFFFF\fscx100\fscy100} भी
+Dialogue: 0,0:00:19.12,0:00:19.28,Pop,,0,0,0,,{\fad(40,40)}उसके बिना {\c&H0024E8FF\fscx118\fscy118}भी{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:19.28,0:00:19.44,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}कर{\c&H00FFFFFF\fscx100\fscy100} सकते हैं
+Dialogue: 0,0:00:19.44,0:00:19.60,Pop,,0,0,0,,{\fad(40,40)}कर {\c&H0024E8FF\fscx118\fscy118}सकते{\c&H00FFFFFF\fscx100\fscy100} हैं
+Dialogue: 0,0:00:19.60,0:00:19.68,Pop,,0,0,0,,{\fad(40,40)}कर सकते {\c&H0024E8FF\fscx118\fscy118}हैं{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:19.68,0:00:19.84,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}और{\c&H00FFFFFF\fscx100\fscy100} मैं यह
+Dialogue: 0,0:00:19.84,0:00:20.00,Pop,,0,0,0,,{\fad(40,40)}और {\c&H0024E8FF\fscx118\fscy118}मैं{\c&H00FFFFFF\fscx100\fscy100} यह
+Dialogue: 0,0:00:20.00,0:00:20.16,Pop,,0,0,0,,{\fad(40,40)}और मैं {\c&H0024E8FF\fscx118\fscy118}यह{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:20.16,0:00:20.40,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100} भी कर
+Dialogue: 0,0:00:20.40,0:00:20.56,Pop,,0,0,0,,{\fad(40,40)}नंगा {\c&H0024E8FF\fscx118\fscy118}भी{\c&H00FFFFFF\fscx100\fscy100} कर
+Dialogue: 0,0:00:20.56,0:00:20.64,Pop,,0,0,0,,{\fad(40,40)}नंगा भी {\c&H0024E8FF\fscx118\fscy118}कर{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:20.64,0:00:20.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}सकता{\c&H00FFFFFF\fscx100\fscy100} हूं। पर
+Dialogue: 0,0:00:20.72,0:00:20.88,Pop,,0,0,0,,{\fad(40,40)}सकता {\c&H0024E8FF\fscx118\fscy118}हूं।{\c&H00FFFFFF\fscx100\fscy100} पर
+Dialogue: 0,0:00:20.88,0:00:21.04,Pop,,0,0,0,,{\fad(40,40)}सकता हूं। {\c&H0024E8FF\fscx118\fscy118}पर{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:21.04,0:00:21.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}आई{\c&H00FFFFFF\fscx100\fscy100} डोंट नो
+Dialogue: 0,0:00:21.20,0:00:21.36,Pop,,0,0,0,,{\fad(40,40)}आई {\c&H0024E8FF\fscx118\fscy118}डोंट{\c&H00FFFFFF\fscx100\fscy100} नो
+Dialogue: 0,0:00:21.36,0:00:21.52,Pop,,0,0,0,,{\fad(40,40)}आई डोंट {\c&H0024E8FF\fscx118\fscy118}नो{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:21.52,0:00:21.68,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ये{\c&H00FFFFFF\fscx100\fscy100} टीवी पे
+Dialogue: 0,0:00:21.68,0:00:21.84,Pop,,0,0,0,,{\fad(40,40)}ये {\c&H0024E8FF\fscx118\fscy118}टीवी{\c&H00FFFFFF\fscx100\fscy100} पे
+Dialogue: 0,0:00:21.84,0:00:22.00,Pop,,0,0,0,,{\fad(40,40)}ये टीवी {\c&H0024E8FF\fscx118\fscy118}पे{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:22.00,0:00:22.16,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}जा{\c&H00FFFFFF\fscx100\fscy100} सकता है
+Dialogue: 0,0:00:22.16,0:00:22.24,Pop,,0,0,0,,{\fad(40,40)}जा {\c&H0024E8FF\fscx118\fscy118}सकता{\c&H00FFFFFF\fscx100\fscy100} है
+Dialogue: 0,0:00:22.24,0:00:22.32,Pop,,0,0,0,,{\fad(40,40)}जा सकता {\c&H0024E8FF\fscx118\fscy118}है{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:22.32,0:00:22.48,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}कि{\c&H00FFFFFF\fscx100\fscy100} नहीं। और
+Dialogue: 0,0:00:22.48,0:00:22.64,Pop,,0,0,0,,{\fad(40,40)}कि {\c&H0024E8FF\fscx118\fscy118}नहीं।{\c&H00FFFFFF\fscx100\fscy100} और
+Dialogue: 0,0:00:22.64,0:00:22.88,Pop,,0,0,0,,{\fad(40,40)}कि नहीं। {\c&H0024E8FF\fscx118\fscy118}और{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:22.88,0:00:23.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}YOUTUBE{\c&H00FFFFFF\fscx100\fscy100} पे जा
+Dialogue: 0,0:00:23.20,0:00:23.36,Pop,,0,0,0,,{\fad(40,40)}YOUTUBE {\c&H0024E8FF\fscx118\fscy118}पे{\c&H00FFFFFF\fscx100\fscy100} जा
+Dialogue: 0,0:00:23.36,0:00:23.52,Pop,,0,0,0,,{\fad(40,40)}YOUTUBE पे {\c&H0024E8FF\fscx118\fscy118}जा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:23.52,0:00:23.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}सकता{\c&H00FFFFFF\fscx100\fscy100} है कि
+Dialogue: 0,0:00:23.60,0:00:23.76,Pop,,0,0,0,,{\fad(40,40)}सकता {\c&H0024E8FF\fscx118\fscy118}है{\c&H00FFFFFF\fscx100\fscy100} कि
+Dialogue: 0,0:00:23.76,0:00:23.84,Pop,,0,0,0,,{\fad(40,40)}सकता है {\c&H0024E8FF\fscx118\fscy118}कि{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:23.84,0:00:24.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नहीं।{\c&H00FFFFFF\fscx100\fscy100} नहीं मान
+Dialogue: 0,0:00:24.64,0:00:25.04,Pop,,0,0,0,,{\fad(40,40)}नहीं। {\c&H0024E8FF\fscx118\fscy118}नहीं{\c&H00FFFFFF\fscx100\fscy100} मान
+Dialogue: 0,0:00:25.04,0:00:25.28,Pop,,0,0,0,,{\fad(40,40)}नहीं। नहीं {\c&H0024E8FF\fscx118\fscy118}मान{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:25.28,0:00:25.44,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ले{\c&H00FFFFFF\fscx100\fscy100} तू नंगा
+Dialogue: 0,0:00:25.44,0:00:25.60,Pop,,0,0,0,,{\fad(40,40)}ले {\c&H0024E8FF\fscx118\fscy118}तू{\c&H00FFFFFF\fscx100\fscy100} नंगा
+Dialogue: 0,0:00:25.60,0:00:25.84,Pop,,0,0,0,,{\fad(40,40)}ले तू {\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:25.84,0:00:26.00,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}है{\c&H00FFFFFF\fscx100\fscy100} अभी। मैं
+Dialogue: 0,0:00:26.00,0:00:26.32,Pop,,0,0,0,,{\fad(40,40)}है {\c&H0024E8FF\fscx118\fscy118}अभी।{\c&H00FFFFFF\fscx100\fscy100} मैं
+Dialogue: 0,0:00:26.32,0:00:26.48,Pop,,0,0,0,,{\fad(40,40)}है अभी। {\c&H0024E8FF\fscx118\fscy118}मैं{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:26.48,0:00:26.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100} हूं। हम
+Dialogue: 0,0:00:26.72,0:00:27.12,Pop,,0,0,0,,{\fad(40,40)}नंगा {\c&H0024E8FF\fscx118\fscy118}हूं।{\c&H00FFFFFF\fscx100\fscy100} हम
+Dialogue: 0,0:00:27.12,0:00:27.28,Pop,,0,0,0,,{\fad(40,40)}नंगा हूं। {\c&H0024E8FF\fscx118\fscy118}हम{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:27.28,0:00:27.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}अस्यूम{\c&H00FFFFFF\fscx100\fscy100} करते हैं
+Dialogue: 0,0:00:27.60,0:00:27.76,Pop,,0,0,0,,{\fad(40,40)}अस्यूम {\c&H0024E8FF\fscx118\fscy118}करते{\c&H00FFFFFF\fscx100\fscy100} हैं
+Dialogue: 0,0:00:27.76,0:00:27.84,Pop,,0,0,0,,{\fad(40,40)}अस्यूम करते {\c&H0024E8FF\fscx118\fscy118}हैं{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:27.84,0:00:28.16,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}कि{\c&H00FFFFFF\fscx100\fscy100} बाकी किसी
+Dialogue: 0,0:00:28.16,0:00:28.40,Pop,,0,0,0,,{\fad(40,40)}कि {\c&H0024E8FF\fscx118\fscy118}बाकी{\c&H00FFFFFF\fscx100\fscy100} किसी
+Dialogue: 0,0:00:28.40,0:00:28.56,Pop,,0,0,0,,{\fad(40,40)}कि बाकी {\c&H0024E8FF\fscx118\fscy118}किसी{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:28.56,0:00:28.72,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}और{\c&H00FFFFFF\fscx100\fscy100} को नंगा
+Dialogue: 0,0:00:28.72,0:00:28.88,Pop,,0,0,0,,{\fad(40,40)}और {\c&H0024E8FF\fscx118\fscy118}को{\c&H00FFFFFF\fscx100\fscy100} नंगा
+Dialogue: 0,0:00:28.88,0:00:29.04,Pop,,0,0,0,,{\fad(40,40)}और को {\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:29.04,0:00:29.20,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}नहीं{\c&H00FFFFFF\fscx100\fscy100} होना। ना
+Dialogue: 0,0:00:29.20,0:00:29.36,Pop,,0,0,0,,{\fad(40,40)}नहीं {\c&H0024E8FF\fscx118\fscy118}होना।{\c&H00FFFFFF\fscx100\fscy100} ना
+Dialogue: 0,0:00:29.36,0:00:29.44,Pop,,0,0,0,,{\fad(40,40)}नहीं होना। {\c&H0024E8FF\fscx118\fscy118}ना{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:29.44,0:00:29.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}मेरे{\c&H00FFFFFF\fscx100\fscy100} साथ तू
+Dialogue: 0,0:00:29.60,0:00:29.84,Pop,,0,0,0,,{\fad(40,40)}मेरे {\c&H0024E8FF\fscx118\fscy118}साथ{\c&H00FFFFFF\fscx100\fscy100} तू
+Dialogue: 0,0:00:29.84,0:00:30.00,Pop,,0,0,0,,{\fad(40,40)}मेरे साथ {\c&H0024E8FF\fscx118\fscy118}तू{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:30.00,0:00:30.08,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}ही{\c&H00FFFFFF\fscx100\fscy100} नंगा है।
+Dialogue: 0,0:00:30.08,0:00:30.24,Pop,,0,0,0,,{\fad(40,40)}ही {\c&H0024E8FF\fscx118\fscy118}नंगा{\c&H00FFFFFF\fscx100\fscy100} है।
+Dialogue: 0,0:00:30.24,0:00:30.40,Pop,,0,0,0,,{\fad(40,40)}ही नंगा {\c&H0024E8FF\fscx118\fscy118}है।{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:30.40,0:00:30.64,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}बस{\c&H00FFFFFF\fscx100\fscy100} ठीक है। परफेक्ट
+Dialogue: 0,0:00:30.64,0:00:30.96,Pop,,0,0,0,,{\fad(40,40)}बस {\c&H0024E8FF\fscx118\fscy118}ठीक है।{\c&H00FFFFFF\fscx100\fscy100} परफेक्ट
+Dialogue: 0,0:00:30.96,0:00:31.44,Pop,,0,0,0,,{\fad(40,40)}बस ठीक है। {\c&H0024E8FF\fscx118\fscy118}परफेक्ट{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:31.44,0:00:32.56,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}परफेक्ट।{\c&H00FFFFFF\fscx100\fscy100} वो अगर
+Dialogue: 0,0:00:32.56,0:00:32.88,Pop,,0,0,0,,{\fad(40,40)}परफेक्ट। {\c&H0024E8FF\fscx118\fscy118}वो{\c&H00FFFFFF\fscx100\fscy100} अगर
+Dialogue: 0,0:00:32.88,0:00:33.28,Pop,,0,0,0,,{\fad(40,40)}परफेक्ट। वो {\c&H0024E8FF\fscx118\fscy118}अगर{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:33.28,0:00:33.60,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तुझे{\c&H00FFFFFF\fscx100\fscy100} मूवी में
+Dialogue: 0,0:00:33.60,0:00:33.92,Pop,,0,0,0,,{\fad(40,40)}तुझे {\c&H0024E8FF\fscx118\fscy118}मूवी{\c&H00FFFFFF\fscx100\fscy100} में
+Dialogue: 0,0:00:33.92,0:00:34.08,Pop,,0,0,0,,{\fad(40,40)}तुझे मूवी {\c&H0024E8FF\fscx118\fscy118}में{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:34.08,0:00:34.40,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}कास्ट{\c&H00FFFFFF\fscx100\fscy100} होना है
+Dialogue: 0,0:00:34.40,0:00:34.64,Pop,,0,0,0,,{\fad(40,40)}कास्ट {\c&H0024E8FF\fscx118\fscy118}होना{\c&H00FFFFFF\fscx100\fscy100} है
+Dialogue: 0,0:00:34.64,0:00:34.72,Pop,,0,0,0,,{\fad(40,40)}कास्ट होना {\c&H0024E8FF\fscx118\fscy118}है{\c&H00FFFFFF\fscx100\fscy100}
+Dialogue: 0,0:00:34.72,0:00:35.28,Pop,,0,0,0,,{\fad(40,40)}{\c&H0024E8FF\fscx118\fscy118}तो{\c&H00FFFFFF\fscx100\fscy100} वो [हंसी]
+Dialogue: 0,0:00:35.28,0:00:35.52,Pop,,0,0,0,,{\fad(40,40)}तो {\c&H0024E8FF\fscx118\fscy118}वो{\c&H00FFFFFF\fscx100\fscy100} [हंसी]
+Dialogue: 0,0:00:35.52,0:00:36.26,Pop,,0,0,0,,{\fad(40,40)}तो वो {\c&H0024E8FF\fscx118\fscy118}[हंसी]{\c&H00FFFFFF\fscx100\fscy100}

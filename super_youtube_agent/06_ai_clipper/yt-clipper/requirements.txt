@@ -1,0 +1,5 @@
+yt-dlp>=2025.1.15
+faster-whisper>=1.1.0      # or: openai-whisper  (set WHISPER_BACKEND=openai)
+edge-tts>=7.0.0            # free Microsoft neural voices (EN + ES)
+openai>=1.60.0             # clip scoring + EN<->ES translation (optional)
+# system deps: ffmpeg + ffprobe on PATH

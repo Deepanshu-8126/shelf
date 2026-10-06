@@ -1,0 +1,35 @@
+# --- core ---
+python-dotenv>=1.0.1
+httpx>=0.27.0
+APScheduler>=3.10.4
+python-telegram-bot>=21.6
+
+# --- video animation: Manim for 3Blue1Brown style animations ---
+manim>=0.21.0
+
+# --- voiceover: 100% free, open-source, runs on your own CPU ---
+# Kokoro-82M (Apache-2.0) - best quality, ~325 MB model downloaded once into TTS_MODEL_DIR
+kokoro-onnx>=0.4.9
+onnxruntime>=1.17.0
+# Piper (MIT) - ~63 MB per voice, ~8x realtime, the lightest option on a small VPS
+piper-tts>=1.2.0
+# numpy is used for the local engines' audio buffers (kokoro-onnx already needs it)
+numpy>=1.26.0
+
+# --- voiceover: free cloud fallback (no key, needs internet) ---
+edge-tts>=6.1.12
+
+# --- captions: word-accurate timings for the local voices (free, local, MIT) ---
+faster-whisper>=1.0.3
+
+# --- YouTube upload ---
+google-api-python-client>=2.140.0
+google-auth-oauthlib>=1.2.1
+google-auth-httplib2>=0.2.0
+
+# --- offline last resort if nothing else can speak ---
+# (system package: espeak-ng)
+
+# NOTE: nothing above needs a paid key. ElevenLabs is optional and NOT in this file -
+# install it yourself only if you want it: pip install elevenlabs (plus a paid plan
+# for commercial use).

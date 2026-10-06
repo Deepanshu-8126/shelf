@@ -1,0 +1,36 @@
+# secrets - never commit these
+.env
+credentials/
+!credentials/.gitkeep
+*client_secret*.json
+*token*.json
+
+# runtime state
+data/
+logs/
+cache/
+output/
+*.db
+*.db-wal
+*.db-shm
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# editors / os
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# large media you download yourself
+assets/stock/*
+!assets/stock/.gitkeep
+assets/music/*
+!assets/music/.gitkeep

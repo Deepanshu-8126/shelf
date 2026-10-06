@@ -1,0 +1,5 @@
+yt-dlp>=2025.1.15
+Pillow>=10.3
+imageio-ffmpeg>=0.5        # ships a static ffmpeg if none on PATH
+faster-whisper>=1.1.0      # only used when a video has no captions
+openai>=1.60.0             # optional: LLM hook selection + titles

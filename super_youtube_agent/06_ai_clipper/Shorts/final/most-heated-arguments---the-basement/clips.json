@@ -1,0 +1,51 @@
+{
+  "source": {
+    "id": "b_mX_IyuGlo",
+    "title": "Most HEATED Arguments - The Basement Yard",
+    "duration": 513,
+    "uploader": "Basement Yard Clips",
+    "path": "/tmp/autoclip/src/b_mX_IyuGlo.mp4",
+    "url": "https://www.youtube.com/watch?v=b_mX_IyuGlo"
+  },
+  "transcript_source": "youtube-captions",
+  "clips": [
+    {
+      "name": "DKX_01_do-you-like-grilled-chee",
+      "title": "Grilled Cheese Debate 🥪🤔",
+      "start": 120.0,
+      "end": 138.0,
+      "hook": "Do you like grilled cheese sandwiches?",
+      "mp4": "/home/user/Shorts/final/most-heated-arguments---the-basement/DKX_01_do-you-like-grilled-chee.mp4",
+      "duration": 18.0,
+      "size_mb": 4.01,
+      "safe": {
+        "zoom": 1.03,
+        "mirror": false,
+        "speed": 1.0,
+        "hue": 0,
+        "sat": 1.12,
+        "con": 1.05,
+        "grain": 0
+      }
+    },
+    {
+      "name": "DKX_02_a-brick-of-tea-leaves-co",
+      "title": "$1,500 Tea Leaves 😲💸",
+      "start": 380.0,
+      "end": 420.0,
+      "hook": "A brick of tea leaves cost $1,500!",
+      "mp4": "/home/user/Shorts/final/most-heated-arguments---the-basement/DKX_02_a-brick-of-tea-leaves-co.mp4",
+      "duration": 40.0,
+      "size_mb": 10.31,
+      "safe": {
+        "zoom": 1.03,
+        "mirror": false,
+        "speed": 1.0,
+        "hue": 0,
+        "sat": 1.12,
+        "con": 1.05,
+        "grain": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Noto Sans Devanagari ExtraBold,119,&H00FFFFFF,&H0024E8FF,&H00141414,&HB0000000,-1,0,0,0,100,100,0,0,3,11,0,2,75,75,692,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.00,0:00:00.40,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}चलो{\c&H00FFFFFF} अब आप
+Dialogue: 0,0:00:00.40,0:00:00.56,Pop,,0,0,0,,{\fad(0,0)}चलो {\c&H0024E8FF}अब{\c&H00FFFFFF} आप
+Dialogue: 0,0:00:00.56,0:00:00.72,Pop,,0,0,0,,{\fad(0,60)}चलो अब {\c&H0024E8FF}आप{\c&H00FFFFFF}
+Dialogue: 0,0:00:00.72,0:00:00.96,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}पीछे{\c&H00FFFFFF} बैठो। मैं
+Dialogue: 0,0:00:00.96,0:00:01.20,Pop,,0,0,0,,{\fad(0,0)}पीछे {\c&H0024E8FF}बैठो।{\c&H00FFFFFF} मैं
+Dialogue: 0,0:00:01.20,0:00:01.36,Pop,,0,0,0,,{\fad(0,60)}पीछे बैठो। {\c&H0024E8FF}मैं{\c&H00FFFFFF}
+Dialogue: 0,0:00:01.36,0:00:01.60,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}चलाता{\c&H00FFFFFF} हूं। अब
+Dialogue: 0,0:00:01.60,0:00:01.76,Pop,,0,0,0,,{\fad(0,0)}चलाता {\c&H0024E8FF}हूं।{\c&H00FFFFFF} अब
+Dialogue: 0,0:00:01.76,0:00:01.92,Pop,,0,0,0,,{\fad(0,60)}चलाता हूं। {\c&H0024E8FF}अब{\c&H00FFFFFF}
+Dialogue: 0,0:00:01.92,0:00:02.08,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}आपको{\c&H00FFFFFF} दिखाता हूं
+Dialogue: 0,0:00:02.08,0:00:02.24,Pop,,0,0,0,,{\fad(0,0)}आपको {\c&H0024E8FF}दिखाता{\c&H00FFFFFF} हूं
+Dialogue: 0,0:00:02.24,0:00:02.40,Pop,,0,0,0,,{\fad(0,60)}आपको दिखाता {\c&H0024E8FF}हूं{\c&H00FFFFFF}
+Dialogue: 0,0:00:02.40,0:00:02.64,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}रियल{\c&H00FFFFFF} मजे इसके।
+Dialogue: 0,0:00:02.64,0:00:02.96,Pop,,0,0,0,,{\fad(0,0)}रियल {\c&H0024E8FF}मजे{\c&H00FFFFFF} इसके।
+Dialogue: 0,0:00:02.96,0:00:03.36,Pop,,0,0,0,,{\fad(0,60)}रियल मजे {\c&H0024E8FF}इसके।{\c&H00FFFFFF}
+Dialogue: 0,0:00:03.36,0:00:03.52,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}भाई{\c&H00FFFFFF} पकड़ के
+Dialogue: 0,0:00:03.52,0:00:03.76,Pop,,0,0,0,,{\fad(0,0)}भाई {\c&H0024E8FF}पकड़{\c&H00FFFFFF} के
+Dialogue: 0,0:00:03.76,0:00:03.84,Pop,,0,0,0,,{\fad(0,60)}भाई पकड़ {\c&H0024E8FF}के{\c&H00FFFFFF}
+Dialogue: 0,0:00:03.84,0:00:04.16,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}बैठना{\c&H00FFFFFF} अच्छे से।
+Dialogue: 0,0:00:04.16,0:00:04.32,Pop,,0,0,0,,{\fad(0,0)}बैठना {\c&H0024E8FF}अच्छे{\c&H00FFFFFF} से।
+Dialogue: 0,0:00:04.32,0:00:04.64,Pop,,0,0,0,,{\fad(0,60)}बैठना अच्छे {\c&H0024E8FF}से।{\c&H00FFFFFF}
+Dialogue: 0,0:00:04.64,0:00:04.88,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}पलट{\c&H00FFFFFF} भी सकती
+Dialogue: 0,0:00:04.88,0:00:05.12,Pop,,0,0,0,,{\fad(0,0)}पलट {\c&H0024E8FF}भी{\c&H00FFFFFF} सकती
+Dialogue: 0,0:00:05.12,0:00:05.28,Pop,,0,0,0,,{\fad(0,60)}पलट भी {\c&H0024E8FF}सकती{\c&H00FFFFFF}
+Dialogue: 0,0:00:05.28,0:00:06.00,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}है।{\c&H00FFFFFF} मजाक कर
+Dialogue: 0,0:00:06.00,0:00:06.32,Pop,,0,0,0,,{\fad(0,0)}है। {\c&H0024E8FF}मजाक{\c&H00FFFFFF} कर
+Dialogue: 0,0:00:06.32,0:00:06.40,Pop,,0,0,0,,{\fad(0,60)}है। मजाक {\c&H0024E8FF}कर{\c&H00FFFFFF}
+Dialogue: 0,0:00:06.40,0:00:06.48,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}रहा{\c&H00FFFFFF} हूं यार।
+Dialogue: 0,0:00:06.48,0:00:06.64,Pop,,0,0,0,,{\fad(0,0)}रहा {\c&H0024E8FF}हूं{\c&H00FFFFFF} यार।
+Dialogue: 0,0:00:06.64,0:00:06.88,Pop,,0,0,0,,{\fad(0,60)}रहा हूं {\c&H0024E8FF}यार।{\c&H00FFFFFF}
+Dialogue: 0,0:00:06.88,0:00:07.20,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मजाक{\c&H00FFFFFF} कर रहा
+Dialogue: 0,0:00:07.20,0:00:07.28,Pop,,0,0,0,,{\fad(0,0)}मजाक {\c&H0024E8FF}कर{\c&H00FFFFFF} रहा
+Dialogue: 0,0:00:07.28,0:00:07.36,Pop,,0,0,0,,{\fad(0,60)}मजाक कर {\c&H0024E8FF}रहा{\c&H00FFFFFF}
+Dialogue: 0,0:00:07.36,0:00:07.60,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}हूं{\c&H00FFFFFF} यार।
+Dialogue: 0,0:00:07.60,0:00:08.34,Pop,,0,0,0,,{\fad(0,60)}हूं {\c&H0024E8FF}यार।{\c&H00FFFFFF}
+Dialogue: 0,0:00:10.16,0:00:11.20,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}बाय{\c&H00FFFFFF} गाइस।
+Dialogue: 0,0:00:11.20,0:00:11.94,Pop,,0,0,0,,{\fad(0,60)}बाय {\c&H0024E8FF}गाइस।{\c&H00FFFFFF}
+Dialogue: 0,0:00:35.76,0:00:36.08,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}अब{\c&H00FFFFFF} बताओ कैसा
+Dialogue: 0,0:00:36.08,0:00:36.32,Pop,,0,0,0,,{\fad(0,0)}अब {\c&H0024E8FF}बताओ{\c&H00FFFFFF} कैसा
+Dialogue: 0,0:00:36.32,0:00:36.64,Pop,,0,0,0,,{\fad(0,60)}अब बताओ {\c&H0024E8FF}कैसा{\c&H00FFFFFF}
+Dialogue: 0,0:00:36.64,0:00:37.76,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}लगा?{\c&H00FFFFFF} कैसा लगा?
+Dialogue: 0,0:00:37.76,0:00:38.08,Pop,,0,0,0,,{\fad(0,0)}लगा? {\c&H0024E8FF}कैसा{\c&H00FFFFFF} लगा?
+Dialogue: 0,0:00:38.08,0:00:38.32,Pop,,0,0,0,,{\fad(0,60)}लगा? कैसा {\c&H0024E8FF}लगा?{\c&H00FFFFFF}
+Dialogue: 0,0:00:38.32,0:00:38.48,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मजा{\c&H00FFFFFF} आओ। मजा
+Dialogue: 0,0:00:38.48,0:00:38.64,Pop,,0,0,0,,{\fad(0,0)}मजा {\c&H0024E8FF}आओ।{\c&H00FFFFFF} मजा
+Dialogue: 0,0:00:38.64,0:00:38.80,Pop,,0,0,0,,{\fad(0,60)}मजा आओ। {\c&H0024E8FF}मजा{\c&H00FFFFFF}
+Dialogue: 0,0:00:38.80,0:00:38.88,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}आ{\c&H00FFFFFF} गया। मेरे
+Dialogue: 0,0:00:38.88,0:00:39.04,Pop,,0,0,0,,{\fad(0,0)}आ {\c&H0024E8FF}गया।{\c&H00FFFFFF} मेरे
+Dialogue: 0,0:00:39.04,0:00:39.20,Pop,,0,0,0,,{\fad(0,60)}आ गया। {\c&H0024E8FF}मेरे{\c&H00FFFFFF}
+Dialogue: 0,0:00:39.20,0:00:39.44,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मुंह{\c&H00FFFFFF} के अंदर
+Dialogue: 0,0:00:39.44,0:00:39.52,Pop,,0,0,0,,{\fad(0,0)}मुंह {\c&H0024E8FF}के{\c&H00FFFFFF} अंदर
+Dialogue: 0,0:00:39.52,0:00:39.76,Pop,,0,0,0,,{\fad(0,60)}मुंह के {\c&H0024E8FF}अंदर{\c&H00FFFFFF}
+Dialogue: 0,0:00:39.76,0:00:40.24,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मिट्टी{\c&H00FFFFFF} है भाई।
+Dialogue: 0,0:00:40.24,0:00:40.56,Pop,,0,0,0,,{\fad(0,0)}मिट्टी {\c&H0024E8FF}है{\c&H00FFFFFF} भाई।
+Dialogue: 0,0:00:40.56,0:00:41.30,Pop,,0,0,0,,{\fad(0,60)}मिट्टी है {\c&H0024E8FF}भाई।{\c&H00FFFFFF}
+Dialogue: 0,0:00:41.44,0:00:41.84,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मजा{\c&H00FFFFFF} आ गया।
+Dialogue: 0,0:00:41.84,0:00:41.92,Pop,,0,0,0,,{\fad(0,0)}मजा {\c&H0024E8FF}आ{\c&H00FFFFFF} गया।
+Dialogue: 0,0:00:41.92,0:00:42.32,Pop,,0,0,0,,{\fad(0,60)}मजा आ {\c&H0024E8FF}गया।{\c&H00FFFFFF}
+Dialogue: 0,0:00:42.32,0:00:42.64,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}लेकिन{\c&H00FFFFFF} भाई भाई
+Dialogue: 0,0:00:42.64,0:00:43.36,Pop,,0,0,0,,{\fad(0,0)}लेकिन {\c&H0024E8FF}भाई{\c&H00FFFFFF} भाई
+Dialogue: 0,0:00:43.36,0:00:43.44,Pop,,0,0,0,,{\fad(0,60)}लेकिन भाई {\c&H0024E8FF}भाई{\c&H00FFFFFF}
+Dialogue: 0,0:00:43.44,0:00:44.00,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}एटीवी{\c&H00FFFFFF} के असली
+Dialogue: 0,0:00:44.00,0:00:44.08,Pop,,0,0,0,,{\fad(0,0)}एटीवी {\c&H0024E8FF}के{\c&H00FFFFFF} असली
+Dialogue: 0,0:00:44.08,0:00:44.32,Pop,,0,0,0,,{\fad(0,60)}एटीवी के {\c&H0024E8FF}असली{\c&H00FFFFFF}
+Dialogue: 0,0:00:44.32,0:00:44.56,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मजे{\c&H00FFFFFF} तो यही
+Dialogue: 0,0:00:44.56,0:00:44.80,Pop,,0,0,0,,{\fad(0,0)}मजे {\c&H0024E8FF}तो{\c&H00FFFFFF} यही
+Dialogue: 0,0:00:44.80,0:00:45.04,Pop,,0,0,0,,{\fad(0,60)}मजे तो {\c&H0024E8FF}यही{\c&H00FFFFFF}
+Dialogue: 0,0:00:45.04,0:00:45.12,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}ले{\c&H00FFFFFF} रहे हैं
+Dialogue: 0,0:00:45.12,0:00:45.20,Pop,,0,0,0,,{\fad(0,0)}ले {\c&H0024E8FF}रहे{\c&H00FFFFFF} हैं
+Dialogue: 0,0:00:45.20,0:00:45.44,Pop,,0,0,0,,{\fad(0,60)}ले रहे {\c&H0024E8FF}हैं{\c&H00FFFFFF}
+Dialogue: 0,0:00:45.44,0:00:45.84,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}भाई।{\c&H00FFFFFF} अब आप
+Dialogue: 0,0:00:45.84,0:00:46.00,Pop,,0,0,0,,{\fad(0,0)}भाई। {\c&H0024E8FF}अब{\c&H00FFFFFF} आप
+Dialogue: 0,0:00:46.00,0:00:46.16,Pop,,0,0,0,,{\fad(0,60)}भाई। अब {\c&H0024E8FF}आप{\c&H00FFFFFF}
+Dialogue: 0,0:00:46.16,0:00:46.64,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}चलाओ।{\c&H00FFFFFF} मैं नहीं
+Dialogue: 0,0:00:46.64,0:00:46.72,Pop,,0,0,0,,{\fad(0,0)}चलाओ। {\c&H0024E8FF}मैं{\c&H00FFFFFF} नहीं
+Dialogue: 0,0:00:46.72,0:00:46.88,Pop,,0,0,0,,{\fad(0,60)}चलाओ। मैं {\c&H0024E8FF}नहीं{\c&H00FFFFFF}
+Dialogue: 0,0:00:46.88,0:00:47.12,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}मैं{\c&H00FFFFFF} नहीं चला
+Dialogue: 0,0:00:47.12,0:00:47.28,Pop,,0,0,0,,{\fad(0,0)}मैं {\c&H0024E8FF}नहीं{\c&H00FFFFFF} चला
+Dialogue: 0,0:00:47.28,0:00:47.52,Pop,,0,0,0,,{\fad(0,60)}मैं नहीं {\c&H0024E8FF}चला{\c&H00FFFFFF}
+Dialogue: 0,0:00:47.52,0:00:47.76,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}रहा{\c&H00FFFFFF} भाई। अरे
+Dialogue: 0,0:00:47.76,0:00:47.92,Pop,,0,0,0,,{\fad(0,0)}रहा {\c&H0024E8FF}भाई।{\c&H00FFFFFF} अरे
+Dialogue: 0,0:00:47.92,0:00:48.08,Pop,,0,0,0,,{\fad(0,60)}रहा भाई। {\c&H0024E8FF}अरे{\c&H00FFFFFF}
+Dialogue: 0,0:00:48.08,0:00:48.32,Pop,,0,0,0,,{\fad(60,0)}{\c&H0024E8FF}ऐसे{\c&H00FFFFFF} चलाओ ना
+Dialogue: 0,0:00:48.32,0:00:48.56,Pop,,0,0,0,,{\fad(0,0)}ऐसे {\c&H0024E8FF}चलाओ{\c&H00FFFFFF} ना
+Dialogue: 0,0:00:48.56,0:00:49.04,Pop,,0,0,0,,{\fad(0,60)}ऐसे चलाओ {\c&H0024E8FF}ना{\c&H00FFFFFF}
+Dialogue: 0,0:00:49.04,0:00:49.78,Pop,,0,0,0,,{\fad(60,60)}{\c&H0024E8FF}चलाई।{\c&H00FFFFFF}

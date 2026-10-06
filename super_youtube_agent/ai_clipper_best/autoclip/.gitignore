@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+Shorts/
+out/
+*.mp4
+*.m4a
+*.wav
+*.words.json
+.cache/
+.DS_Store
+cookies.txt
+.env

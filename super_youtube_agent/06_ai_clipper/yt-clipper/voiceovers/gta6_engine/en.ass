@@ -1,0 +1,25 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Pop,Arial,99,&H00FFFFFF,&H0000E5FF,&H00101010,&H90000000,-1,0,0,0,100,100,0,0,1,7,2,2,80,80,576,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:00.10,0:00:01.46,Pop,,0,0,0,,{\fad(60,60)}{\k47}EVERYONE {\k23}SAYS {\k8}THE {\k41}TRAILER
+Dialogue: 0,0:00:01.35,0:00:02.25,Pop,,0,0,0,,{\fad(60,60)}{\k12}IS {\k64}PRE-RENDERED.
+Dialogue: 0,0:00:02.93,0:00:03.77,Pop,,0,0,0,,{\fad(60,60)}{\k13}IT {\k12}IS {\k42}NOT.
+Dialogue: 0,0:00:04.44,0:00:05.35,Pop,,0,0,0,,{\fad(60,60)}{\k15}YOU {\k13}CAN {\k19}SEE {\k26}DRAW
+Dialogue: 0,0:00:05.24,0:00:06.29,Pop,,0,0,0,,{\fad(60,60)}{\k42}DISTANCE {\k28}POP {\k10}ON {\k6}THE
+Dialogue: 0,0:00:06.18,0:00:07.88,Pop,,0,0,0,,{\fad(60,60)}{\k33}BRIDGE {\k13}AT {\k107}38 SECONDS.
+Dialogue: 0,0:00:08.55,0:00:09.54,Pop,,0,0,0,,{\fad(60,60)}{\k24}THAT {\k23}MEANS {\k10}IT {\k25}RUNS
+Dialogue: 0,0:00:09.43,0:00:10.47,Pop,,0,0,0,,{\fad(60,60)}{\k8}ON {\k4}THE {\k41}ENGINE, {\k13}AND
+Dialogue: 0,0:00:10.36,0:00:11.86,Pop,,0,0,0,,{\fad(60,60)}{\k48}ROCKSTAR {\k27}NEVER {\k28}SHOWS {\k28}ENGINE
+Dialogue: 0,0:00:11.75,0:00:12.98,Pop,,0,0,0,,{\fad(60,60)}{\k34}FOOTAGE {\k20}MORE {\k13}THAN {\k38}18
+Dialogue: 0,0:00:12.87,0:00:14.08,Pop,,0,0,0,,{\fad(60,60)}{\k25}MONTHS {\k32}BEFORE {\k48}LAUNCH.

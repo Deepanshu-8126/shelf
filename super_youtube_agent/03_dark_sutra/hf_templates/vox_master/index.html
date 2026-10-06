@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vox Style Master Documentary</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Special+Elite&display=block" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #080a0f;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+    }
+    #root {
+      width: 1080px;
+      height: 1920px;
+      position: relative;
+      overflow: hidden;
+      perspective: 1200px;
+      background: #080a0f;
+    }
+
+    /* Film Grain & Scanlines Layer */
+    .grain-overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.8) 100%),
+                  repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.85;
+    }
+
+    /* Top Universal Military / Vox HUD */
+    .global-hud {
+      position: absolute; top: 80px; left: 60px; right: 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px;
+      background: rgba(10, 15, 25, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 4px solid #ff3b30;
+      z-index: 90;
+      font-size: 19px;
+      letter-spacing: 0.18em;
+    }
+    .hud-title { color: #f0f0f0; font-weight: 700; }
+    .hud-badge {
+      padding: 4px 12px;
+      background: rgba(255, 59, 48, 0.2);
+      border: 1px solid #ff3b30;
+      color: #ff3b30;
+      font-weight: 800;
+      border-radius: 3px;
+    }
+
+    /* Scene Containers */
+    .scene {
+      position: absolute; inset: 0;
+      width: 1080px; height: 1920px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* =========================================
+       SCENE 1: SATELLITE RADAR RECON
+       ========================================= */
+    #scene1 {
+      background: radial-gradient(circle at 50% 45%, #121c2e 0%, #080a0f 80%);
+    }
+    .recon-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+      background-size: 70px 70px;
+    }
+    .radar-box {
+      position: absolute; top: 750px; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 700px;
+    }
+    .radar-ring {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(0, 240, 255, 0.25);
+    }
+    .radar-sweep {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.5) 0deg, transparent 65deg, transparent 360deg);
+    }
+    .radar-target-box {
+      position: absolute; top: 45%; left: 60%;
+      transform: translate(-50%, -50%);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .radar-blip {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #ff3b30;
+      box-shadow: 0 0 25px #ff3b30;
+    }
+    .radar-label {
+      font-size: 20px; color: #ff3b30; font-weight: 800;
+      text-shadow: 0 0 15px rgba(255,59,48,0.8);
+      white-space: nowrap;
+    }
+    .stamp-classified {
+      position: absolute; top: 380px; left: 50%;
+      transform: translate(-50%, -50%) rotate(-12deg);
+      border: 8px solid #ff3b30;
+      padding: 16px 44px;
+      color: #ff3b30;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: 0.25em;
+      border-radius: 10px;
+      box-shadow: 0 0 35px rgba(255, 59, 48, 0.6), inset 0 0 20px rgba(255, 59, 48, 0.3);
+      opacity: 0;
+    }
+
+    /* =========================================
+       SCENE 2: 2.5D VINTAGE NEWSPAPER + HIGHLIGHTER
+       ========================================= */
+    #scene2 {
+      background: #101216;
+    }
+    .dossier-wrapper {
+      position: absolute; top: 680px; left: 50%;
+      transform: translate(-50%, -50%) rotateX(12deg) rotateY(-8deg) rotateZ(2deg);
+      transform-style: preserve-3d;
+      width: 880px; height: 1100px;
+    }
+    .dossier-paper {
+      position: absolute; inset: 0;
+      background: #e8ded1;
+      color: #1a1a1a;
+      padding: 60px;
+      border-radius: 4px;
+      box-shadow: 0 35px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.2);
+      font-family: 'Special Elite', cursive, serif;
+    }
+    .dossier-header {
+      border-bottom: 3px double #222;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .dossier-agency {
+      font-size: 24px; font-weight: 800; letter-spacing: 0.3em;
+      color: #8b0000;
+    }
+    .dossier-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px; font-weight: 900; line-height: 1.15;
+      margin-top: 10px;
+    }
+    .dossier-body {
+      font-size: 22px; line-height: 1.6;
+      position: relative;
+    }
+    .highlight-target {
+      position: relative;
+      display: inline;
+      font-weight: bold;
+      color: #000000;
+    }
+    .highlighter-svg {
+      position: absolute;
+      top: -4px; left: -10px; right: -10px; bottom: -4px;
+      width: calc(100% + 20px); height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .highlighter-stroke {
+      stroke: rgba(255, 228, 94, 0.85);
+      stroke-width: 32px;
+      stroke-linecap: round;
+      fill: none;
+      mix-blend-mode: multiply;
+      stroke-dasharray: 800;
+      stroke-dashoffset: 800;
+    }
+
+    /* Red Marker Circle around coordinate */
+    .circle-target {
+      position: relative;
+      display: inline-block;
+    }
+    .circle-svg {
+      position: absolute;
+      top: -15px; left: -15px;
+      width: calc(100% + 30px); height: calc(100% + 30px);
+      pointer-events: none;
+    }
+    .circle-stroke {
+      stroke: #d32f2f;
+      stroke-width: 4px;
+      fill: none;
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+    }
+
+    /* =========================================
+       SCENE 3: SATELLITE PHOTO KEN BURNS + PINS
+       ========================================= */
+    #scene3 {
+      background: #090c12;
+    }
+    .photo-container {
+      position: absolute; top: 680px; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px; height: 900px;
+      border: 3px solid rgba(255,255,255,0.2);
+      overflow: hidden;
+      box-shadow: 0 40px 90px rgba(0,0,0,0.9);
+    }
+    .photo-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scale(1.0);
+    }
+    .badge-pin-1 {
+      position: absolute; top: 220px; left: 140px;
+      padding: 12px 24px;
+      background: rgba(0, 240, 255, 0.15);
+      border: 2px solid #00f0ff;
+      color: #00f0ff;
+      font-size: 22px; font-weight: 800;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .badge-pin-2 {
+      position: absolute; bottom: 220px; right: 140px;
+      padding: 12px 24px;
+      background: rgba(255, 214, 10, 0.15);
+      border: 2px solid #ffd60a;
+      color: #ffd60a;
+      font-size: 22px; font-weight: 800;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 25px rgba(255, 214, 10, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* =========================================
+       SCENE 4: FINAL KINETIC HOOK / CLIMAX
+       ========================================= */
+    #scene4 {
+      background: radial-gradient(circle at 50% 50%, #1e132b 0%, #09060f 80%);
+    }
+    .climax-container {
+      position: absolute; top: 720px; left: 80px; right: 80px;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+    .climax-eyebrow {
+      font-size: 28px;
+      letter-spacing: 0.3em;
+      color: #ff3b30;
+      margin-bottom: 30px;
+      font-weight: 800;
+    }
+    .climax-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 68px;
+      line-height: 1.18;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 0 40px rgba(0,0,0,0.9);
+    }
+    .climax-gold {
+      color: #ffd60a;
+      text-shadow: 0 0 40px rgba(255, 214, 10, 0.8), 0 0 80px rgba(255, 214, 10, 0.4);
+    }
+
+    /* =========================================
+       UNIVERSAL BOTTOM SUBTITLE DRAWER (SAFE AREA)
+       ========================================= */
+    .caption-card {
+      position: absolute; bottom: 240px; left: 60px; right: 60px;
+      background: rgba(8, 10, 15, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 30px 40px;
+      text-align: center;
+      z-index: 95;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .caption-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #f0f0f0;
+    }
+    .word {
+      display: inline-block;
+      opacity: 0.3;
+      transform: scale(0.95);
+      margin: 0 6px;
+      transition: color 0.1s;
+    }
+    .word.active {
+      opacity: 1;
+      transform: scale(1.1);
+      color: #ffd60a;
+      text-shadow: 0 0 25px rgba(255, 214, 10, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="15.0" data-width="1080" data-height="1920">
+    <div class="grain-overlay"></div>
+
+    <!-- Global HUD -->
+    <div class="global-hud">
+      <div class="hud-title">DOSSIER // SAHARA SECTOR 7</div>
+      <div class="hud-badge">DECLASSIFIED</div>
+    </div>
+
+    <!-- SCENE 1: RADAR RECON (0.0s - 4.0s) -->
+    <div id="scene1" class="scene">
+      <div class="recon-grid"></div>
+      <div class="stamp-classified" id="s1-stamp">TOP SECRET // 1994</div>
+      <div class="radar-box" id="s1-radar">
+        <div class="radar-ring" style="width: 680px; height: 680px; border-width: 2px;"></div>
+        <div class="radar-ring" style="width: 480px; height: 480px; border-style: dashed;"></div>
+        <div class="radar-ring" style="width: 260px; height: 260px; border-color: rgba(255,214,10,0.4);"></div>
+        <div class="radar-sweep" id="s1-sweep"></div>
+        <div class="radar-target-box">
+          <div class="radar-blip"></div>
+          <div class="radar-label">RICHAT STRUCTURE [21.12°N]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 2: 2.5D VINTAGE NEWSPAPER + HIGHLIGHTER (4.0s - 8.0s) -->
+    <div id="scene2" class="scene">
+      <div class="dossier-wrapper" id="s2-dossier">
+        <div class="dossier-paper">
+          <div class="dossier-header">
+            <div class="dossier-agency">CENTRAL INTELLIGENCE AGENCY</div>
+            <div class="dossier-headline">GEOLOGICAL ANOMALY REPORT: MAURITANIA</div>
+          </div>
+          <div class="dossier-body">
+            CONFIDENTIAL MEMORANDUM FOR DIRECTORS.<br><br>
+            Satellite telemetry confirms a circular structure spanning 40 kilometers across the Sahara desert. 
+            <br><br>
+            <div class="highlight-target">
+              "THE PHYSICAL DIMENSIONS EXACTLY MATCH PLATO'S ORIGINAL TEXT OF ATLANTIS."
+              <svg class="highlighter-svg" viewBox="0 0 650 40">
+                <path id="s2-highlighter" class="highlighter-stroke" d="M 10 20 L 640 20" />
+              </svg>
+            </div>
+            <br><br>
+            Coordinates fixed at: 
+            <div class="circle-target">
+              <span style="font-weight: bold; color: #8b0000;">21°07'N 11°24'W</span>
+              <svg class="circle-svg" viewBox="0 0 160 50">
+                <ellipse id="s2-circle" class="circle-stroke" cx="80" cy="25" rx="72" ry="20" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: ARCHIVAL EVIDENCE KEN BURNS + PINS (8.0s - 11.5s) -->
+    <div id="scene3" class="scene">
+      <div class="photo-container" id="s3-container">
+        <!-- SVG Graphic Satellite Rendering of Richat Concentric Rings -->
+        <svg viewBox="0 0 900 900" style="width:100%; height:100%; background: #1a1714;">
+          <defs>
+            <radialGradient id="sandGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#3d2a1a" />
+              <stop offset="60%" stop-color="#241a12" />
+              <stop offset="100%" stop-color="#0e0b08" />
+            </radialGradient>
+          </defs>
+          <rect width="900" height="900" fill="url(#sandGlow)" />
+          <!-- Concentric Geological Rings -->
+          <circle cx="450" cy="450" r="380" fill="none" stroke="#7a5538" stroke-width="12" stroke-dasharray="8 4" opacity="0.6"/>
+          <circle cx="450" cy="450" r="320" fill="none" stroke="#a6784d" stroke-width="18" opacity="0.8"/>
+          <circle cx="450" cy="450" r="240" fill="none" stroke="#523924" stroke-width="24" opacity="0.7"/>
+          <circle cx="450" cy="450" r="160" fill="none" stroke="#d49b65" stroke-width="16" opacity="0.9"/>
+          <circle cx="450" cy="450" r="70" fill="#2b1e14" stroke="#ffcc80" stroke-width="8"/>
+        </svg>
+        <div class="badge-pin-1" id="s3-pin1">DIAMETER: 40 KM</div>
+        <div class="badge-pin-2" id="s3-pin2">CONCENTRIC RINGS: 3</div>
+      </div>
+    </div>
+
+    <!-- SCENE 4: CLIMAX / HOOK QUESTION (11.5s - 15.0s) -->
+    <div id="scene4" class="scene">
+      <div class="climax-container">
+        <div class="climax-eyebrow" id="s4-eye">THE UNTOLD TRUTH</div>
+        <div class="climax-headline">
+          <span id="s4-w1">WAS</span> <span id="s4-w2">ATLANTIS</span><br>
+          <span id="s4-w3">NEVER</span> <span id="s4-w4">IN</span> <span id="s4-w5">THE</span> <span id="s4-w6">OCEAN...</span><br>
+          <span class="climax-gold" id="s4-w7">BUT BURIED HERE?</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIVERSAL SUBTITLE DRAWER -->
+    <div class="caption-card">
+      <div class="caption-text" id="captionText">
+        <!-- Dynamic Syllables will update via timeline -->
+        <span class="word active" id="capWord">Deep inside the Sahara desert, an anomaly was found.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+
+    // ==========================================
+    // SCENE 1: RADAR RECON (0.0s - 4.0s)
+    // ==========================================
+    tl.set("#scene1", { autoAlpha: 1 }, 0);
+    tl.to("#s1-sweep", { rotation: 720, duration: 4.0, ease: "none" }, 0);
+    tl.fromTo("#s1-radar", { scale: 0.9 }, { scale: 1.1, duration: 4.0, ease: "sine.out" }, 0);
+
+    // Classified stamp slam with camera shake
+    tl.fromTo("#s1-stamp", 
+      { scale: 3.5, opacity: 0, rotation: -25 }, 
+      { scale: 1, opacity: 1, rotation: -12, duration: 0.35, ease: "power4.in" }, 
+      0.6
+    );
+    tl.to("#root", { x: -14, y: 10, duration: 0.05, ease: "power1.inOut" }, 0.95);
+    tl.to("#root", { x: 12, y: -8, duration: 0.05, ease: "power1.inOut" }, 1.0);
+    tl.to("#root", { x: 0, y: 0, duration: 0.05, ease: "power1.inOut" }, 1.05);
+
+    // Subtitle 1 (0.0s - 4.0s)
+    tl.call(() => {
+      document.getElementById("captionText").innerHTML = '<span class="word active">Deep inside the Sahara desert, something was found.</span>';
+    }, null, 0.2);
+
+    // ==========================================
+    // SCENE 2: 2.5D DOSSIER + HIGHLIGHTER (4.0s - 8.0s)
+    // ==========================================
+    tl.to("#scene1", { autoAlpha: 0, duration: 0.3 }, 3.9);
+    tl.set("#scene2", { autoAlpha: 1 }, 4.0);
+
+    // 2.5D Paper Camera move (dolly-in + subtle tilt)
+    tl.fromTo("#s2-dossier", 
+      { scale: 0.92, rotateX: 16, rotateY: -10 }, 
+      { scale: 1.05, rotateX: 6, rotateY: -3, duration: 4.0, ease: "sine.out" }, 
+      4.0
+    );
+
+    // Subtitle 2 (4.0s - 8.0s)
+    tl.call(() => {
+      document.getElementById("captionText").innerHTML = '<span class="word active">Declassified records match Plato\'s original dimensions.</span>';
+    }, null, 4.1);
+
+    // SVG Highlighter draw-on (4.8s - 6.2s)
+    tl.to("#s2-highlighter", {
+      strokeDashoffset: 0,
+      duration: 1.4,
+      ease: "power2.inOut"
+    }, 4.8);
+
+    // Red Circle draw-on (6.3s - 7.3s)
+    tl.to("#s2-circle", {
+      strokeDashoffset: 0,
+      duration: 1.0,
+      ease: "power2.out"
+    }, 6.3);
+
+    // ==========================================
+    // SCENE 3: ARCHIVAL KEN BURNS + PINS (8.0s - 11.5s)
+    // ==========================================
+    tl.to("#scene2", { autoAlpha: 0, duration: 0.3 }, 7.9);
+    tl.set("#scene3", { autoAlpha: 1 }, 8.0);
+
+    tl.fromTo("#s3-container", 
+      { scale: 0.95, rotate: -2 }, 
+      { scale: 1.15, rotate: 1, duration: 3.5, ease: "sine.out" }, 
+      8.0
+    );
+
+    // Subtitle 3 (8.0s - 11.5s)
+    tl.call(() => {
+      document.getElementById("captionText").innerHTML = '<span class="word active">A 40-kilometer structure with three concentric rings.</span>';
+    }, null, 8.1);
+
+    // Floating badges pop with overshoot
+    tl.to("#s3-pin1", { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2.0)" }, 8.8);
+    tl.to("#s3-pin2", { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2.0)" }, 9.6);
+
+    // ==========================================
+    // SCENE 4: CLIMAX QUESTION (11.5s - 15.0s)
+    // ==========================================
+    tl.to("#scene3", { autoAlpha: 0, duration: 0.3 }, 11.4);
+    tl.set("#scene4", { autoAlpha: 1 }, 11.5);
+
+    // Subtitle 4
+    tl.call(() => {
+      document.getElementById("captionText").innerHTML = '<span class="word active">Was Atlantis buried beneath the sand all along?</span>';
+    }, null, 11.6);
+
+    tl.fromTo("#s4-eye", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4 }, 11.6);
+
+    // Stagger words pop
+    tl.fromTo("#s4-w1", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.0)" }, 11.8);
+    tl.fromTo("#s4-w2", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.0)" }, 12.1);
+    tl.fromTo("#s4-w3", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2.0)" }, 12.4);
+    tl.fromTo("#s4-w4", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2.0)" }, 12.7);
+    tl.fromTo("#s4-w5", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2.0)" }, 12.9);
+    tl.fromTo("#s4-w6", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.0)" }, 13.2);
+    tl.fromTo("#s4-w7", { opacity: 0, scale: 0.6, y: 30 }, { opacity: 1, scale: 1.12, y: 0, duration: 0.5, ease: "back.out(2.5)" }, 13.6);
+
+    window.__timelines["main"] = tl;
+  </script>
+</body>
+</html>
