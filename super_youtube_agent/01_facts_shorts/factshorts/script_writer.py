@@ -83,11 +83,15 @@ GENERIC_VISUALS: dict[str, list[str]] = {
     "psychology": ["human brain abstract", "person thinking", "neon abstract motion", "dark psychology aesthetic", "chess strategy thinking"],
     "history": ["ancient ruins", "old manuscripts", "museum artifacts", "desert archaeology", "historical architecture"],
     "mystery": ["foggy mystery woods", "dark atmospheric shadows", "magnifying glass investigation", "ancient riddle symbols"],
+    "crime": ["crime scene investigation", "dark detective investigation", "police archive files", "night rain city lights", "evidence examination forensic"],
+    "paranormal": ["eerie fog dark forest", "haunted abandoned building", "mysterious shadows night", "ancient paranormal artifacts", "stormy night lightning"],
     "finance": ["luxury lifestyle modern", "wall street stock charts", "wealth accumulation vaults", "credit card banking luxury", "money counting modern"],
     "legal": ["courthouse justice scales", "gavel judge courtroom", "legal documents signing", "law library leather books"],
     "kids": ["colorful cartoon 3d world", "cute baby animals playing", "bright rainbow wonderland", "fun balloon animations"],
     "science": ["laboratory science", "microscope footage", "water droplets macro", "physics experiment"],
     "animals": ["wildlife closeup", "ocean underwater", "birds in flight", "forest animals"],
+    "coding": ["programming code screen", "cyberpunk code hacker", "software engineer typing", "digital matrix network", "modern tech setup neon"],
+    "tech": ["futuristic artificial intelligence", "robotics technology laboratory", "digital data visualization", "quantum computer motherboard", "microchip processor macro"],
 }
 MIN_KEYWORD_LEN = 3
 
@@ -393,7 +397,9 @@ def _offline_story(topic: Topic, cfg: Config | None = None) -> Script:
             enriched.append(random.choice(STORY_BRIDGES))
     body = clean_text(" ".join(enriched)) or core
     sentences = [Sentence(text=t, keywords=[]) for t in _split_sentences(body)] or [Sentence(text=body)]
-    probe = sanitize_keywords(list(topic.keywords) + list(GENERIC_VISUALS.get(topic.niche, [])), topic.niche)
+    topic_words = [w for w in re.findall(r"\b[A-Za-z0-9_-]{3,}\b", topic.topic) if w.lower() not in _STOP]
+    direct_topic_terms = [topic.topic] + ([f"{topic.topic} {w}" for w in topic_words[:3]]) if topic.topic else []
+    probe = sanitize_keywords(direct_topic_terms + list(topic.keywords) + list(GENERIC_VISUALS.get(topic.niche, [])), topic.niche)
     for i, sentence in enumerate(sentences):
         pick = [probe[i % len(probe)]]
         if len(probe) > 1:
@@ -421,7 +427,9 @@ def _offline_script(topic: Topic, cfg: Config | None = None) -> Script:
         if len(candidate) <= 34:  # keep the hook short; long ones get trimmed awkwardly
             hook = candidate
     sentences = [Sentence(text=t, keywords=[]) for t in _split_sentences(body)] or [Sentence(text=body)]
-    probe = sanitize_keywords(list(topic.keywords) + list(GENERIC_VISUALS.get(topic.niche, [])), topic.niche)
+    topic_words = [w for w in re.findall(r"\b[A-Za-z0-9_-]{3,}\b", topic.topic) if w.lower() not in _STOP]
+    direct_topic_terms = [topic.topic] + ([f"{topic.topic} {w}" for w in topic_words[:3]]) if topic.topic else []
+    probe = sanitize_keywords(direct_topic_terms + list(topic.keywords) + list(GENERIC_VISUALS.get(topic.niche, [])), topic.niche)
     for i, sentence in enumerate(sentences):
         pick = [probe[i % len(probe)]]
         if len(probe) > 1:

@@ -1,0 +1,129 @@
+name: Channel 5 - Dark Sutra Crime Studio
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Specific crime/mystery topic (e.g. "Jack the Ripper", "Bermuda Triangle", "Burari Deaths", or leave blank for auto AI discovery)'
+        required: false
+        default: ''
+        type: string
+      script:
+        description: 'Custom Script (Optional: paste your exact story text)'
+        required: false
+        default: ''
+        type: string
+      duration:
+        description: 'Target Duration Seconds (default 55s)'
+        required: false
+        default: '55'
+        type: string
+      auto_upload:
+        description: 'Auto-upload to YouTube after render'
+        required: true
+        default: false
+        type: boolean
+      privacy:
+        description: 'Upload privacy (unlisted / public / private)'
+        required: false
+        default: 'unlisted'
+        type: choice
+        options:
+          - unlisted
+          - public
+          - private
+      language:
+        description: 'Narration Language (hindi = Kokoro hm_omega / english = Christopher)'
+        required: false
+        default: 'hindi'
+        type: choice
+        options:
+          - hindi
+          - english
+
+jobs:
+  produce_channel_5_video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & Fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg texlive-latex-extra texlive-fonts-extra fonts-montserrat fonts-liberation fonts-dejavu-core
+          mkdir -p ~/.local/share/fonts
+          fc-cache -f -v > /dev/null 2>&1 || true
+
+      - name: Install Python Dependencies
+        working-directory: factshorts-bot
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: Configure YouTube Channel 5 OAuth
+        env:
+          YT_TOKEN_B64: ${{ secrets.YT_TOKEN_CH5_B64 || secrets.YT_TOKEN_B64 }}
+          YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
+        run: |
+          mkdir -p factshorts-bot/credentials
+          [ -n "$YT_TOKEN_B64" ]  && printf '%s' "$YT_TOKEN_B64"  | base64 -d > factshorts-bot/credentials/token.json || true
+          [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > factshorts-bot/credentials/client_secret.json || true
+          python3 -c "import json; json.load(open('factshorts-bot/credentials/token.json')); print('✅ token.json is valid JSON')" 2>/dev/null || echo "ℹ️ token.json pending"
+
+      - name: Generate Dark Sutra Documentary Short
+        working-directory: factshorts-bot
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          FOOTAGE_PROVIDERS: pexels,pixabay,local
+          LLM_PROVIDER: auto
+          NICHE: crime
+          VIDEO_MODE: story
+          SCRIPT_STYLE: suspenseful
+          SCRIPT_LANGUAGE: ${{ github.event.inputs.language || 'hindi' }}
+          VOICE_PROVIDER: kokoro
+          VOICE: hm_omega
+          TOPIC_INPUT: ${{ github.event.inputs.topic }}
+          SCRIPT_INPUT: ${{ github.event.inputs.script }}
+          DURATION_INPUT: ${{ github.event.inputs.duration }}
+          AUTO_UPLOAD: ${{ github.event.inputs.auto_upload }}
+          PRIVACY_OPT: ${{ github.event.inputs.privacy || 'unlisted' }}
+        run: |
+          python main.py --generate --niche crime --mode story
+
+      - name: 📱 Send Video Directly to Telegram Phone
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
+          CHANNEL_BADGE: 'Channel 5 (Dark Sutra Crime Studio)'
+        run: |
+          python send_to_telegram.py factshorts-bot/output || true
+
+      - name: Save Rendered Video Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-5-dark-sutra-rendered-videos
+          path: factshorts-bot/output/*.mp4
+          retention-days: 14
+
+      - name: Keep topic memory (Never repeat topics)
+        if: always()
+        run: |
+          git config user.name  "factshorts-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f factshorts-bot/data/factshorts.db 2>/dev/null || true
+          git commit -m "chore: topic memory update $(date -u +%F-%H%M)" || echo "nothing to commit"
+          git push || echo "push skipped"

@@ -1,135 +1,116 @@
 @echo off
-set SCRIPT_DIR=%~dp0
-call "%SCRIPT_DIR%super_youtube_agent\01_facts_shorts\venv\Scripts\activate.bat"
+setlocal enabledelayedexpansion
+title Multi-Channel AI YouTube Studio Master Hub
+color 0A
 
-if /i "%~1"=="--help" goto help
-if /i "%~1"=="-h" goto help
-if /i "%~1"=="/?" goto help
-if /i "%~1"=="--verify" goto verify
-if /i "%~1"=="--reticle" goto verify
-if /i "%~1"=="--channel1" goto facts
-if /i "%~1"=="--channel2" goto studio
-if /i "%~1"=="--studio" goto studio
-if /i "%~1"=="--gaming" goto studio
-if /i "%~1"=="--channel3" goto dark
-if /i "%~1"=="--dark" goto dark
-if /i "%~1"=="--sutra" goto dark
-if /i "%~1"=="--channel4" goto lofi
-if /i "%~1"=="--lofi" goto lofi
-if /i "%~1"=="--channel5" goto vox
-if /i "%~1"=="--vox" goto vox
-if /i "%~1"=="--ledger" goto vox
-if /i "%~1"=="--clipper" goto clipper
-if /i "%~1"=="--channel7" goto coding
-if /i "%~1"=="--coding" goto coding
-if /i "%~1"=="--captions" goto captions
-if /i "%~1"=="--pycaps" goto captions
-if /i "%~1"=="--batch-captions" goto batch_captions
+:menu
+cls
+echo ================================================================
+echo        🚀 MULTI-CHANNEL AI YOUTUBE STUDIO MASTER HUB
+echo ================================================================
+echo.
+echo   [1] 🔵 Channel 1 — Viral Facts Shorts (Space & Science)
+echo   [2] 🔴 Channel 2 — Story & Mysteries Studio (Historical Cases)
+echo   [3] 🟢 Channel 3 — Vox & Geopolitics Studio (Map Documentaries)
+echo   [4] 🟣 Channel 4 — Lofi 24/7 Music Studio (Ambient Beats)
+echo   [5] 🕵️ Channel 5 — Dark Sutra Crime Studio (True Crime & Paranormal)
+echo   [6] ✂️ Channel 6 — AI Auto Clipper Best (Viral Podcast Cuts)
+echo   [7] 💻 Channel 7 — Coding & Tech Studio (Code Hacks & AI Tools)
+echo.
+echo   [C] 🎬 Start ComfyUI + Wan 2.2 Local GPU Server (Dark Sutra)
+echo   [T] 📱 Send Telegram Connection Test Ping to All Channels
+echo   [0] ❌ Exit
+echo.
+echo ================================================================
+set /p choice="Select Option [1-7, C, T, 0]: "
 
-:facts
-cd /d "%SCRIPT_DIR%super_youtube_agent\01_facts_shorts"
-echo [Channel 1: FactShorts] Viral 9:16 Facts Pipeline
-if "%~1"=="" (
-    echo Running demo video render...
-    python main.py --demo
-) else if /i "%~1"=="--channel1" (
-    shift
-    python main.py %1 %2 %3 %4 %5 %6
-) else (
-    python main.py %*
+if "%choice%"=="1" (
+    echo.
+    echo Launching Channel 1: Viral Facts Shorts...
+    cd super_youtube_agent\01_facts_shorts
+    python main.py --generate --mode facts
+    cd ..\..
+    pause
+    goto menu
 )
-goto end
-
-:studio
-cd /d "%SCRIPT_DIR%super_youtube_agent\02_story_studio"
-echo [Channel 2: Story Studio] Starting Web Server at http://localhost:8787...
-echo Features: GTA VI Clips Lab (Hindi/Hinglish) + Market Scout + Documentary Research + Strategy Calendar
-python server.py
-goto end
-
-:dark
-cd /d "%SCRIPT_DIR%super_youtube_agent\03_dark_sutra"
-echo [Channel 3: Dark Sutra] True Crime and Mystery Documentary Engine...
-if /i "%~1"=="--channel3" shift
-if /i "%~1"=="--dark" shift
-if /i "%~1"=="--sutra" shift
-python main.py %*
-goto end
-
-:lofi
-cd /d "%SCRIPT_DIR%super_youtube_agent\04_lofi_studio"
-echo [Channel 4: Lofi Studio] Starting 24/7 Lofi Ambient Pipeline...
-if /i "%~1"=="--channel4" shift
-if /i "%~1"=="--lofi" shift
-if exist "main_lofi.py" (
-    python main_lofi.py %*
-) else (
-    python lofi_pipeline.py %*
+if "%choice%"=="2" (
+    echo.
+    echo Launching Channel 2: Story & Mysteries Studio...
+    cd super_youtube_agent\01_facts_shorts
+    python main.py --generate --niche history --mode story
+    cd ..\..
+    pause
+    goto menu
 )
-goto end
+if "%choice%"=="3" (
+    echo.
+    echo Launching Channel 3: Vox & Geopolitics Studio...
+    cd super_youtube_agent\03_vox_studio
+    python cli.py trends --limit 3 --auto-produce
+    cd ..\..
+    pause
+    goto menu
+)
+if "%choice%"=="4" (
+    echo.
+    echo Launching Channel 4: Lofi 24/7 Music Studio...
+    cd super_youtube_agent\04_lofi_studio
+    python -m main
+    cd ..\..
+    pause
+    goto menu
+)
+if "%choice%"=="5" (
+    echo.
+    echo ================================================================
+    echo  🕵️ CHANNEL 5: DARK SUTRA CRIME STUDIO (INVESTIGATIVE ENGINE)
+    echo ================================================================
+    set /p dark_topic="Enter Crime/Mystery Topic (Press Enter for 'Burari Deaths'): "
+    if "!dark_topic!"=="" set "dark_topic=Burari Deaths"
+    cd super_youtube_agent\05_dark_sutra
+    python main.py --topic "!dark_topic!" --format short --lang hindi --voice hm_omega
+    cd ..\..
+    pause
+    goto menu
+)
+if /i "%choice%"=="C" (
+    echo.
+    echo Launching ComfyUI + Wan 2.2 Server...
+    call super_youtube_agent\05_dark_sutra\scripts\start_comfyui_wan.bat
+    pause
+    goto menu
+)
+if "%choice%"=="6" (
+    echo.
+    echo Launching Channel 6: AI Auto Clipper Best...
+    cd super_youtube_agent\06_ai_clipper
+    python main.py
+    cd ..\..
+    pause
+    goto menu
+)
+if "%choice%"=="7" (
+    echo.
+    echo Launching Channel 7: Coding & Tech Studio...
+    cd super_youtube_agent\07_coding_studio
+    python main.py --generate --niche coding --mode story
+    cd ..\..
+    pause
+    goto menu
+)
+if /i "%choice%"=="T" (
+    echo.
+    echo Sending test pings to Telegram...
+    python send_to_telegram.py --test "Channel 1 (Space & Science - FactShorts)"
+    python send_to_telegram.py --test "Channel 2 (Story & Mysteries Studio)"
+    python send_to_telegram.py --test "Channel 3 (Vox & Geopolitics Studio)"
+    python send_to_telegram.py --test "Channel 5 (Dark Sutra Crime Studio)"
+    python send_to_telegram.py --test "Channel 7 (Coding & Tech Studio)"
+    pause
+    goto menu
+)
+if "%choice%"=="0" exit /b 0
 
-:vox
-cd /d "%SCRIPT_DIR%super_youtube_agent\05_vox_ledger"
-echo [Channel 5: The Global Ledger] Geopolitical Map and Investigative Explainer...
-if /i "%~1"=="--channel5" shift
-if /i "%~1"=="--vox" shift
-if /i "%~1"=="--ledger" shift
-python cli.py %*
-goto end
-
-:clipper
-cd /d "%SCRIPT_DIR%super_youtube_agent\06_ai_clipper"
-echo [Channel 6: AI Clipper Best] Auto-clipping Video Pipeline...
-shift
-python -m autoclip.cli %*
-goto end
-
-:coding
-cd /d "%SCRIPT_DIR%super_youtube_agent\01_facts_shorts"
-echo [Channel 7: Coding & Tech Studio] Auto Developer Shorts & Tech Hacks Pipeline...
-if /i "%~1"=="--channel7" shift
-if /i "%~1"=="--coding" shift
-python main.py --generate --niche coding --mode story %*
-goto end
-
-:captions
-cd /d "%SCRIPT_DIR%"
-shift
-python caption_studio\main.py %*
-goto end
-
-:batch_captions
-cd /d "%SCRIPT_DIR%"
-shift
-python caption_studio\main.py --batch %*
-goto end
-
-:verify
-cd /d "%SCRIPT_DIR%"
-echo [Reticle Verifier] Running Brahmastra Runtime Perception and Proof Suite...
-python reticle_verify.py
-goto end
-
-:help
-echo =========================================================================
-echo   SUPER YOUTUBE AGENT - MULTI-CHANNEL AUTOMATION SUITE
-echo =========================================================================
-echo   run.bat                          - Render Demo Short (Channel 1: FactShorts)
-echo   run.bat --channel1               - Run Channel 1 (FactShorts)
-echo   run.bat --channel2               - Run Channel 2 (Story Studio on port 8787)
-echo   run.bat --channel3               - Run Channel 3 (Dark Sutra True Crime / Mystery)
-echo   run.bat --sutra                  - Alias for Dark Sutra
-echo   run.bat --channel4               - Run Channel 4 (Lofi 24/7 Studio)
-echo   run.bat --channel5               - Run Channel 5 (The Global Ledger Map Explainer)
-echo   run.bat --ledger                 - Alias for The Global Ledger
-echo   run.bat --clipper                - Run AI Clipper Best
-echo   run.bat --channel7               - Run Channel 7 (Coding & Tech Studio)
-echo   run.bat --coding                 - Alias for Coding Studio
-echo   run.bat --captions video.mp4     - PyCaps TikTok Animated Kinetic Captions
-echo   run.bat --batch-captions folder/ - Batch Caption All Videos in Folder
-echo   run.bat --verify                 - Run Reticle Runtime Verification Suite
-echo   run.bat --help                   - Show this help menu
-echo =========================================================================
-goto end
-
-:end
+echo Invalid selection.
+pause
+goto menu

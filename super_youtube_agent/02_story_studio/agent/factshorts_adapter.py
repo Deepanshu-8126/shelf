@@ -15,11 +15,12 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 WORKSPACE = ROOT.parent
 _fs_candidates = [
+    WORKSPACE / "01_facts_shorts",
     WORKSPACE / "channel_1_facts_shorts",
     WORKSPACE / "factshorts-bot",
-    WORKSPACE.parent / "channel_1_facts_shorts",
+    WORKSPACE.parent / "01_facts_shorts",
 ]
-FACTSHORTS_DIR = next((p for p in _fs_candidates if p.is_dir()), WORKSPACE / "channel_1_facts_shorts").resolve()
+FACTSHORTS_DIR = next((p for p in _fs_candidates if p.is_dir()), WORKSPACE / "01_facts_shorts").resolve()
 OUTPUT_DIR = (FACTSHORTS_DIR / "output").resolve()
 FACTSHORTS_OUTPUT = OUTPUT_DIR
 PYTHON_EXE = (FACTSHORTS_DIR / "venv" / "Scripts" / "python.exe").resolve()

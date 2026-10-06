@@ -203,8 +203,12 @@ class FootageClient:
 
         def rank(f: dict[str, Any]) -> tuple[int, int]:
             h = int(f.get("height") or 0)
-            too_big = 1 if h > self.cfg.clip_max_height else 0
-            return (too_big, -h)  # prefer not-too-big, then the tallest
+            sz = int(f.get("file_size") or 0)
+            # Avoid massive 4K files > 60MB that stall downloads
+            oversized = 1 if (h > 1920 or sz > 60 * 1024 * 1024) else 0
+            # Target ~1080p/720p
+            target_res = abs(h - 1920) if h >= int(f.get("width") or 0) else abs(h - 1080)
+            return (oversized, target_res)
 
         pool = portrait or usable
         return sorted(pool, key=rank)[0]
@@ -512,7 +516,10 @@ class FootageClient:
                             fh.write(chunk)
                             size += len(chunk)
                             if size > 90 * 1024 * 1024:
-                                raise FootageError("clip exceeds 90 MB, aborting")
+                                fh.close()
+                                tmp.unlink(missing_ok=True)
+                                log.warning("clip exceeds 90 MB (%s), skipping candidate", cand.key)
+                                return False
                     tmp.replace(target)
                     log.info("downloaded %s (%s)", target.name, human_bytes(size))
                 return True
@@ -520,7 +527,7 @@ class FootageClient:
                 target.unlink(missing_ok=True)
                 if attempt < 3:
                     log.warning("download attempt %d failed for %s: %s", attempt, cand.key, exc)
-                    await asyncio.sleep(2.0 * attempt)
+                    await asyncio.sleep(1.0 * attempt)
                 else:
                     log.warning("download failed for %s after %d attempts: %s", cand.key, attempt, exc)
         return False

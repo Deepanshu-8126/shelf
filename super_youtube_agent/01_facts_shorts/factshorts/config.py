@@ -186,7 +186,7 @@ class Config:
         self.max_duration: float = _f("VIDEO_MAX_DURATION", 14.5)
         self.min_duration: float = _f("VIDEO_MIN_DURATION", 9.5)
         self.clip_count: int = _i("VIDEO_CLIP_COUNT", 4)
-        self.transition: str = _s("VIDEO_TRANSITION", "fade").lower()  # fade|cut
+        self.transition: str = _s("VIDEO_TRANSITION", "fade").lower()  # fade|cut|wipe|glitch|slide|grid
         self.transition_duration: float = _f("VIDEO_TRANSITION_DURATION", 0.28)
         self.zoom_amount: float = _f("VIDEO_ZOOM", 0.10)
         self.crf: int = _i("VIDEO_CRF", 20)

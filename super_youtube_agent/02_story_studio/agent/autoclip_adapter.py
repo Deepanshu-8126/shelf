@@ -13,17 +13,22 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
-WORKSPACE = ROOT.parent
-_clipper_base = (WORKSPACE / "ai_clipper_best") if (WORKSPACE / "ai_clipper_best").is_dir() else (WORKSPACE / "ai clipper best")
+_clipper_candidates = [
+    WORKSPACE / "06_ai_clipper",
+    WORKSPACE / "ai_clipper_best",
+    WORKSPACE / "ai clipper best"
+]
+_clipper_base = next((p for p in _clipper_candidates if p.is_dir()), WORKSPACE / "06_ai_clipper")
 AUTOCLIP_DIR = (_clipper_base / "autoclip").resolve()
 SHORTS_DIR = (_clipper_base / "Shorts").resolve()
 INSTAPOST_DIR = (_clipper_base / "instapost").resolve()
 _fs_candidates = [
+    WORKSPACE / "01_facts_shorts",
     WORKSPACE / "channel_1_facts_shorts",
     WORKSPACE / "factshorts-bot",
-    WORKSPACE.parent / "channel_1_facts_shorts",
+    WORKSPACE.parent / "01_facts_shorts",
 ]
-FACTSHORTS_DIR = next((p for p in _fs_candidates if p.is_dir()), WORKSPACE / "channel_1_facts_shorts").resolve()
+FACTSHORTS_DIR = next((p for p in _fs_candidates if p.is_dir()), WORKSPACE / "01_facts_shorts").resolve()
 
 
 # Tasks storage for background renders

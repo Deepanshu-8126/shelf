@@ -20,6 +20,8 @@ NICHE_TAGS = {
     "psychology": ["psychology facts", "dark psychology", "human behavior", "mind tricks", "psychological hacks", "manipulation techniques", "psychology shorts", "body language", "psychology tips"],
     "history": ["history facts", "historical mysteries", "unsolved history", "ancient history", "bizarre history", "history shorts", "did you know history", "archaeology discoveries"],
     "mystery": ["unsolved mysteries", "strange events", "creepy mysteries", "conspiracy facts", "bizarre facts", "mystery shorts", "dark mysteries"],
+    "crime": ["true crime", "unsolved crime", "crime documentary", "dark files", "criminal psychology", "crime shorts", "investigation", "mystery case"],
+    "paranormal": ["paranormal", "creepy facts", "unexplained phenomena", "haunted mysteries", "dark secrets", "paranormal shorts", "horror facts"],
     "finance": ["personal finance", "money tips", "wealth mindset", "credit card hacks", "investing for beginners", "financial freedom", "money hacks", "finance shorts", "wealth secrets", "passive income"],
     "legal": ["legal hacks", "court drama", "consumer rights", "lawyer tips", "crazy laws", "legal advice", "bizarre court cases", "legal rights", "law shorts"],
     "science": ["science facts", "science shorts", "amazing science", "physics facts", "biology facts", "scientific discoveries"],

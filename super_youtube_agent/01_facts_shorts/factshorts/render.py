@@ -13,6 +13,7 @@ temporary files live inside cache/tmp so the output folder stays clean.
 from __future__ import annotations
 
 import json
+import math
 import random
 import re
 import shutil
@@ -111,7 +112,7 @@ def _cover_crop_chain(cfg: Config) -> str:
 
 
 def _zoom_chain(idx: int, seg_len: float, cfg: Config) -> str:
-    """FireRed-OpenStoryline intention-driven directing + Ken-Burns camera movement.
+    """FireRed-OpenStoryline intention-directed directing + Ken-Burns camera movement.
 
     * Beat 0 (The Hook, 0-3s): Punch zoom-in (z * 1.45) to capture immediate viewer focus.
     * Middle Beats (Core Story): Alternating zoom-in/zoom-out with cinematic lateral drift.
@@ -137,13 +138,27 @@ def _zoom_chain(idx: int, seg_len: float, cfg: Config) -> str:
             sign = 1 if (idx // 3) % 2 == 0 else -1
             drift = f"+{sign}*0.02*{cfg.width}*(t/{max(seg_len,0.1):.3f})"
 
-    return (
+    # Base zoom/pan chain
+    base_chain = (
         f"scale=w='max({cfg.width}, trunc({cfg.width}*({scale_expr})/2)*2)':"
         f"h='max({cfg.height}, trunc({cfg.height}*({scale_expr})/2)*2)':eval=frame:flags=bicubic,"
         f"crop={cfg.width}:{cfg.height}:"
         f"x='max(0, min(in_w-{cfg.width}, (in_w-{cfg.width})/2{drift}))':"
         f"y='max(0, min(in_h-{cfg.height}, (in_h-{cfg.height})/2))',setsar=1"
     )
+    
+    # Add 3D effects for coding/tech niche
+    if cfg.niche == "coding":
+        # Add subtle 2D rotation that varies by segment index (in-plane spin)
+        # Slow oscillation: -2 to +2 degrees
+        rotation_degree = 2.0 * math.sin(idx * 0.5)  # Oscillates based on index
+        # Add subtle perspective effect for more 3D depth
+        perspective_x = 0.03 * math.sin(idx * 0.4)  # Subtle horizontal perspective shift
+        perspective_y = 0.03 * math.cos(idx * 0.3)  # Subtle vertical perspective shift
+        # Add rotation and perspective to the chain
+        return f"{base_chain},rotate={rotation_degree}*PI/180:fillcolor=black,perspective={perspective_x}:{perspective_y}"
+    else:
+        return base_chain
 
 
 TARGET_SECONDS_PER_CLIP = 3.8  # calmer than a hard cut every 1.5s, still snappy
@@ -380,6 +395,103 @@ async def _normalize_segment(plan: SegmentPlan, index: int, workdir: Path, cfg: 
     return out
 
 
+async def _join_segments_glitch(segments: list[Path], workdir: Path, cfg: Config, total_duration: float, out_path: Path) -> None:
+    """Apply glitch transition between segments using RGB splitting and displacement."""
+    if len(segments) < 2:
+        # Fallback to simple copy if only one segment
+        await run_cmd_async(
+            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(segments[0]),
+             "-t", f"{total_duration:.3f}", "-c", "copy", str(out_path)],
+            timeout=180,
+        )
+        return
+
+    d = cfg.transition_duration
+    lengths = [media_duration(p) for p in segments]
+    
+    # Build complex filter for glitch transitions
+    parts = []
+    inputs = []
+    
+    # Add all input segments
+    for i, seg in enumerate(segments):
+        inputs.extend(["-i", str(seg)])
+    
+    # Build filter chain for glitch transitions between consecutive segments
+    filter_parts = []
+    current_label = "[0:v]"
+    
+    for i in range(1, len(segments)):
+        # Calculate offset for this transition
+        offset = sum(lengths[:i]) + max(0.05, lengths[i-1] - d)
+        
+        # Glitch effect: RGB split with displacement
+        glitch_filter = (
+            f"[{i-1}:v][{i}:v]xfade=transition=glitch:duration={d:.3f}:offset={offset:.3f}:"
+            f"params=0.5:rgb{5}[v{i}]"
+        )
+        filter_parts.append(glitch_filter)
+        current_label = f"[v{i}]"
+    
+    # Combine all parts
+    if filter_parts:
+        filter_graph = ";".join(filter_parts)
+        cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"] + inputs
+        cmd += ["-filter_complex", filter_graph, "-map", current_label, "-an",
+                "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", str(out_path)]
+        try:
+            await run_cmd_async(cmd, timeout=420)
+            return
+        except CommandError:
+            pass  # Fall back to xfade if glitch fails
+    
+    # Fallback to xfade with a cool transition if glitch fails
+    await _join_segments_xfade_fallback(segments, workdir, cfg, total_duration, out_path)
+
+
+async def _join_segments_xfade_fallback(segments: list[Path], workdir: Path, cfg: Config, total_duration: float, out_path: Path) -> None:
+    """Fallback transition handler using xfade with interesting transitions."""
+    # Try some interesting xfade transitions for coding/tech
+    interesting_transitions = ["radial", "circleopen", "circleclose", "hblur", "faderadial"]
+    transition_type = cfg.transition
+    
+    # For coding niche, use more interesting transitions by default
+    if cfg.niche == "coding" and transition_type == "fade":
+        transition_type = "radial"
+    
+    d = cfg.transition_duration
+    lengths = [media_duration(p) for p in segments]
+    parts = []
+    prev = "[0:v]"
+    offset = 0.0
+    
+    for i in range(1, len(segments)):
+        offset += max(0.05, lengths[i - 1] - d)
+        label = f"[v{i}]"
+        # Try to use interesting transition, fallback to fade if not supported
+        try_transition = transition_type if i == 1 else "fade"  # Only try fancy ones once
+        parts.append(f"{prev}[{i}:v]xfade=transition={try_transition}:duration={d:.3f}:offset={offset:.3f}{label}")
+        prev = label
+    
+    graph = ";".join(parts)
+    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]
+    for seg in segments:
+        cmd += ["-i", str(seg)]
+    cmd += ["-filter_complex", graph, "-map", prev, "-an", "-c:v", "libx264", "-preset", "veryfast",
+            "-crf", "18", "-pix_fmt", "yuv420p", str(out_path)]
+    try:
+        await run_cmd_async(cmd, timeout=420)
+    except CommandError:
+        # Final fallback to simple concat
+        listfile = workdir / "concat.txt"
+        listfile.write_text("".join(f"file '{p.resolve()}'\n" for p in segments), encoding="utf-8")
+        await run_cmd_async(
+            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
+             "-i", str(listfile), "-t", f"{total_duration:.3f}", "-c", "copy", str(out_path)],
+            timeout=240,
+        )
+
+
 async def _join_segments(segments: list[Path], workdir: Path, cfg: Config, total_duration: float) -> Path:
     out = workdir / "base.mp4"
     if len(segments) == 1:
@@ -390,7 +502,18 @@ async def _join_segments(segments: list[Path], workdir: Path, cfg: Config, total
         )
         return out
 
-    if cfg.transition == "fade":
+    # Determine transition type - special handling for coding/tech niche
+    if cfg.niche == "coding":
+        # For coding/tech, use more dynamic transitions by default
+        transition_type = cfg.transition
+        if transition_type == "fade":  # Default to grid for coding if fade is set
+            transition_type = "grid"
+    else:
+        transition_type = cfg.transition
+    
+    # Handle transitions that can use xfade (fade, wipe, slide, grid)
+    xfade_transitions = {"fade", "wipe", "slide", "grid"}
+    if transition_type in xfade_transitions:
         d = cfg.transition_duration
         lengths = [media_duration(p) for p in segments]
         parts = []
@@ -399,7 +522,14 @@ async def _join_segments(segments: list[Path], workdir: Path, cfg: Config, total
         for i in range(1, len(segments)):
             offset += max(0.05, lengths[i - 1] - d)
             label = f"[v{i}]"
-            parts.append(f"{prev}[{i}:v]xfade=transition=fade:duration={d:.3f}:offset={offset:.3f}{label}")
+            # Map transition types to ffmpeg xfade transition names
+            ffmpeg_transition = {
+                "fade": "fade",
+                "wipe": "wipeleft", 
+                "slide": "slideleft",
+                "grid": "grid"
+            }.get(transition_type, "fade")
+            parts.append(f"{prev}[{i}:v]xfade=transition={ffmpeg_transition}:duration={d:.3f}:offset={offset:.3f}{label}")
             prev = label
         graph = ";".join(parts)
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]
@@ -413,7 +543,11 @@ async def _join_segments(segments: list[Path], workdir: Path, cfg: Config, total
             log.warning("xfade join failed (%s) -> hard cuts", exc)
             cfg.transition = "cut"
             return await _join_segments(segments, workdir, cfg, total_duration)
+    elif transition_type == "glitch":
+        # Glitch transition - more complex, uses rgb shift and displacement
+        await _join_segments_glitch(segments, workdir, cfg, total_duration, out)
     else:
+        # Fallback to concat for cut or unknown transitions
         listfile = workdir / "concat.txt"
         listfile.write_text("".join(f"file '{p.resolve()}'\n" for p in segments), encoding="utf-8")
         try:
@@ -466,10 +600,10 @@ async def _mix_audio(
             "-i", str(sfx),
         ]
         graph = (
-            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo[v0];"
+            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo,asplit=2[v0][v_duck];"
             f"[1:a]aformat=channel_layouts=stereo,atrim=0:{total_duration:.3f},volume={cfg.music_volume:.3f},afade=t=out:st={music_fade_start:.3f}:d=3.0[m0];"
             f"[2:a]aformat=channel_layouts=stereo,atrim=0:{total_duration:.3f},volume=0.9[s0];"
-            f"[m0][v0]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
+            f"[m0][v_duck]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
             f"[v0][ducked][s0]amix=inputs=3:duration=first:dropout_transition=0:normalize=0[mixed];"
             f"[mixed]apad,atrim=0:{total_duration:.3f},afade=t=out:st={fade_start:.3f}:d=0.35[aout]"
         )
@@ -482,9 +616,9 @@ async def _mix_audio(
             "-stream_loop", "-1", "-i", str(music),
         ]
         graph = (
-            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo[v0];"
+            f"[0:a]adelay=delays={int(lead_in*1000)}|{int(lead_in*1000)},aformat=channel_layouts=stereo,asplit=2[v0][v_duck];"
             f"[1:a]aformat=channel_layouts=stereo,atrim=0:{total_duration:.3f},volume={cfg.music_volume:.3f},afade=t=out:st={music_fade_start:.3f}:d=3.0[m0];"
-            f"[m0][v0]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
+            f"[m0][v_duck]sidechaincompress=threshold=0.045:ratio=9:attack=15:release=320:makeup=1[ducked];"
             f"[v0][ducked]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[mixed];"
             f"[mixed]apad,atrim=0:{total_duration:.3f},afade=t=out:st={fade_start:.3f}:d=0.35[aout]"
         )
@@ -654,7 +788,7 @@ async def render_video(
     sfx_track: Path | None = None
     if getattr(voice, "segments", None):
         from .sound_design import build_sfx_track
-        sfx_track = await build_sfx_track(voice.segments, total_duration, workdir, cfg)
+        sfx_track = await build_sfx_track(voice.segments, total_duration, workdir, cfg, script_text=script.full_text)
 
     music = await pick_music(cfg, niche=getattr(script, "niche", "space"), duration=total_duration)
     audio = await _mix_audio(voice, workdir, total_duration, cfg, music=music, sfx=sfx_track)
@@ -669,13 +803,13 @@ async def render_video(
         clean_base = workdir / "clean_composite.mp4"
         await _final_pass(base, audio, None, clean_base, total_duration, cfg, workdir)
         try:
-            # Run Caption Studio in an isolated subprocess to prevent Playwright sync-in-asyncio conflicts
             cmd = [
                 sys.executable, "-m", "caption_studio.engine",
                 str(clean_base.resolve()), str(out_path.resolve()),
                 "--style", style
             ]
-            await run_cmd_async(cmd, cwd="d:/facts_yt", timeout=300)
+            root_dir = str(Path(__file__).resolve().parent.parent.parent)
+            await run_cmd_async(cmd, cwd=root_dir, timeout=300)
             if not out_path.exists() or out_path.stat().st_size < 10000:
                 raise RuntimeError(f"Animated captions output missing or empty: {out_path}")
             log.info("✅ [Caption Studio] Option 1 Animated Captions successfully applied to %s", out_path.name)

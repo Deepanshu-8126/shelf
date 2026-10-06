@@ -268,12 +268,27 @@ class LocalTtsResult:
 
 
 def _synth_kokoro(sentences: list[str], voice: str, speed: float, cfg: Config) -> tuple[list, int]:
+    lang_code = 'h' if (getattr(cfg, "script_language", "") == "hindi" or voice.startswith("h")) else 'a'
+    try:
+        from kokoro import KPipeline
+        pipeline = KPipeline(lang_code=lang_code)
+        chunks: list = []
+        rate = 24000
+        for sentence in sentences:
+            generator = pipeline(sentence, voice=voice, speed=speed, split_pattern=r'\n+')
+            for _, _, audio in generator:
+                chunks.append(audio)
+        if chunks:
+            return chunks, rate
+    except Exception as exc:
+        log.debug("kokoro KPipeline fallback to kokoro_onnx: %s", exc)
+
     from kokoro_onnx import Kokoro  # type: ignore
 
     model = _local_file(KOKORO_FILES[0].name, cfg)
     voices = _local_file(KOKORO_FILES[1].name, cfg)
     engine = Kokoro(str(model), str(voices))
-    chunks: list = []
+    chunks = []
     rate = 24000
     for sentence in sentences:
         audio, rate = engine.create(sentence, voice=voice, speed=speed)

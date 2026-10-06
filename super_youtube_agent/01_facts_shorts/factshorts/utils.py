@@ -21,6 +21,16 @@ log = logging.getLogger("factshorts")
 
 
 # --------------------------------------------------------------------- logging
+class _NicheFilter(logging.Filter):
+    """Add the niche to the log record."""
+    def filter(self, record: logging.LogRecord) -> bool:
+        try:
+            cfg = get_config()
+            record.niche = cfg.niche
+        except Exception:
+            record.niche = "unknown"
+        return True
+
 def setup_logging(level: str | None = None) -> logging.Logger:
     cfg = get_config()
     lvl = getattr(logging, (level or cfg.log_level).upper(), logging.INFO)
@@ -29,11 +39,12 @@ def setup_logging(level: str | None = None) -> logging.Logger:
         return root
     root.setLevel(lvl)
     fmt = logging.Formatter(
-        "%(asctime)s | %(levelname)-7s | %(name)-22s | %(message)s", "%Y-%m-%d %H:%M:%S"
+        "%(asctime)s | %(levelname)-7s | %(niche)-8s | %(name)-22s | %(message)s", "%Y-%m-%d %H:%M:%S"
     )
 
     console = logging.StreamHandler()
     console.setFormatter(fmt)
+    console.addFilter(_NicheFilter())
     root.addHandler(console)
 
     try:
@@ -42,6 +53,7 @@ def setup_logging(level: str | None = None) -> logging.Logger:
             cfg.log_dir / "factshorts.log", maxBytes=2_000_000, backupCount=3, encoding="utf-8"
         )
         fh.setFormatter(fmt)
+        fh.addFilter(_NicheFilter())
         root.addHandler(fh)
     except Exception as exc:  # pragma: no cover - logging must never break the app
         root.warning("file logging disabled: %s", exc)
