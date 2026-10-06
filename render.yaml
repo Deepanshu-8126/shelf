@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: shelf-storefront-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server/catalog_api.py
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OWNER_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

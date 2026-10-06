@@ -1,0 +1,12 @@
+node_modules
+dist
+*.mp4
+*.zip
+*.sqlite3
+*.log
+data/
+uploads/
+.git
+.venv
+.cache
+browser_sessions/

@@ -1,0 +1,4 @@
+/blog/*     /blog/:splat   200
+/ebooks/*   /ebooks/:splat 200
+/assets/*   /assets/:splat 200
+/*          /index.html    200

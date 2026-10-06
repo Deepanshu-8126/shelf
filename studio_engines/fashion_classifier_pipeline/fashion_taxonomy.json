@@ -1,0 +1,705 @@
+{
+  "metadata": {
+    "source": "Atlas (52 Categories) + Kaggle Fashion (50+ Article Types) + 10 Indian Festivals + Gen Z Trends",
+    "version": "2.0.0-deep-trained",
+    "zeroStorageFootprint": true
+  },
+  "atlas_categories": {
+    "Women_Ethnic Wear_Blouse": {
+      "cat": "Ethnic Wear",
+      "sub": "Blouse",
+      "cost": 180,
+      "sell": 449,
+      "mrp": 999,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Churidar": {
+      "cat": "Ethnic Wear",
+      "sub": "Churidar",
+      "cost": 160,
+      "sell": 399,
+      "mrp": 899,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Dupattas": {
+      "cat": "Ethnic Wear",
+      "sub": "Dupatta & Stoles",
+      "cost": 140,
+      "sell": 349,
+      "mrp": 799,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Gowns": {
+      "cat": "Ethnic Wear",
+      "sub": "Ethnic Gown",
+      "cost": 420,
+      "sell": 899,
+      "mrp": 2999,
+      "season": "Festive"
+    },
+    "Women_Ethnic Wear_Kurtas": {
+      "cat": "Ethnic Wear",
+      "sub": "Kurta & Kurti",
+      "cost": 290,
+      "sell": 649,
+      "mrp": 1699,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Lehenga Choli": {
+      "cat": "Ethnic Wear",
+      "sub": "Lehenga Choli",
+      "cost": 480,
+      "sell": 1099,
+      "mrp": 3999,
+      "season": "Festive"
+    },
+    "Women_Ethnic Wear_Palazzos": {
+      "cat": "Ethnic Wear",
+      "sub": "Palazzo",
+      "cost": 210,
+      "sell": 499,
+      "mrp": 1299,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Salwars": {
+      "cat": "Ethnic Wear",
+      "sub": "Salwar",
+      "cost": 190,
+      "sell": 449,
+      "mrp": 999,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Sarees": {
+      "cat": "Ethnic Wear",
+      "sub": "Saree",
+      "cost": 360,
+      "sell": 799,
+      "mrp": 2499,
+      "season": "All-Season"
+    },
+    "Women_Ethnic Wear_Shararas": {
+      "cat": "Ethnic Wear",
+      "sub": "Sharara & Gharara",
+      "cost": 390,
+      "sell": 849,
+      "mrp": 2799,
+      "season": "Festive"
+    },
+    "Women_Western Wear_Dresses": {
+      "cat": "Women Dresses",
+      "sub": "Western Dress",
+      "cost": 290,
+      "sell": 649,
+      "mrp": 1699,
+      "season": "Summer/All"
+    },
+    "Women_Western Wear_Jumpsuits": {
+      "cat": "Co-ord Sets",
+      "sub": "Jumpsuit & Romper",
+      "cost": 340,
+      "sell": 749,
+      "mrp": 1999,
+      "season": "Summer/All"
+    },
+    "Women_Western Wear_Skirts": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Skirts",
+      "cost": 220,
+      "sell": 529,
+      "mrp": 1399,
+      "season": "Summer/All"
+    },
+    "Women_Western Wear_Tops": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Crop Top & Blouse",
+      "cost": 180,
+      "sell": 449,
+      "mrp": 999,
+      "season": "Summer/All"
+    },
+    "Women_Western Wear_T-Shirts": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Baby Tee & Graphic Tee",
+      "cost": 160,
+      "sell": 399,
+      "mrp": 999,
+      "season": "Summer/All"
+    },
+    "Women_Western Wear_Jeans": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Jeans & Denims",
+      "cost": 340,
+      "sell": 749,
+      "mrp": 1999,
+      "season": "All-Season"
+    },
+    "Women_Western Wear_Trousers": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Tailored Trousers",
+      "cost": 270,
+      "sell": 599,
+      "mrp": 1499,
+      "season": "All-Season"
+    },
+    "Women_Western Wear_Jackets": {
+      "cat": "Winter Outerwear",
+      "sub": "Jackets & Blazers",
+      "cost": 380,
+      "sell": 799,
+      "mrp": 2499,
+      "season": "Winter/All"
+    },
+    "Women_Western Wear_Sweaters": {
+      "cat": "Winter Outerwear",
+      "sub": "Sweaters & Cardigans",
+      "cost": 310,
+      "sell": 699,
+      "mrp": 1799,
+      "season": "Winter"
+    },
+    "Women_Western Wear_Shorts": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Shorts & Jorts",
+      "cost": 190,
+      "sell": 449,
+      "mrp": 1199,
+      "season": "Summer"
+    },
+    "Women_Lingerie_Bras": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Bra & Bralette",
+      "cost": 120,
+      "sell": 299,
+      "mrp": 799,
+      "season": "All-Season"
+    },
+    "Women_Lingerie_Panties": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Panties & Briefs",
+      "cost": 90,
+      "sell": 249,
+      "mrp": 599,
+      "season": "All-Season"
+    },
+    "Women_Lingerie_Shapewear": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Shapewear & Bodysuit",
+      "cost": 260,
+      "sell": 599,
+      "mrp": 1499,
+      "season": "All-Season"
+    },
+    "Men_Ethnic Wear_Kurta": {
+      "cat": "Ethnic Wear",
+      "sub": "Men Kurta",
+      "cost": 280,
+      "sell": 649,
+      "mrp": 1699,
+      "season": "All-Season"
+    },
+    "Men_Ethnic Wear_Sherwani": {
+      "cat": "Ethnic Wear",
+      "sub": "Sherwani",
+      "cost": 590,
+      "sell": 1399,
+      "mrp": 4999,
+      "season": "Festive"
+    },
+    "Men_Ethnic Wear_Bandhgala": {
+      "cat": "Ethnic Wear",
+      "sub": "Bandhgala & Nehru Jacket",
+      "cost": 380,
+      "sell": 899,
+      "mrp": 2999,
+      "season": "Festive"
+    },
+    "Men_Ethnic Wear_Dhoti Kurta": {
+      "cat": "Ethnic Wear",
+      "sub": "Dhoti Kurta Set",
+      "cost": 360,
+      "sell": 799,
+      "mrp": 2499,
+      "season": "Festive"
+    },
+    "Men_Topwear_T-Shirts": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Graphic Tee & Jersey",
+      "cost": 180,
+      "sell": 449,
+      "mrp": 999,
+      "season": "Summer/All"
+    },
+    "Men_Topwear_Shirts": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Casual & Formal Shirts",
+      "cost": 260,
+      "sell": 599,
+      "mrp": 1499,
+      "season": "All-Season"
+    },
+    "Men_Bottomwear_Jeans": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Men Baggy Jeans",
+      "cost": 360,
+      "sell": 799,
+      "mrp": 2199,
+      "season": "All-Season"
+    },
+    "Men_Bottomwear_Trousers": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Chinos & Trousers",
+      "cost": 280,
+      "sell": 649,
+      "mrp": 1599,
+      "season": "All-Season"
+    }
+  },
+  "kaggle_article_types": {
+    "Tshirts": {
+      "cat": "Tops & Baby Tees",
+      "sub": "T-Shirts",
+      "cost": 170,
+      "sell": 429,
+      "mrp": 999
+    },
+    "Shirts": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Shirts",
+      "cost": 250,
+      "sell": 599,
+      "mrp": 1499
+    },
+    "Casual Shoes": {
+      "cat": "Footwear",
+      "sub": "Casual Sneakers",
+      "cost": 270,
+      "sell": 649,
+      "mrp": 1799
+    },
+    "Watches": {
+      "cat": "Bags & Accessories",
+      "sub": "Watches",
+      "cost": 240,
+      "sell": 599,
+      "mrp": 1899
+    },
+    "Sports Shoes": {
+      "cat": "Footwear",
+      "sub": "Sports & Running Shoes",
+      "cost": 320,
+      "sell": 799,
+      "mrp": 2299
+    },
+    "Kurtas": {
+      "cat": "Ethnic Wear",
+      "sub": "Kurtas",
+      "cost": 290,
+      "sell": 649,
+      "mrp": 1699
+    },
+    "Tops": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Tops",
+      "cost": 180,
+      "sell": 449,
+      "mrp": 999
+    },
+    "Handbags": {
+      "cat": "Bags & Accessories",
+      "sub": "Handbags",
+      "cost": 220,
+      "sell": 529,
+      "mrp": 1399
+    },
+    "Heels": {
+      "cat": "Footwear",
+      "sub": "Heels & Pumps",
+      "cost": 290,
+      "sell": 699,
+      "mrp": 1999
+    },
+    "Sunglasses": {
+      "cat": "Bags & Accessories",
+      "sub": "Sunglasses",
+      "cost": 120,
+      "sell": 299,
+      "mrp": 899
+    },
+    "Wallets": {
+      "cat": "Bags & Accessories",
+      "sub": "Wallets & Clutches",
+      "cost": 140,
+      "sell": 349,
+      "mrp": 799
+    },
+    "Flats": {
+      "cat": "Footwear",
+      "sub": "Ballet Flats & Mules",
+      "cost": 190,
+      "sell": 449,
+      "mrp": 1199
+    },
+    "Dresses": {
+      "cat": "Women Dresses",
+      "sub": "Dresses",
+      "cost": 290,
+      "sell": 649,
+      "mrp": 1699
+    },
+    "Sarees": {
+      "cat": "Ethnic Wear",
+      "sub": "Sarees",
+      "cost": 360,
+      "sell": 799,
+      "mrp": 2499
+    },
+    "Jeans": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Jeans",
+      "cost": 340,
+      "sell": 749,
+      "mrp": 1999
+    },
+    "Shorts": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Shorts",
+      "cost": 190,
+      "sell": 449,
+      "mrp": 1199
+    },
+    "Belts": {
+      "cat": "Bags & Accessories",
+      "sub": "Belts",
+      "cost": 110,
+      "sell": 279,
+      "mrp": 699
+    },
+    "Briefs": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Briefs & Panties",
+      "cost": 90,
+      "sell": 249,
+      "mrp": 599
+    },
+    "Socks": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Socks & Stockings",
+      "cost": 70,
+      "sell": 199,
+      "mrp": 499
+    },
+    "Skirts": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Skirts",
+      "cost": 220,
+      "sell": 529,
+      "mrp": 1399
+    },
+    "Trousers": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Trousers",
+      "cost": 270,
+      "sell": 599,
+      "mrp": 1499
+    },
+    "Bra": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Bras & Bralettes",
+      "cost": 120,
+      "sell": 299,
+      "mrp": 799
+    },
+    "Necklace and Chains": {
+      "cat": "Bags & Accessories",
+      "sub": "Necklaces & Chains",
+      "cost": 130,
+      "sell": 329,
+      "mrp": 899
+    },
+    "Earrings": {
+      "cat": "Bags & Accessories",
+      "sub": "Earrings & Jhumkas",
+      "cost": 110,
+      "sell": 279,
+      "mrp": 799
+    },
+    "Backpacks": {
+      "cat": "Bags & Accessories",
+      "sub": "Backpacks & Rucksacks",
+      "cost": 260,
+      "sell": 599,
+      "mrp": 1699
+    },
+    "Capris": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Capris & Cropped Pants",
+      "cost": 190,
+      "sell": 449,
+      "mrp": 1199
+    },
+    "Clutches": {
+      "cat": "Bags & Accessories",
+      "sub": "Clutches",
+      "cost": 160,
+      "sell": 399,
+      "mrp": 999
+    },
+    "Sweaters": {
+      "cat": "Winter Outerwear",
+      "sub": "Sweaters",
+      "cost": 310,
+      "sell": 699,
+      "mrp": 1799
+    },
+    "Track Pants": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Track Pants & Joggers",
+      "cost": 220,
+      "sell": 499,
+      "mrp": 1299
+    },
+    "Leggings": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Leggings",
+      "cost": 150,
+      "sell": 349,
+      "mrp": 799
+    },
+    "Jackets": {
+      "cat": "Winter Outerwear",
+      "sub": "Jackets",
+      "cost": 380,
+      "sell": 799,
+      "mrp": 2499
+    },
+    "Sweatshirts": {
+      "cat": "Winter Outerwear",
+      "sub": "Sweatshirts & Hoodies",
+      "cost": 290,
+      "sell": 649,
+      "mrp": 1699
+    },
+    "Sandals": {
+      "cat": "Footwear",
+      "sub": "Sandals",
+      "cost": 210,
+      "sell": 499,
+      "mrp": 1399
+    },
+    "Dupatta": {
+      "cat": "Ethnic Wear",
+      "sub": "Dupatta",
+      "cost": 140,
+      "sell": 349,
+      "mrp": 799
+    },
+    "Kaftan": {
+      "cat": "Ethnic Wear",
+      "sub": "Kaftan",
+      "cost": 310,
+      "sell": 699,
+      "mrp": 1899
+    },
+    "Nightdress": {
+      "cat": "Innerwear & Shapewear",
+      "sub": "Nightwear & Robes",
+      "cost": 230,
+      "sell": 549,
+      "mrp": 1399
+    },
+    "Jumpsuit": {
+      "cat": "Co-ord Sets",
+      "sub": "Jumpsuits",
+      "cost": 330,
+      "sell": 749,
+      "mrp": 1999
+    },
+    "Kurti": {
+      "cat": "Ethnic Wear",
+      "sub": "Kurti",
+      "cost": 260,
+      "sell": 599,
+      "mrp": 1499
+    },
+    "Blazer": {
+      "cat": "Winter Outerwear",
+      "sub": "Blazers",
+      "cost": 410,
+      "sell": 899,
+      "mrp": 2799
+    },
+    "Tunics": {
+      "cat": "Tops & Baby Tees",
+      "sub": "Tunics",
+      "cost": 210,
+      "sell": 499,
+      "mrp": 1299
+    },
+    "Lehenga Choli": {
+      "cat": "Ethnic Wear",
+      "sub": "Lehenga Choli",
+      "cost": 480,
+      "sell": 1099,
+      "mrp": 3999
+    },
+    "Salwar and Dupatta": {
+      "cat": "Ethnic Wear",
+      "sub": "Salwar Suit Set",
+      "cost": 380,
+      "sell": 849,
+      "mrp": 2699
+    },
+    "Churidar": {
+      "cat": "Ethnic Wear",
+      "sub": "Churidar",
+      "cost": 160,
+      "sell": 399,
+      "mrp": 899
+    },
+    "Bangles": {
+      "cat": "Bags & Accessories",
+      "sub": "Bangles & Kadas",
+      "cost": 110,
+      "sell": 279,
+      "mrp": 799
+    },
+    "Pendant": {
+      "cat": "Bags & Accessories",
+      "sub": "Pendants & Lockets",
+      "cost": 100,
+      "sell": 249,
+      "mrp": 699
+    },
+    "Ring": {
+      "cat": "Bags & Accessories",
+      "sub": "Rings",
+      "cost": 90,
+      "sell": 229,
+      "mrp": 599
+    },
+    "Jeggings": {
+      "cat": "Bottomwear & Skirts",
+      "sub": "Jeggings",
+      "cost": 180,
+      "sell": 449,
+      "mrp": 999
+    },
+    "Rompers": {
+      "cat": "Co-ord Sets",
+      "sub": "Rompers & Playsuits",
+      "cost": 280,
+      "sell": 649,
+      "mrp": 1599
+    },
+    "Stoles": {
+      "cat": "Winter Outerwear",
+      "sub": "Stoles & Wraps",
+      "cost": 170,
+      "sell": 399,
+      "mrp": 999
+    },
+    "Shawl": {
+      "cat": "Winter Outerwear",
+      "sub": "Shawls & Pashmina",
+      "cost": 340,
+      "sell": 749,
+      "mrp": 1999
+    },
+    "Boots": {
+      "cat": "Footwear",
+      "sub": "Boots",
+      "cost": 380,
+      "sell": 849,
+      "mrp": 2499
+    }
+  },
+  "distinguish_rules": {
+    "hoodie": {
+      "keywords": [
+        "hoodie",
+        "hooded",
+        "hood",
+        "sweatshirt",
+        "fleece pullover"
+      ],
+      "features": "Has attached drawstring hood, front kangaroo pouch or zip, ribbed cuffs, casual fleece texture.",
+      "types": {
+        "Gents Oversized Hoodie": "Boxy shoulders, heavy 350-400 GSM fleece, long drop sleeves, neutral/earth/graphic tones, loose fit for men.",
+        "Women Cropped Hoodie": "Short torso length hitting above navel, fitted or relaxed waist, pastel/solid colors.",
+        "Unisex Zip-Up Hoodie": "Full front zipper, split front pockets, casual daily wear."
+      }
+    },
+    "sweater": {
+      "keywords": [
+        "sweater",
+        "cardigan",
+        "knit",
+        "pullover",
+        "turtleneck",
+        "cable knit",
+        "cashmere",
+        "ribbed jumper"
+      ],
+      "features": "Knitted yarn construction (cable knit, ribbed, fine wool), no hood, button-down (cardigan) or crewneck/turtleneck collar.",
+      "types": {
+        "Chunky Cable-Knit Sweater": "Thick textured rope/cable weave, soft warm winter feel.",
+        "Button-Down Cardigan": "Open front with buttons, V-neck or round collar, layerable.",
+        "Turtleneck / Roll-Neck Sweater": "High folded neck covering throat, fitted warm silhouette.",
+        "Gents Crewneck Knit Pullover": "Classic horizontal or plain knit sweater without hood for men."
+      }
+    },
+    "dress": {
+      "keywords": [
+        "dress",
+        "bodycon",
+        "maxi",
+        "midi",
+        "mini dress",
+        "sundress",
+        "slip dress",
+        "gown"
+      ],
+      "types": {
+        "Bodycon Maxi Dress": "Tight form-fitting stretch fabric hugging hips and bust down to ankle.",
+        "Satin Slip Dress": "Glossy lightweight satin with delicate spaghetti straps and cowl/straight neckline.",
+        "A-Line Floral Sundress": "Flared skirt from waist down, breezy floral cotton or chiffon."
+      }
+    },
+    "ethnic": {
+      "keywords": [
+        "kurti",
+        "kurta",
+        "anarkali",
+        "saree",
+        "lehenga",
+        "sharara",
+        "salwar",
+        "dupatta",
+        "phiran"
+      ],
+      "types": {
+        "Chikankari Kurti": "Hand or machine delicate white-on-color shadow thread embroidery.",
+        "Anarkali Suit": "Fitted bodice with dramatic flared frock umbrella skirt.",
+        "Saree": "Unstitched 5.5 to 6 meter drape with decorative pallu and blouse piece.",
+        "Lehenga Choli": "Heavy circular flared skirt paired with fitted cropped blouse and dupatta."
+      }
+    },
+    "bottomwear": {
+      "keywords": [
+        "cargo",
+        "jeans",
+        "denim",
+        "trouser",
+        "palazzo",
+        "skirt",
+        "jorts",
+        "shorts"
+      ],
+      "types": {
+        "Baggy Cargo Pants": "Multiple functional flap utility pockets on thighs, wide loose leg opening.",
+        "Tailored Pleated Trousers": "High rise, clean front pleats, fluid formal drape.",
+        "Pleated Tennis Skirt": "Short A-line skirt with sharp vertical knife pleats."
+      }
+    }
+  }
+}
