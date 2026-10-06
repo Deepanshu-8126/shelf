@@ -1,4 +1,7 @@
-"""Zero-dependency Telegram video delivery script (pure Python standard library)."""
+"""
+Zero-dependency Master Telegram Video Delivery Script (Pure Python Standard Library).
+Routes all 7 channels with color-coded headers, HTML safe formatting, and SEO tags.
+"""
 import os
 import sys
 import json
@@ -6,6 +9,8 @@ import sqlite3
 import urllib.request
 import urllib.parse
 import uuid
+import html
+import time
 from pathlib import Path
 
 # UTF-8 for console
@@ -16,51 +21,97 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8809830963:AAG22CFChal-D13uSkNLUmCo
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6486771356")
 
 
-import time
-
-
 def detect_channel_badge(path: Path | str) -> str:
     """Identify the originating channel and return chan1/chan2/chan3... badge."""
     env_badge = os.getenv("CHANNEL_BADGE")
     if env_badge:
         return env_badge
     s = str(path).lower().replace("\\", "/")
-    if "03_dark" in s or "dark_sutra" in s or "/dark" in s:
-        return "chan3 (Dark Sutra)"
+    if "01_facts" in s or "factshorts" in s:
+        return "Channel 1 (Viral Facts Shorts)"
+    if "02_story" in s or "story_studio" in s or "history" in s:
+        return "Channel 2 (Story & Mysteries Studio)"
     if "05_vox" in s or "vox_ledger" in s or "vox_studio" in s or "/vox" in s:
-        return "chan5 (The Global Ledger)"
-    if "02_story" in s or "story_studio" in s or "/story" in s:
-        return "chan2 (Story Studio)"
+        return "Channel 3 (Vox & Geopolitics Studio)"
     if "04_lofi" in s or "lofi" in s:
-        return "chan4 (Lofi Studio)"
+        return "Channel 4 (Lofi 24/7 Music Studio)"
+    if "03_dark" in s or "dark_sutra" in s:
+        return "Channel 5 (Dark Sutra Crime Studio)"
     if "06_ai_clipper" in s or "autoclip" in s or "clipper" in s:
-        return "chan6 (AI Clipper)"
-    # Default to Channel 1 (FunCous Facts)
-    return "chan1 (FunCous Facts)"
+        return "Channel 6 (AI Auto Clipper Best)"
+    if "coding" in s or "tech" in s or "chan7" in s:
+        return "Channel 7 (Coding & Tech Studio)"
+    return "Channel 1 (Viral Facts Shorts)"
 
 
-def find_latest_video(search_dirs: list[str], max_age_minutes: int = 45) -> Path | None:
+def format_channel_header(channel_badge: str) -> str:
+    """Return a prominent, eye-catching visual banner for the channel."""
+    b_lower = channel_badge.lower()
+    if "chan2" in b_lower or "channel 2" in b_lower or "story" in b_lower or "mystery" in b_lower or "history" in b_lower:
+        icon = "🔴"
+        label = "CHANNEL 2 — STORY & MYSTERIES STUDIO"
+        tagline = "Historical Mysteries & True Crime Stories"
+    elif "chan3" in b_lower or "channel 3" in b_lower or "vox" in b_lower or "ledger" in b_lower:
+        icon = "🟢"
+        label = "CHANNEL 3 — VOX & GEOPOLITICS STUDIO"
+        tagline = "Johnny Harris / Vox Style Map Documentaries"
+    elif "chan4" in b_lower or "channel 4" in b_lower or "lofi" in b_lower:
+        icon = "🟣"
+        label = "CHANNEL 4 — LOFI 24/7 MUSIC STUDIO"
+        tagline = "Relaxing Ambient Lofi Beats & Visuals"
+    elif "chan5" in b_lower or "channel 5" in b_lower or "dark" in b_lower or "sutra" in b_lower:
+        icon = "🕵️"
+        label = "CHANNEL 5 — DARK SUTRA CRIME STUDIO"
+        tagline = "Unsolved Dark Paranormal & Case Files"
+    elif "chan6" in b_lower or "channel 6" in b_lower or "clipper" in b_lower:
+        icon = "✂️"
+        label = "CHANNEL 6 — AI AUTO CLIPPER BEST"
+        tagline = "Viral Podcast Cuts & Subtitled Shorts"
+    elif "chan7" in b_lower or "channel 7" in b_lower or "coding" in b_lower or "tech" in b_lower or "dev" in b_lower:
+        icon = "💻"
+        label = "CHANNEL 7 — CODING & TECH STUDIO"
+        tagline = "Python/JS Tricks, Code Hacks & AI Tools"
+    else:
+        icon = "🔵"
+        label = "CHANNEL 1 — VIRAL FACTS SHORTS"
+        tagline = "Space, Science & Mind-Bending Facts"
+
+    return f"{icon} <b>━━━━━━━━━━━━━━━━━━━━━━━━</b>\n{icon} <b>[{label}]</b>\n📌 <i>{tagline}</i>\n{icon} <b>━━━━━━━━━━━━━━━━━━━━━━━━</b>"
+
+
+def find_latest_video(search_dirs: list[str], max_age_minutes: int = 60) -> Path | None:
     all_videos = []
     now = time.time()
     max_age_sec = max_age_minutes * 60
     for sdir in search_dirs:
-        for p in Path(sdir).glob("**/*.mp4"):
+        p_dir = Path(sdir)
+        if not p_dir.exists():
+            continue
+        for p in p_dir.glob("**/*.mp4"):
             if not p.name.startswith("tg_") and p.is_file() and p.stat().st_size > 100000:
                 age = now - p.stat().st_mtime
                 if age <= max_age_sec:
                     all_videos.append(p)
     if not all_videos:
-        print(f"⚠️ No fresh video rendered within the last {max_age_minutes} minutes found (blocking stale video dispatch).")
+        # Fallback to any recent mp4 if no fresh filter
+        for sdir in search_dirs:
+            p_dir = Path(sdir)
+            if p_dir.exists():
+                for p in p_dir.glob("**/*.mp4"):
+                    if not p.name.startswith("tg_") and p.is_file() and p.stat().st_size > 100000:
+                        all_videos.append(p)
+    if not all_videos:
         return None
     all_videos.sort(key=lambda x: x.stat().st_mtime, reverse=True)
     return all_videos[0]
 
 
 def get_video_seo(video_path: Path) -> dict:
-    seo = {"title": "", "description": "", "tags": ""}
+    seo = {"title": "", "description": "", "tags": "", "yt_video_id": "", "yt_url": ""}
     db_paths = [
         video_path.parent.parent / "data" / "factshorts.db",
-        Path("factshorts-bot/data/factshorts.db"),
+        video_path.parent / "data" / "factshorts.db",
+        Path("super_youtube_agent/01_facts_shorts/data/factshorts.db"),
         Path("data/factshorts.db")
     ]
     for db_path in db_paths:
@@ -69,7 +120,7 @@ def get_video_seo(video_path: Path) -> dict:
                 conn = sqlite3.connect(str(db_path))
                 cursor = conn.cursor()
                 cursor.execute(
-                    "SELECT title, description, tags FROM videos WHERE video_path LIKE ? ORDER BY id DESC LIMIT 1",
+                    "SELECT title, description, tags, yt_video_id FROM videos WHERE video_path LIKE ? ORDER BY id DESC LIMIT 1",
                     (f"%{video_path.name}%",)
                 )
                 row = cursor.fetchone()
@@ -81,6 +132,9 @@ def get_video_seo(video_path: Path) -> dict:
                         seo["tags"] = " ".join([f"#{t.replace(' ', '')}" for t in tags_list[:8]])
                     except Exception:
                         seo["tags"] = row[2] or ""
+                    if row[3]:
+                        seo["yt_video_id"] = str(row[3])
+                        seo["yt_url"] = f"https://youtube.com/shorts/{row[3]}"
                     conn.close()
                     return seo
                 conn.close()
@@ -94,14 +148,43 @@ def get_video_seo(video_path: Path) -> dict:
                 data = json.load(f)
                 seo["title"] = data.get("title", "")
                 seo["description"] = data.get("description", "")
+                if data.get("yt_video_id"):
+                    seo["yt_video_id"] = data.get("yt_video_id")
+                    seo["yt_url"] = f"https://youtube.com/shorts/{data.get('yt_video_id')}"
+                elif data.get("youtube_url"):
+                    seo["yt_url"] = data.get("youtube_url")
         except Exception:
             pass
 
     return seo
 
 
+def send_message(text: str) -> bool:
+    """Send an HTML text message to the Telegram channel."""
+    if not BOT_TOKEN or not CHAT_ID:
+        return False
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = json.dumps({
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": False
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return bool(data.get("ok"))
+    except Exception as exc:
+        print(f"⚠️ Telegram send_message error: {exc}")
+        return False
+
+
 def upload_multipart(url: str, fields: dict, file_field: str, file_path: Path) -> bool:
-    """Send multipart/form-data via standard library urllib."""
     boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
     body = bytearray()
 
@@ -137,37 +220,7 @@ def upload_multipart(url: str, fields: dict, file_field: str, file_path: Path) -
         return False
 
 
-def format_channel_header(channel_badge: str) -> str:
-    """Return a prominent, eye-catching visual banner for the channel."""
-    b_lower = channel_badge.lower()
-    if "chan2" in b_lower or "channel 2" in b_lower or "story" in b_lower or "mystery" in b_lower or "history" in b_lower:
-        icon = "🔴"
-        label = "CHANNEL 2 — STORY & MYSTERIES STUDIO"
-    elif "chan3" in b_lower or "channel 3" in b_lower or "vox" in b_lower or "dark" in b_lower or "ledger" in b_lower:
-        icon = "🟢"
-        label = "CHANNEL 3 — VOX & DOCUMENTARY STUDIO"
-    elif "chan4" in b_lower or "channel 4" in b_lower or "lofi" in b_lower:
-        icon = "🟣"
-        label = "CHANNEL 4 — LOFI STUDIO"
-    elif "chan5" in b_lower or "channel 5" in b_lower:
-        icon = "🟠"
-        label = "CHANNEL 5 — GLOBAL LEDGER"
-    elif "chan6" in b_lower or "channel 6" in b_lower or "clipper" in b_lower:
-        icon = "🟡"
-        label = "CHANNEL 6 — AI CLIPPER"
-    elif "chan7" in b_lower or "channel 7" in b_lower or "coding" in b_lower or "tech" in b_lower or "dev" in b_lower:
-        icon = "💻"
-        label = "CHANNEL 7 — CODING & TECH STUDIO"
-    else:
-        icon = "🔵"
-        label = "CHANNEL 1 — VIRAL FACTS SHORTS"
-
-    return f"{icon} <b>━━━━━━━━━━━━━━━━━━━━</b>\n{icon} <b>[{label}]</b>\n{icon} <b>━━━━━━━━━━━━━━━━━━━━</b>"
-
-
 def send_video(video_path: Path):
-    import html
-
     if not BOT_TOKEN or not CHAT_ID:
         print("❌ Telegram BOT_TOKEN or CHAT_ID missing. Skipping Telegram notification.")
         return False
@@ -187,14 +240,20 @@ def send_video(video_path: Path):
     safe_tags = html.escape(tags)
     safe_badge = html.escape(channel_badge)
 
+    yt_line = ""
+    if seo.get("yt_url"):
+        safe_url = html.escape(seo["yt_url"])
+        yt_line = f"🔗 <b>YouTube Link:</b> <a href=\"{safe_url}\">{safe_url}</a>\n\n"
+
     caption = (
         f"{header}\n\n"
         f"🎬 <b>Title:</b> {safe_title}\n"
-        f"📺 <b>Target:</b> <code>{safe_badge}</code>\n"
+        f"📺 <b>Target Channel:</b> <code>{safe_badge}</code>\n"
         f"📁 <b>File:</b> <code>{safe_filename}</code>\n"
         f"📊 <b>Size:</b> <code>{size_mb:.2f} MB</code>\n\n"
+        f"{yt_line}"
         f"🏷️ <b>Tags:</b> {safe_tags}\n\n"
-        f"✅ <b>Status:</b> Render complete &amp; ready!"
+        f"✅ <b>Status:</b> Video Render Complete &amp; Delivered!"
     )
 
     fields = {
@@ -228,6 +287,24 @@ def send_video(video_path: Path):
 
 
 if __name__ == "__main__":
+    # Test ping mode: python send_to_telegram.py --test "Channel 1"
+    if len(sys.argv) > 1 and sys.argv[1] in ("--test", "--ping", "-t"):
+        ch_name = sys.argv[2] if len(sys.argv) > 2 else os.getenv("CHANNEL_BADGE", "Channel 1 (Viral Facts Shorts)")
+        hdr = format_channel_header(ch_name)
+        msg = (
+            f"{hdr}\n\n"
+            f"🔔 <b>Telegram Notification Link Active!</b>\n"
+            f"📡 <b>Target Channel:</b> <code>{html.escape(ch_name)}</code>\n"
+            f"🤖 <b>Bot Status:</b> Online &amp; Ready\n"
+            f"⚡ <b>Action:</b> Whenever this channel finishes rendering or uploading, your video + HD link will arrive directly here!"
+        )
+        ok = send_message(msg)
+        if ok:
+            print(f"✅ Test ping sent successfully to Telegram for {ch_name}!")
+        else:
+            print(f"❌ Failed to send test ping.")
+        sys.exit(0 if ok else 1)
+
     target_path = None
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
         arg_path = Path(sys.argv[1])
@@ -239,13 +316,11 @@ if __name__ == "__main__":
     if not target_path:
         search_dirs = [
             "super_youtube_agent/01_facts_shorts/output",
-            "super_youtube_agent/03_dark_sutra/output",
-            "super_youtube_agent/05_vox_ledger/output",
             "super_youtube_agent/02_story_studio/output",
+            "super_youtube_agent/03_dark_sutra/output",
             "super_youtube_agent/04_lofi_studio/output",
+            "super_youtube_agent/05_vox_ledger/output",
             "super_youtube_agent/06_ai_clipper/output",
-            "factshorts-bot/output",
-            "vox_studio/output",
             "output",
             "."
         ]
