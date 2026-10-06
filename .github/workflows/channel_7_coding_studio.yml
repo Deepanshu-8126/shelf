@@ -88,7 +88,7 @@ jobs:
           SCRIPT_STYLE: punchy
           SCRIPT_LANGUAGE: english
           VOICE_PROVIDER: edge
-          VOICE: en-US-ChristopherNeural
+          VOICE: en-US-JennyNeural
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           SCRIPT_INPUT: ${{ github.event.inputs.script }}
           DURATION_INPUT: ${{ github.event.inputs.duration }}
