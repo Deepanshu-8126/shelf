@@ -9,6 +9,7 @@ Produces Teacher-Grade Vox-Style Animated Coding Shorts:
 - 100% procedural 1080x1920 60fps render (Zero Pexels stock footage)
 """
 import asyncio
+import json
 from typing import Any
 import math
 import os
@@ -104,158 +105,209 @@ def render_pedagogical_frame(
     t = frame_idx / total_frames
     sec = t * total_sec
 
-    # 1. Background: Deep Matrix Grid with subtle radial gradient
-    img = Image.new("RGBA", (W, H), (9, 14, 26, 255))
-    draw = ImageDraw.Draw(img)
+    # Climax threshold: Last 22% of the video switches to the Comparison Screen (Image 2 style)
+    climax_start = beats[2] if len(beats) > 2 else total_sec * 0.75
+    is_climax_beat = sec >= climax_start
 
-    # Ambient grid lines
-    grid_gap = 64
-    for x in range(0, W, grid_gap):
-        draw.line([(x, 0), (x, H)], fill=(20, 32, 54, 160), width=1)
-    for y in range(0, H, grid_gap):
-        draw.line([(0, y), (W, y)], fill=(20, 32, 54, 160), width=1)
+    # Common typography
+    font_huge = get_font(52, bold=True)
+    font_bread = get_font(38, bold=True)
+    font_card_head = get_font(28, bold=True)
+    font_mono = get_font(26, bold=True)
+    font_tip_title = get_font(28, bold=True)
+    font_tip_body = get_font(24, bold=False)
+    font_head_comp = get_font(26, bold=True)
+    font_vs = get_font(36, bold=True)
 
-    # Pulse glow behind the window
-    glow_color = (239, 68, 68, 30) if sec < beats[1] else (34, 197, 94, 35)
-    draw.ellipse([W // 2 - 380, 420, W // 2 + 380, 1180], fill=glow_color)
+    series_name = getattr(lesson, "series_name", "100 DAYS OF PYTHON")
+    ep_num = getattr(lesson, "episode_num", 14)
+    topic_title = getattr(lesson, "topic_title", "Memory Optimization")
 
-    # 2. Header: Series Badge & Difficulty
-    series_name = getattr(lesson, "series_name", None)
-    if series_name:
-        series_label = f"⚡ {series_name} • DAY #{lesson.episode_num}" if "100" in series_name else f"⚡ {series_name} • EP #{lesson.episode_num}"
-        diff_label = getattr(lesson, "badge_tag", "TEACHER")
+    if is_climax_beat:
+        # =========================================================================
+        # STYLE 2: SIDE-BY-SIDE COMPARISON CLIMAX SCREEN (Exact match to Image 2)
+        # =========================================================================
+        img = Image.new("RGBA", (W, H), (255, 255, 255, 255))
+        draw = ImageDraw.Draw(img)
+
+        # Subtle micro-dot grid
+        for x in range(24, W, 40):
+            for y in range(24, H, 40):
+                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(241, 245, 249, 180))
+
+        # Main Big Headline
+        draw.text((W // 2, 160), "100 DAYS OF", fill=(15, 23, 42), font=font_huge, anchor="mm")
+        draw.text((W // 2, 235), f"PYTHON • DAY {ep_num}", fill=(15, 23, 42), font=font_huge, anchor="mm")
+
+        # Side-by-side vertical cards
+        card_w, card_h = 430, 840
+        card_y = 340
+        left_x = 75
+        right_x = 575
+
+        # Left Card: Soft Coral Red (Naive / Eager)
+        for offset, alpha in [(12, 15), (6, 25)]:
+            draw.rounded_rectangle([left_x, card_y + offset, left_x + card_w, card_y + card_h + offset], radius=32, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([left_x, card_y, left_x + card_w, card_y + card_h], radius=32, fill=(254, 205, 211), outline=(251, 113, 133), width=2)
+        draw.text((left_x + card_w // 2, card_y + 90), "LIST COMPREHENSION", fill=(159, 18, 57), font=font_head_comp, anchor="mm")
+        draw.text((left_x + card_w // 2, card_y + 135), "• 80MB RAM • EAGER", fill=(190, 18, 60), font=font_head_comp, anchor="mm")
+        # Code pill
+        draw.rounded_rectangle([left_x + 25, card_y + 360, left_x + card_w - 25, card_y + 440], radius=20, fill=(39, 39, 42))
+        draw.text((left_x + card_w // 2, card_y + 400), "[x*2 for x in range(10M)]", fill=(255, 255, 255), font=font_mono, anchor="mm")
+
+        # Right Card: Soft Mint Green (Optimal / Lazy)
+        for offset, alpha in [(12, 15), (6, 25)]:
+            draw.rounded_rectangle([right_x, card_y + offset, right_x + card_w, card_y + card_h + offset], radius=32, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([right_x, card_y, right_x + card_w, card_y + card_h], radius=32, fill=(209, 250, 229), outline=(52, 211, 153), width=2)
+        draw.text((right_x + card_w // 2, card_y + 90), "GENERATOR EXPRESSION", fill=(6, 95, 70), font=font_head_comp, anchor="mm")
+        draw.text((right_x + card_w // 2, card_y + 135), "• 112 BYTES • LAZY", fill=(4, 120, 87), font=font_head_comp, anchor="mm")
+        # Code pill
+        draw.rounded_rectangle([right_x + 25, card_y + 360, right_x + card_w - 25, card_y + 440], radius=20, fill=(39, 39, 42))
+        draw.text((right_x + card_w // 2, card_y + 400), "(x*2 for x in range(10M))", fill=(255, 255, 255), font=font_mono, anchor="mm")
+
+        # Center VS Badge
+        vs_cx, vs_cy = W // 2, card_y + 400
+        draw.ellipse([vs_cx - 48, vs_cy - 48, vs_cx + 48, vs_cy + 48], fill=(255, 255, 255), outline=(226, 232, 240), width=3)
+        draw.text((vs_cx, vs_cy), "VS", fill=(15, 23, 42), font=font_vs, anchor="mm")
+
+        # Bottom Memory Saved Card (Soft Blue)
+        save_x, save_y = 75, 1240
+        save_w, save_h = 930, 240
+        for offset, alpha in [(12, 15), (6, 25)]:
+            draw.rounded_rectangle([save_x, save_y + offset, save_x + save_w, save_y + save_h + offset], radius=28, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([save_x, save_y, save_x + save_w, save_y + save_h], radius=28, fill=(191, 219, 254), outline=(96, 165, 250), width=2)
+        # Checkmark circle
+        draw.ellipse([save_x + 50, save_y + 50, save_x + 120, save_y + 120], fill=(59, 130, 246))
+        # Draw clean vector checkmark
+        draw.line([(save_x + 72, save_y + 85), (save_x + 82, save_y + 98)], fill=(255, 255, 255), width=5)
+        draw.line([(save_x + 82, save_y + 98), (save_x + 102, save_y + 72)], fill=(255, 255, 255), width=5)
+
+        draw.text((save_x + 145, save_y + 85), "Memory Saved: 99.9% •", fill=(30, 58, 138), font=get_font(34, bold=True), anchor="lm")
+        draw.text((save_x + 145, save_y + 150), "Generator uses ~730,000x less memory by computing on-the-fly", fill=(30, 64, 175), font=font_tip_body, anchor="lm")
+
     else:
-        series_label = f"⚡ {getattr(lesson, 'series', 'CODE CRAFT')}"
-        diff_label = getattr(lesson, "difficulty", "MEDIUM")
+        # =========================================================================
+        # STYLE 1: WHITE MINIMAL SWISS UI (Exact match to Image 1 & 3)
+        # =========================================================================
+        img = Image.new("RGBA", (W, H), (250, 250, 250, 255))
+        draw = ImageDraw.Draw(img)
 
-    diff_color = (250, 204, 21) if "OPTIMIZATION" in diff_label or "MEDIUM" in diff_label else (34, 197, 94)
+        # 1. Subtle dot grid background
+        dot_gap = 36
+        for x in range(24, W, dot_gap):
+            for y in range(24, H, dot_gap):
+                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 200))
 
-    header_y = 120
-    draw.rounded_rectangle([W // 2 - 470, header_y, W // 2 + 470, header_y + 80], radius=16, fill=(15, 23, 42, 240), outline=(51, 65, 85), width=2)
-    # Left tag: Series
-    draw.text((W // 2 - 440, header_y + 40), series_label, fill=(148, 163, 184), font=font_title, anchor="lm")
-    # Right tag: Difficulty
-    draw.rounded_rectangle([W // 2 + 250, header_y + 16, W // 2 + 450, header_y + 64], radius=10, fill=(30, 41, 59), outline=diff_color, width=2)
-    draw.text((W // 2 + 350, header_y + 40), diff_label[:14], fill=diff_color, font=font_hud, anchor="mm")
+        # 2. Breadcrumb Navigation
+        bread_y = 130
+        draw.text((110, bread_y), "Python", fill=(148, 163, 184), font=font_bread)
+        draw.text((260, bread_y), ">", fill=(203, 213, 225), font=font_bread)
+        draw.text((305, bread_y), f"Day {ep_num}", fill=(148, 163, 184), font=font_bread)
+        draw.text((455, bread_y), ">", fill=(203, 213, 225), font=font_bread)
+        draw.text((500, bread_y), "Memory", fill=(15, 23, 42), font=font_bread)
 
-    # 3. Hero IDE Window
-    win_w, win_h = 980, 940
-    win_x = (W - win_w) // 2
-    win_y = 230
+        # 3. White IDE Card
+        card_x, card_y = 90, 215
+        card_w, card_h = 900, 770
 
-    # Determine Phase: Naive vs Optimal
-    is_optimal_phase = sec >= beats[1]
-    border_color = (74, 222, 128, 220) if is_optimal_phase else (239, 68, 68, 200)
+        # Elevation Drop Shadow
+        for offset, alpha in [(16, 15), (10, 25), (4, 45)]:
+            draw.rounded_rectangle([card_x - 2, card_y + offset, card_x + card_w + 2, card_y + card_h + offset], radius=28, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=28, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
 
-    # Fast layered drop shadow (Zero Gaussian blur CPU overhead)
-    draw.rounded_rectangle([win_x - 6, win_y + 8, win_x + win_w + 6, win_y + win_h + 16], radius=24, fill=(0, 0, 0, 130))
-    draw.rounded_rectangle([win_x - 2, win_y + 4, win_x + win_w + 2, win_y + win_h + 10], radius=22, fill=(0, 0, 0, 180))
+        # Header bar: macOS dots + filename + dots menu
+        title_bar_h = 68
+        # Traffic light dots
+        draw.ellipse([card_x + 40, card_y + 26, card_x + 58, card_y + 44], fill=(255, 95, 86))
+        draw.ellipse([card_x + 68, card_y + 26, card_x + 86, card_y + 44], fill=(255, 189, 46))
+        draw.ellipse([card_x + 96, card_y + 26, card_x + 114, card_y + 44], fill=(39, 201, 63))
+        # Title
+        draw.text((card_x + 140, card_y + 35), f"{lesson.filename} • Python 3.11", fill=(15, 23, 42), font=font_card_head, anchor="lm")
+        draw.text((card_x + card_w - 70, card_y + 24), "•••", fill=(148, 163, 184), font=font_huge)
+        draw.line([(card_x + 20, card_y + title_bar_h), (card_x + card_w - 20, card_y + title_bar_h)], fill=(241, 245, 249), width=2)
 
-    # Window Canvas
-    draw = ImageDraw.Draw(img)
-    draw.rounded_rectangle([win_x, win_y, win_x + win_w, win_y + win_h], radius=20, fill=(15, 23, 42, 250), outline=border_color, width=3)
+        # Determine Phase (Naive vs Optimal Generator)
+        is_optimal_phase = sec >= beats[1]
+        start_code_y = card_y + title_bar_h + 45
+        line_spacing = 66
 
-    # Titlebar
-    title_h = 58
-    draw.rounded_rectangle([win_x, win_y, win_x + win_w, win_y + title_h], radius=20, fill=(30, 41, 59))
-    draw.rectangle([win_x, win_y + title_h - 12, win_x + win_w, win_y + title_h], fill=(30, 41, 59))
-    draw.line([(win_x, win_y + title_h), (win_x + win_w, win_y + title_h)], fill=(51, 65, 85), width=2)
+        # Code lines
+        draw.text((card_x + 60, start_code_y), "1", fill=(148, 163, 184), font=font_mono)
+        draw.text((card_x + 130, start_code_y), "import sys", fill=(15, 23, 42), font=font_code)
 
-    # macOS window buttons
-    btn_y = win_y + title_h // 2
-    draw.ellipse([win_x + 24, btn_y - 8, win_x + 40, btn_y + 8], fill=(239, 68, 68))
-    draw.ellipse([win_x + 50, btn_y - 8, win_x + 66, btn_y + 8], fill=(234, 179, 8))
-    draw.ellipse([win_x + 76, btn_y - 8, win_x + 92, btn_y + 8], fill=(34, 197, 94))
+        draw.text((card_x + 60, start_code_y + line_spacing), "2", fill=(203, 213, 225), font=font_mono)
 
-    # Active File Tab
-    tab_x = win_x + 130
-    draw.rectangle([tab_x, win_y + 8, tab_x + 300, win_y + title_h], fill=(15, 23, 42))
-    draw.text((tab_x + 150, win_y + title_h // 2), f"🐍 {lesson.filename}", fill=(241, 245, 249), font=font_code, anchor="mm")
+        line3_y = start_code_y + line_spacing * 2
+        draw.text((card_x + 60, line3_y), "3", fill=(148, 163, 184), font=font_mono)
 
-    # Phase Badge on right of titlebar
-    phase_txt = "✨ PRODUCTION CLEAN" if is_optimal_phase else "❌ SLOW / ANTI-PATTERN"
-    draw.text((win_x + win_w - 30, win_y + title_h // 2), phase_txt, fill=border_color, font=font_hud, anchor="rm")
+        if not is_optimal_phase:
+            # Phase 1: List Comprehension with yellow highlight
+            draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 850, line3_y + 44], radius=8, fill=(254, 240, 138, 230))
+            draw.text((card_x + 130, line3_y), "numbers_list = [x*2 for x in range(10_000_000)]", fill=(15, 23, 42), font=font_code)
 
-    # Render Active Snippet
-    snippet_optimal = getattr(lesson, "code_after", None) or getattr(lesson, "snippet_optimal", [])
-    snippet_naive = getattr(lesson, "code_before", None) or getattr(lesson, "snippet_naive", [])
-    active_snippet = snippet_optimal if is_optimal_phase else snippet_naive
-    code_start_y = win_y + title_h + 30
-    line_h = 44
+            # Floating Tooltip Callout
+            badge_x = card_x + 400
+            badge_y = line3_y + 60
+            draw.rounded_rectangle([badge_x, badge_y, badge_x + 440, badge_y + 48], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
+            draw.text((badge_x + 220, badge_y + 24), "Allocates 10M ints → ~80MB ⓘ", fill=(113, 63, 18), font=get_font(22, bold=True), anchor="mm")
+        else:
+            # Phase 2: Generator Expression with mint green highlight
+            draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 850, line3_y + 44], radius=8, fill=(209, 250, 229, 230))
+            draw.text((card_x + 130, line3_y), "numbers_gen = (x*2 for x in range(10_000_000))", fill=(15, 23, 42), font=font_code)
 
-    token_colors = {
-        "comment": (100, 116, 139),
-        "def": (244, 63, 94),
-        "loop": (56, 189, 248),
-        "keyword": (168, 85, 247),
-        "return": (250, 204, 21),
-        "assign": (74, 222, 128),
-        "call": (56, 189, 248),
-        "normal": (248, 250, 252),
-    }
+            # Floating Tooltip Callout
+            badge_x = card_x + 420
+            badge_y = line3_y + 60
+            draw.rounded_rectangle([badge_x, badge_y, badge_x + 420, badge_y + 48], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+            draw.text((badge_x + 210, badge_y + 24), "⚡ 112 Bytes (O(1) memory) ⓘ", fill=(20, 83, 45), font=get_font(22, bold=True), anchor="mm")
 
-    # Animate lines typing in progressively
-    phase_start_sec = beats[1] if is_optimal_phase else 0.0
-    phase_elapsed = sec - phase_start_sec
-    lines_to_show = min(len(active_snippet), int(phase_elapsed * 2.2) + 1)
+        # 4. Terminal Card
+        term_x, term_y = 90, 1035
+        term_w, term_h = 900, 260
+        for offset, alpha in [(10, 15), (4, 30)]:
+            draw.rounded_rectangle([term_x, term_y + offset, term_x + term_w, term_y + term_h + offset], radius=24, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([term_x, term_y, term_x + term_w, term_y + term_h], radius=24, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+        draw.text((term_x + 50, term_y + 20), "Terminal", fill=(100, 116, 139), font=font_card_head)
 
-    for i in range(lines_to_show):
-        code_text, token_type = active_snippet[i]
-        curr_y = code_start_y + i * line_h
-        color = token_colors.get(token_type, (248, 250, 252))
+        in_box_y = term_y + 62
+        draw.rounded_rectangle([term_x + 25, in_box_y, term_x + term_w - 25, term_y + term_h - 20], radius=16, fill=(24, 24, 27))
+        draw.text((term_x + 55, in_box_y + 36), getattr(lesson, "terminal_command", "$ python3 generator_bench.py"), fill=(244, 244, 245), font=font_mono, anchor="lm")
 
-        # Line number
-        draw.text((win_x + 35, curr_y), f"{i+1:2d}", fill=(71, 85, 105), font=font_code)
-        # Code line
-        draw.text((win_x + 95, curr_y), code_text, fill=color, font=font_code)
+        # Status lines
+        if sec > beats[0]:
+            draw.text((term_x + 55, in_box_y + 80), "✓ Completed in 1.42s", fill=(74, 222, 128), font=font_mono, anchor="lm")
+            peak_ram = "Peak memory: 112 Bytes (O(1))" if is_optimal_phase else "Peak memory: 80.3 MB"
+            ram_color = (74, 222, 128) if is_optimal_phase else (248, 113, 113)
+            draw.text((term_x + 55, in_box_y + 120), peak_ram, fill=ram_color, font=font_mono, anchor="lm")
 
-    # Blinking cursor
-    if int(sec * 4) % 2 == 0 and lines_to_show < len(active_snippet):
-        cursor_y = code_start_y + lines_to_show * line_h
-        draw.rectangle([win_x + 95, cursor_y, win_x + 108, cursor_y + 30], fill=(56, 189, 248))
+        # 5. Teacher Tip Card
+        tip_x, tip_y = 90, 1335
+        tip_w, tip_h = 900, 220
+        for offset, alpha in [(8, 12), (3, 20)]:
+            draw.rounded_rectangle([tip_x, tip_y + offset, tip_x + tip_w, tip_y + tip_h + offset], radius=24, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([tip_x, tip_y, tip_x + tip_w, tip_y + tip_h], radius=24, fill=(254, 243, 199), outline=(253, 230, 138), width=2)
 
-    # 4. Integrated Terminal (Bottom of IDE window)
-    term_h = 240
-    term_y = win_y + win_h - term_h - 15
-    draw.rounded_rectangle([win_x + 18, term_y, win_x + win_w - 18, term_y + term_h], radius=14, fill=(2, 6, 23, 245), outline=(51, 65, 85), width=2)
-    # Terminal titlebar
-    draw.rectangle([win_x + 18, term_y, win_x + win_w - 18, term_y + 36], fill=(15, 23, 42))
-    draw.text((win_x + 40, term_y + 18), "TERMINAL  |  bash  (Live Output)", fill=(148, 163, 184), font=font_hud, anchor="lm")
+        # Lightbulb icon
+        draw.ellipse([tip_x + 35, tip_y + 35, tip_x + 115, tip_y + 115], fill=(253, 230, 138))
+        draw.text((tip_x + 75, tip_y + 75), "💡", fill=(146, 64, 14), font=font_card_head, anchor="mm")
+        draw.text((tip_x + 140, tip_y + 44), "Teacher Tip", fill=(146, 64, 14), font=font_tip_title)
 
-    # Command execution
-    term_cmd = getattr(lesson, "terminal_command", None) or getattr(lesson, "terminal_cmd", "$ python3 main.py")
-    draw.text((win_x + 40, term_y + 55), term_cmd, fill=(248, 250, 252), font=font_code)
+        tip_lines = [
+            "This creates a full list in memory. For large data, use a",
+            "generator expression like (x*2 for x in range(10_000_000))",
+            "to avoid storing all values at once."
+        ]
+        for idx, l in enumerate(tip_lines):
+            draw.text((tip_x + 140, tip_y + 88 + idx * 34), l, fill=(180, 83, 9), font=font_tip_body)
 
-    # Terminal output starts streaming after beat 2
-    term_logs = getattr(lesson, "terminal_logs", None) or getattr(lesson, "terminal_output", [])
-    if sec > beats[2]:
-        term_out_start = beats[2]
-        out_lines_count = min(len(term_logs), int((sec - term_out_start) * 2.0) + 1)
-        for idx in range(out_lines_count):
-            out_txt = term_logs[idx]
-            out_color = (74, 222, 128) if "✓" in out_txt or "PASSED" in out_txt or "SPEEDUP" in out_txt else (250, 204, 21)
-            draw.text((win_x + 40, term_y + 95 + idx * 36), out_txt, fill=out_color, font=font_code)
-
-    # 5. Floating Dry-Run / Teacher Pointer Card
-    dry_w, dry_h = 940, 100
-    dry_x = (W - dry_w) // 2
-    dry_y = win_y + win_h + 30
-
-    tip_text = getattr(lesson, "teacher_tip", None) or getattr(lesson, "dry_run_step", "TEACHER INSIGHT")
-    card_img = Image.new("RGBA", (dry_w, dry_h), (0, 0, 0, 0))
-    c_draw = ImageDraw.Draw(card_img)
-    # Sticker outline
-    c_draw.rounded_rectangle([0, 0, dry_w, dry_h], radius=16, fill=(255, 255, 255))
-    c_draw.rounded_rectangle([4, 4, dry_w - 4, dry_h - 4], radius=14, fill=(15, 23, 42))
-    c_draw.text((dry_w // 2, dry_h // 2), f"💡 {tip_text}", fill=(250, 204, 21), font=font_hud, anchor="mm")
-    img.alpha_composite(card_img, (dry_x, dry_y))
-
-    # 6. Kinetic Karaoke Subtitles (Bottom Safe Zone)
-    sub_box_y = 1580
-    hook_txt = getattr(lesson, "intro_hook", None) or getattr(lesson, "hook_narration", "")
-    trap_txt = getattr(lesson, "concept_walkthrough", None) or getattr(lesson, "trap_narration", "")
-    sol_txt = getattr(lesson, "code_explanation", None) or getattr(lesson, "solution_narration", "")
-    out_txt = getattr(lesson, "outro_homework", None) or getattr(lesson, "takeaway_narration", "")
+    # =========================================================================
+    # 6. KINETIC KARAOKE SUBTITLES (Safe Margin 9:16)
+    # =========================================================================
+    sub_box_y = 1660
+    hook_txt = getattr(lesson, "intro_hook", "")
+    trap_txt = getattr(lesson, "concept_walkthrough", "")
+    sol_txt = getattr(lesson, "code_explanation", "")
+    out_txt = getattr(lesson, "outro_homework", "")
 
     active_speech = (
         hook_txt if sec < beats[0] else
@@ -265,35 +317,33 @@ def render_pedagogical_frame(
     )
 
     words = active_speech.split()
-    # Word highlight progress inside the active beat
-    beat_start = 0.0 if sec < beats[0] else beats[0] if sec < beats[1] else beats[1] if sec < beats[2] else beats[2]
-    beat_end = beats[0] if sec < beats[0] else beats[1] if sec < beats[1] else beats[2] if sec < beats[2] else beats[3]
-    beat_progress = max(0.0, min(1.0, (sec - beat_start) / max(0.1, beat_end - beat_start)))
-    active_word_idx = min(len(words) - 1, int(beat_progress * len(words)))
-
-    # Display up to 2 lines of text
     mid = len(words) // 2
     line1 = " ".join(words[:mid]) if mid > 0 else active_speech
     line2 = " ".join(words[mid:]) if mid > 0 else ""
 
-    draw.rounded_rectangle([W // 2 - 470, sub_box_y - 20, W // 2 + 470, sub_box_y + 150], radius=24, fill=(0, 0, 0, 220), outline=(250, 204, 21, 220), width=3)
+    draw.rounded_rectangle([W // 2 - 470, sub_box_y - 20, W // 2 + 470, sub_box_y + 130], radius=24, fill=(15, 23, 42), outline=(250, 204, 21), width=3)
     draw.text((W // 2, sub_box_y + 25), line1, fill=(255, 255, 255), font=font_sub, anchor="mm")
     if line2:
-        draw.text((W // 2, sub_box_y + 90), line2, fill=(56, 189, 248), font=font_sub, anchor="mm")
+        draw.text((W // 2, sub_box_y + 80), line2, fill=(56, 189, 248), font=font_sub, anchor="mm")
 
     # 7. Bottom Branding Telemetry
-    draw.text((W // 2, 1835), "CHANNEL 7 // CODE CRAFT • PYTHON & DSA MASTERCLASS • 60 FPS VOX", fill=(100, 116, 139), font=font_hud, anchor="mm")
+    draw.text((W // 2, 1835), "CHANNEL 7 // CODE CRAFT • 100 DAYS OF PYTHON • 60 FPS", fill=(148, 163, 184), font=font_hud, anchor="mm")
 
     return img.convert("RGB")
+
 
 
 async def render_coding_short(lesson_id: str | None = None) -> Path:
     lesson = None
     if lesson_id:
+        clean_id = lesson_id.strip().lower()
+        # 1. Match directly in MASTER_SERIES_CATALOG
         for tl in MASTER_SERIES_CATALOG:
-            if lesson_id.lower() in tl.topic_title.lower() or lesson_id.lower() in tl.series_name.lower():
+            if clean_id in tl.topic_title.lower() or clean_id in tl.series_name.lower() or clean_id in tl.filename.lower():
                 lesson = tl
                 break
+
+    # 2. If not matched, query Teacher Brain (AI Dynamic Generator or Sequential progression)
     if not lesson:
         lesson = get_next_teacher_lesson(lesson_id)
 
@@ -357,9 +407,33 @@ async def render_coding_short(lesson_id: str | None = None) -> Path:
     print(f"🎉 Master Video Render Complete in {render_time:.2f}s: {out_mp4}")
     print(f"📦 File Size: {out_mp4.stat().st_size / (1024*1024):.2f} MB")
 
+    # Save YouTube & Playlist Metadata
+    yt_meta = {
+        "title": f"{series} • Ep {ep}: {title} ⚡ #shorts",
+        "description": (
+            f"🔥 Welcome to {series} (Episode {ep})!\n\n"
+            f"Topic: {title}\n"
+            f"Series Playlist: {series} Masterclass\n\n"
+            f"💡 Teacher Pro-Tip:\n{getattr(lesson, 'teacher_tip', 'Clean code wins!')}\n\n"
+            f"Subscribe to Channel 7 for daily Senior Software Engineer breakdowns, DSA patterns, and modern Python tools.\n\n"
+            f"#coding #programming #python #dsa #softwareengineer #webdev #shorts #developer"
+        ),
+        "playlist_title": f"{series} Masterclass",
+        "tags": ["coding", "programming", "python", "dsa", "leetcode", "software engineer", "developer", "tech", "shorts"],
+        "category_id": "28",
+        "privacy": os.getenv("PRIVACY_OPT", "unlisted")
+    }
+    meta_path = OUTPUT_DIR / f"{les_id}_metadata.json"
+    meta_path.write_text(json.dumps(yt_meta, indent=2), encoding="utf-8")
+    print(f"📄 YouTube Playlist Metadata saved: {meta_path}")
+
     # Dispatch to Telegram
     print("📱 Sending Pedagogical Coding Video to Telegram...")
-    telegram_script = Path("d:/facts_yt/send_to_telegram.py")
+    repo_root = CURRENT_DIR.parents[1]
+    telegram_script = repo_root / "send_to_telegram.py"
+    if not telegram_script.exists():
+        telegram_script = Path("d:/facts_yt/send_to_telegram.py")
+
     if telegram_script.exists():
         subprocess.run([sys.executable, str(telegram_script), str(OUTPUT_DIR)], check=False)
         print("✅ Telegram notification dispatched!")

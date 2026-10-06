@@ -463,7 +463,7 @@ LESSONS: list[CodingLesson] = [
         title="Why Redis is Single-Threaded Yet Blazing Fast",
         language="python",
         filename="redis_model.py",
-        hook_narration("How can Redis handle 100,000+ operations per second on a single core when most databases use complex multi-threading?"),
+        hook_narration="How can Redis handle 100,000+ operations per second on a single core when most databases use complex multi-threading?",
         trap_narration="Many engineers assume that multi-threading is always better for performance, leading to over-engineered solutions with locking overhead and cache coherency issues.",
         solution_narration="Redis uses an event-driven, single-threaded architecture with highly optimized data structures and I/O multiplexing (epoll/kqueue). The bottleneck is usually network/disk, not CPU computation for in-memory operations.",
         takeaway_narration="Sometimes the simplest architecture wins. Understanding when to avoid complexity is as important as knowing how to build complex systems!",
