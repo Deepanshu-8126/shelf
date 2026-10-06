@@ -64,23 +64,24 @@ jobs:
           fc-cache -f -v > /dev/null 2>&1 || true
 
       - name: Install Python Dependencies
-        working-directory: factshorts-bot
+        working-directory: super_youtube_agent/01_facts_shorts
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
+          pip install httpx edge-tts
 
       - name: Configure YouTube Channel 5 OAuth
         env:
           YT_TOKEN_B64: ${{ secrets.YT_TOKEN_CH5_B64 || secrets.YT_TOKEN_B64 }}
           YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
         run: |
-          mkdir -p factshorts-bot/credentials
-          [ -n "$YT_TOKEN_B64" ]  && printf '%s' "$YT_TOKEN_B64"  | base64 -d > factshorts-bot/credentials/token.json || true
-          [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > factshorts-bot/credentials/client_secret.json || true
-          python3 -c "import json; json.load(open('factshorts-bot/credentials/token.json')); print('✅ token.json is valid JSON')" 2>/dev/null || echo "ℹ️ token.json pending"
+          mkdir -p super_youtube_agent/01_facts_shorts/credentials
+          [ -n "$YT_TOKEN_B64" ]  && printf '%s' "$YT_TOKEN_B64"  | base64 -d > super_youtube_agent/01_facts_shorts/credentials/token.json || true
+          [ -n "$YT_CLIENT_B64" ] && printf '%s' "$YT_CLIENT_B64" | base64 -d > super_youtube_agent/01_facts_shorts/credentials/client_secret.json || true
+          python3 -c "import json; json.load(open('super_youtube_agent/01_facts_shorts/credentials/token.json')); print('✅ token.json is valid JSON')" 2>/dev/null || echo "ℹ️ token.json pending"
 
       - name: Generate Dark Sutra Documentary Short
-        working-directory: factshorts-bot
+        working-directory: super_youtube_agent/01_facts_shorts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -109,14 +110,14 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
           CHANNEL_BADGE: 'Channel 5 (Dark Sutra Crime Studio)'
         run: |
-          python send_to_telegram.py factshorts-bot/output || true
+          python send_to_telegram.py super_youtube_agent/01_facts_shorts/output || true
 
       - name: Save Rendered Video Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: channel-5-dark-sutra-rendered-videos
-          path: factshorts-bot/output/*.mp4
+          path: super_youtube_agent/01_facts_shorts/output/*.mp4
           retention-days: 14
 
       - name: Keep topic memory (Never repeat topics)
@@ -124,6 +125,6 @@ jobs:
         run: |
           git config user.name  "factshorts-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -f factshorts-bot/data/factshorts.db 2>/dev/null || true
+          git add -f super_youtube_agent/01_facts_shorts/data/factshorts.db 2>/dev/null || true
           git commit -m "chore: topic memory update $(date -u +%F-%H%M)" || echo "nothing to commit"
           git push || echo "push skipped"
