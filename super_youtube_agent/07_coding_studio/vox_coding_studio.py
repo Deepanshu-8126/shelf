@@ -493,6 +493,66 @@ def render_pedagogical_frame(
         img = Image.new("RGBA", (W, H), (250, 250, 250, 255))
         draw = ImageDraw.Draw(img)
 
+        # Add educational illustration background if available
+        try:
+            # Define image display schedule: which image to show when
+            image_schedule = [
+                # (start_time, end_time, image_filename, fade_in_duration, fade_out_duration)
+                (beats[0] + 0.5, beats[0] + 2.5, "image.png", 0.5, 0.5),      # Show image 1 during early part
+                (beats[0] + 2.5, beats[0] + 4.5, "image copy.png", 0.5, 0.5), # Show image 2 during middle
+                (beats[0] + 4.5, beats[1] - 0.5, "image copy 2.png", 0.5, 0.5), # Show image 3 during late part
+            ]
+            
+            # Check if current time falls within any image display window
+            for start_time, end_time, img_filename, fade_in, fade_out in image_schedule:
+                if start_time <= sec < end_time:
+                    # Load and composite the image
+                    img_path = f"super_youtube_agent\\07_coding_studio\\assets\\images\\{img_filename}"
+                    bg_img = load_image_cached(img_path)
+                    
+                    # Calculate alpha for fade-in/fade-out
+                    alpha = 1.0
+                    if sec < start_time + fade_in:
+                        # Fade in
+                        alpha = (sec - start_time) / fade_in
+                    elif sec > end_time - fade_out:
+                        # Fade out
+                        alpha = (end_time - sec) / fade_out
+                        
+                    # Resize image to fit screen while maintaining aspect ratio
+                    bg_width, bg_height = bg_img.size
+                    target_ratio = W / H
+                    img_ratio = bg_width / bg_height
+                    
+                    if img_ratio > target_ratio:
+                        # Image is wider than screen ratio
+                        new_width = W
+                        new_height = int(W / img_ratio)
+                    else:
+                        # Image is taller than screen ratio
+                        new_height = H
+                        new_width = int(H * img_ratio)
+                        
+                    # Resize and center the image
+                    resized_img = bg_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                    paste_x = (W - new_width) // 2
+                    paste_y = (H - new_height) // 2
+                    
+                    # Create a temporary image with the calculated alpha
+                    if alpha < 1.0:
+                        # Apply alpha to the image
+                        alpha_img = Image.new("RGBA", resized_img.size, (255, 255, 255, int(255 * alpha)))
+                        img_to_paste = Image.blend(resized_img, alpha_img, 1.0 - alpha)
+                    else:
+                        img_to_paste = resized_img
+                        
+                    # Composite the image onto the background
+                    img.paste(img_to_paste, (paste_x, paste_y), img_to_paste)
+                    break  # Only show one image at a time
+        except Exception:
+            # If there's any error with image processing, continue without background
+            pass
+
         # 1. Subtle dot grid background
         dot_gap = 36
         for x in range(24, W, dot_gap):

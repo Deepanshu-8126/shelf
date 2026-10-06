@@ -33,7 +33,7 @@ def main():
 
     topic_query = ""
     if args.day > 0:
-        topic_query = f"100 DAYS OF PYTHON {args.day}"
+        topic_query = f"day {args.day}"
     elif args.episode > 0 and args.series:
         topic_query = f"{args.series} {args.episode}"
     elif args.series:
