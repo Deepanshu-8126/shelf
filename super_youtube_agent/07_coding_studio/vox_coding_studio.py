@@ -507,7 +507,7 @@ def render_pedagogical_frame(
               for start_time, end_time, img_filename, fade_in, fade_out in image_schedule:
                   if start_time <= sec < end_time:
                       # Load and composite the image
-                      img_path = f"assets/images/{img_filename}"
+                      img_path = f"super_youtube_agent\\07_coding_studio\\assets\\images\\{img_filename}"
                       bg_img = load_image_cached(img_path)
                       
                       # Calculate alpha for fade-in/fade-out
@@ -518,7 +518,7 @@ def render_pedagogical_frame(
                       elif sec > end_time - fade_out:
                           # Fade out
                           alpha = (end_time - sec) / fade_out
-                      
+                          
                       # Resize image to fit screen while maintaining aspect ratio
                       bg_width, bg_height = bg_img.size
                       target_ratio = W / H
@@ -554,10 +554,10 @@ def render_pedagogical_frame(
               pass
 
           # 1. Subtle dot grid background
-        dot_gap = 36
-        for x in range(24, W, dot_gap):
-            for y in range(24, H, dot_gap):
-                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 200))
+          dot_gap = 36
+          for x in range(24, W, dot_gap):
+              for y in range(24, H, dot_gap):
+                  draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 200))
 
         # 2. Dynamic Breadcrumb Navigation
         category = "Python" if "PYTHON" in series_name.upper() else "DSA" if "LEETCODE" in series_name.upper() else "DevTools"

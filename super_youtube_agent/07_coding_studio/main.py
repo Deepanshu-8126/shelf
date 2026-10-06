@@ -14,6 +14,7 @@ CURRENT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(CURRENT_DIR))
 
 from vox_coding_studio import render_coding_short
+from videosynx_renderer import render_videosynx_short
 
 
 def main():
@@ -23,6 +24,7 @@ def main():
     parser.add_argument("--series", type=str, default="", help="Series filter (e.g. python, leetcode, tools, sysdesign)")
     parser.add_argument("--topic", type=str, default="", help="Coding topic or LeetCode question")
     parser.add_argument("--lesson", type=str, default="", help="Specific lesson ID")
+    parser.add_argument("--engine", type=str, default="videosynx", choices=["videosynx", "vox"], help="Rendering engine (videosynx: line-by-line anchored, vox: 4-scene overview)")
     parser.add_argument("--generate", action="store_true", help="Generate coding short")
     parser.add_argument("--mode", type=str, default="story", help="Video mode")
     parser.add_argument("--niche", type=str, default="coding", help="Niche")
@@ -43,9 +45,13 @@ def main():
     else:
         topic_query = os.getenv("TOPIC_INPUT") or os.getenv("TOPIC") or ""
 
-    print(f"🎬 [Channel 7 CLI] Starting generation with query: '{topic_query}'")
+    print(f"🎬 [Channel 7 CLI] Starting generation with engine='{args.engine}', query='{topic_query}'")
 
-    out_video = asyncio.run(render_coding_short(topic_query if topic_query.strip() else None))
+    if args.engine == "videosynx":
+        out_video = asyncio.run(render_videosynx_short(topic_query if topic_query.strip() else None))
+    else:
+        out_video = asyncio.run(render_coding_short(topic_query if topic_query.strip() else None))
+
     print(f"✅ Video ready: {out_video}")
     return 0
 
