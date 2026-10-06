@@ -19,6 +19,7 @@ import time
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import edge_tts
+from sfx_foley import build_teacher_foley_soundtrack
 
 # Fix Windows console UTF-8 output
 if hasattr(sys.stdout, "reconfigure"):
@@ -241,18 +242,40 @@ def render_pedagogical_frame(
         draw.text((card_x + 60, line3_y), "3", fill=(148, 163, 184), font=font_mono)
 
         if not is_optimal_phase:
-            # Phase 1: List Comprehension with yellow highlight
-            draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 850, line3_y + 44], radius=8, fill=(254, 240, 138, 230))
+            # Phase 1: List Comprehension with animated highlighter wipe!
+            marker_start = 2.6
+            marker_duration = 0.8
+            if sec < marker_start:
+                sweep_prog = 0.0
+            else:
+                sweep_prog = min(1.0, (sec - marker_start) / marker_duration)
+
+            # Quadratic ease-out for marker sweep
+            ease_sweep = 1.0 - (1.0 - sweep_prog) ** 2
+            max_highlight_w = 730
+            curr_highlight_w = int(max_highlight_w * ease_sweep)
+
+            if curr_highlight_w > 0:
+                draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 120 + curr_highlight_w, line3_y + 44], radius=8, fill=(254, 240, 138, 230))
             draw.text((card_x + 130, line3_y), "numbers_list = [x*2 for x in range(10_000_000)]", fill=(15, 23, 42), font=font_code)
 
-            # Floating Tooltip Callout
-            badge_x = card_x + 400
-            badge_y = line3_y + 60
-            draw.rounded_rectangle([badge_x, badge_y, badge_x + 440, badge_y + 48], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
-            draw.text((badge_x + 220, badge_y + 24), "Allocates 10M ints → ~80MB ⓘ", fill=(113, 63, 18), font=get_font(22, bold=True), anchor="mm")
+            # Floating Tooltip Callout with pop bounce
+            if ease_sweep > 0.4:
+                badge_pop = min(1.0, (ease_sweep - 0.4) / 0.6)
+                badge_w = int(440 * badge_pop)
+                badge_x = card_x + 400
+                badge_y = line3_y + 60
+                if badge_w > 60:
+                    draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 48], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
+                    if badge_pop >= 0.85:
+                        draw.text((badge_x + 220, badge_y + 24), "Allocates 10M ints → ~80MB ⓘ", fill=(113, 63, 18), font=get_font(22, bold=True), anchor="mm")
         else:
-            # Phase 2: Generator Expression with mint green highlight
-            draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 850, line3_y + 44], radius=8, fill=(209, 250, 229, 230))
+            # Phase 2: Generator Expression with mint green animated wipe!
+            gen_start = beats[1]
+            gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
+            curr_w = int(730 * (1.0 - (1.0 - gen_sweep) ** 2))
+            if curr_w > 0:
+                draw.rounded_rectangle([card_x + 120, line3_y - 6, card_x + 120 + curr_w, line3_y + 44], radius=8, fill=(209, 250, 229, 230))
             draw.text((card_x + 130, line3_y), "numbers_gen = (x*2 for x in range(10_000_000))", fill=(15, 23, 42), font=font_code)
 
             # Floating Tooltip Callout
@@ -300,8 +323,28 @@ def render_pedagogical_frame(
         for idx, l in enumerate(tip_lines):
             draw.text((tip_x + 140, tip_y + 88 + idx * 34), l, fill=(180, 83, 9), font=font_tip_body)
 
+        # =========================================================================
+        # DYNAMIC CAMERA ZOOM (Smooth punch-in on highlighted code between 2.5s and 8.5s)
+        # =========================================================================
+        zoom = 1.0
+        if 2.5 <= sec <= 8.5:
+            # Smooth bell curve zoom peaking at 1.12x
+            zoom_factor = math.sin((sec - 2.5) / 6.0 * math.pi)
+            zoom = 1.0 + 0.12 * zoom_factor
+
+        if zoom > 1.005:
+            crop_w = int(W / zoom)
+            crop_h = int(H / zoom)
+            focus_x = W // 2
+            focus_y = int(card_y + title_bar_h + 100) # Centered on Line 3
+            x1 = max(0, min(W - crop_w, focus_x - crop_w // 2))
+            y1 = max(0, min(H - crop_h, focus_y - crop_h // 2))
+            cropped = img.crop((x1, y1, x1 + crop_w, y1 + crop_h))
+            img = cropped.resize((W, H), Image.Resampling.BILINEAR)
+            draw = ImageDraw.Draw(img)
+
     # =========================================================================
-    # 6. KINETIC KARAOKE SUBTITLES (Safe Margin 9:16)
+    # 6. KINETIC KARAOKE SUBTITLES (Safe Margin 9:16 - Fixed overlay)
     # =========================================================================
     sub_box_y = 1660
     hook_txt = getattr(lesson, "intro_hook", "")
@@ -364,6 +407,17 @@ async def render_coding_short(lesson_id: str | None = None) -> Path:
     wav_path, beats, duration = await generate_speech_tracks(lesson, OUTPUT_DIR)
     print(f"✅ Voiceover rendered: {duration:.2f}s (Beats: {[round(b, 2) for b in beats]})")
 
+    # 2. Sound Design: Mix Mechanical Keyboard, Marker Wipe, Enter Key Click, Ding
+    print("🎧 Synthesizing Diegetic Coding Foley & Keyboard Keystrokes SFX...")
+    master_soundtrack = OUTPUT_DIR / f"{les_id}_master_soundtrack.wav"
+    try:
+        build_teacher_foley_soundtrack(wav_path, master_soundtrack, beats)
+        final_audio_path = master_soundtrack
+        print("✅ Foley & SFX sound track mixed seamlessly!")
+    except Exception as e:
+        print(f"⚠️ SFX mixing notice ({e}), using raw voiceover")
+        final_audio_path = wav_path
+
     fps = 30
     total_frames = int(duration * fps)
 
@@ -383,7 +437,7 @@ async def render_coding_short(lesson_id: str | None = None) -> Path:
         "-pix_fmt", "rgb24",
         "-r", str(fps),
         "-i", "-",
-        "-i", str(wav_path),
+        "-i", str(final_audio_path),
         "-c:v", "libx264",
         "-preset", "veryfast",
         "-crf", "18",
