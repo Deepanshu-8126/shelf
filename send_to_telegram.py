@@ -321,6 +321,7 @@ if __name__ == "__main__":
             "super_youtube_agent/04_lofi_studio/output",
             "super_youtube_agent/05_vox_ledger/output",
             "super_youtube_agent/06_ai_clipper/output",
+            "super_youtube_agent/07_coding_studio/output",
             "output",
             "."
         ]

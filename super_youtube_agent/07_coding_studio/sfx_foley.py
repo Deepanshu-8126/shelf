@@ -9,42 +9,47 @@ Generates 100% copyright-free, procedural sound design:
 """
 from __future__ import annotations
 import math
+import os
+import sys
 import wave
 from pathlib import Path
 import numpy as np
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 SAMPLE_RATE = 44100
 
 
-def create_mechanical_click(duration_sec: float = 0.025) -> np.ndarray:
-    """Crisp mechanical switch click (Cherry MX Blue/Brown tactile click)."""
-    n = int(duration_sec * SAMPLE_RATE)
-    t = np.linspace(0, duration_sec, n, endpoint=False)
-    
-    # Fast attack, exponential decay
-    decay = np.exp(-t * 280)
-    # Click resonance at 2800Hz + 4200Hz
-    click = (np.sin(2 * np.pi * 2800 * t) * 0.6 + np.sin(2 * np.pi * 4200 * t) * 0.4) * decay
-    # Add subtle snap transient
-    noise = np.random.uniform(-0.3, 0.3, n) * np.exp(-t * 600)
-    out = (click + noise) * 0.45
-    return out.astype(np.float32)
+SFX_DIR = Path(__file__).resolve().parent / "assets" / "sfx"
 
 
-def create_enter_key(duration_sec: float = 0.08) -> np.ndarray:
-    """Heavy mechanical Enter key thud with stabilizer bar click."""
-    n = int(duration_sec * SAMPLE_RATE)
-    t = np.linspace(0, duration_sec, n, endpoint=False)
-    
-    # Bottom-out thud around 320Hz
-    thud = np.sin(2 * np.pi * 320 * t) * np.exp(-t * 80) * 0.7
-    # Metallic stabilizer ring
-    ring = np.sin(2 * np.pi * 2400 * t) * np.exp(-t * 220) * 0.35
-    # Initial snap
-    snap = np.random.uniform(-0.5, 0.5, n) * np.exp(-t * 800) * 0.4
-    
-    out = (thud + ring + snap) * 0.55
-    return out.astype(np.float32)
+def get_real_click() -> np.ndarray:
+    """Loads studio recording of Cherry MX Blue switch click if available, else synthetic fallback."""
+    click_path = SFX_DIR / "keyboard_click.wav"
+    if click_path.exists():
+        try:
+            with wave.open(str(click_path), 'rb') as wf:
+                raw = wf.readframes(wf.getnframes())
+                return (np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0) * 0.72
+        except Exception:
+            pass
+    return create_mechanical_click()
+
+
+def get_real_enter() -> np.ndarray:
+    """Loads studio recording of Cherry MX heavy Enter key with stabilizer thud."""
+    enter_path = SFX_DIR / "keyboard_enter.wav"
+    if enter_path.exists():
+        try:
+            with wave.open(str(enter_path), 'rb') as wf:
+                raw = wf.readframes(wf.getnframes())
+                return (np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0) * 0.85
+        except Exception:
+            pass
+    return create_enter_key()
 
 
 def create_marker_sweep(duration_sec: float = 0.65) -> np.ndarray:
@@ -119,8 +124,8 @@ def overlay_keystroke_sequence(
     rng = np.random.RandomState(42)
     t = start_time
     end_time = min(len(master) / SAMPLE_RATE, start_time + duration)
-    click = create_mechanical_click()
-    enter = create_enter_key()
+    click = get_real_click()
+    enter = get_real_enter()
 
     while t < end_time:
         is_newline = rng.rand() < 0.14
@@ -132,10 +137,62 @@ def overlay_keystroke_sequence(
             t += rng.uniform(0.048, 0.088)
 
 
-def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, beats: list[float]) -> Path:
+def overlay_precise_keystrokes(
+    master: np.ndarray,
+    code_text: str,
+    start_sec: float,
+    duration_sec: float,
+    volume: float = 0.38,
+    ease_exponent: float = 1.6
+):
     """
-    Reads Edge TTS narration, mixes diegetic coding Foley SFX at key pedagogical beats,
+    Overlays exact keystrokes corresponding to each character typed in code_text
+    over duration_sec, with Cherry MX Blue click per char and enter thud for newlines.
+    """
+    if not code_text or duration_sec <= 0:
+        return
+    click = get_real_click()
+    enter = get_real_enter()
+    chars = list(code_text)
+    total_chars = len(chars)
+    if total_chars == 0:
+        return
+
+    for idx, ch in enumerate(chars):
+        progress = (idx / total_chars) ** (1.0 / ease_exponent)
+        t = start_sec + progress * duration_sec
+        if t * SAMPLE_RATE >= len(master):
+            break
+        if ch == '\n':
+            overlay_audio_stem(master, enter, t, volume=volume * 1.25)
+        elif ch in (' ', '\t'):
+            overlay_audio_stem(master, click, t, volume=volume * 0.65)
+        else:
+            overlay_audio_stem(master, click, t, volume=volume)
+
+
+def build_teacher_foley_soundtrack(
+    voice_wav_path: Path, 
+    output_wav_path: Path, 
+    beats: list[float],
+    lesson: Any = None,
+    is_optimal_phase_func=None,
+    get_active_code_func=None,
+    get_full_code_raw_func=None,
+    get_type_start_func=None,
+    get_type_duration_func=None
+) -> Path:
+    """
+    Reads teacher narration, mixes authentic Cherry MX mechanical switch Foley SFX at key pedagogical beats,
     and saves the synchronized master soundtrack.
+    
+    Optional typing synchronization parameters:
+    - lesson: The lesson object containing code snippets
+    - is_optimal_phase_func: Function(sec) -> bool indicating if we're in optimal phase
+    - get_active_code_func: Function() -> list of (text, token_type) tuples for active code
+    - get_full_code_raw_func: Function() -> str of complete code being typed
+    - get_type_start_func: Function(sec) -> float when typing starts for current phase
+    - get_type_duration_func: Function(sec) -> float how long typing takes for current phase
     """
     # 1. Load voice wav
     with wave.open(str(voice_wav_path), 'rb') as vf:
@@ -163,37 +220,90 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
     whoosh = create_whoosh()
     ding = create_success_ding()
 
-    # Foley Cues (Synchronized frame-accurately with visual transitions):
-    # 1. Early character-by-character typing keystrokes (0.5s to 2.4s)
-    overlay_keystroke_sequence(master, start_time=0.5, duration=2.0, volume=0.38)
+    # Use precise typing synchronization if lesson data is provided
+    if lesson is not None and all([
+        is_optimal_phase_func, 
+        get_active_code_func, 
+        get_full_code_raw_func, 
+        get_type_start_func, 
+        get_type_duration_func
+    ]):
+        # Generate precise keyboard clicks for both phases (naive and optimal)
+        for phase_name, is_optimal in [("naive", False), ("optimal", True)]:
+            # Determine when this phase is active based on lesson-specific timing
+            # We need to sample time points to detect when each phase is active
+            # For simplicity, we'll use the same timing logic as in the renderer
+            
+            # Get the code for this phase
+            if hasattr(lesson, 'snippet_naive'):  # CodingLesson
+                active_code = lesson.snippet_optimal if is_optimal else lesson.snippet_naive
+            else:  # TeacherLesson
+                active_code = lesson.code_after if is_optimal else lesson.code_before
+                
+            full_code_raw = "\n".join([line_tuple[0] for line_tuple in active_code[:6]])
+            
+            if not full_code_raw.strip():
+                continue
+                
+            # For each phase, we need to determine when typing occurs
+            # In the renderer, typing occurs during the first part of each phase
+            # Let's approximate based on the beats and phase duration
+            
+            if is_optimal:
+                # Optimal phase: typing from beats[1] to beats[1] + type_dur
+                type_start = beats[1] if len(beats) > 1 else 2.0
+                type_duration = 1.7  # From renderer
+            else:
+                # Naive phase: typing from 0.5 to 0.5 + type_dur  
+                type_start = 0.5
+                type_duration = 1.9  # From renderer
+                
+            # Only add typing sounds if this phase is actually in the video timeline
+            phase_end_time = type_start + type_duration
+            if type_start < len(master) / SAMPLE_RATE:
+                actual_duration = min(type_duration, len(master) / SAMPLE_RATE - type_start)
+                if actual_duration > 0:
+                    overlay_precise_keystrokes(
+                        master, 
+                        full_code_raw, 
+                        type_start, 
+                        actual_duration,
+                        volume=0.38,
+                        ease_exponent=1.6
+                    )
+    else:
+        # Fallback to original behavior if typing sync not available
+        # Foley Cues (Synchronized frame-accurately with visual transitions):
+        # 1. Early character-by-character typing keystrokes (0.5s to 2.4s)
+        overlay_keystroke_sequence(master, start_time=0.5, duration=2.0, volume=0.38)
 
-    # 2. Highlighter marker sweep on key line (around 2.6s - exactly when visual wipe begins)
-    marker_time = 2.6
-    if marker_time < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, marker, marker_time, volume=0.55)
+        # 2. Highlighter marker sweep on key line (around 2.6s - exactly when visual wipe begins)
+        marker_time = 2.6
+        if marker_time < len(master) / SAMPLE_RATE:
+            overlay_audio_stem(master, marker, marker_time, volume=0.55)
 
-    # 3. Enter key click when Terminal executes (around beats[0] + 0.4s)
-    enter_thud = create_enter_key()
-    term_enter_time = beats[0] + 0.4 if len(beats) > 0 else 7.0
-    if term_enter_time < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, enter_thud, term_enter_time, volume=0.65)
+        # 3. Enter key click when Terminal executes (around beats[0] + 0.4s)
+        enter_thud = get_real_enter()
+        term_enter_time = beats[0] + 0.4 if len(beats) > 0 else 7.0
+        if term_enter_time < len(master) / SAMPLE_RATE:
+            overlay_audio_stem(master, enter_thud, term_enter_time, volume=0.65)
 
-    # 4. Terminal pass / benchmark ding (around beats[0] + 1.8s)
-    term_ding_time = beats[0] + 1.8 if len(beats) > 0 else 8.5
-    if term_ding_time < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, ding, term_ding_time, volume=0.50)
+        # 4. Terminal pass / benchmark ding (around beats[0] + 1.8s)
+        term_ding_time = beats[0] + 1.8 if len(beats) > 0 else 8.5
+        if term_ding_time < len(master) / SAMPLE_RATE:
+            overlay_audio_stem(master, ding, term_ding_time, volume=0.50)
 
-    # 5. Whoosh transition into Clean Code phase (around beats[1])
-    if len(beats) > 1 and beats[1] < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.50)
-        # Fast typing clacks for the clean refactor
-        overlay_keystroke_sequence(master, start_time=beats[1], duration=1.8, volume=0.38)
+        # 5. Whoosh transition into Clean Code phase (around beats[1])
+        if len(beats) > 1 and beats[1] < len(master) / SAMPLE_RATE:
+            overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.50)
+            # Fast typing clacks for the clean refactor
+            overlay_keystroke_sequence(master, start_time=beats[1], duration=1.8, volume=0.38)
 
-    # 6. Climax Whoosh + Ding into the VS Comparison Screen (around beats[2])
-    climax_beat = beats[2] if len(beats) > 2 else len(master) / SAMPLE_RATE * 0.75
-    if climax_beat < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, whoosh, climax_beat - 0.25, volume=0.60)
-        overlay_audio_stem(master, ding, climax_beat + 0.45, volume=0.65)
+        # 6. Climax Whoosh + Ding into the VS Comparison Screen (around beats[2])
+        climax_beat = beats[2] if len(beats) > 2 else len(master) / SAMPLE_RATE * 0.75
+        if climax_beat < len(master) / SAMPLE_RATE:
+            overlay_audio_stem(master, whoosh, climax_beat - 0.25, volume=0.60)
+            overlay_audio_stem(master, ding, climax_beat + 0.45, volume=0.65)
 
     # Normalize to prevent clipping
     peak = np.max(np.abs(master))

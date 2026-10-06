@@ -35,6 +35,20 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 from curriculum import CodingLesson, get_lesson
 from teacher_brain import TeacherLesson, get_next_teacher_lesson, MASTER_SERIES_CATALOG
 
+# Image caching for efficient reuse
+_image_cache = {}
+
+def load_image_cached(image_path: str) -> Image.Image:
+    """Load and cache an image to avoid reloading from disk every frame."""
+    if image_path not in _image_cache:
+        try:
+            _image_cache[image_path] = Image.open(image_path).convert("RGBA")
+        except Exception as e:
+            print(f"⚠️ Failed to load image {image_path}: {e}")
+            # Return a placeholder image if loading fails
+            _image_cache[image_path] = Image.new("RGBA", (100, 100), (255, 0, 0, 128))
+    return _image_cache[image_path]
+
 
 def get_font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
     paths = [
@@ -51,45 +65,69 @@ def get_font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
 
 
 async def generate_speech_tracks(lesson: Any, output_dir: Path) -> tuple[Path, list[float], float]:
-    """Generates continuous voiceover and measures beat durations."""
+    """Generates continuous voiceover using Kokoro-82M per pedagogical beat."""
     hook = getattr(lesson, "intro_hook", None) or getattr(lesson, "hook_narration", "")
     trap = getattr(lesson, "concept_walkthrough", None) or getattr(lesson, "trap_narration", "")
     solution = getattr(lesson, "code_explanation", None) or getattr(lesson, "solution_narration", "")
     takeaway = getattr(lesson, "outro_homework", None) or getattr(lesson, "takeaway_narration", "")
 
-    full_script = f"{hook} {trap} {solution} {takeaway}"
     les_id = getattr(lesson, "id", None) or f"{lesson.series_name.lower().replace(' ', '_')}_{lesson.episode_num}"
-    mp3_path = output_dir / f"{les_id}_voice.mp3"
     wav_path = output_dir / f"{les_id}_voice.wav"
 
-    comm = edge_tts.Communicate(full_script, "en-US-JennyNeural", rate="+6%", pitch="+0Hz")
-    await comm.save(str(mp3_path))
+    try:
+        from kokoro_tts import generate_kokoro_narration
+        import soundfile as sf
+        import numpy as np
 
-    subprocess.run([
-        "ffmpeg", "-y", "-i", str(mp3_path),
-        "-ar", "44100", "-ac", "2", str(wav_path)
-    ], check=True, capture_output=True)
+        is_hindi = any('\u0900' <= char <= '\u097F' for char in f"{hook} {trap} {solution}")
+        lang = "hi" if is_hindi else "en"
+        voice = "hm_omega" if is_hindi else "am_adam"
 
-    probe = subprocess.run([
-        "ffprobe", "-v", "error", "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1", str(wav_path)
-    ], check=True, capture_output=True, text=True)
-    total_duration = float(probe.stdout.strip())
+        audios = []
+        beats = []
+        accum = 0.0
 
-    # Proportional split of beats based on word count
-    words_h = len(hook.split())
-    words_t = len(trap.split())
-    words_s = len(solution.split())
-    words_o = len(takeaway.split())
-    total_words = words_h + words_t + words_s + words_o
+        for idx, text in enumerate([hook, trap, solution, takeaway]):
+            if not text.strip():
+                continue
+            seg_wav = output_dir / f"{les_id}_seg_{idx}.wav"
+            _, seg_dur = generate_kokoro_narration(text, seg_wav, lang=lang, voice=voice, speed=0.96)
+            seg_data, _ = sf.read(str(seg_wav))
+            audios.append(seg_data)
+            accum += seg_dur
+            beats.append(accum)
 
-    b1_end = total_duration * (words_h / max(1, total_words))
-    b2_end = total_duration * ((words_h + words_t) / max(1, total_words))
-    b3_end = total_duration * ((words_h + words_t + words_s) / max(1, total_words))
-    b4_end = total_duration
+        full_audio = np.concatenate(audios)
+        raw_kokoro_wav = output_dir / f"{les_id}_kokoro_raw.wav"
+        sf.write(str(raw_kokoro_wav), full_audio, 24000)
 
-    beats = [b1_end, b2_end, b3_end, b4_end]
-    return wav_path, beats, total_duration
+        # Resample to 44.1kHz stereo for master pipeline
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(raw_kokoro_wav),
+            "-ar", "44100", "-ac", "2", str(wav_path)
+        ], check=True, capture_output=True)
+
+        print(f"🎙️ [Kokoro Engine] Successfully rendered {accum:.2f}s voice across 4 beats: {[round(b, 2) for b in beats]}")
+        return wav_path, beats, accum
+    except Exception as e:
+        print(f"⚠️ Kokoro TTS fallback to Edge TTS ({e})")
+        full_script = f"{hook} {trap} {solution} {takeaway}"
+        mp3_path = output_dir / f"{les_id}_voice.mp3"
+        comm = edge_tts.Communicate(full_script, "en-US-JennyNeural", rate="+6%", pitch="+0Hz")
+        await comm.save(str(mp3_path))
+        subprocess.run(["ffmpeg", "-y", "-i", str(mp3_path), "-ar", "44100", "-ac", "2", str(wav_path)], check=True, capture_output=True)
+        probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(wav_path)], check=True, capture_output=True, text=True)
+        total_duration = float(probe.stdout.strip())
+        words_h = len(hook.split())
+        words_t = len(trap.split())
+        words_s = len(solution.split())
+        words_o = len(takeaway.split())
+        total_words = words_h + words_t + words_s + words_o
+        b1_end = total_duration * (words_h / max(1, total_words))
+        b2_end = total_duration * ((words_h + words_t) / max(1, total_words))
+        b3_end = total_duration * ((words_h + words_t + words_s) / max(1, total_words))
+        return wav_path, [b1_end, b2_end, b3_end, total_duration], total_duration
+
 
 
 def render_pedagogical_frame(
@@ -181,44 +219,59 @@ def render_pedagogical_frame(
         if not left_pill:
             left_pill = "Naive Code"
 
+        # Card borders and backgrounds
         for offset, alpha in [(12, 15), (6, 25)]:
             draw.rounded_rectangle([left_x, card_y + offset, left_x + card_w, card_y + card_h + offset], radius=32, fill=(0, 0, 0, alpha))
-        draw.rounded_rectangle([left_x, card_y, left_x + card_w, card_y + card_h], radius=32, fill=(254, 205, 211), outline=(251, 113, 133), width=2)
-        draw.text((left_x + card_w // 2, card_y + 90), left_title, fill=(159, 18, 57), font=font_head_comp, anchor="mm")
-        draw.text((left_x + card_w // 2, card_y + 135), f"• {left_sub}", fill=(190, 18, 60), font=font_head_comp, anchor="mm")
-        # Code pill
-        draw.rounded_rectangle([left_x + 20, card_y + 360, left_x + card_w - 20, card_y + 440], radius=20, fill=(39, 39, 42))
-        draw.text((left_x + card_w // 2, card_y + 400), left_pill, fill=(255, 255, 255), font=font_mono, anchor="mm")
+            draw.rounded_rectangle([right_x, card_y + offset, right_x + card_w, card_y + card_h + offset], radius=32, fill=(0, 0, 0, alpha))
+            
+        draw.rounded_rectangle([left_x, card_y, left_x + card_w, card_y + card_h], radius=32, fill=(254, 242, 242), outline=(251, 113, 133), width=2)
+        draw.rounded_rectangle([right_x, card_y, right_x + card_w, card_y + card_h], radius=32, fill=(240, 253, 244), outline=(52, 211, 153), width=2)
 
-        # Right Card: Soft Mint Green (Optimal / Production)
+        # Left Header
+        draw.rounded_rectangle([left_x + 30, card_y + 35, left_x + card_w - 30, card_y + 85], radius=14, fill=(254, 226, 226))
+        draw.text((left_x + card_w // 2, card_y + 60), f"[x] {left_title}", fill=(185, 28, 28), font=get_font(20, bold=True), anchor="mm")
+        draw.text((left_x + card_w // 2, card_y + 115), f"• {left_sub} •", fill=(190, 18, 60), font=get_font(22, bold=True), anchor="mm")
+
+        # Right Header
         right_title = "OPTIMAL FIX"
         for l_t, _ in optimal_code:
             if l_t.startswith("# ✨"):
                 right_title = l_t.replace("# ✨", "").split("(")[0].strip()[:20]
                 break
         right_sub = "PRODUCTION CLEAN"
+        draw.rounded_rectangle([right_x + 30, card_y + 35, right_x + card_w - 30, card_y + 85], radius=14, fill=(220, 252, 231))
+        draw.text((right_x + card_w // 2, card_y + 60), f"[✓] {right_title}", fill=(20, 83, 45), font=get_font(20, bold=True), anchor="mm")
+        draw.text((right_x + card_w // 2, card_y + 115), f"• {right_sub} •", fill=(4, 120, 87), font=get_font(22, bold=True), anchor="mm")
 
-        right_pill = ""
-        for l_t, _ in optimal_code:
-            if not l_t.startswith("#") and len(l_t.strip()) > 3:
-                right_pill = l_t.strip()[:26]
-                break
-        if not right_pill:
-            right_pill = "Clean Code"
+        # Left Code Box (Dark Card)
+        cbox_y = card_y + 155
+        cbox_h = 390
+        draw.rounded_rectangle([left_x + 16, cbox_y, left_x + card_w - 16, cbox_y + cbox_h], radius=18, fill=(24, 24, 27))
+        font_code_comp = get_font(18, bold=True)
+        code_lines_left = [l_t for l_t, _ in naive_code if not l_t.startswith("#")][:6]
+        for c_idx, cl in enumerate(code_lines_left):
+            draw.text((left_x + 30, cbox_y + 24 + c_idx * 34), cl[:28], fill=(244, 244, 245), font=font_code_comp)
 
-        for offset, alpha in [(12, 15), (6, 25)]:
-            draw.rounded_rectangle([right_x, card_y + offset, right_x + card_w, card_y + card_h + offset], radius=32, fill=(0, 0, 0, alpha))
-        draw.rounded_rectangle([right_x, card_y, right_x + card_w, card_y + card_h], radius=32, fill=(209, 250, 229), outline=(52, 211, 153), width=2)
-        draw.text((right_x + card_w // 2, card_y + 90), right_title, fill=(6, 95, 70), font=font_head_comp, anchor="mm")
-        draw.text((right_x + card_w // 2, card_y + 135), f"• {right_sub}", fill=(4, 120, 87), font=font_head_comp, anchor="mm")
-        # Code pill
-        draw.rounded_rectangle([right_x + 20, card_y + 360, right_x + card_w - 20, card_y + 440], radius=20, fill=(39, 39, 42))
-        draw.text((right_x + card_w // 2, card_y + 400), right_pill, fill=(255, 255, 255), font=font_mono, anchor="mm")
+        # Right Code Box (Dark Card)
+        draw.rounded_rectangle([right_x + 16, cbox_y, right_x + card_w - 16, cbox_y + cbox_h], radius=18, fill=(24, 24, 27))
+        code_lines_right = [l_t for l_t, _ in optimal_code if not l_t.startswith("#")][:6]
+        for c_idx, cl in enumerate(code_lines_right):
+            draw.text((right_x + 30, cbox_y + 24 + c_idx * 34), cl[:28], fill=(220, 252, 231) if c_idx == 0 else (244, 244, 245), font=font_code_comp)
+
+        # Bullets Below Code Boxes
+        bullets_y = cbox_y + cbox_h + 30
+        draw.text((left_x + 35, bullets_y), "• O(n²) Slow Execution", fill=(185, 28, 28), font=get_font(21, bold=True))
+        draw.text((left_x + 35, bullets_y + 40), "• Nested Loop Overhead", fill=(185, 28, 28), font=get_font(21, bold=True))
+        draw.text((left_x + 35, bullets_y + 80), "• Fails Scale Tests", fill=(153, 27, 27), font=get_font(21, bold=True))
+
+        draw.text((right_x + 35, bullets_y), "• O(n log n) Divide & Conquer", fill=(20, 83, 45), font=get_font(21, bold=True))
+        draw.text((right_x + 35, bullets_y + 40), "• 160x Faster Speedup", fill=(20, 83, 45), font=get_font(21, bold=True))
+        draw.text((right_x + 35, bullets_y + 80), "• Production Standard", fill=(4, 120, 87), font=get_font(21, bold=True))
 
         # Center VS Badge
-        vs_cx, vs_cy = W // 2, card_y + 400
-        draw.ellipse([vs_cx - 48, vs_cy - 48, vs_cx + 48, vs_cy + 48], fill=(255, 255, 255), outline=(226, 232, 240), width=3)
-        draw.text((vs_cx, vs_cy), "VS", fill=(15, 23, 42), font=font_vs, anchor="mm")
+        vs_cx, vs_cy = W // 2, cbox_y + cbox_h // 2
+        draw.ellipse([vs_cx - 44, vs_cy - 44, vs_cx + 44, vs_cy + 44], fill=(255, 255, 255), outline=(226, 232, 240), width=4)
+        draw.text((vs_cx, vs_cy), "VS", fill=(15, 23, 42), font=get_font(30, bold=True), anchor="mm")
 
         # Bottom Metric Saved Card (Soft Blue)
         save_x, save_y = 75, 1240
@@ -246,17 +299,261 @@ def render_pedagogical_frame(
         else:  # TeacherLesson
             bot_sub = lesson.outro_homework if lesson.outro_homework else lesson.teacher_tip
 
-        draw.text((save_x + 145, save_y + 85), bot_metric, fill=(30, 58, 138), font=get_font(32, bold=True), anchor="lm")
-        draw.text((save_x + 145, save_y + 150), bot_sub[:62], fill=(30, 64, 175), font=font_tip_body, anchor="lm")
+        draw.text((save_x + 145, save_y + 80), bot_metric, fill=(30, 58, 138), font=get_font(30, bold=True), anchor="lm")
+        # Multi-line wrap for takeaway
+        sub_words = bot_sub.split()
+        sub_l1 = " ".join(sub_words[:8])
+        sub_l2 = " ".join(sub_words[8:16])
+        draw.text((save_x + 145, save_y + 130), sub_l1, fill=(30, 64, 175), font=font_tip_body, anchor="lm")
+        if sub_l2:
+            draw.text((save_x + 145, save_y + 168), sub_l2, fill=(30, 64, 175), font=font_tip_body, anchor="lm")
 
-    else:
+    elif sec < beats[0]:
         # =========================================================================
-        # STYLE 1: WHITE MINIMAL SWISS UI (Exact match to Image 1 & 3)
+        # SCENE 1: THE HOOK & VISUAL PROBLEM / UNSORTED DATA CARD (0s -> beats[0])
         # =========================================================================
         img = Image.new("RGBA", (W, H), (250, 250, 250, 255))
         draw = ImageDraw.Draw(img)
 
-        # 1. Subtle dot grid background
+        # Subtle micro-dot grid
+        for x in range(24, W, 36):
+            for y in range(24, H, 36):
+                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 200))
+
+        # Breadcrumb
+        category = "Python" if "PYTHON" in series_name.upper() else "DSA" if "LEETCODE" in series_name.upper() else "DevTools"
+        tag_str = getattr(lesson, "badge_tag", "Mastery").split("•")[0].strip()[:16]
+        bread_y = 130
+        draw.text((110, bread_y), f"{category} > {series_name[:16]} > Day {ep_num}", fill=(148, 163, 184), font=font_bread)
+
+        # Hero Pill
+        draw.rounded_rectangle([110, 190, 680, 246], radius=16, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
+        draw.text((395, 218), f"[!] CHALLENGE: {tag_str}", fill=(185, 28, 28), font=get_font(22, bold=True), anchor="mm")
+
+        # Headline
+        draw.text((110, 275), topic_title[:38], fill=(15, 23, 42), font=get_font(38, bold=True))
+
+        # 1. Visual Problem Component Card
+        card_x, card_y, card_w, card_h = 90, 360, 900, 480
+        for offset, alpha in [(16, 15), (10, 25), (4, 45)]:
+            draw.rounded_rectangle([card_x - 2, card_y + offset, card_x + card_w + 2, card_y + card_h + offset], radius=28, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=28, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+
+        # macOS dots + Title
+        draw.ellipse([card_x + 40, card_y + 26, card_x + 58, card_y + 44], fill=(255, 95, 86))
+        draw.ellipse([card_x + 68, card_y + 26, card_x + 86, card_y + 44], fill=(255, 189, 46))
+        draw.ellipse([card_x + 96, card_y + 26, card_x + 114, card_y + 44], fill=(39, 201, 63))
+        draw.text((card_x + 140, card_y + 35), f"Input Problem State • {lesson.filename}", fill=(15, 23, 42), font=font_card_head, anchor="lm")
+        draw.line([(card_x + 20, card_y + 68), (card_x + card_w - 20, card_y + 68)], fill=(241, 245, 249), width=2)
+
+        if "quicksort" in lesson.filename.lower() or "sort" in topic_title.lower() or "array" in topic_title.lower():
+            # Render Unsorted Array Component
+            tiles = [38, 27, 43, 3, 9, 82, 10]
+            tile_w, tile_h = 100, 120
+            tile_y = card_y + 130
+            start_tx = card_x + 50
+            gap = 18
+
+            for idx, val in enumerate(tiles):
+                tx = start_tx + idx * (tile_w + gap)
+                is_mid = (idx == len(tiles) // 2)
+                border_col = (245, 158, 11) if is_mid else (203, 213, 225)
+                bg_col = (254, 243, 199) if is_mid else (248, 250, 252)
+                text_col = (180, 83, 9) if is_mid else (15, 23, 42)
+                draw.rounded_rectangle([tx, tile_y, tx + tile_w, tile_y + tile_h], radius=20, fill=bg_col, outline=border_col, width=2)
+                draw.text((tx + tile_w // 2, tile_y + tile_h // 2), str(val), fill=text_col, font=get_font(36, bold=True), anchor="mm")
+                draw.text((tx + tile_w // 2, tile_y + tile_h + 26), f"[{idx}]", fill=(148, 163, 184), font=get_font(20, bold=True), anchor="mm")
+
+            draw.rounded_rectangle([card_x + 60, card_y + 350, card_x + card_w - 60, card_y + 430], radius=18, fill=(241, 245, 249))
+            draw.text((card_x + card_w // 2, card_y + 390), "⚡ Challenge: Sort without O(n) auxiliary allocation!", fill=(51, 65, 85), font=get_font(24, bold=True), anchor="mm")
+        else:
+            # Render Memory Gauge or General Trap Preview
+            draw.text((card_x + 60, card_y + 130), "Memory Profile • Eager Allocation", fill=(30, 58, 138), font=get_font(28, bold=True))
+            draw.rounded_rectangle([card_x + 60, card_y + 190, card_x + card_w - 60, card_y + 270], radius=20, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
+            draw.rounded_rectangle([card_x + 64, card_y + 194, card_x + int((card_w - 128) * 0.88), card_y + 266], radius=16, fill=(239, 68, 68))
+            draw.text((card_x + card_w // 2, card_y + 230), "80.0 MB RAM ALLOCATED (10M Integers)", fill=(255, 255, 255), font=font_mono, anchor="mm")
+            draw.text((card_x + 60, card_y + 320), "⚠️ Every element is created eagerly at definition time!", fill=(185, 28, 28), font=get_font(24, bold=False))
+            draw.rounded_rectangle([card_x + 60, card_y + 370, card_x + card_w - 60, card_y + 440], radius=18, fill=(241, 245, 249))
+            draw.text((card_x + card_w // 2, card_y + 405), "⚡ Goal: Achieve O(1) memory with generator lazy evaluation", fill=(51, 65, 85), font=get_font(24, bold=True), anchor="mm")
+
+        # 2. Trap Card Below
+        trap_y = 880
+        trap_h = 360
+        for offset, alpha in [(12, 15), (6, 25)]:
+            draw.rounded_rectangle([card_x, trap_y + offset, card_x + card_w, trap_y + trap_h + offset], radius=28, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([card_x, trap_y, card_x + card_w, trap_y + trap_h], radius=28, fill=(254, 242, 242), outline=(248, 113, 113), width=2)
+
+        draw.text((card_x + 50, trap_y + 40), "[x] THE JUNIOR TRAP: NAIVE APPROACH", fill=(185, 28, 28), font=font_card_head)
+        draw.text((card_x + 50, trap_y + 90), "• Inefficient complexity or uncontrolled memory consumption", fill=(153, 27, 27), font=get_font(24, bold=False))
+        draw.text((card_x + 50, trap_y + 130), "• Times out or triggers Out-Of-Memory in production!", fill=(153, 27, 27), font=get_font(24, bold=False))
+
+        # Formula / Warning pill
+        draw.rounded_rectangle([card_x + 50, trap_y + 190, card_x + card_w - 50, trap_y + 270], radius=16, fill=(239, 68, 68))
+        draw.text((card_x + card_w // 2, trap_y + 230), "ANTI-PATTERN: HIGH COMPLEXITY / WASTED RESOURCES", fill=(255, 255, 255), font=font_mono, anchor="mm")
+        draw.text((card_x + 50, trap_y + 310), "💡 Next: Watch how senior engineers solve this cleanly...", fill=(120, 53, 15), font=get_font(22, bold=True))
+
+    elif beats[1] <= sec < beats[2]:
+        # =========================================================================
+        # SCENE 3: STEP-BY-STEP EXECUTION DRY RUN (beats[1] -> beats[2])
+        # =========================================================================
+        img = Image.new("RGBA", (W, H), (250, 250, 250, 255))
+        draw = ImageDraw.Draw(img)
+
+        for x in range(24, W, 36):
+            for y in range(24, H, 36):
+                draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 200))
+
+        draw.text((110, 130), f"Step-by-Step Execution • {topic_title[:28]}", fill=(148, 163, 184), font=font_bread)
+
+        # Hero Pill
+        draw.rounded_rectangle([110, 190, 680, 246], radius=16, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((395, 218), "[*] LIVE DRY-RUN • STEP-BY-STEP TRACE", fill=(20, 83, 45), font=get_font(22, bold=True), anchor="mm")
+
+        draw.text((110, 275), "Execution Trace: Logic Explained", fill=(15, 23, 42), font=get_font(36, bold=True))
+
+        card_x, card_y, card_w, card_h = 90, 350, 900, 1000
+        for offset, alpha in [(16, 15), (10, 25), (4, 45)]:
+            draw.rounded_rectangle([card_x - 2, card_y + offset, card_x + card_w + 2, card_y + card_h + offset], radius=28, fill=(0, 0, 0, alpha))
+        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=28, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+
+        draw.ellipse([card_x + 40, card_y + 26, card_x + 58, card_y + 44], fill=(255, 95, 86))
+        draw.ellipse([card_x + 68, card_y + 26, card_x + 86, card_y + 44], fill=(255, 189, 46))
+        draw.ellipse([card_x + 96, card_y + 26, card_x + 114, card_y + 44], fill=(39, 201, 63))
+        draw.text((card_x + 140, card_y + 35), "Dry Run Visualizer • Runtime Trace", fill=(15, 23, 42), font=font_card_head, anchor="lm")
+        draw.line([(card_x + 20, card_y + 68), (card_x + card_w - 20, card_y + 68)], fill=(241, 245, 249), width=2)
+
+        if "quicksort" in lesson.filename.lower() or "sort" in topic_title.lower():
+            # QuickSort Partitioning Trace
+            y_s1 = card_y + 100
+            draw.text((card_x + 50, y_s1), "STEP 1: SELECT PIVOT (Middle Element)", fill=(30, 58, 138), font=get_font(26, bold=True))
+            draw.rounded_rectangle([card_x + 50, y_s1 + 40, card_x + 240, y_s1 + 130], radius=16, fill=(254, 243, 199), outline=(245, 158, 11), width=2)
+            draw.text((card_x + 145, y_s1 + 85), "PIVOT = 9", fill=(180, 83, 9), font=get_font(28, bold=True), anchor="mm")
+            draw.text((card_x + 265, y_s1 + 85), "← Middle index: len(arr) // 2", fill=(100, 116, 139), font=get_font(22, bold=False), anchor="lm")
+
+            y_s2 = card_y + 270
+            draw.text((card_x + 50, y_s2), "STEP 2: PARTITION ELEMENTS AROUND PIVOT", fill=(30, 58, 138), font=get_font(26, bold=True))
+
+            draw.rounded_rectangle([card_x + 50, y_s2 + 40, card_x + 420, y_s2 + 200], radius=18, fill=(239, 246, 255), outline=(147, 197, 253), width=2)
+            draw.text((card_x + 70, y_s2 + 70), "LEFT (< PIVOT)", fill=(29, 78, 216), font=get_font(22, bold=True))
+            draw.rounded_rectangle([card_x + 70, y_s2 + 105, card_x + 160, y_s2 + 175], radius=12, fill=(255, 255, 255), outline=(191, 219, 254))
+            draw.text((card_x + 115, y_s2 + 140), "3", fill=(30, 58, 138), font=get_font(32, bold=True), anchor="mm")
+
+            draw.rounded_rectangle([card_x + 460, y_s2 + 40, card_x + 850, y_s2 + 200], radius=18, fill=(250, 245, 255), outline=(216, 180, 254), width=2)
+            draw.text((card_x + 480, y_s2 + 70), "RIGHT (> PIVOT)", fill=(126, 34, 206), font=get_font(22, bold=True))
+            right_vals = [38, 27, 43, 82, 10]
+            for r_i, r_v in enumerate(right_vals):
+                rx = card_x + 480 + r_i * 68
+                draw.rounded_rectangle([rx, y_s2 + 105, rx + 60, y_s2 + 175], radius=12, fill=(255, 255, 255), outline=(233, 213, 255))
+                draw.text((rx + 30, y_s2 + 140), str(r_v), fill=(107, 33, 168), font=get_font(22, bold=True), anchor="mm")
+
+            y_s3 = card_y + 510
+            draw.text((card_x + 50, y_s3), "STEP 3: RECURSIVE CONCATENATION", fill=(30, 58, 138), font=get_font(26, bold=True))
+            formula_str = "quicksort(left) + [pivot] + quicksort(right)"
+            draw.rounded_rectangle([card_x + 50, y_s3 + 40, card_x + 850, y_s3 + 120], radius=16, fill=(39, 39, 42))
+            draw.text((card_x + 450, y_s3 + 80), formula_str, fill=(255, 255, 255), font=get_font(26, bold=True), anchor="mm")
+
+            y_s4 = card_y + 680
+            draw.text((card_x + 50, y_s4), "STEP 4: FINAL SORTED ARRAY [✓ PASS]", fill=(20, 83, 45), font=get_font(26, bold=True))
+            sorted_vals = [3, 9, 10, 27, 38, 43, 82]
+            for s_i, s_v in enumerate(sorted_vals):
+                sx = card_x + 50 + s_i * (100 + 16)
+                draw.rounded_rectangle([sx, y_s4 + 40, sx + 100, y_s4 + 140], radius=16, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+                draw.text((sx + 50, y_s4 + 90), str(s_v), fill=(20, 83, 45), font=get_font(34, bold=True), anchor="mm")
+
+            draw.rounded_rectangle([card_x + 50, card_y + 870, card_x + 850, card_y + 950], radius=16, fill=(241, 245, 249))
+            draw.text((card_x + 450, card_y + 910), "⚡ TIME COMPLEXITY: O(n log n) AVERAGE • 160x FASTER!", fill=(15, 23, 42), font=get_font(24, bold=True), anchor="mm")
+        else:
+            # Memory Profiling & State Trace for Other Lessons
+            y_s1 = card_y + 100
+            draw.text((card_x + 50, y_s1), "STEP 1: MEMORY USAGE COMPARISON", fill=(30, 58, 138), font=get_font(26, bold=True))
+            draw.text((card_x + 50, y_s1 + 50), "List Comprehension (Eager):", fill=(71, 85, 105), font=get_font(24, bold=True))
+            draw.rounded_rectangle([card_x + 50, y_s1 + 90, card_x + 850, y_s1 + 150], radius=16, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
+            draw.rounded_rectangle([card_x + 54, y_s1 + 94, card_x + 800, y_s1 + 146], radius=12, fill=(239, 68, 68))
+            draw.text((card_x + 450, y_s1 + 120), "80,000,000 BYTES (~80 MB RAM)", fill=(255, 255, 255), font=font_mono, anchor="mm")
+
+            draw.text((card_x + 50, y_s1 + 190), "Generator Expression (Lazy):", fill=(71, 85, 105), font=get_font(24, bold=True))
+            draw.rounded_rectangle([card_x + 50, y_s1 + 230, card_x + 850, y_s1 + 290], radius=16, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+            draw.rounded_rectangle([card_x + 54, y_s1 + 234, card_x + 120, y_s1 + 286], radius=12, fill=(34, 197, 94))
+            draw.text((card_x + 450, y_s1 + 260), "112 BYTES ONLY (99.9% SAVED!)", fill=(20, 83, 45), font=font_mono, anchor="mm")
+
+            y_s2 = card_y + 440
+            draw.text((card_x + 50, y_s2), "STEP 2: HOW GENERATORS WORK UNDER THE HOOD", fill=(30, 58, 138), font=get_font(26, bold=True))
+            draw.rounded_rectangle([card_x + 50, y_s2 + 40, card_x + 850, y_s2 + 200], radius=18, fill=(241, 245, 249))
+            draw.text((card_x + 70, y_s2 + 75), "• Generates values one-by-one via iterator protocol (__next__)", fill=(30, 41, 59), font=get_font(24, bold=False))
+            draw.text((card_x + 70, y_s2 + 115), "• State suspended between yields -> Constant O(1) memory", fill=(30, 41, 59), font=get_font(24, bold=False))
+            draw.text((card_x + 70, y_s2 + 155), "• Never allocates full list in RAM!", fill=(22, 101, 52), font=get_font(24, bold=True))
+
+            draw.rounded_rectangle([card_x + 50, card_y + 870, card_x + 850, card_y + 950], radius=16, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+            draw.text((card_x + 450, card_y + 910), "⚡ RESULT: 112 BYTES FIXED RAM • ZERO CRASHES", fill=(20, 83, 45), font=get_font(24, bold=True), anchor="mm")
+
+    else:
+        # =========================================================================
+        # SCENE 2: THE IDE CODE CARD & CHAR-BY-CHAR TYPING (beats[0] -> beats[1])
+        # =========================================================================
+        img = Image.new("RGBA", (W, H), (250, 250, 250, 255))
+          draw = ImageDraw.Draw(img)
+
+          # Add educational illustration background if available
+          try:
+              # Define image display schedule: which image to show when
+              image_schedule = [
+                  # (start_time, end_time, image_filename, fade_in_duration, fade_out_duration)
+                  (beats[0] + 0.5, beats[0] + 2.5, "image.png", 0.5, 0.5),      # Show image 1 during early part
+                  (beats[0] + 2.5, beats[0] + 4.5, "image copy.png", 0.5, 0.5), # Show image 2 during middle
+                  (beats[0] + 4.5, beats[1] - 0.5, "image copy 2.png", 0.5, 0.5), # Show image 3 during late part
+              ]
+              
+              # Check if current time falls within any image display window
+              for start_time, end_time, img_filename, fade_in, fade_out in image_schedule:
+                  if start_time <= sec < end_time:
+                      # Load and composite the image
+                      img_path = f"assets/images/{img_filename}"
+                      bg_img = load_image_cached(img_path)
+                      
+                      # Calculate alpha for fade-in/fade-out
+                      alpha = 1.0
+                      if sec < start_time + fade_in:
+                          # Fade in
+                          alpha = (sec - start_time) / fade_in
+                      elif sec > end_time - fade_out:
+                          # Fade out
+                          alpha = (end_time - sec) / fade_out
+                      
+                      # Resize image to fit screen while maintaining aspect ratio
+                      bg_width, bg_height = bg_img.size
+                      target_ratio = W / H
+                      img_ratio = bg_width / bg_height
+                      
+                      if img_ratio > target_ratio:
+                          # Image is wider than screen ratio
+                          new_width = W
+                          new_height = int(W / img_ratio)
+                      else:
+                          # Image is taller than screen ratio
+                          new_height = H
+                          new_width = int(H * img_ratio)
+                          
+                      # Resize and center the image
+                      resized_img = bg_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                      paste_x = (W - new_width) // 2
+                      paste_y = (H - new_height) // 2
+                      
+                      # Create a temporary image with the calculated alpha
+                      if alpha < 1.0:
+                          # Apply alpha to the image
+                          alpha_img = Image.new("RGBA", resized_img.size, (255, 255, 255, int(255 * alpha)))
+                          img_to_paste = Image.blend(resized_img, alpha_img, 1.0 - alpha)
+                      else:
+                          img_to_paste = resized_img
+                          
+                      # Composite the image onto the background
+                      img.paste(img_to_paste, (paste_x, paste_y), img_to_paste)
+                      break  # Only show one image at a time
+          except Exception as e:
+              # If there's any error with image processing, continue without background
+              pass
+
+          # 1. Subtle dot grid background
         dot_gap = 36
         for x in range(24, W, dot_gap):
             for y in range(24, H, dot_gap):
@@ -290,52 +587,33 @@ def render_pedagogical_frame(
         draw.text((card_x + card_w - 70, card_y + 24), "•••", fill=(148, 163, 184), font=font_huge)
         draw.line([(card_x + 20, card_y + title_bar_h), (card_x + card_w - 20, card_y + title_bar_h)], fill=(241, 245, 249), width=2)
 
-        # Determine Phase (Naive vs Optimal) - Handle both CodingLesson and TeacherLesson
-        is_optimal_phase = sec >= beats[1]
-        
-        # Get the appropriate code snippets based on lesson type
-        if hasattr(lesson, 'snippet_naive'):  # CodingLesson
-            naive_code = lesson.snippet_naive
-            optimal_code = lesson.snippet_optimal
-        else:  # TeacherLesson
-            naive_code = lesson.code_before
-            optimal_code = lesson.code_after
-            
-        active_code = optimal_code if is_optimal_phase else naive_code
+        # Get optimal solution code for IDE display
+        if hasattr(lesson, 'snippet_optimal'):
+            active_code = lesson.snippet_optimal
+        else:
+            active_code = lesson.code_after
 
-        # Reconstruct raw string for syntax tokenization and progressive typing
         full_code_raw = "\n".join([line_tuple[0] for line_tuple in active_code[:6]])
         
         # Progressive Typing Cadence (CodeVideoRenderer Style)
-        if not is_optimal_phase:
-            type_start = 0.5
-            type_dur = 1.9
-            type_prog = min(1.0, max(0.0, (sec - type_start) / type_dur))
-        else:
-            type_start = beats[1]
-            type_dur = 1.7
-            type_prog = min(1.0, max(0.0, (sec - type_start) / type_dur))
+        type_start = beats[0]
+        type_dur = max(1.2, min(2.5, (beats[1] - beats[0]) * 0.45))
+        type_prog = min(1.0, max(0.0, (sec - type_start) / type_dur))
 
         is_typing = type_prog < 1.0
         if is_typing:
-            # Ease-out typing curve with tactile cadence
             ease_prog = 1.0 - (1.0 - type_prog) ** 1.6
             char_limit = max(1, int(len(full_code_raw) * ease_prog))
         else:
             char_limit = None
 
-        # Tokenize code with Pygments syntax engine
         tokenized_lines, cursor_info = tokenize_code(
             full_code_raw, language="python", is_dark=False, char_limit=char_limit
         )
 
-        # Determine which line to highlight dynamically:
         highlight_idx = 1
         for idx, (l_text, l_tok) in enumerate(active_code[:6]):
-            if any(k in l_text for k in ["⚠️", "BUG", "range(", "basket=", "visited", "slow =", "[x*", "(x*", "pl.col"]):
-                highlight_idx = idx
-                break
-            elif l_tok in ["def", "assign", "loop"] and idx > 0:
+            if any(k in l_text for k in ["pivot", "seen", "basket=", "yield", "range(", "diff", "[x*", "(x*"]):
                 highlight_idx = idx
                 break
 
@@ -343,45 +621,22 @@ def render_pedagogical_frame(
         line_spacing = 66
         focus_line_y = start_code_y + highlight_idx * line_spacing
 
-        # Render code lines with token-level Pygments syntax highlighting
         for i, code_line in enumerate(tokenized_lines[:6]):
             curr_y = start_code_y + i * line_spacing
-            
-            # Line number
             draw.text((card_x + 60, curr_y), str(i + 1), fill=(148, 163, 184), font=font_mono)
 
-            # Highlighter / Execution Backgrounds (Active once typing completes)
+            # Highlighter Wipe on key line
             if i == highlight_idx and not is_typing:
-                if not is_optimal_phase:
-                    # Animated yellow highlighter marker sweep
-                    marker_start = 2.6
-                    sweep_prog = min(1.0, max(0.0, (sec - marker_start) / 0.8))
-                    ease_sweep = 1.0 - (1.0 - sweep_prog) ** 2
-                    curr_w = int(740 * ease_sweep)
-                    if curr_w > 0:
-                        draw.rounded_rectangle([card_x + 120, curr_y - 6, card_x + 120 + curr_w, curr_y + 44], radius=8, fill=(254, 240, 138, 230))
-                else:
-                    # Phase 2: Animated mint green sweep
-                    gen_start = beats[1] + type_dur
-                    gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
-                    curr_w = int(740 * (1.0 - (1.0 - gen_sweep) ** 2))
-                    if curr_w > 0:
-                        draw.rounded_rectangle([card_x + 120, curr_y - 6, card_x + 120 + curr_w, curr_y + 44], radius=8, fill=(209, 250, 229, 230))
+                gen_start = type_start + type_dur
+                gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
+                curr_w = int(740 * (1.0 - (1.0 - gen_sweep) ** 2))
+                if curr_w > 0:
+                    draw.rounded_rectangle([card_x + 120, curr_y - 6, card_x + 120 + curr_w, curr_y + 44], radius=8, fill=(209, 250, 229, 230))
 
-            # Execution Indicator Pointer when Terminal is actively evaluating
-            if sec >= beats[0] and sec < beats[1] and i == highlight_idx:
-                draw.ellipse([card_x + 35, curr_y + 12, card_x + 47, curr_y + 24], fill=(239, 68, 68))
-
-            # Draw Token Runs with Pygments Syntax Colors
+            # Draw Token Runs
             cur_run_x = card_x + 130
             for run in code_line.runs:
-                # Sanitize emojis from raw code text for clean Consolas rendering
-                sanitized_text = (
-                    run.text.replace("❌", "[x]")
-                    .replace("✨", "[*]")
-                    .replace("⚠️", "[!]")
-                    .replace("💡", "[TIP]")
-                )
+                sanitized_text = run.text.replace("❌", "[x]").replace("✨", "[*]").replace("⚠️", "[!]").replace("💡", "[TIP]")
                 run_color = (15, 23, 42) if (i == highlight_idx and not is_typing) else run.color
                 draw.text((cur_run_x, curr_y), sanitized_text, fill=run_color, font=font_code)
                 try:
@@ -389,43 +644,22 @@ def render_pedagogical_frame(
                 except Exception:
                     cur_run_x += len(sanitized_text) * 16
 
-            # Cursor Auto-Tracking (ExploreMaths / CodeVideoRenderer style)
+            # Cursor Auto-Tracking
             if cursor_info and cursor_info[0] == i:
                 cursor_visible = ((int(sec * 1000) % 450) < 320)
                 if cursor_visible:
                     cur_line_w = cur_run_x
-                    draw.line(
-                        [(cur_line_w + 3, curr_y - 2), (cur_line_w + 3, curr_y + 38)],
-                        fill=(14, 165, 233), width=3
-                    )
+                    draw.line([(cur_line_w + 3, curr_y - 2), (cur_line_w + 3, curr_y + 38)], fill=(14, 165, 233), width=3)
 
-        # Docked Tooltip Callout Badge at Bottom of IDE Card (Zero text collision)
+        # Docked Tooltip Callout Badge at Bottom of IDE Card
         if not is_typing:
-            if not is_optimal_phase:
-                marker_start = 2.6
-                sweep_prog = min(1.0, max(0.0, (sec - marker_start) / 0.8))
-                ease_sweep = 1.0 - (1.0 - sweep_prog) ** 2
-                if ease_sweep > 0.35:
-                    badge_pop = min(1.0, (ease_sweep - 0.35) / 0.65)
-                    tooltip_txt = "Allocates 10M ints → ~80MB RAM [!]" if ("10M" in full_code_raw or "14" in str(ep_num)) else "Pitfall: Inefficient Pattern [!]"
-                    badge_w = int(500 * badge_pop)
-                    badge_x = card_x + card_w - badge_w - 40
-                    badge_y = card_y + card_h - 72
-                    if badge_w > 80:
-                        draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 46], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
-                        if badge_pop >= 0.85:
-                            draw.text((badge_x + badge_w // 2, badge_y + 23), tooltip_txt, fill=(113, 63, 18), font=get_font(21, bold=True), anchor="mm")
-            else:
-                gen_start = beats[1] + type_dur
-                gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
-                if gen_sweep > 0.3:
-                    badge_w = 480
-                    badge_x = card_x + card_w - badge_w - 40
-                    badge_y = card_y + card_h - 72
-                    draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 46], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
-                    draw.text((badge_x + badge_w // 2, badge_y + 23), "Production Clean: 112 Bytes (O(1)) [*]", fill=(20, 83, 45), font=get_font(21, bold=True), anchor="mm")
+            badge_w = 520
+            badge_x = card_x + card_w - badge_w - 40
+            badge_y = card_y + card_h - 72
+            draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 46], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+            draw.text((badge_x + badge_w // 2, badge_y + 23), "⚡ Production Clean (Optimal Solution) [*]", fill=(20, 83, 45), font=get_font(21, bold=True), anchor="mm")
 
-        # 4. Dynamic Terminal Card
+        # 4. Terminal Card Underneath
         term_x, term_y = 90, 1035
         term_w, term_h = 900, 260
         for offset, alpha in [(10, 15), (4, 30)]:
@@ -434,26 +668,17 @@ def render_pedagogical_frame(
         draw.text((term_x + 50, term_y + 20), "Terminal", fill=(100, 116, 139), font=font_card_head)
 
         in_box_y = term_y + 62
-        # Get the appropriate terminal attributes based on lesson type
-        if hasattr(lesson, 'terminal_cmd'):  # CodingLesson
-            terminal_command = lesson.terminal_cmd
-            terminal_output = lesson.terminal_output
-        else:  # TeacherLesson
-            terminal_command = getattr(lesson, "terminal_command", "$ python3 main.py")
-            terminal_output = getattr(lesson, "terminal_logs", [])
-        
+        terminal_command = getattr(lesson, "terminal_cmd", getattr(lesson, "terminal_command", "$ python3 main.py"))
+        terminal_output = getattr(lesson, "terminal_output", getattr(lesson, "terminal_logs", []))
         draw.rounded_rectangle([term_x + 25, in_box_y, term_x + term_w - 25, term_y + term_h - 20], radius=16, fill=(24, 24, 27))
         draw.text((term_x + 55, in_box_y + 36), terminal_command, fill=(244, 244, 245), font=font_mono, anchor="lm")
 
-        # Dynamic terminal logs streaming
-        if sec > beats[0] and terminal_output:
-            elapsed_term = sec - beats[0]
-            for log_idx, log_line in enumerate(terminal_output[:3]):
-                if elapsed_term >= 0.4 + log_idx * 0.7:
-                    log_color = (74, 222, 128) if any(k in log_line for k in ["✓", "PASS", "SPEEDUP", "RESULT", "Test", "SORTED"]) else (248, 113, 113) if "⚠️" in log_line or "Peak: 8" in log_line or "BUG" in log_line else (244, 244, 245)
-                    draw.text((term_x + 55, in_box_y + 78 + log_idx * 36), log_line[:52], fill=log_color, font=font_mono, anchor="lm")
+        if terminal_output:
+            for log_idx, log_line in enumerate(terminal_output[:2]):
+                log_color = (74, 222, 128) if any(k in log_line for k in ["✓", "PASS", "SPEEDUP", "RESULT", "Test", "SORTED"]) else (248, 113, 113) if "⚠️" in log_line or "Peak: 8" in log_line or "BUG" in log_line else (244, 244, 245)
+                draw.text((term_x + 55, in_box_y + 78 + log_idx * 36), log_line[:52], fill=log_color, font=font_mono, anchor="lm")
 
-        # 5. Dynamic Teacher Tip Card (Crisp Vector Badge)
+        # 5. Teacher Tip Card
         tip_x, tip_y = 90, 1335
         tip_w, tip_h = 900, 220
         for offset, alpha in [(8, 12), (3, 20)]:
@@ -464,7 +689,6 @@ def render_pedagogical_frame(
         draw.text((tip_x + 75, tip_y + 75), "TIP", fill=(120, 53, 15), font=get_font(24, bold=True), anchor="mm")
         draw.text((tip_x + 140, tip_y + 44), "Teacher Tip", fill=(146, 64, 14), font=font_tip_title)
 
-        # Clean auto-wrapping for teacher tip
         raw_tip = getattr(lesson, "teacher_tip", "Clean code wins!").replace("TEACHER TIP:", "").strip()
         words_tip = raw_tip.split()
         tip_lines = []
@@ -481,22 +705,6 @@ def render_pedagogical_frame(
         for idx, l in enumerate(tip_lines[:3]):
             draw.text((tip_x + 140, tip_y + 88 + idx * 34), l, fill=(180, 83, 9), font=font_tip_body)
 
-        # Dynamic Camera Zoom on the highlighted line
-        zoom = 1.0
-        if 2.5 <= sec <= 8.5:
-            zoom_factor = math.sin((sec - 2.5) / 6.0 * math.pi)
-            zoom = 1.0 + 0.12 * zoom_factor
-
-        if zoom > 1.005:
-            crop_w = int(W / zoom)
-            crop_h = int(H / zoom)
-            focus_x = W // 2
-            focus_y = int(card_y + title_bar_h + 100)
-            x1 = max(0, min(W - crop_w, focus_x - crop_w // 2))
-            y1 = max(0, min(H - crop_h, focus_y - crop_h // 2))
-            cropped = img.crop((x1, y1, x1 + crop_w, y1 + crop_h))
-            img = cropped.resize((W, H), Image.Resampling.BILINEAR)
-            draw = ImageDraw.Draw(img)
 
     # =========================================================================
     # 6. KINETIC KARAOKE SUBTITLES (Safe Margin 9:16 - Fixed overlay)
@@ -590,7 +798,7 @@ async def render_coding_short(lesson_id: str | None = None) -> Path:
     t0 = time.time()
 
     # 1. Voiceover
-    print(f"🎙️ Generating continuous teacher narration via Edge TTS Jenny...")
+    print(f"🎙️ Generating teacher narration via Kokoro-82M...")
     wav_path, beats, duration = await generate_speech_tracks(lesson, OUTPUT_DIR)
     print(f"✅ Voiceover rendered: {duration:.2f}s (Beats: {[round(b, 2) for b in beats]})")
 
@@ -598,7 +806,49 @@ async def render_coding_short(lesson_id: str | None = None) -> Path:
     print("🎧 Synthesizing Diegetic Coding Foley & Keyboard Keystrokes SFX...")
     master_soundtrack = OUTPUT_DIR / f"{les_id}_master_soundtrack.wav"
     try:
-        build_teacher_foley_soundtrack(wav_path, master_soundtrack, beats)
+        # Define helper functions for typing synchronization
+        def is_optimal_phase(sec):
+            return sec >= beats[1] if len(beats) > 1 else False
+            
+        def get_active_code():
+            # Get the appropriate code snippets based on lesson type
+            if hasattr(lesson, 'snippet_naive'):  # CodingLesson
+                naive_code = lesson.snippet_naive
+                optimal_code = lesson.snippet_optimal
+            else:  # TeacherLesson
+                naive_code = lesson.code_before
+                optimal_code = lesson.code_after
+            return optimal_code if is_optimal_phase(0) else naive_code  # Default to naive for getting active code
+            
+        def get_full_code_raw():
+            active_code = get_active_code()
+            return "\n".join([line_tuple[0] for line_tuple in active_code[:6]])
+            
+        def get_type_start(sec):
+            # Determine if we're in optimal phase at this second
+            if is_optimal_phase(sec):
+                return beats[1] if len(beats) > 1 else 0.5
+            else:
+                return 0.5
+                
+        def get_type_duration(sec):
+            # Determine if we're in optimal phase at this second
+            if is_optimal_phase(sec):
+                return 1.7  # Optimal phase typing duration
+            else:
+                return 1.9  # Naive phase typing duration
+        
+        build_teacher_foley_soundtrack(
+            wav_path, 
+            master_soundtrack, 
+            beats,
+            lesson=lesson,
+            is_optimal_phase_func=is_optimal_phase,
+            get_active_code_func=get_active_code,
+            get_full_code_raw_func=get_full_code_raw,
+            get_type_start_func=get_type_start,
+            get_type_duration_func=get_type_duration
+        )
         final_audio_path = master_soundtrack
         print("✅ Foley & SFX sound track mixed seamlessly!")
     except Exception as e:
