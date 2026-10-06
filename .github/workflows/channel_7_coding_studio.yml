@@ -74,19 +74,10 @@ jobs:
           [ -n "$YT_CLIENT_B64" ]       && printf '%s' "$YT_CLIENT_B64"       | base64 -d > super_youtube_agent/01_facts_shorts/credentials/client_secret.json || true
           python3 -c "import json; json.load(open('super_youtube_agent/01_facts_shorts/credentials/token.json')); print('✅ token.json is valid JSON for Coding Channel')" 2>/dev/null || echo "ℹ️ token.json pending"
 
-      - name: Generate Short Video (Coding & Tech Mode)
-        working-directory: super_youtube_agent/01_facts_shorts
+      - name: Generate Pedagogical Coding Short (Live IDE & Terminal Animation)
+        working-directory: super_youtube_agent/07_coding_studio
         env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-          FOOTAGE_PROVIDERS: pexels,pixabay,local
-          LLM_PROVIDER: auto
-          NICHE: coding
-          VIDEO_MODE: story
-          SCRIPT_STYLE: punchy
-          SCRIPT_LANGUAGE: english
           VOICE_PROVIDER: edge
           VOICE: en-US-JennyNeural
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
@@ -95,7 +86,7 @@ jobs:
           AUTO_UPLOAD: ${{ github.event.inputs.auto_upload }}
           PRIVACY_OPT: ${{ github.event.inputs.privacy || 'unlisted' }}
         run: |
-          python main.py --generate --niche coding --mode story
+          python main.py --generate
 
       - name: 📱 Send Video Directly to Telegram Phone
         if: always()
@@ -104,12 +95,12 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
           CHANNEL_BADGE: 'Channel 7 (Coding & Tech Studio)'
         run: |
-          python send_to_telegram.py super_youtube_agent/01_facts_shorts/output || true
+          python send_to_telegram.py super_youtube_agent/07_coding_studio/output || true
 
       - name: Save Rendered Video Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: channel-7-coding-rendered-videos
-          path: super_youtube_agent/01_facts_shorts/output/*.mp4
+          path: super_youtube_agent/07_coding_studio/output/*.mp4
           retention-days: 14

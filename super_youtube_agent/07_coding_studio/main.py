@@ -1,24 +1,38 @@
 """
-Channel 7 — Coding & Tech Studio
-Generates viral programming shorts, Python/JS hacks, AI tool breakdowns, and dev tutorials.
+Channel 7 — Pedagogical Coding & Tech Studio.
+Generates viral programming shorts, DSA patterns, LeetCode walkthroughs, and Python traps.
+Completely standalone and decoupled from 01_facts_shorts.
 """
+import argparse
+import asyncio
 import os
 import sys
 from pathlib import Path
 
-# Add 01_facts_shorts to path
+# Add self to path
 CURRENT_DIR = Path(__file__).resolve().parent
-ROOT_DIR = CURRENT_DIR.parent
-FACTS_SHORTS_DIR = ROOT_DIR / "01_facts_shorts"
-sys.path.insert(0, str(FACTS_SHORTS_DIR))
+sys.path.insert(0, str(CURRENT_DIR))
 
-# Ensure credentials point to token_coding.json if token.json is not present
-os.environ["NICHE"] = "coding"
-os.environ["VIDEO_MODE"] = os.getenv("VIDEO_MODE", "story")
-os.environ["SCRIPT_STYLE"] = os.getenv("SCRIPT_STYLE", "punchy")
+from vox_coding_studio import render_coding_short
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Channel 7 Pedagogical Coding Studio")
+    parser.add_argument("--topic", type=str, default="", help="Coding topic or LeetCode question")
+    parser.add_argument("--lesson", type=str, default="", help="Specific lesson ID")
+    parser.add_argument("--generate", action="store_true", help="Generate coding short")
+    parser.add_argument("--mode", type=str, default="story", help="Video mode")
+    parser.add_argument("--niche", type=str, default="coding", help="Niche")
+
+    args = parser.parse_args()
+
+    topic_query = args.topic or args.lesson or os.getenv("TOPIC_INPUT") or os.getenv("TOPIC") or ""
+    print(f"🎬 [Channel 7 CLI] Starting generation with query: '{topic_query}'")
+
+    out_video = asyncio.run(render_coding_short(topic_query if topic_query.strip() else None))
+    print(f"✅ Video ready: {out_video}")
+    return 0
+
 
 if __name__ == "__main__":
-    from main import main
-    # Pass along any CLI arguments or default to generating a coding short
-    args = sys.argv[1:] if len(sys.argv) > 1 else ["--generate", "--niche", "coding", "--mode", "story"]
-    sys.exit(main(args))
+    sys.exit(main())
