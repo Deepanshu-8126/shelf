@@ -62,7 +62,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r super_youtube_agent/01_facts_shorts/requirements.txt
-          pip install httpx edge-tts
+          pip install httpx edge-tts pygments
 
       - name: Setup YouTube Credentials (Coding Channel)
         env:

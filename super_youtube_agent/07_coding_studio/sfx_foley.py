@@ -109,6 +109,29 @@ def overlay_audio_stem(master: np.ndarray, stem: np.ndarray, start_sec: float, v
         master[start_sample:end_sample] += stem[:stem_len] * volume
 
 
+def overlay_keystroke_sequence(
+    master: np.ndarray,
+    start_time: float,
+    duration: float,
+    volume: float = 0.36
+):
+    """Generates humanized Cherry MX mechanical keyboard typing sounds with tactile cadence."""
+    rng = np.random.RandomState(42)
+    t = start_time
+    end_time = min(len(master) / SAMPLE_RATE, start_time + duration)
+    click = create_mechanical_click()
+    enter = create_enter_key()
+
+    while t < end_time:
+        is_newline = rng.rand() < 0.14
+        if is_newline:
+            overlay_audio_stem(master, enter, t, volume=volume * 1.25)
+            t += rng.uniform(0.11, 0.18)
+        else:
+            overlay_audio_stem(master, click, t, volume=volume * rng.uniform(0.85, 1.15))
+            t += rng.uniform(0.048, 0.088)
+
+
 def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, beats: list[float]) -> Path:
     """
     Reads Edge TTS narration, mixes diegetic coding Foley SFX at key pedagogical beats,
@@ -136,18 +159,13 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
     master = np.copy(voice_data)
 
     # Prepare SFX stems
-    click = create_mechanical_click()
-    enter = create_enter_key()
     marker = create_marker_sweep()
     whoosh = create_whoosh()
     ding = create_success_ding()
 
     # Foley Cues (Synchronized frame-accurately with visual transitions):
-    # 1. Early typing clicks during hook (0.5s to 2.2s)
-    typing_times = [0.6, 0.8, 1.0, 1.25, 1.45, 1.7, 1.95, 2.2]
-    for tt in typing_times:
-        if tt < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, click, tt, volume=0.35)
+    # 1. Early character-by-character typing keystrokes (0.5s to 2.4s)
+    overlay_keystroke_sequence(master, start_time=0.5, duration=2.0, volume=0.38)
 
     # 2. Highlighter marker sweep on key line (around 2.6s - exactly when visual wipe begins)
     marker_time = 2.6
@@ -155,9 +173,10 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
         overlay_audio_stem(master, marker, marker_time, volume=0.55)
 
     # 3. Enter key click when Terminal executes (around beats[0] + 0.4s)
+    enter_thud = create_enter_key()
     term_enter_time = beats[0] + 0.4 if len(beats) > 0 else 7.0
     if term_enter_time < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, enter, term_enter_time, volume=0.65)
+        overlay_audio_stem(master, enter_thud, term_enter_time, volume=0.65)
 
     # 4. Terminal pass / benchmark ding (around beats[0] + 1.8s)
     term_ding_time = beats[0] + 1.8 if len(beats) > 0 else 8.5
@@ -168,10 +187,7 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
     if len(beats) > 1 and beats[1] < len(master) / SAMPLE_RATE:
         overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.50)
         # Fast typing clacks for the clean refactor
-        gen_typing = [beats[1] + 0.25, beats[1] + 0.4, beats[1] + 0.55, beats[1] + 0.7]
-        for gt in gen_typing:
-            if gt < len(master) / SAMPLE_RATE:
-                overlay_audio_stem(master, click, gt, volume=0.35)
+        overlay_keystroke_sequence(master, start_time=beats[1], duration=1.8, volume=0.38)
 
     # 6. Climax Whoosh + Ding into the VS Comparison Screen (around beats[2])
     climax_beat = beats[2] if len(beats) > 2 else len(master) / SAMPLE_RATE * 0.75

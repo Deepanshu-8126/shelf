@@ -20,6 +20,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import edge_tts
 from sfx_foley import build_teacher_foley_soundtrack
+from code_highlighter import tokenize_code
 
 # Fix Windows console UTF-8 output
 if hasattr(sys.stdout, "reconfigure"):
@@ -157,14 +158,23 @@ def render_pedagogical_frame(
 
         # Left Card: Soft Coral Red (Naive / Pitfall)
         left_title = "NAIVE PATTERN"
-        for l_t, _ in lesson.code_before:
+        
+        # Get the appropriate code snippets based on lesson type
+        if hasattr(lesson, 'snippet_naive'):  # CodingLesson
+            naive_code = lesson.snippet_naive
+            optimal_code = lesson.snippet_optimal
+        else:  # TeacherLesson
+            naive_code = lesson.code_before
+            optimal_code = lesson.code_after
+        
+        for l_t, _ in naive_code:
             if l_t.startswith("# ❌"):
                 left_title = l_t.replace("# ❌", "").split("(")[0].strip()[:20]
                 break
         left_sub = getattr(lesson, "badge_tag", "EAGER")[:18]
 
         left_pill = ""
-        for l_t, _ in lesson.code_before:
+        for l_t, _ in naive_code:
             if not l_t.startswith("#") and len(l_t.strip()) > 3:
                 left_pill = l_t.strip()[:26]
                 break
@@ -182,14 +192,14 @@ def render_pedagogical_frame(
 
         # Right Card: Soft Mint Green (Optimal / Production)
         right_title = "OPTIMAL FIX"
-        for l_t, _ in lesson.code_after:
+        for l_t, _ in optimal_code:
             if l_t.startswith("# ✨"):
                 right_title = l_t.replace("# ✨", "").split("(")[0].strip()[:20]
                 break
         right_sub = "PRODUCTION CLEAN"
 
         right_pill = ""
-        for l_t, _ in lesson.code_after:
+        for l_t, _ in optimal_code:
             if not l_t.startswith("#") and len(l_t.strip()) > 3:
                 right_pill = l_t.strip()[:26]
                 break
@@ -222,9 +232,19 @@ def render_pedagogical_frame(
         draw.line([(save_x + 82, save_y + 98), (save_x + 102, save_y + 72)], fill=(255, 255, 255), width=5)
 
         bot_metric = "Production Optimal •"
-        if lesson.terminal_logs:
-            bot_metric = lesson.terminal_logs[-1].replace(">>", "").replace("[+]", "").strip()[:32] + " •"
-        bot_sub = lesson.outro_homework if lesson.outro_homework else lesson.teacher_tip
+        # Get the appropriate terminal attributes based on lesson type
+        if hasattr(lesson, 'terminal_cmd'):  # CodingLesson
+            terminal_output = lesson.terminal_output
+        else:  # TeacherLesson
+            terminal_output = getattr(lesson, "terminal_logs", [])
+        
+        if terminal_output:
+            bot_metric = terminal_output[-1].replace(">>", "").replace("[+]", "").strip()[:32] + " •"
+        # Get the appropriate outro/takeaway attribute based on lesson type
+        if hasattr(lesson, 'takeaway_narration'):  # CodingLesson
+            bot_sub = lesson.takeaway_narration if lesson.takeaway_narration else lesson.teacher_tip
+        else:  # TeacherLesson
+            bot_sub = lesson.outro_homework if lesson.outro_homework else lesson.teacher_tip
 
         draw.text((save_x + 145, save_y + 85), bot_metric, fill=(30, 58, 138), font=get_font(32, bold=True), anchor="lm")
         draw.text((save_x + 145, save_y + 150), bot_sub[:62], fill=(30, 64, 175), font=font_tip_body, anchor="lm")
@@ -270,13 +290,48 @@ def render_pedagogical_frame(
         draw.text((card_x + card_w - 70, card_y + 24), "•••", fill=(148, 163, 184), font=font_huge)
         draw.line([(card_x + 20, card_y + title_bar_h), (card_x + card_w - 20, card_y + title_bar_h)], fill=(241, 245, 249), width=2)
 
-        # Determine Phase (Naive vs Optimal)
+        # Determine Phase (Naive vs Optimal) - Handle both CodingLesson and TeacherLesson
         is_optimal_phase = sec >= beats[1]
-        active_code = lesson.code_after if is_optimal_phase else lesson.code_before
+        
+        # Get the appropriate code snippets based on lesson type
+        if hasattr(lesson, 'snippet_naive'):  # CodingLesson
+            naive_code = lesson.snippet_naive
+            optimal_code = lesson.snippet_optimal
+        else:  # TeacherLesson
+            naive_code = lesson.code_before
+            optimal_code = lesson.code_after
+            
+        active_code = optimal_code if is_optimal_phase else naive_code
+
+        # Reconstruct raw string for syntax tokenization and progressive typing
+        full_code_raw = "\n".join([line_tuple[0] for line_tuple in active_code[:6]])
+        
+        # Progressive Typing Cadence (CodeVideoRenderer Style)
+        if not is_optimal_phase:
+            type_start = 0.5
+            type_dur = 1.9
+            type_prog = min(1.0, max(0.0, (sec - type_start) / type_dur))
+        else:
+            type_start = beats[1]
+            type_dur = 1.7
+            type_prog = min(1.0, max(0.0, (sec - type_start) / type_dur))
+
+        is_typing = type_prog < 1.0
+        if is_typing:
+            # Ease-out typing curve with tactile cadence
+            ease_prog = 1.0 - (1.0 - type_prog) ** 1.6
+            char_limit = max(1, int(len(full_code_raw) * ease_prog))
+        else:
+            char_limit = None
+
+        # Tokenize code with Pygments syntax engine
+        tokenized_lines, cursor_info = tokenize_code(
+            full_code_raw, language="python", is_dark=False, char_limit=char_limit
+        )
 
         # Determine which line to highlight dynamically:
         highlight_idx = 1
-        for idx, (l_text, l_tok) in enumerate(active_code):
+        for idx, (l_text, l_tok) in enumerate(active_code[:6]):
             if any(k in l_text for k in ["⚠️", "BUG", "range(", "basket=", "visited", "slow =", "[x*", "(x*", "pl.col"]):
                 highlight_idx = idx
                 break
@@ -288,12 +343,15 @@ def render_pedagogical_frame(
         line_spacing = 66
         focus_line_y = start_code_y + highlight_idx * line_spacing
 
-        # Render code lines with line numbers
-        for i, (l_text, l_tok) in enumerate(active_code[:6]):
+        # Render code lines with token-level Pygments syntax highlighting
+        for i, code_line in enumerate(tokenized_lines[:6]):
             curr_y = start_code_y + i * line_spacing
+            
+            # Line number
             draw.text((card_x + 60, curr_y), str(i + 1), fill=(148, 163, 184), font=font_mono)
 
-            if i == highlight_idx:
+            # Highlighter / Execution Backgrounds (Active once typing completes)
+            if i == highlight_idx and not is_typing:
                 if not is_optimal_phase:
                     # Animated yellow highlighter marker sweep
                     marker_start = 2.6
@@ -302,36 +360,70 @@ def render_pedagogical_frame(
                     curr_w = int(740 * ease_sweep)
                     if curr_w > 0:
                         draw.rounded_rectangle([card_x + 120, curr_y - 6, card_x + 120 + curr_w, curr_y + 44], radius=8, fill=(254, 240, 138, 230))
-                    draw.text((card_x + 130, curr_y), l_text, fill=(15, 23, 42), font=font_code)
-
-                    # Tooltip callout badge with scale bounce
-                    if ease_sweep > 0.4:
-                        badge_pop = min(1.0, (ease_sweep - 0.4) / 0.6)
-                        tooltip_txt = "Allocates 10M ints → ~80MB ⓘ" if "10M" in l_text or "14" in str(ep_num) else "⚠️ Anti-Pattern Pitfall ⓘ"
-                        badge_w = int(420 * badge_pop)
-                        badge_x = card_x + 400
-                        badge_y = curr_y + 58
-                        if badge_w > 60:
-                            draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 48], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
-                            if badge_pop >= 0.85:
-                                draw.text((badge_x + badge_w // 2, badge_y + 24), tooltip_txt, fill=(113, 63, 18), font=get_font(21, bold=True), anchor="mm")
                 else:
                     # Phase 2: Animated mint green sweep
-                    gen_start = beats[1]
+                    gen_start = beats[1] + type_dur
                     gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
                     curr_w = int(740 * (1.0 - (1.0 - gen_sweep) ** 2))
                     if curr_w > 0:
                         draw.rounded_rectangle([card_x + 120, curr_y - 6, card_x + 120 + curr_w, curr_y + 44], radius=8, fill=(209, 250, 229, 230))
-                    draw.text((card_x + 130, curr_y), l_text, fill=(15, 23, 42), font=font_code)
 
-                    # Tooltip callout badge
-                    badge_x = card_x + 400
-                    badge_y = curr_y + 58
-                    draw.rounded_rectangle([badge_x, badge_y, badge_x + 400, badge_y + 48], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
-                    draw.text((badge_x + 200, badge_y + 24), "⚡ Production Clean (Optimal) ⓘ", fill=(20, 83, 45), font=get_font(21, bold=True), anchor="mm")
+            # Execution Indicator Pointer when Terminal is actively evaluating
+            if sec >= beats[0] and sec < beats[1] and i == highlight_idx:
+                draw.ellipse([card_x + 35, curr_y + 12, card_x + 47, curr_y + 24], fill=(239, 68, 68))
+
+            # Draw Token Runs with Pygments Syntax Colors
+            cur_run_x = card_x + 130
+            for run in code_line.runs:
+                # Sanitize emojis from raw code text for clean Consolas rendering
+                sanitized_text = (
+                    run.text.replace("❌", "[x]")
+                    .replace("✨", "[*]")
+                    .replace("⚠️", "[!]")
+                    .replace("💡", "[TIP]")
+                )
+                run_color = (15, 23, 42) if (i == highlight_idx and not is_typing) else run.color
+                draw.text((cur_run_x, curr_y), sanitized_text, fill=run_color, font=font_code)
+                try:
+                    cur_run_x += font_code.getlength(sanitized_text)
+                except Exception:
+                    cur_run_x += len(sanitized_text) * 16
+
+            # Cursor Auto-Tracking (ExploreMaths / CodeVideoRenderer style)
+            if cursor_info and cursor_info[0] == i:
+                cursor_visible = ((int(sec * 1000) % 450) < 320)
+                if cursor_visible:
+                    cur_line_w = cur_run_x
+                    draw.line(
+                        [(cur_line_w + 3, curr_y - 2), (cur_line_w + 3, curr_y + 38)],
+                        fill=(14, 165, 233), width=3
+                    )
+
+        # Docked Tooltip Callout Badge at Bottom of IDE Card (Zero text collision)
+        if not is_typing:
+            if not is_optimal_phase:
+                marker_start = 2.6
+                sweep_prog = min(1.0, max(0.0, (sec - marker_start) / 0.8))
+                ease_sweep = 1.0 - (1.0 - sweep_prog) ** 2
+                if ease_sweep > 0.35:
+                    badge_pop = min(1.0, (ease_sweep - 0.35) / 0.65)
+                    tooltip_txt = "Allocates 10M ints → ~80MB RAM [!]" if ("10M" in full_code_raw or "14" in str(ep_num)) else "Pitfall: Inefficient Pattern [!]"
+                    badge_w = int(500 * badge_pop)
+                    badge_x = card_x + card_w - badge_w - 40
+                    badge_y = card_y + card_h - 72
+                    if badge_w > 80:
+                        draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 46], radius=14, fill=(254, 249, 195), outline=(253, 224, 71), width=2)
+                        if badge_pop >= 0.85:
+                            draw.text((badge_x + badge_w // 2, badge_y + 23), tooltip_txt, fill=(113, 63, 18), font=get_font(21, bold=True), anchor="mm")
             else:
-                line_color = (100, 116, 139) if l_tok == "comment" else (15, 23, 42)
-                draw.text((card_x + 130, curr_y), l_text, fill=line_color, font=font_code)
+                gen_start = beats[1] + type_dur
+                gen_sweep = min(1.0, max(0.0, (sec - gen_start) / 0.7))
+                if gen_sweep > 0.3:
+                    badge_w = 480
+                    badge_x = card_x + card_w - badge_w - 40
+                    badge_y = card_y + card_h - 72
+                    draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w, badge_y + 46], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+                    draw.text((badge_x + badge_w // 2, badge_y + 23), "Production Clean: 112 Bytes (O(1)) [*]", fill=(20, 83, 45), font=get_font(21, bold=True), anchor="mm")
 
         # 4. Dynamic Terminal Card
         term_x, term_y = 90, 1035
@@ -342,24 +434,34 @@ def render_pedagogical_frame(
         draw.text((term_x + 50, term_y + 20), "Terminal", fill=(100, 116, 139), font=font_card_head)
 
         in_box_y = term_y + 62
+        # Get the appropriate terminal attributes based on lesson type
+        if hasattr(lesson, 'terminal_cmd'):  # CodingLesson
+            terminal_command = lesson.terminal_cmd
+            terminal_output = lesson.terminal_output
+        else:  # TeacherLesson
+            terminal_command = getattr(lesson, "terminal_command", "$ python3 main.py")
+            terminal_output = getattr(lesson, "terminal_logs", [])
+        
         draw.rounded_rectangle([term_x + 25, in_box_y, term_x + term_w - 25, term_y + term_h - 20], radius=16, fill=(24, 24, 27))
-        draw.text((term_x + 55, in_box_y + 36), getattr(lesson, "terminal_command", "$ python3 main.py"), fill=(244, 244, 245), font=font_mono, anchor="lm")
+        draw.text((term_x + 55, in_box_y + 36), terminal_command, fill=(244, 244, 245), font=font_mono, anchor="lm")
 
         # Dynamic terminal logs streaming
-        if sec > beats[0] and lesson.terminal_logs:
-            for log_idx, log_line in enumerate(lesson.terminal_logs[:2]):
-                log_color = (74, 222, 128) if any(k in log_line for k in ["✓", "PASS", "SPEEDUP", "RESULT", "Test"]) else (248, 113, 113) if "⚠️" in log_line or "Peak: 8" in log_line else (244, 244, 245)
-                draw.text((term_x + 55, in_box_y + 78 + log_idx * 38), log_line[:52], fill=log_color, font=font_mono, anchor="lm")
+        if sec > beats[0] and terminal_output:
+            elapsed_term = sec - beats[0]
+            for log_idx, log_line in enumerate(terminal_output[:3]):
+                if elapsed_term >= 0.4 + log_idx * 0.7:
+                    log_color = (74, 222, 128) if any(k in log_line for k in ["✓", "PASS", "SPEEDUP", "RESULT", "Test", "SORTED"]) else (248, 113, 113) if "⚠️" in log_line or "Peak: 8" in log_line or "BUG" in log_line else (244, 244, 245)
+                    draw.text((term_x + 55, in_box_y + 78 + log_idx * 36), log_line[:52], fill=log_color, font=font_mono, anchor="lm")
 
-        # 5. Dynamic Teacher Tip Card
+        # 5. Dynamic Teacher Tip Card (Crisp Vector Badge)
         tip_x, tip_y = 90, 1335
         tip_w, tip_h = 900, 220
         for offset, alpha in [(8, 12), (3, 20)]:
             draw.rounded_rectangle([tip_x, tip_y + offset, tip_x + tip_w, tip_y + tip_h + offset], radius=24, fill=(0, 0, 0, alpha))
         draw.rounded_rectangle([tip_x, tip_y, tip_x + tip_w, tip_y + tip_h], radius=24, fill=(254, 243, 199), outline=(253, 230, 138), width=2)
 
-        draw.ellipse([tip_x + 35, tip_y + 35, tip_x + 115, tip_y + 115], fill=(253, 230, 138))
-        draw.text((tip_x + 75, tip_y + 75), "💡", fill=(146, 64, 14), font=font_card_head, anchor="mm")
+        draw.rounded_rectangle([tip_x + 35, tip_y + 35, tip_x + 115, tip_y + 115], radius=20, fill=(251, 191, 36))
+        draw.text((tip_x + 75, tip_y + 75), "TIP", fill=(120, 53, 15), font=get_font(24, bold=True), anchor="mm")
         draw.text((tip_x + 140, tip_y + 44), "Teacher Tip", fill=(146, 64, 14), font=font_tip_title)
 
         # Clean auto-wrapping for teacher tip
@@ -413,14 +515,27 @@ def render_pedagogical_frame(
     )
 
     words = active_speech.split()
-    mid = len(words) // 2
-    line1 = " ".join(words[:mid]) if mid > 0 else active_speech
-    line2 = " ".join(words[mid:]) if mid > 0 else ""
+    lines_sub = []
+    curr_line = []
+    for w in words:
+        test_line = " ".join(curr_line + [w])
+        if len(test_line) > 36:
+            lines_sub.append(" ".join(curr_line))
+            curr_line = [w]
+        else:
+            curr_line.append(w)
+    if curr_line:
+        lines_sub.append(" ".join(curr_line))
 
-    draw.rounded_rectangle([W // 2 - 470, sub_box_y - 20, W // 2 + 470, sub_box_y + 130], radius=24, fill=(15, 23, 42), outline=(250, 204, 21), width=3)
-    draw.text((W // 2, sub_box_y + 25), line1, fill=(255, 255, 255), font=font_sub, anchor="mm")
+    line1 = lines_sub[0] if len(lines_sub) > 0 else ""
+    line2 = lines_sub[1] if len(lines_sub) > 1 else ""
+
+    box_w = 940
+    font_sub_cal = get_font(28, bold=True)
+    draw.rounded_rectangle([W // 2 - box_w // 2, sub_box_y - 20, W // 2 + box_w // 2, sub_box_y + 125], radius=22, fill=(15, 23, 42), outline=(250, 204, 21), width=3)
+    draw.text((W // 2, sub_box_y + 24), line1, fill=(255, 255, 255), font=font_sub_cal, anchor="mm")
     if line2:
-        draw.text((W // 2, sub_box_y + 80), line2, fill=(56, 189, 248), font=font_sub, anchor="mm")
+        draw.text((W // 2, sub_box_y + 76), line2, fill=(56, 189, 248), font=font_sub_cal, anchor="mm")
 
     # 7. Bottom Branding Telemetry
     draw.text((W // 2, 1835), "CHANNEL 7 // CODE CRAFT • 100 DAYS OF PYTHON • 60 FPS", fill=(148, 163, 184), font=font_hud, anchor="mm")
@@ -432,26 +547,31 @@ def render_pedagogical_frame(
 async def render_coding_short(lesson_id: str | None = None) -> Path:
     lesson = None
     if lesson_id:
-        clean_id = lesson_id.strip().lower()
+        # First check curriculum lessons (advanced CS topics)
+        curriculum_lesson = get_lesson(lesson_id)
+        if curriculum_lesson:
+            lesson = curriculum_lesson
+        else:
+            clean_id = lesson_id.strip().lower()
 
-        # 1. Check if specific day/episode number requested (e.g. "day 1", "1", "day 14")
-        parts = clean_id.split()
-        for p in parts:
-            if p.isdigit():
-                target_num = int(p)
+            # 1. Check if specific day/episode number requested (e.g. "day 1", "1", "day 14")
+            parts = clean_id.split()
+            for p in parts:
+                if p.isdigit():
+                    target_num = int(p)
+                    for tl in MASTER_SERIES_CATALOG:
+                        if tl.episode_num == target_num:
+                            lesson = tl
+                            break
+                    if lesson:
+                        break
+
+            # 2. Match directly in MASTER_SERIES_CATALOG by string
+            if not lesson:
                 for tl in MASTER_SERIES_CATALOG:
-                    if tl.episode_num == target_num:
+                    if clean_id in tl.topic_title.lower() or clean_id in tl.series_name.lower() or clean_id in tl.filename.lower():
                         lesson = tl
                         break
-                if lesson:
-                    break
-
-        # 2. Match directly in MASTER_SERIES_CATALOG by string
-        if not lesson:
-            for tl in MASTER_SERIES_CATALOG:
-                if clean_id in tl.topic_title.lower() or clean_id in tl.series_name.lower() or clean_id in tl.filename.lower():
-                    lesson = tl
-                    break
 
     # 3. If not matched, query Teacher Brain (AI Dynamic Generator or Sequential progression)
     if not lesson:

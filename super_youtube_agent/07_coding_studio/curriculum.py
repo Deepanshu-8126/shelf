@@ -543,10 +543,11 @@ LESSONS: list[CodingLesson] = [
     ),
 ]
 
-def get_lesson(query: str | None = None) -> CodingLesson:
+def get_lesson(query: str | None = None) -> CodingLesson | None:
     if query:
         q = query.lower()
         for les in LESSONS:
             if q in les.id.lower() or q in les.title.lower() or q in les.series.lower():
                 return les
+        return None
     return random.choice(LESSONS)
