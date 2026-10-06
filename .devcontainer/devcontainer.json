@@ -1,0 +1,16 @@
+{
+  "name": "YouTube Agent Studio (Cloud Codespace)",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y ffmpeg texlive-latex-extra texlive-fonts-extra && pip install --upgrade pip && pip install -r super_youtube_agent/01_facts_shorts/requirements.txt && pip install httpx edge-tts kokoro",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  }
+}
