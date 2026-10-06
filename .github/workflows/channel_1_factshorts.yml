@@ -35,6 +35,24 @@ on:
           - 'unlisted'
           - 'public'
           - 'private'
+      language:
+        description: 'Narration Language (hindi = Kokoro / english = Christopher)'
+        required: false
+        default: 'hindi'
+        type: choice
+        options:
+          - 'hindi'
+          - 'english'
+      voice:
+        description: 'Voice Profile (Kokoro Hindi: hm_omega Male / hf_alpha Female)'
+        required: false
+        default: 'hm_omega'
+        type: choice
+        options:
+          - 'hm_omega'
+          - 'hf_alpha'
+          - 'hf_beta'
+          - 'hm_psi'
 
 permissions:
   contents: write
@@ -84,10 +102,10 @@ jobs:
           FOOTAGE_PROVIDERS: pexels,pixabay,nasa,wikimedia,local
           LLM_PROVIDER: auto
           VIDEO_MODE: story
-          SCRIPT_LANGUAGE: english
+          SCRIPT_LANGUAGE: ${{ github.event.inputs.language || 'hindi' }}
           SCRIPT_STYLE: friendly
-          VOICE_PROVIDER: edge
-          VOICE: en-US-ChristopherNeural
+          VOICE_PROVIDER: kokoro
+          VOICE: ${{ github.event.inputs.voice || 'hm_omega' }}
           TOPIC_INPUT: ${{ github.event.inputs.topic }}
           SCRIPT_INPUT: ${{ github.event.inputs.script }}
           DURATION_INPUT: ${{ github.event.inputs.duration }}
