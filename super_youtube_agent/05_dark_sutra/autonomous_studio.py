@@ -24,8 +24,8 @@ if sys.platform == "win32":
 from fire_crawler.crawler import FireCrawler
 from fire_crawler.trends import GoogleTrendsCrawler
 from fire_crawler.image_fetcher import RealImageFetcher
-from dark_case_studio.voice_engine import generate_voiceover
-from dark_case_studio.sfx_generator import (
+from voice_engine import generate_voiceover
+from sfx_generator import (
     generate_tension_drone,
     generate_marker_scratch,
     generate_cinematic_boom,

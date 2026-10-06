@@ -160,6 +160,40 @@ FACT_BANK: dict[str, list[dict[str, str]]] = {
                  "adulthood, effectively restarting its life cycle.",
          "angle": "the jellyfish that starts over"},
     ],
+    "coding": [
+        {"topic": "Linux powers all supercomputers",
+         "fact": "Every single one of the world's top 500 supercomputers runs on Linux. Not a single supercomputer uses Windows or macOS.",
+         "angle": "Linux controls 100% of supercomputers"},
+        {"topic": "First computer bug was a moth",
+         "fact": "In 1947, computer scientist Grace Hopper found an actual moth trapped inside the Harvard Mark II relay. She taped it into the logbook as the first actual computer bug.",
+         "angle": "the first bug was a real moth"},
+        {"topic": "Git was written in 10 days",
+         "fact": "Linus Torvalds created the initial core of Git in just ten days because the Linux team lost access to their proprietary version control system.",
+         "angle": "Git built in 10 days"},
+        {"topic": "Python is not named after a snake",
+         "fact": "Guido van Rossum named Python after the BBC comedy series Monty Python's Flying Circus because he wanted the language to be fun and enjoyable to write.",
+         "angle": "Python named after comedy show"},
+        {"topic": "Apollo Moon landing code was handwritten",
+         "fact": "Margaret Hamilton and her team wrote the Apollo 11 navigation software so carefully that it was literally hand-woven into magnetic rope core memory wire by wire.",
+         "angle": "Moon landing code woven by hand"},
+        {"topic": "JavaScript created in 10 days",
+         "fact": "In 1995, Brendan Eich developed the prototype of JavaScript in just ten days at Netscape, and today it powers over 98 percent of all websites.",
+         "angle": "JavaScript created in 10 days"},
+        {"topic": "First 1GB hard drive was 500 pounds",
+         "fact": "IBM released the first one-gigabyte hard drive in 1980. It weighed over 550 pounds, was the size of a refrigerator, and cost forty thousand dollars.",
+         "angle": "1GB hard drive weighed 500 lbs"},
+        {"topic": "C language powers modern civilization",
+         "fact": "Almost every major operating system, database engine, compiler, and browser kernel is built on C or C++, making it the invisible foundation of the digital world.",
+         "angle": "one language runs the world"},
+    ],
+    "tech": [
+        {"topic": "Linux powers all supercomputers",
+         "fact": "Every single one of the world's top 500 supercomputers runs on Linux. Not a single supercomputer uses Windows or macOS.",
+         "angle": "Linux controls 100% of supercomputers"},
+        {"topic": "First computer mouse was wooden",
+         "fact": "The first computer mouse, invented by Douglas Engelbart in 1964, had a carved wooden shell with two metal wheels inside.",
+         "angle": "the first mouse was made of wood"},
+    ],
 }
 
 
@@ -196,6 +230,16 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
     "Elephants hear with their feet": ["elephant walking", "savanna africa", "elephant herd"],
     "Ants lift many times their weight": ["ants macro", "ant colony", "insect closeup"],
     "Immortal jellyfish": ["jellyfish swimming", "deep ocean", "underwater jellyfish"],
+    # Coding & Tech
+    "Linux powers all supercomputers": ["supercomputer server room", "datacenter blinking lights", "server rack code", "linux terminal command"],
+    "First computer bug was a moth": ["vintage computer mainframe", "old electronics circuit", "retro computing terminal", "computer motherboard"],
+    "Git was written in 10 days": ["developer coding keyboard", "terminal git commit", "programmer typing dark screen", "vs code ide screen"],
+    "Python is not named after a snake": ["python code dark screen", "software developer typing", "code editor screen", "programming syntax highlight"],
+    "Apollo Moon landing code was handwritten": ["apollo moon landing", "nasa control room vintage", "circuit board vintage", "space shuttle computer"],
+    "JavaScript created in 10 days": ["javascript code editor", "web developer browser screen", "coding terminal dark", "programmer multiple monitors"],
+    "First 1GB hard drive was 500 pounds": ["vintage mainframe computer", "retro hard drive disk", "datacenter server racks", "old computer 1980s"],
+    "C language powers modern civilization": ["c programming code", "matrix code green dark", "kernel terminal screen", "binary code flow animation"],
+    "First computer mouse was wooden": ["vintage computer mouse", "retro computer lab", "electronics prototype desk"],
 }
 
 
@@ -218,6 +262,8 @@ class Topic:
 
 
 def _bank_topics(niche: str) -> list[dict[str, str]]:
+    if niche in ("coding", "tech", "ai", "developer"):
+        return FACT_BANK.get(niche) or FACT_BANK.get("coding") or FACT_BANK["space"]
     pool = FACT_BANK.get(niche) or FACT_BANK["space"]
     return pool
 

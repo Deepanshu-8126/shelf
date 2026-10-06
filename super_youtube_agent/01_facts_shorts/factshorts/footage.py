@@ -69,6 +69,12 @@ COMMONS_EXTRA_QUERIES = [
     "laboratory science", "desert aerial", "deep space nebula", "animal wildlife closeup",
 ]
 
+CODING_FALLBACK_QUERIES = [
+    "developer typing code", "programming screen dark", "hacker terminal matrix code",
+    "software engineer ide screen", "coding monitor closeup", "cybersecurity server room",
+    "binary code matrix animation", "programmer typing keyboard dark",
+]
+
 
 @dataclass
 class ClipCandidate:
@@ -731,8 +737,12 @@ async def collect_clips_for_sentences(
 
         # Fallback to thematic niche visual query if no specific hit
         if not found:
-            generic_fallback = COMMONS_EXTRA_QUERIES[idx % len(COMMONS_EXTRA_QUERIES)]
-            candidates = await client.search(f"{niche} {generic_fallback}", per_provider=4)
+            if niche in ("coding", "tech", "ai", "developer"):
+                fallback_q = CODING_FALLBACK_QUERIES[idx % len(CODING_FALLBACK_QUERIES)]
+            else:
+                generic_fallback = COMMONS_EXTRA_QUERIES[idx % len(COMMONS_EXTRA_QUERIES)]
+                fallback_q = f"{niche} {generic_fallback}"
+            candidates = await client.search(fallback_q, per_provider=4)
             for cand in candidates:
                 if cand.key not in used_keys:
                     c = await client.download(cand)

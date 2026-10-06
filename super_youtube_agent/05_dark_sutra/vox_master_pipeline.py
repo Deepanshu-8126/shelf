@@ -11,8 +11,8 @@ import os
 import subprocess
 import time
 from pathlib import Path
-from dark_case_studio.voice_engine import generate_voiceover
-from dark_case_studio.sfx_generator import (
+from voice_engine import generate_voiceover
+from sfx_generator import (
     generate_tension_drone,
     generate_marker_scratch,
     generate_cinematic_boom,
