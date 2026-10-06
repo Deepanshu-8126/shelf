@@ -142,15 +142,15 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
     whoosh = create_whoosh()
     ding = create_success_ding()
 
-    # Foley Cues:
-    # 1. Early typing clicks (0.5s to 2.2s)
-    typing_times = [0.6, 0.75, 0.9, 1.1, 1.25, 1.45, 1.7, 1.9, 2.15]
+    # Foley Cues (Synchronized frame-accurately with visual transitions):
+    # 1. Early typing clicks during hook (0.5s to 2.2s)
+    typing_times = [0.6, 0.8, 1.0, 1.25, 1.45, 1.7, 1.95, 2.2]
     for tt in typing_times:
         if tt < len(master) / SAMPLE_RATE:
             overlay_audio_stem(master, click, tt, volume=0.35)
 
-    # 2. Highlighter marker sweep on Line 3 (around 3.0s)
-    marker_time = 3.0
+    # 2. Highlighter marker sweep on key line (around 2.6s - exactly when visual wipe begins)
+    marker_time = 2.6
     if marker_time < len(master) / SAMPLE_RATE:
         overlay_audio_stem(master, marker, marker_time, volume=0.55)
 
@@ -164,18 +164,20 @@ def build_teacher_foley_soundtrack(voice_wav_path: Path, output_wav_path: Path, 
     if term_ding_time < len(master) / SAMPLE_RATE:
         overlay_audio_stem(master, ding, term_ding_time, volume=0.50)
 
-    # 5. Whoosh transition into Generator phase (around beats[1])
+    # 5. Whoosh transition into Clean Code phase (around beats[1])
     if len(beats) > 1 and beats[1] < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, whoosh, beats[1] - 0.2, volume=0.45)
-        gen_typing = [beats[1] + 0.3, beats[1] + 0.45, beats[1] + 0.6, beats[1] + 0.75]
+        overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.50)
+        # Fast typing clacks for the clean refactor
+        gen_typing = [beats[1] + 0.25, beats[1] + 0.4, beats[1] + 0.55, beats[1] + 0.7]
         for gt in gen_typing:
             if gt < len(master) / SAMPLE_RATE:
                 overlay_audio_stem(master, click, gt, volume=0.35)
 
     # 6. Climax Whoosh + Ding into the VS Comparison Screen (around beats[2])
-    if len(beats) > 2 and beats[2] < len(master) / SAMPLE_RATE:
-        overlay_audio_stem(master, whoosh, beats[2] - 0.3, volume=0.60)
-        overlay_audio_stem(master, ding, beats[2] + 0.5, volume=0.65)
+    climax_beat = beats[2] if len(beats) > 2 else len(master) / SAMPLE_RATE * 0.75
+    if climax_beat < len(master) / SAMPLE_RATE:
+        overlay_audio_stem(master, whoosh, climax_beat - 0.25, volume=0.60)
+        overlay_audio_stem(master, ding, climax_beat + 0.45, volume=0.65)
 
     # Normalize to prevent clipping
     peak = np.max(np.abs(master))
