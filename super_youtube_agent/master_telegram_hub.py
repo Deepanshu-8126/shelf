@@ -579,28 +579,66 @@ async def handle_user_text_command(msg: Dict[str, Any]) -> None:
         await send_telegram_msg(chat_id, welcome, reply_markup=build_master_menu_keyboard())
         return
 
-    if text in ("/status", "/matrix"):
+    lower_text = text.lower()
+
+    # 1. Analytics & Storage Matrix Intent
+    if any(k in lower_text for k in ["analytics", "matrix", "status", "kitni video", "total video", "storage", "disk", "stats", "dikhao", "/status", "/matrix"]):
         matrix_text = get_live_matrix_markdown()
         await send_telegram_msg(chat_id, matrix_text, reply_markup=build_master_menu_keyboard())
         return
 
-    if text in ("/quota", "/github", "/minutes", "/cloud"):
+    # 2. GitHub Quota & Minutes Remaining Intent
+    if any(k in lower_text for k in ["quota", "github", "minutes", "minute", "cloud", "kitna minute", "kitna time", "capacity", "/quota", "/github", "/minutes", "/cloud"]):
         q_card = format_full_telemetry_card()
         await send_telegram_msg(chat_id, q_card, reply_markup=build_master_menu_keyboard())
         return
 
-    if text in ("/youtube", "/yt"):
+    # 3. YouTube Publishing & Token Intent
+    if any(k in lower_text for k in ["youtube", "yt", "upload", "token", "oauth", "/youtube", "/yt"]):
         yt = get_youtube_token_status()
         card = (
             f"📺 *YOUTUBE PUBLISHING INTELLIGENCE*\n\n"
             f"• Connection Status: {yt['icon']} *{yt['status_text']}*\n"
             f"• Can Auto-Upload: `{'YES (Direct API Ready)' if yt['can_upload'] else 'NO (Requires OAuth Token)'}`\n"
             f"• Default Privacy Mode: `Unlisted`\n"
+            f"• Auto SEO Tagging: `Active (Multi-niche hashtags generated)`\n"
         )
         await send_telegram_msg(chat_id, card, reply_markup=build_master_menu_keyboard())
         return
 
-    # Prefixed Channel Steppers
+    # 4. Series & Day Progression Intent
+    if any(k in lower_text for k in ["day", "100 day", "progress", "series", "curriculum", "schedule"]):
+        from series_progress_tracker import get_series_status_summary
+        status_txt = get_series_status_summary()
+        await send_telegram_msg(chat_id, f"📊 *[Channel 7 Progression Status]*\n\n`{status_txt}`", reply_markup=build_channel_action_keyboard(7))
+        return
+
+    # 5. Direct Channel Inquiry Intent (e.g. "ch 1", "channel 5", "vox", "lofi")
+    channel_keywords = {
+        1: ["ch 1", "ch1", "channel 1", "facts shorts"],
+        2: ["ch 2", "ch2", "channel 2", "story studio"],
+        3: ["ch 3", "ch3", "channel 3", "vox", "geopolitics"],
+        4: ["ch 4", "ch4", "channel 4", "lofi", "ambient"],
+        5: ["ch 5", "ch5", "channel 5", "dark sutra", "crime"],
+        6: ["ch 6", "ch6", "channel 6", "clipper", "clips"],
+        7: ["ch 7", "ch7", "channel 7", "coding", "python studio"]
+    }
+    for c_num, kws in channel_keywords.items():
+        if any(kw == lower_text or lower_text.startswith(f"{kw} ") for kw in kws):
+            m = scan_channel_real_metrics(c_num)
+            latest = m.get("latest_video")
+            l_str = f"`{latest['name']}` ({latest['size_mb']}MB)" if latest else "_No renders yet_"
+            detail_text = (
+                f"📺 *{m['name'].upper()}*\n"
+                f"🔖 Format: `{m['format']}`\n"
+                f"📦 Total Rendered: `{m['total_videos']} videos` ({m['total_storage_mb']}MB)\n"
+                f"🎬 Latest: {l_str}\n\n"
+                f"Action select karein:"
+            )
+            await send_telegram_msg(chat_id, detail_text, reply_markup=build_channel_action_keyboard(c_num))
+            return
+
+    # 6. Prefixed Channel Steppers
     if text.startswith("/c7 ") or text.startswith("/coding "):
         q = text.split(" ", 1)[1].strip()
         await start_draft_stepper(chat_id, 7, q, ["--topic", q], f"Custom Coding: {q}")
@@ -621,7 +659,7 @@ async def handle_user_text_command(msg: Dict[str, Any]) -> None:
         await start_draft_stepper(chat_id, 3, q, ["--topic", q], f"Custom Vox Topic: {q}")
         return
 
-    # Fallback: treat raw text as a custom Channel 7 topic stepper
+    # 7. Fallback: treat any raw text/topic as Channel 7 interactive Stepper preview
     await start_draft_stepper(chat_id, 7, text, ["--topic", text], f"Topic: {text}")
 
 
