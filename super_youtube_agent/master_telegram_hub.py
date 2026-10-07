@@ -39,6 +39,10 @@ from cloud_and_youtube_controller import (
     record_workflow_execution,
     AVG_RENDER_MINS_PER_VIDEO
 )
+from telegram_agentic_director import (
+    call_agentic_llm,
+    format_agentic_plan_card
+)
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY").strip()
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6486771356").strip()
@@ -659,8 +663,58 @@ async def handle_user_text_command(msg: Dict[str, Any]) -> None:
         await start_draft_stepper(chat_id, 3, q, ["--topic", q], f"Custom Vox Topic: {q}")
         return
 
-    # 7. Fallback: treat any raw text/topic as Channel 7 interactive Stepper preview
-    await start_draft_stepper(chat_id, 7, text, ["--topic", text], f"Topic: {text}")
+    # 7. Multi-Agent Studio Director: Autonomous reasoning on any user command
+    await send_telegram_msg(chat_id, "🧠 *[Agentic Studio Director]* Analyzing instruction & coordinating multi-agent production plan...")
+    
+    plan = call_agentic_llm(text)
+    action = plan.get("action", "plan_render")
+
+    if action == "show_analytics":
+        matrix_text = get_live_matrix_markdown()
+        await send_telegram_msg(chat_id, matrix_text, reply_markup=build_master_menu_keyboard())
+        return
+
+    if action == "show_quota":
+        q_card = format_full_telemetry_card()
+        await send_telegram_msg(chat_id, q_card, reply_markup=build_master_menu_keyboard())
+        return
+
+    if action == "show_youtube":
+        yt = get_youtube_token_status()
+        card = (
+            f"📺 *YOUTUBE PUBLISHING INTELLIGENCE*\n\n"
+            f"• Connection Status: {yt['icon']} *{yt['status_text']}*\n"
+            f"• Can Auto-Upload: `{'YES (Direct API Ready)' if yt['can_upload'] else 'NO (Requires OAuth Token)'}`\n"
+            f"• Default Privacy Mode: `Unlisted`\n"
+        )
+        await send_telegram_msg(chat_id, card, reply_markup=build_master_menu_keyboard())
+        return
+
+    if action == "conversational":
+        c_reply = plan.get("reply_text", "Instructions noted!")
+        await send_telegram_msg(chat_id, c_reply, reply_markup=build_master_menu_keyboard())
+        return
+
+    # Multi-Agent Plan Production Card Launch
+    c_num = plan.get("channel_num") or 7
+    topic = plan.get("topic") or text
+    dur = plan.get("duration_sec") or 45
+    card_text = format_agentic_plan_card(plan)
+
+    draft = {
+        "chan_num": c_num,
+        "topic": topic,
+        "duration": dur,
+        "upload_yt": False,
+        "extra_args": ["--topic", topic, "--duration", str(dur)],
+        "label": f"Agentic Short: {topic[:28]}",
+        "preview": generate_interactive_script_preview(topic, dur),
+        "message_id": None
+    }
+    USER_DRAFTS[chat_id] = draft
+    kb = build_script_preview_keyboard(chat_id)
+    msg_id = await send_telegram_msg(chat_id, card_text, reply_markup=kb)
+    draft["message_id"] = msg_id
 
 
 async def run_master_hub_listener() -> None:
