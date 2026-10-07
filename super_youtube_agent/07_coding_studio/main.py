@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--generate", action="store_true", help="Generate coding short")
     parser.add_argument("--mode", type=str, default="story", help="Video mode")
     parser.add_argument("--niche", type=str, default="", help="Niche filter (dsa, python, java, ai_tools, sysdesign, web_backend)")
+    parser.add_argument("--duration", type=int, default=45, help="Target duration in seconds (30, 45, 60)")
 
     args = parser.parse_args()
 
