@@ -603,7 +603,7 @@ def generate_ai_teacher_lesson(user_topic: str) -> TeacherLesson | None:
     Ensure code_before and code_after have at most 6 lines each so they fit on screen comfortably.
     """
 
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    candidate_models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"]
     body = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "systemInstruction": {"parts": [{"text": system_instruction}]},
@@ -614,34 +614,40 @@ def generate_ai_teacher_lesson(user_topic: str) -> TeacherLesson | None:
     }
 
     try:
-        with httpx.Client(timeout=15.0) as client:
-            resp = client.post(url, params={"key": api_key}, json=body)
-            if resp.status_code == 200:
-                data = resp.json()
-                raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
-                parsed = json.loads(raw_text)
-                lesson = TeacherLesson(
-                    series_name=parsed.get("series_name", "MODERN DEV MASTERCLASS"),
-                    episode_num=int(parsed.get("episode_num", 101)),
-                    topic_title=parsed.get("topic_title", user_topic),
-                    badge_tag=parsed.get("badge_tag", "SENIOR ENGINEERING"),
-                    filename=parsed.get("filename", "solution.py"),
-                    language=parsed.get("language", "python"),
-                    intro_hook=parsed.get("intro_hook", ""),
-                    concept_walkthrough=parsed.get("concept_walkthrough", ""),
-                    code_explanation=parsed.get("code_explanation", ""),
-                    outro_homework=parsed.get("outro_homework", ""),
-                    code_before=[(l[0], l[1]) for l in parsed.get("code_before", [])],
-                    code_after=[(l[0], l[1]) for l in parsed.get("code_after", [])],
-                    teacher_tip=parsed.get("teacher_tip", "TEACHER TIP: Clean code wins!"),
-                    terminal_command=parsed.get("terminal_command", "$ python3 test.py"),
-                    terminal_logs=parsed.get("terminal_logs", ["All tests passing!"])
-                )
-                print(f"✨ [Teacher Brain AI] Dynamically crafted lesson: {lesson.topic_title} ({lesson.series_name})")
-                return lesson
+        with httpx.Client(timeout=22.0) as client:
+            for model in candidate_models:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+                try:
+                    resp = client.post(url, params={"key": api_key}, json=body)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+                        parsed = json.loads(raw_text)
+                        lesson = TeacherLesson(
+                            series_name=parsed.get("series_name", "MODERN DEV MASTERCLASS"),
+                            episode_num=int(parsed.get("episode_num", 101)),
+                            topic_title=parsed.get("topic_title", user_topic),
+                            badge_tag=parsed.get("badge_tag", "SENIOR ENGINEERING"),
+                            filename=parsed.get("filename", "solution.py"),
+                            language=parsed.get("language", "python"),
+                            intro_hook=parsed.get("intro_hook", ""),
+                            concept_walkthrough=parsed.get("concept_walkthrough", ""),
+                            code_explanation=parsed.get("code_explanation", ""),
+                            outro_homework=parsed.get("outro_homework", ""),
+                            code_before=[(l[0], l[1]) for l in parsed.get("code_before", [])],
+                            code_after=[(l[0], l[1]) for l in parsed.get("code_after", [])],
+                            teacher_tip=parsed.get("teacher_tip", "TEACHER TIP: Clean code wins!"),
+                            terminal_command=parsed.get("terminal_command", "$ python3 test.py"),
+                            terminal_logs=parsed.get("terminal_logs", ["All tests passing!"])
+                        )
+                        print(f"✨ [Teacher Brain AI] Dynamically crafted lesson with {model}: {lesson.topic_title} ({lesson.series_name})")
+                        return lesson
+                except Exception:
+                    continue
     except Exception as e:
         print(f"⚠️ [Teacher Brain AI] Dynamic generation failed ({e}), falling back to catalog.")
         return None
+    return None
 
 
 def get_next_teacher_lesson(series_or_topic_filter: str | None = None) -> TeacherLesson:

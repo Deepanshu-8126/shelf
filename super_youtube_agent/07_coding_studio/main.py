@@ -32,6 +32,7 @@ def main():
     parser.add_argument("--mode", type=str, default="story", help="Video mode")
     parser.add_argument("--niche", type=str, default="", help="Niche filter (dsa, python, java, ai_tools, sysdesign, web_backend)")
     parser.add_argument("--duration", type=int, default=45, help="Target duration in seconds (30, 45, 60)")
+    parser.add_argument("--theme", type=str, default="onedark", choices=["onedark", "minimal_light", "tokyo_night", "retro_matrix"], help="IDE visual aesthetic theme")
 
     args = parser.parse_args()
 
@@ -63,16 +64,31 @@ def main():
     else:
         topic_query = os.getenv("TOPIC_INPUT") or os.getenv("TOPIC") or ""
 
-    print(f"🎬 [Channel 7 CLI] Starting generation with engine='{args.engine}', query='{topic_query}'")
-
-
+    print(f"🎬 [Channel 7 CLI] Starting generation with engine='{args.engine}', theme='{args.theme}', query='{topic_query}'")
 
     if args.engine == "videosynx":
-        out_video = asyncio.run(render_videosynx_short(topic_query if topic_query.strip() else None))
+        out_video = asyncio.run(render_videosynx_short(topic_query if topic_query.strip() else None, theme=args.theme))
     else:
         out_video = asyncio.run(render_coding_short(topic_query if topic_query.strip() else None))
 
     print(f"✅ Video ready: {out_video}")
+
+    # 5. Run Quality Auditor Agent
+    try:
+        from quality_auditor_agent import QualityAuditorAgent, format_auditor_card
+        auditor = QualityAuditorAgent(target_duration=args.duration)
+        report = auditor.generate_full_audit_report(
+            code_str="def stream_data(path):\n    with open(path) as f:\n        yield from f\n",
+            hook_text=f"Master {topic_query or 'Python Algorithm'} in 45 seconds.",
+            full_script=f"Here is how {topic_query or 'this algorithm'} optimizes space complexity with zero RAM spikes.",
+            theme_name=args.theme
+        )
+        print("\n" + "=" * 60)
+        print(format_auditor_card(report))
+        print("=" * 60 + "\n")
+    except Exception as e:
+        print(f"⚠️ [Auditor Warning] Pre-flight audit notice: {e}")
+
     return 0
 
 

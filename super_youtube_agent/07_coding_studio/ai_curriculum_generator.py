@@ -207,7 +207,7 @@ def _call_gemini_for_lesson(topic: str, api_key: str) -> Optional[AnchoredLesson
     CRITICAL: Provide 4 to 7 lines of code so it fits comfortably on screen. Ensure indentation in 'code' is 100% correct.
     """
 
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    candidate_models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"]
     body = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "systemInstruction": {"parts": [{"text": system_instruction}]},
@@ -217,50 +217,57 @@ def _call_gemini_for_lesson(topic: str, api_key: str) -> Optional[AnchoredLesson
         }
     }
 
-    with httpx.Client(timeout=18.0) as client:
-        resp = client.post(url, params={"key": api_key}, json=body)
-        if resp.status_code == 200:
-            data = resp.json()
-            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
-            d = json.loads(raw_text)
+    with httpx.Client(timeout=22.0) as client:
+        last_err = ""
+        for model in candidate_models:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            try:
+                resp = client.post(url, params={"key": api_key}, json=body)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+                    d = json.loads(raw_text)
 
-            anchored_lines = []
-            for l_data in d.get("lines", []):
-                anchored_lines.append(AnchoredLine(
-                    code=l_data.get("code", ""),
-                    narration=l_data.get("narration", ""),
-                    highlight=bool(l_data.get("highlight", False)),
-                    state_label=l_data.get("state_label", ""),
-                    tip=l_data.get("tip", "Concept")
-                ))
+                    anchored_lines = []
+                    for l_data in d.get("lines", []):
+                        anchored_lines.append(AnchoredLine(
+                            code=l_data.get("code", ""),
+                            narration=l_data.get("narration", ""),
+                            highlight=bool(l_data.get("highlight", False)),
+                            state_label=l_data.get("state_label", ""),
+                            tip=l_data.get("tip", "Concept")
+                        ))
 
-            ep_num = int(d.get("episode_num", 1))
-            series = d.get("series_name", "TECH & CODING MASTERCLASS")
-            lang_detected = d.get("language", "python").lower()
+                    ep_num = int(d.get("episode_num", 1))
+                    series = d.get("series_name", "TECH & CODING MASTERCLASS")
+                    lang_detected = d.get("language", "python").lower()
 
-            return AnchoredLesson(
-                id=d.get("id", re.sub(r'[^a-zA-Z0-9_]', '_', topic.lower()[:24])),
-                title=d.get("title", topic.title()),
-                series_name=series,
-                episode_num=ep_num,
-                badge_tag=d.get("badge_tag", "SENIOR ENGINEERING"),
-                filename=d.get("filename", "solution.py" if lang_detected == "python" else f"solution.{lang_detected}"),
-                language=lang_detected,
-                intro_narration=d.get("intro_narration", f"Aaj hum {topic} ko senior production style me solve karenge."),
-                problem_statement=d.get("problem_statement", f"Efficiently implement {topic} in production."),
-                input_example=d.get("input_example", f"# Example test call for {topic}"),
-                naive_pitfall=d.get("naive_pitfall", "Naive approach creates boilerplate or high latency."),
-                warning_banner=d.get("warning_banner", "[!] INSUFFICIENT OR BUGGY PATTERN"),
-                complexity_badge=d.get("complexity_badge", "O(1) OPTIMAL"),
-                benchmark_metric=d.get("benchmark_metric", "10x Cleaner Code"),
-                lines=anchored_lines,
-                test_runner_code=d.get("test_runner_code", f"print('Executing {topic}...')\nprint('>> TEST STATUS: PASS')\n"),
-                diagram_title=d.get("diagram_title", f"State Visualizer: {topic.title()}"),
-                diagram_rows=d.get("diagram_rows", [f"Active state: {topic}", "Clean execution verified"]),
-                diagram_caption=d.get("diagram_caption", "[METRIC] ZERO OVERHEAD VERIFIED"),
-                next_day_preview=d.get("next_day_preview", "Next Advanced Developer Pattern"),
-                outro_narration=d.get("outro_narration", "Clean architecture wins in production. Follow for the next deep dive!")
-            )
+                    return AnchoredLesson(
+                        id=d.get("id", re.sub(r'[^a-zA-Z0-9_]', '_', topic.lower()[:24])),
+                        title=d.get("title", topic.title()),
+                        series_name=series,
+                        episode_num=ep_num,
+                        badge_tag=d.get("badge_tag", "SENIOR ENGINEERING"),
+                        filename=d.get("filename", "solution.py" if lang_detected == "python" else f"solution.{lang_detected}"),
+                        language=lang_detected,
+                        intro_narration=d.get("intro_narration", f"Aaj hum {topic} ko senior production style me solve karenge."),
+                        problem_statement=d.get("problem_statement", f"Efficiently implement {topic} in production."),
+                        input_example=d.get("input_example", f"# Example test call for {topic}"),
+                        naive_pitfall=d.get("naive_pitfall", "Naive approach creates boilerplate or high latency."),
+                        warning_banner=d.get("warning_banner", "[!] INSUFFICIENT OR BUGGY PATTERN"),
+                        complexity_badge=d.get("complexity_badge", "O(1) OPTIMAL"),
+                        benchmark_metric=d.get("benchmark_metric", "10x Cleaner Code"),
+                        lines=anchored_lines,
+                        test_runner_code=d.get("test_runner_code", f"print('Executing {topic}...')\nprint('>> TEST STATUS: PASS')\n"),
+                        diagram_title=d.get("diagram_title", f"State Visualizer: {topic.title()}"),
+                        diagram_rows=d.get("diagram_rows", [f"Active state: {topic}", "Clean execution verified"]),
+                        diagram_caption=d.get("diagram_caption", "[METRIC] ZERO OVERHEAD VERIFIED"),
+                        next_day_preview=d.get("next_day_preview", "Next Advanced Developer Pattern"),
+                        outro_narration=d.get("outro_narration", "Clean architecture wins in production. Follow for the next deep dive!")
+                    )
+            except Exception as e:
+                last_err = str(e)
+                continue
     return None
 
 

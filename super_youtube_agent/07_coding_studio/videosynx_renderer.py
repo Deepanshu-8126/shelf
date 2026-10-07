@@ -71,6 +71,103 @@ def wrap_text_lines(text: str, max_chars: int = 42) -> List[str]:
     return lines
 
 
+STUDIO_THEMES: Dict[str, Dict[str, Any]] = {
+    "onedark": {
+        "bg": (13, 17, 23, 255),
+        "grid_dot": (33, 38, 45, 180),
+        "header_sub": (139, 148, 158),
+        "badge_bg": (22, 27, 34),
+        "badge_border": (48, 54, 61),
+        "badge_text": (88, 166, 255),
+        "headline": (240, 246, 252),
+        "card_bg": (22, 27, 34),
+        "card_border": (48, 54, 61),
+        "card_divider": (33, 38, 45),
+        "file_head": (201, 209, 217),
+        "code_plain": (240, 246, 252),
+        "gutter": (110, 118, 129),
+        "gutter_active": (88, 166, 255),
+        "cursor": (88, 166, 255),
+        "teach_bg": (22, 27, 34),
+        "teach_border": (48, 54, 61),
+        "teach_title": (88, 166, 255),
+        "teach_text": (240, 246, 252),
+        "is_dark": True
+    },
+    "tokyo_night": {
+        "bg": (26, 27, 38, 255),
+        "grid_dot": (41, 46, 66, 180),
+        "header_sub": (122, 162, 247),
+        "badge_bg": (36, 40, 59),
+        "badge_border": (65, 72, 104),
+        "badge_text": (187, 154, 247),
+        "headline": (192, 202, 245),
+        "card_bg": (36, 40, 59),
+        "card_border": (65, 72, 104),
+        "card_divider": (41, 46, 66),
+        "file_head": (192, 202, 245),
+        "code_plain": (192, 202, 245),
+        "gutter": (86, 95, 137),
+        "gutter_active": (187, 154, 247),
+        "cursor": (187, 154, 247),
+        "teach_bg": (36, 40, 59),
+        "teach_border": (65, 72, 104),
+        "teach_title": (187, 154, 247),
+        "teach_text": (192, 202, 245),
+        "is_dark": True
+    },
+    "minimal_light": {
+        "bg": (248, 250, 252, 255),
+        "grid_dot": (226, 232, 240, 180),
+        "header_sub": (100, 116, 139),
+        "badge_bg": (238, 242, 255),
+        "badge_border": (199, 210, 254),
+        "badge_text": (67, 56, 202),
+        "headline": (15, 23, 42),
+        "card_bg": (255, 255, 255),
+        "card_border": (226, 232, 240),
+        "card_divider": (241, 245, 249),
+        "file_head": (30, 41, 59),
+        "code_plain": (15, 23, 42),
+        "gutter": (148, 163, 184),
+        "gutter_active": (79, 70, 229),
+        "cursor": (79, 70, 229),
+        "teach_bg": (255, 255, 255),
+        "teach_border": (254, 215, 170),
+        "teach_title": (180, 83, 9),
+        "teach_text": (15, 23, 42),
+        "is_dark": False
+    },
+    "retro_matrix": {
+        "bg": (10, 14, 20, 255),
+        "grid_dot": (20, 32, 25, 180),
+        "header_sub": (0, 216, 255),
+        "badge_bg": (14, 22, 17),
+        "badge_border": (0, 245, 155),
+        "badge_text": (0, 245, 155),
+        "headline": (240, 255, 245),
+        "card_bg": (14, 22, 17),
+        "card_border": (0, 245, 155),
+        "card_divider": (22, 38, 28),
+        "file_head": (0, 245, 155),
+        "code_plain": (225, 245, 230),
+        "gutter": (60, 100, 75),
+        "gutter_active": (0, 245, 155),
+        "cursor": (0, 245, 155),
+        "teach_bg": (14, 22, 17),
+        "teach_border": (0, 216, 255),
+        "teach_title": (0, 245, 155),
+        "teach_text": (240, 255, 245),
+        "is_dark": True
+    }
+}
+
+
+def get_theme_palette(name: str) -> Dict[str, Any]:
+    n = (name or "onedark").lower().strip()
+    return STUDIO_THEMES.get(n, STUDIO_THEMES["onedark"])
+
+
 def render_anchored_frame(
     frame_idx: int,
     total_frames: int,
@@ -91,14 +188,15 @@ def render_anchored_frame(
     W, H = 1080, 1920
     sec = (frame_idx / total_frames) * duration
 
-    img = Image.new("RGBA", (W, H), (248, 250, 252, 255))
+    t_cfg = get_theme_palette(getattr(lesson, "theme", "onedark"))
+    img = Image.new("RGBA", (W, H), t_cfg["bg"])
     draw = ImageDraw.Draw(img)
 
     # 1. Background Dot Grid
     dot_gap = 36
     for x in range(24, W, dot_gap):
         for y in range(24, H, dot_gap):
-            draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=(226, 232, 240, 180))
+            draw.ellipse([x - 1, y - 1, x + 1, y + 1], fill=t_cfg["grid_dot"])
 
     card_x = 80
     card_w = 920
@@ -111,31 +209,32 @@ def render_anchored_frame(
         # Determine episode display label
         ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
         # Top Header
-        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
-        draw.rounded_rectangle([80, 115, 660, 168], radius=14, fill=(238, 242, 255), outline=(199, 210, 254), width=2)
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=t_cfg["header_sub"], font=fonts["hud_label"])
+        draw.rounded_rectangle([80, 115, 660, 168], radius=14, fill=t_cfg["badge_bg"], outline=t_cfg["badge_border"], width=2)
         badge_header = f"[{ep_label}]  {lesson.badge_tag.upper()}" if ("DAY" not in lesson.badge_tag.upper() and "EP" not in lesson.badge_tag.upper()) else f"{lesson.badge_tag.upper()}"
-        draw.text((370, 141), badge_header[:36], fill=(67, 56, 202), font=fonts["hud_badge"], anchor="mm")
-        draw.text((80, 195), lesson.title, fill=(15, 23, 42), font=fonts["headline"])
+        draw.text((370, 141), badge_header[:36], fill=t_cfg["badge_text"], font=fonts["hud_badge"], anchor="mm")
+        draw.text((80, 195), lesson.title, fill=t_cfg["headline"], font=fonts["headline"])
 
         # Card 1: Problem Challenge Card
         c1_y, c1_h = 265, 460
         for off, a in [(12, 12), (4, 20)]:
             draw.rounded_rectangle([card_x, c1_y + off, card_x + card_w, c1_y + c1_h + off], radius=24, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, c1_y, card_x + card_w, c1_y + c1_h], radius=24, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+        draw.rounded_rectangle([card_x, c1_y, card_x + card_w, c1_y + c1_h], radius=24, fill=t_cfg["card_bg"], outline=t_cfg["card_border"], width=2)
 
         # macOS dots + Title
         draw.ellipse([card_x + 36, c1_y + 24, card_x + 52, c1_y + 40], fill=(255, 95, 86))
         draw.ellipse([card_x + 62, c1_y + 24, card_x + 78, c1_y + 40], fill=(255, 189, 46))
         draw.ellipse([card_x + 88, c1_y + 24, card_x + 104, c1_y + 40], fill=(39, 201, 63))
         spec_title = getattr(lesson, "challenge_header", "") or f"{lesson.series_name} • Specification"
-        draw.text((card_x + 130, c1_y + 32), spec_title[:45], fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
-        draw.line([(card_x + 20, c1_y + 64), (card_x + card_w - 20, c1_y + 64)], fill=(241, 245, 249), width=2)
+        draw.text((card_x + 130, c1_y + 32), spec_title[:45], fill=t_cfg["file_head"], font=fonts["file_head"], anchor="lm")
+        draw.line([(card_x + 20, c1_y + 64), (card_x + card_w - 20, c1_y + 64)], fill=t_cfg["card_divider"], width=2)
 
-        draw.text((card_x + 35, c1_y + 85), "[CHALLENGE SPECIFICATION]", fill=(30, 58, 138), font=fonts["section_title"])
+        challenge_col = t_cfg["badge_text"] if t_cfg["is_dark"] else (30, 58, 138)
+        draw.text((card_x + 35, c1_y + 85), "[CHALLENGE SPECIFICATION]", fill=challenge_col, font=fonts["section_title"])
         prob_text = lesson.problem_statement or "Solve this challenge with optimal time and space complexity."
         prob_lines = wrap_text_lines(prob_text, max_chars=40)
         for p_idx, pl in enumerate(prob_lines[:3]):
-            draw.text((card_x + 35, c1_y + 125 + p_idx * 34), pl, fill=(51, 65, 85), font=fonts["card_body"])
+            draw.text((card_x + 35, c1_y + 125 + p_idx * 34), pl, fill=t_cfg["code_plain"], font=fonts["card_body"])
 
         # Input Code Box
         in_y, in_h = c1_y + 240, 190
@@ -183,15 +282,15 @@ def render_anchored_frame(
         t_y, t_h = 1510, 290
         for off, a in [(12, 12), (4, 20)]:
             draw.rounded_rectangle([card_x, t_y + off, card_x + card_w, t_y + t_h + off], radius=22, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, t_y, card_x + card_w, t_y + t_h], radius=22, fill=(255, 255, 255), outline=(254, 215, 170), width=2)
+        draw.rounded_rectangle([card_x, t_y, card_x + card_w, t_y + t_h], radius=22, fill=t_cfg["teach_bg"], outline=t_cfg["teach_border"], width=2)
 
         draw.rounded_rectangle([card_x + 28, t_y + 24, card_x + 80, t_y + 76], radius=14, fill=(245, 158, 11))
         draw.text((card_x + 54, t_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
-        draw.text((card_x + 96, t_y + 36), "AI TEACHER // PROBLEM HOOK", fill=(180, 83, 9), font=fonts["teach_title"])
+        draw.text((card_x + 96, t_y + 36), "AI TEACHER // PROBLEM HOOK", fill=t_cfg["teach_title"], font=fonts["teach_title"])
 
         intro_lines = wrap_text_lines(lesson.intro_narration, max_chars=42)
         for i_idx, il in enumerate(intro_lines[:3]):
-            draw.text((card_x + 36, t_y + 95 + i_idx * 40), il, fill=(15, 23, 42), font=fonts["teach_body"])
+            draw.text((card_x + 36, t_y + 95 + i_idx * 40), il, fill=t_cfg["teach_text"], font=fonts["teach_body"])
 
     elif sec < timeline.exec_start_sec:
         # =========================================================================
@@ -217,10 +316,10 @@ def render_anchored_frame(
 
         # Header
         ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
-        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
-        draw.rounded_rectangle([80, 115, 620, 168], radius=14, fill=(238, 242, 255), outline=(199, 210, 254), width=2)
-        draw.text((350, 141), f"⚡ {lesson.badge_tag}", fill=(67, 56, 202), font=fonts["hud_badge"], anchor="mm")
-        draw.text((80, 195), lesson.title, fill=(15, 23, 42), font=fonts["headline"])
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=t_cfg["header_sub"], font=fonts["hud_label"])
+        draw.rounded_rectangle([80, 115, 620, 168], radius=14, fill=t_cfg["badge_bg"], outline=t_cfg["badge_border"], width=2)
+        draw.text((350, 141), f"⚡ {lesson.badge_tag}", fill=t_cfg["badge_text"], font=fonts["hud_badge"], anchor="mm")
+        draw.text((80, 195), lesson.title, fill=t_cfg["headline"], font=fonts["headline"])
 
         total_lines = len(lesson.lines)
         disp_line = min(total_lines, max(0, current_line_idx + 1))
@@ -235,15 +334,15 @@ def render_anchored_frame(
         card_y, card_h = 280, 860
         for off, a in [(14, 15), (6, 25)]:
             draw.rounded_rectangle([card_x, card_y + off, card_x + card_w, card_y + card_h + off], radius=26, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=26, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+        draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=26, fill=t_cfg["card_bg"], outline=t_cfg["card_border"], width=2)
 
         # macOS Dots & File Header
         draw.ellipse([card_x + 36, card_y + 24, card_x + 52, card_y + 40], fill=(255, 95, 86))
         draw.ellipse([card_x + 62, card_y + 24, card_x + 78, card_y + 40], fill=(255, 189, 46))
         draw.ellipse([card_x + 88, card_y + 24, card_x + 104, card_y + 40], fill=(39, 201, 63))
         lang_label = getattr(lesson, "language", "python").title()
-        draw.text((card_x + 130, card_y + 32), f"{lesson.filename} • {lang_label}", fill=(30, 41, 59), font=fonts["file_head"], anchor="lm")
-        draw.line([(card_x + 20, card_y + 64), (card_x + card_w - 20, card_y + 64)], fill=(241, 245, 249), width=2)
+        draw.text((card_x + 130, card_y + 32), f"{lesson.filename} • {lang_label}", fill=t_cfg["file_head"], font=fonts["file_head"], anchor="lm")
+        draw.line([(card_x + 20, card_y + 64), (card_x + card_w - 20, card_y + 64)], fill=t_cfg["card_divider"], width=2)
 
         # Render Code Lines with Spotlight Halo
         code_start_y = card_y + 92
@@ -260,12 +359,16 @@ def render_anchored_frame(
                     slide_offset = int((1.0 - typed_char_fraction) * -20)
                 pulse = math.sin(sec * 5.0) * 0.5 + 0.5
                 spot_border_w = 3 if pulse > 0.5 else 2
-                spot_col = (254, 243, 199) if sched.highlight else (238, 242, 255)
-                spot_border = (245, 158, 11) if sched.highlight else (129, 140, 248)
+                if t_cfg["is_dark"]:
+                    spot_col = (45, 35, 15) if sched.highlight else (30, 41, 59)
+                    spot_border = (245, 158, 11) if sched.highlight else t_cfg["gutter_active"]
+                else:
+                    spot_col = (254, 243, 199) if sched.highlight else (238, 242, 255)
+                    spot_border = (245, 158, 11) if sched.highlight else (129, 140, 248)
                 draw.rounded_rectangle([card_x + 24, ly - 6, card_x + card_w - 24, ly + 38], radius=10, fill=spot_col, outline=spot_border, width=spot_border_w)
 
             # Gutter
-            gutter_col = (79, 70, 229) if is_active else (148, 163, 184)
+            gutter_col = t_cfg["gutter_active"] if is_active else t_cfg["gutter"]
             draw.text((card_x + 55, ly + 4), f"{idx + 1:2d}", fill=gutter_col, font=fonts["gutter"], anchor="rm")
 
             full_text = sched.code_text
@@ -280,13 +383,24 @@ def render_anchored_frame(
             else:
                 disp_text = ""
 
-            txt_col = (15, 23, 42)
-            if "def " in disp_text:
-                txt_col = (147, 51, 234)
-            elif "if " in disp_text or "return " in disp_text:
-                txt_col = (225, 29, 72)
-            elif "=" in disp_text:
-                txt_col = (30, 58, 138)
+            if t_cfg["is_dark"]:
+                txt_col = t_cfg["code_plain"]
+                if "def " in disp_text or "class " in disp_text:
+                    txt_col = (210, 168, 255)
+                elif "if " in disp_text or "return " in disp_text or "for " in disp_text:
+                    txt_col = (255, 123, 114)
+                elif "=" in disp_text or "in " in disp_text:
+                    txt_col = (126, 231, 135)
+                elif '"' in disp_text or "'" in disp_text or any(c.isdigit() for c in disp_text):
+                    txt_col = (165, 214, 255)
+            else:
+                txt_col = (15, 23, 42)
+                if "def " in disp_text:
+                    txt_col = (147, 51, 234)
+                elif "if " in disp_text or "return " in disp_text:
+                    txt_col = (225, 29, 72)
+                elif "=" in disp_text:
+                    txt_col = (30, 58, 138)
 
             line_x = card_x + 85 + slide_offset
             draw.text((line_x, ly + 4), disp_text, fill=txt_col, font=fonts["code"])
@@ -300,15 +414,16 @@ def render_anchored_frame(
                 cursor_vis = (int(sec * 1000) % 500) < 320
                 if cursor_vis:
                     cur_x = line_x + txt_w + 3
-                    draw.line([(cur_x, ly + 2), (cur_x, ly + 34)], fill=(79, 70, 229), width=3)
+                    draw.line([(cur_x, ly + 2), (cur_x, ly + 34)], fill=t_cfg["cursor"], width=3)
 
                 # Floating Tooltip Popup
                 if not is_typing_now and sched.tip:
                     tip_label = f"[{sched.tip}]"
                     pop_w = min(320, max(150, len(tip_label) * 14))
                     pop_x = card_x + card_w - pop_w - 30
-                    draw.rounded_rectangle([pop_x, ly - 4, pop_x + pop_w, ly + 36], radius=12, fill=(255, 251, 235), outline=(245, 158, 11), width=2)
-                    draw.text((pop_x + pop_w // 2, ly + 16), tip_label, fill=(180, 83, 9), font=fonts["teach_title"], anchor="mm")
+                    pop_bg = (38, 28, 15) if t_cfg["is_dark"] else (255, 251, 235)
+                    draw.rounded_rectangle([pop_x, ly - 4, pop_x + pop_w, ly + 36], radius=12, fill=pop_bg, outline=(245, 158, 11), width=2)
+                    draw.text((pop_x + pop_w // 2, ly + 16), tip_label, fill=(245, 158, 11), font=fonts["teach_title"], anchor="mm")
 
         # Dynamic State Visualizer Box
         diag_y = 1170
@@ -319,18 +434,18 @@ def render_anchored_frame(
         teach_y, teach_h = 1500, 290
         for off, a in [(12, 12), (4, 20)]:
             draw.rounded_rectangle([card_x, teach_y + off, card_x + card_w, teach_y + teach_h + off], radius=22, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=22, fill=(255, 255, 255), outline=(254, 215, 170), width=2)
+        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=22, fill=t_cfg["teach_bg"], outline=t_cfg["teach_border"], width=2)
 
         draw.rounded_rectangle([card_x + 28, teach_y + 24, card_x + 80, teach_y + 76], radius=14, fill=(245, 158, 11))
         draw.text((card_x + 54, teach_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
 
         tag_title = active_sched.tip if (active_sched and active_sched.tip) else "Algorithm Walkthrough"
-        draw.text((card_x + 96, teach_y + 36), f"TEACHER INSIGHT • {tag_title.upper()}", fill=(180, 83, 9), font=fonts["teach_title"])
+        draw.text((card_x + 96, teach_y + 36), f"TEACHER INSIGHT • {tag_title.upper()}", fill=t_cfg["teach_title"], font=fonts["teach_title"])
 
         spoken_txt = active_sched.narration_text if active_sched else lesson.intro_narration
         s_lines = wrap_text_lines(spoken_txt, max_chars=44)
         for s_idx, sl in enumerate(s_lines[:3]):
-            draw.text((card_x + 36, teach_y + 95 + s_idx * 40), sl, fill=(15, 23, 42), font=fonts["teach_body"])
+            draw.text((card_x + 36, teach_y + 95 + s_idx * 40), sl, fill=t_cfg["teach_text"], font=fonts["teach_body"])
 
     elif sec < timeline.exec_end_sec:
         # =========================================================================
@@ -338,10 +453,10 @@ def render_anchored_frame(
         # =========================================================================
         # Header
         ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
-        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=(100, 116, 139), font=fonts["hud_label"])
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label}", fill=t_cfg["header_sub"], font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 680, 168], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((380, 141), "[RUN] LIVE DRY-RUN & SANDBOX EXECUTION", fill=(20, 83, 45), font=fonts["hud_badge"], anchor="mm")
-        draw.text((80, 195), "Runtime Sandbox Verification", fill=(15, 23, 42), font=fonts["headline"])
+        draw.text((80, 195), "Runtime Sandbox Verification", fill=t_cfg["headline"], font=fonts["headline"])
 
         # Progress Track Full
         bar_w = 920
@@ -385,16 +500,16 @@ def render_anchored_frame(
         teach_y, teach_h = 1510, 280
         for off, a in [(12, 12), (4, 20)]:
             draw.rounded_rectangle([card_x, teach_y + off, card_x + card_w, teach_y + teach_h + off], radius=22, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=22, fill=(255, 255, 255), outline=(220, 252, 231), width=2)
+        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=22, fill=t_cfg["teach_bg"], outline=t_cfg["teach_border"], width=2)
 
         draw.rounded_rectangle([card_x + 28, teach_y + 24, card_x + 80, teach_y + 76], radius=14, fill=(34, 197, 94))
         draw.text((card_x + 54, teach_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
-        draw.text((card_x + 96, teach_y + 36), "AI TEACHER // EXECUTION VERIFICATION", fill=(20, 83, 45), font=fonts["teach_title"])
+        draw.text((card_x + 96, teach_y + 36), "AI TEACHER // EXECUTION VERIFICATION", fill=(20, 83, 45) if not t_cfg["is_dark"] else (74, 222, 128), font=fonts["teach_title"])
 
         ver_txt = f"{lesson.title} execution dry-run test verified. All assertions passing with optimal efficiency!"
         v_lines = wrap_text_lines(ver_txt, max_chars=44)
         for v_idx, vl in enumerate(v_lines[:3]):
-            draw.text((card_x + 36, teach_y + 95 + v_idx * 40), vl, fill=(15, 23, 42), font=fonts["teach_body"])
+            draw.text((card_x + 36, teach_y + 95 + v_idx * 40), vl, fill=t_cfg["teach_text"], font=fonts["teach_body"])
 
     else:
         # =========================================================================
@@ -402,10 +517,10 @@ def render_anchored_frame(
         # =========================================================================
         # Top Header
         ep_label = getattr(lesson, "episode_label", "") or f"EPISODE #{lesson.episode_num}"
-        draw.text((80, 75), f"{lesson.series_name} • {ep_label} COMPLETED", fill=(100, 116, 139), font=fonts["hud_label"])
+        draw.text((80, 75), f"{lesson.series_name} • {ep_label} COMPLETED", fill=t_cfg["header_sub"], font=fonts["hud_label"])
         draw.rounded_rectangle([80, 115, 680, 168], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((380, 141), "[PASS] OPTIMAL SOLUTION ACCEPTED", fill=(20, 83, 45), font=fonts["hud_badge"], anchor="mm")
-        draw.text((80, 195), "Mastery Complete!", fill=(15, 23, 42), font=fonts["headline"])
+        draw.text((80, 195), "Mastery Complete!", fill=t_cfg["headline"], font=fonts["headline"])
 
         # Progress Track Full
         bar_w = 920
@@ -415,14 +530,14 @@ def render_anchored_frame(
         c1_y, c1_h = 280, 580
         for off, a in [(14, 15), (6, 25)]:
             draw.rounded_rectangle([card_x, c1_y + off, card_x + card_w, c1_y + c1_h + off], radius=24, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, c1_y, card_x + card_w, c1_y + c1_h], radius=24, fill=(255, 255, 255), outline=(226, 232, 240), width=2)
+        draw.rounded_rectangle([card_x, c1_y, card_x + card_w, c1_y + c1_h], radius=24, fill=t_cfg["card_bg"], outline=t_cfg["card_border"], width=2)
 
         # Huge Checkmark
         draw.ellipse([card_x + 50, c1_y + 40, card_x + 130, c1_y + 120], fill=(34, 197, 94))
         draw.line([(card_x + 75, c1_y + 80), (card_x + 88, c1_y + 95)], fill=(255, 255, 255), width=6)
         draw.line([(card_x + 88, c1_y + 95), (card_x + 112, c1_y + 65)], fill=(255, 255, 255), width=6)
 
-        draw.text((card_x + 160, c1_y + 55), "PRODUCTION OPTIMAL CONFIRMED", fill=(15, 23, 42), font=fonts["section_title"])
+        draw.text((card_x + 160, c1_y + 55), "PRODUCTION OPTIMAL CONFIRMED", fill=t_cfg["headline"], font=fonts["section_title"])
         draw.text((card_x + 160, c1_y + 95), f"• {lesson.benchmark_metric} •", fill=(22, 101, 52), font=fonts["card_body"])
 
         # Side-by-side comparison boxes
@@ -490,13 +605,15 @@ def render_anchored_frame(
     return img.convert("RGB")
 
 
-async def render_videosynx_short(query: str | None = None) -> Path:
+async def render_videosynx_short(query: str | None = None, theme: str = "onedark") -> Path:
     """
     Renders an end-to-end line-by-line anchored short with Kokoro narration and Cherry MX SFX.
     """
     lesson = get_anchored_lesson(query)
+    if theme:
+        lesson.theme = theme
     print("=" * 70)
-    print(f"🎬 [Videosynx Engine] Rendering Line-by-Line Short: {lesson.title}")
+    print(f"🎬 [Videosynx Engine] Rendering Line-by-Line Short: {lesson.title} (Theme: {lesson.theme})")
     print(f"📚 Series: {lesson.series_name} • Episode #{lesson.episode_num}")
     print("=" * 70)
 

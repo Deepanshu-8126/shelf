@@ -45,6 +45,8 @@ class AnchoredLesson:
     diagram_rows: List[str] = field(default_factory=list)
     diagram_caption: str = ""
     next_day_preview: str = ""
+    theme: str = "onedark"
+    veo_prompt: str = ""
 
 
 

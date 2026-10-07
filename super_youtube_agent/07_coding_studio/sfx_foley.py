@@ -26,27 +26,74 @@ SAMPLE_RATE = 44100
 SFX_DIR = Path(__file__).resolve().parent / "assets" / "sfx"
 
 
+def create_mechanical_click(duration_sec: float = 0.08) -> np.ndarray:
+    """High-craft procedural mechanical switch click (dual-stage tactile thock + crisp click)."""
+    n = int(duration_sec * SAMPLE_RATE)
+    t = np.linspace(0, duration_sec, n, endpoint=False)
+    snap = np.sin(2 * np.pi * 2200 * t) * np.exp(-t * 110) * 0.45
+    thock = np.sin(2 * np.pi * 340 * t) * np.exp(-t * 65) * 0.55
+    noise = np.random.uniform(-0.15, 0.15, n) * np.exp(-t * 180)
+    sig = (snap + thock + noise) * 0.28
+    return sig.astype(np.float32)
+
+
+def create_enter_key(duration_sec: float = 0.14) -> np.ndarray:
+    """High-craft procedural Enter key with stabilizer housing thud."""
+    n = int(duration_sec * SAMPLE_RATE)
+    t = np.linspace(0, duration_sec, n, endpoint=False)
+    thud = np.sin(2 * np.pi * 180 * t) * np.exp(-t * 40) * 0.70
+    click = np.sin(2 * np.pi * 1800 * t) * np.exp(-t * 90) * 0.35
+    noise = np.random.uniform(-0.2, 0.2, n) * np.exp(-t * 120)
+    sig = (thud + click + noise) * 0.32
+    return sig.astype(np.float32)
+
+
 def get_real_click() -> np.ndarray:
-    """Loads studio recording of Cherry MX Blue switch click if available, else synthetic fallback."""
+    """Loads studio recording of mechanical switch click in clean mono, else procedural fallback."""
     click_path = SFX_DIR / "keyboard_click.wav"
     if click_path.exists():
         try:
             with wave.open(str(click_path), 'rb') as wf:
                 raw = wf.readframes(wf.getnframes())
-                return (np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0) * 0.72
+                n_ch = wf.getnchannels()
+                arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+                if n_ch > 1:
+                    arr = arr.reshape(-1, n_ch).mean(axis=1)
+                return arr * 0.28
         except Exception:
             pass
     return create_mechanical_click()
 
 
 def get_real_enter() -> np.ndarray:
-    """Loads studio recording of Cherry MX heavy Enter key with stabilizer thud."""
+    """Loads studio recording of heavy Enter key with stabilizer thud in clean mono."""
     enter_path = SFX_DIR / "keyboard_enter.wav"
     if enter_path.exists():
         try:
             with wave.open(str(enter_path), 'rb') as wf:
                 raw = wf.readframes(wf.getnframes())
-                return (np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0) * 0.85
+                n_ch = wf.getnchannels()
+                arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+                if n_ch > 1:
+                    arr = arr.reshape(-1, n_ch).mean(axis=1)
+                return arr * 0.32
+        except Exception:
+            pass
+    return create_enter_key()
+
+
+def get_real_space() -> np.ndarray:
+    """Loads studio recording of deep spacebar acoustic thud in clean mono."""
+    space_path = SFX_DIR / "keyboard_space.wav"
+    if space_path.exists():
+        try:
+            with wave.open(str(space_path), 'rb') as wf:
+                raw = wf.readframes(wf.getnframes())
+                n_ch = wf.getnchannels()
+                arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+                if n_ch > 1:
+                    arr = arr.reshape(-1, n_ch).mean(axis=1)
+                return arr * 0.30
         except Exception:
             pass
     return create_enter_key()
@@ -118,23 +165,29 @@ def overlay_keystroke_sequence(
     master: np.ndarray,
     start_time: float,
     duration: float,
-    volume: float = 0.36
+    volume: float = 0.16
 ):
-    """Generates humanized Cherry MX mechanical keyboard typing sounds with tactile cadence."""
+    """Generates humanized mechanical keyboard typing sounds with organic tactile cadence."""
     rng = np.random.RandomState(42)
     t = start_time
     end_time = min(len(master) / SAMPLE_RATE, start_time + duration)
     click = get_real_click()
     enter = get_real_enter()
+    space = get_real_space()
 
     while t < end_time:
-        is_newline = rng.rand() < 0.14
-        if is_newline:
-            overlay_audio_stem(master, enter, t, volume=volume * 1.25)
-            t += rng.uniform(0.11, 0.18)
+        roll = rng.rand()
+        if roll < 0.12:
+            overlay_audio_stem(master, enter, t, volume=volume * 1.15)
+            t += rng.uniform(0.12, 0.22)
+        elif roll < 0.30:
+            overlay_audio_stem(master, space, t, volume=volume * 0.90)
+            t += rng.uniform(0.08, 0.15)
         else:
-            overlay_audio_stem(master, click, t, volume=volume * rng.uniform(0.85, 1.15))
-            t += rng.uniform(0.048, 0.088)
+            # Subtle pitch / velocity variation for natural feel
+            vel = volume * rng.uniform(0.85, 1.12)
+            overlay_audio_stem(master, click, t, volume=vel)
+            t += rng.uniform(0.065, 0.110)
 
 
 def overlay_precise_keystrokes(
@@ -142,33 +195,43 @@ def overlay_precise_keystrokes(
     code_text: str,
     start_sec: float,
     duration_sec: float,
-    volume: float = 0.38,
-    ease_exponent: float = 1.6
+    volume: float = 0.16,
+    ease_exponent: float = 1.4
 ):
     """
-    Overlays exact keystrokes corresponding to each character typed in code_text
-    over duration_sec, with Cherry MX Blue click per char and enter thud for newlines.
+    Overlays exact keystrokes corresponding to code_text over duration_sec.
+    Humanized with space thud, Enter stabilizer thud, and realistic key cadence (max 14 keys/sec).
     """
     if not code_text or duration_sec <= 0:
         return
     click = get_real_click()
     enter = get_real_enter()
+    space = get_real_space()
     chars = list(code_text)
     total_chars = len(chars)
     if total_chars == 0:
         return
 
-    for idx, ch in enumerate(chars):
+    # To avoid robotic machine-gun buzzing, limit key sound rate to max ~14 keys/sec
+    max_keystrokes = max(3, int(duration_sec * 14))
+    step = max(1, total_chars // max_keystrokes) if total_chars > max_keystrokes else 1
+    rng = np.random.RandomState(int(start_sec * 100))
+
+    for idx in range(0, total_chars, step):
+        ch = chars[idx]
         progress = (idx / total_chars) ** (1.0 / ease_exponent)
-        t = start_sec + progress * duration_sec
+        jitter = rng.uniform(-0.015, 0.015)
+        t = max(0.0, start_sec + progress * duration_sec + jitter)
         if t * SAMPLE_RATE >= len(master):
             break
+
+        vel = volume * rng.uniform(0.88, 1.12)
         if ch == '\n':
-            overlay_audio_stem(master, enter, t, volume=volume * 1.25)
+            overlay_audio_stem(master, enter, t, volume=vel * 1.25)
         elif ch in (' ', '\t'):
-            overlay_audio_stem(master, click, t, volume=volume * 0.65)
+            overlay_audio_stem(master, space, t, volume=vel * 0.85)
         else:
-            overlay_audio_stem(master, click, t, volume=volume)
+            overlay_audio_stem(master, click, t, volume=vel)
 
 
 def build_teacher_foley_soundtrack(
@@ -268,42 +331,42 @@ def build_teacher_foley_soundtrack(
                         full_code_raw, 
                         type_start, 
                         actual_duration,
-                        volume=0.38,
-                        ease_exponent=1.6
+                        volume=0.16,
+                        ease_exponent=1.4
                     )
     else:
         # Fallback to original behavior if typing sync not available
         # Foley Cues (Synchronized frame-accurately with visual transitions):
         # 1. Early character-by-character typing keystrokes (0.5s to 2.4s)
-        overlay_keystroke_sequence(master, start_time=0.5, duration=2.0, volume=0.38)
+        overlay_keystroke_sequence(master, start_time=0.5, duration=2.0, volume=0.16)
 
         # 2. Highlighter marker sweep on key line (around 2.6s - exactly when visual wipe begins)
         marker_time = 2.6
         if marker_time < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, marker, marker_time, volume=0.55)
+            overlay_audio_stem(master, marker, marker_time, volume=0.24)
 
         # 3. Enter key click when Terminal executes (around beats[0] + 0.4s)
         enter_thud = get_real_enter()
         term_enter_time = beats[0] + 0.4 if len(beats) > 0 else 7.0
         if term_enter_time < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, enter_thud, term_enter_time, volume=0.65)
+            overlay_audio_stem(master, enter_thud, term_enter_time, volume=0.26)
 
         # 4. Terminal pass / benchmark ding (around beats[0] + 1.8s)
         term_ding_time = beats[0] + 1.8 if len(beats) > 0 else 8.5
         if term_ding_time < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, ding, term_ding_time, volume=0.50)
+            overlay_audio_stem(master, ding, term_ding_time, volume=0.25)
 
         # 5. Whoosh transition into Clean Code phase (around beats[1])
         if len(beats) > 1 and beats[1] < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.50)
+            overlay_audio_stem(master, whoosh, beats[1] - 0.25, volume=0.28)
             # Fast typing clacks for the clean refactor
-            overlay_keystroke_sequence(master, start_time=beats[1], duration=1.8, volume=0.38)
+            overlay_keystroke_sequence(master, start_time=beats[1], duration=1.8, volume=0.16)
 
         # 6. Climax Whoosh + Ding into the VS Comparison Screen (around beats[2])
         climax_beat = beats[2] if len(beats) > 2 else len(master) / SAMPLE_RATE * 0.75
         if climax_beat < len(master) / SAMPLE_RATE:
-            overlay_audio_stem(master, whoosh, climax_beat - 0.25, volume=0.60)
-            overlay_audio_stem(master, ding, climax_beat + 0.45, volume=0.65)
+            overlay_audio_stem(master, whoosh, climax_beat - 0.25, volume=0.30)
+            overlay_audio_stem(master, ding, climax_beat + 0.45, volume=0.28)
 
     # Normalize to prevent clipping
     peak = np.max(np.abs(master))

@@ -155,21 +155,27 @@ class AnchoredTimeline:
         ding_stem = create_success_ding()
         whoosh_stem = create_whoosh()
 
-        # Keystroke clicks for each line
+        # Humanized Cherry MX mechanical keystroke clicks for each line
+        rng = np.random.RandomState(42)
         for sched in self.schedules:
             chars = list(sched.code_text)
             total_chars = len(chars)
             dur = sched.type_end_sec - sched.type_start_sec
-            for c_i, ch in enumerate(chars):
-                t = sched.type_start_sec + (c_i / max(1, total_chars)) * dur
+            
+            # Step in organic human typing cadence (~10-14 keys/sec max, not harsh machine-gun)
+            step = max(1, total_chars // 14) if total_chars > 14 else 1
+            for c_i in range(0, total_chars, step):
+                ch = chars[c_i]
+                jitter = float(rng.uniform(-0.012, 0.012))
+                t = max(0.0, sched.type_start_sec + (c_i / max(1, total_chars)) * dur + jitter)
                 if ch in (' ', '\t'):
-                    overlay_audio_stem(master, click_stem, t, volume=0.25)
-                elif ch == '\n':
-                    overlay_audio_stem(master, enter_stem, t, volume=0.55)
+                    overlay_audio_stem(master, click_stem, t, volume=0.12)
                 else:
-                    overlay_audio_stem(master, click_stem, t, volume=0.38)
-            # Enter thud at the end of every line
-            overlay_audio_stem(master, enter_stem, sched.type_end_sec, volume=0.50)
+                    vol = float(rng.uniform(0.13, 0.17))
+                    overlay_audio_stem(master, click_stem, t, volume=vol)
+
+            # Crisp Enter key clack at the end of every line (subtle thud)
+            overlay_audio_stem(master, enter_stem, sched.type_end_sec, volume=0.22)
 
         # Transition whoosh into execution phase
         overlay_audio_stem(master, whoosh_stem, self.exec_start_sec, volume=0.45)
