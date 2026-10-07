@@ -37,6 +37,9 @@ on:
         required: false
         default: ''
 
+  repository_dispatch:
+    types: [render_coding_short, render_fleet_short]
+
 permissions:
   contents: write
 
@@ -73,9 +76,9 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
-          ACTION_TYPE: ${{ github.event.inputs.action || 'next' }}
-          NICHE_INPUT: ${{ github.event.inputs.niche || 'java' }}
-          CUSTOM_TOPIC: ${{ github.event.inputs.topic || '' }}
+          ACTION_TYPE: ${{ github.event.inputs.action || github.event.client_payload.action || 'next' }}
+          NICHE_INPUT: ${{ github.event.inputs.niche || github.event.client_payload.niche || 'java' }}
+          CUSTOM_TOPIC: ${{ github.event.inputs.topic || github.event.client_payload.topic || '' }}
         run: |
           if [ "$ACTION_TYPE" = "topic" ] && [ -n "$CUSTOM_TOPIC" ]; then
             echo "🚀 Rendering Custom Topic: $CUSTOM_TOPIC"
