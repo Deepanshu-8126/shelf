@@ -25,9 +25,10 @@ if ENV_FILE.exists():
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip())
     except Exception as e:
         print(f"⚠️ [Agentic Director] Error reading .env: {e}")
+
+sys.path.insert(0, str(CURRENT_DIR))
 
 from master_channel_registry import (
     scan_all_channels,
@@ -47,6 +48,8 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b").strip()
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 SYSTEM_PROMPT = """You are the Master Agentic Studio Director for the Super YouTube Agent fleet.
+You enforce strict Anti-Slop Design Craft (inspired by Hallmark & Taste-Design) and support both native engines and Pinokio local AI generation.
+
 You control 7 autonomous channels:
 - Channel 1: Viral Facts Shorts (9:16 high retention science & world facts)
 - Channel 2: Story Studio (History & historical mysteries)
@@ -56,23 +59,36 @@ You control 7 autonomous channels:
 - Channel 6: AI Clipper (Auto viral podcast clips)
 - Channel 7: Coding & Tech Studio (9:16 line-by-line pedagogical IDE, 100 Days of Python/DSA)
 
+ANTI-SLOP CRAFT PRINCIPLES:
+1. Zero generic AI templates: No AI-purple mesh gradients, no boring centered text on black screens.
+2. Bespoke visual palettes: Deep slate #0d1117, warm amber noir, crisp editorial parchment #f8f6f0.
+3. High retention rhythm: Visual state changes / code typing / spotlight shifts every 1.5 - 2.5 seconds.
+4. Pedagogical anchoring: Spoken explanation must be synchronized to the visual element shown on screen.
+
+PINOKIO LOCAL AI ENGINE SUPPORT:
+If the user mentions "pinokio" or asks for diffusion AI video generation (Wan 2.1, LTX-Video, CogVideo, ComfyUI, Maestro):
+- Set "engine": "pinokio"
+- Configure Pinokio workflow dispatch instructions.
+
 When the user gives ANY instruction in Hinglish, Hindi, or English:
 1. Deconstruct the request into an intelligent, professional Multi-Agent Plan:
    - 🎯 Intent & Target Channel
    - 🧠 Script & Narrative Hook (0-5s, 5-30s, 30-45s)
-   - 🎨 Visual Direction & Theme
-   - ⚙️ Execution Action
+   - 🎨 Anti-Slop Visual Direction & Color Palette
+   - ⚙️ Engine Choice: "videosynx" | "vox" | "pinokio" | "factshorts" | "dark_sutra"
 2. Respond with structured JSON outputting:
    {
-     "thought": "Brief internal chain of thought",
+     "thought": "Internal chain of thought with anti-slop aesthetic reasoning",
      "action": "plan_render" | "show_analytics" | "show_quota" | "show_youtube" | "conversational",
      "channel_num": 1 to 7 (or null),
      "topic": "Clean inferred topic",
+     "engine": "videosynx" | "pinokio" | "vox" | "dark_sutra",
      "duration_sec": 30 | 45 | 60,
+     "visual_palette": "e.g. Monokai Pro Dark #0d1117 with Neon Cyan Accents",
      "reply_text": "Engaging, professional Hinglish reply with markdown, plan breakdown, and call to action"
    }
 
-Be extremely smart, helpful, creative, and action-oriented. Always maintain high aesthetic standards."""
+Be extremely smart, helpful, creative, and action-oriented. Always maintain elite anti-slop aesthetic craft."""
 
 
 def call_agentic_llm(user_prompt: str) -> Dict[str, Any]:
@@ -175,17 +191,20 @@ def format_agentic_plan_card(plan: Dict[str, Any]) -> str:
     preview = generate_interactive_script_preview(topic, dur)
     tags_str = " ".join([f"#{t}" for t in preview["youtube_tags"][:6]])
 
+    engine = plan.get("engine", "videosynx")
+    palette = plan.get("visual_palette", "OneDark Slate #0d1117 + Neon Accents")
+
     card = [
         "🧠 *[AGENTIC STUDIO DIRECTOR — MULTI-AGENT SWARM]*",
         f"🎯 *Target*: *{ch_name}*",
         f"📝 *Topic*: *{topic}*",
-        f"⏱️ *Duration*: *{dur}s*",
+        f"⏱️ *Duration*: *{dur}s* | ⚙️ *Engine*: `{engine.upper()}`",
+        f"🎨 *Anti-Slop Craft*: `{palette}`",
         "",
-        "🤖 *Agent Breakdown & Production Plan*:",
+        "🤖 *Multi-Agent Production Plan*:",
         f"  • 🎯 *Hook Agent (0-5s)*: {preview['spoken_summary'][0]}",
         f"  • 💡 *Core Logic Agent (5-30s)*: {preview['spoken_summary'][1]}",
         f"  • ⚡ *Verification Agent (30-{dur}s)*: {preview['spoken_summary'][2]}",
-        f"  • 🎨 *Visual Director*: Native 9:16 High-Aesthetic Engine",
         f"  • 🏷️ *Viral SEO Agent*: `{tags_str}`",
         "",
         f"💭 *Agent Reasoning*: _{thought}_",
