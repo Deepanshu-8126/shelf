@@ -14,3 +14,19 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true
+
+  - type: worker
+    name: shelf-telegram-autopilot-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/run_telegram_listener.py
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

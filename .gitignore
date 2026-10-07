@@ -17,6 +17,8 @@ public/studio_media/
 data/audio/
 data/media_assets/
 data/model_face_dataset/
+data/reels_output/*.mp4
+studio_engines/data/**/*.mp4
 video_engine/
 *.zip
 .stitch/

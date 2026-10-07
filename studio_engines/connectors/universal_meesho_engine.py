@@ -106,7 +106,7 @@ class UniversalMeeshoEngine:
             img_path=ref_image
         )
 
-        # 5. Compile into 60fps MP4
+        # 5. Compile into 60fps MP4 with subtle Ken Burns smooth zoom
         slug = re.sub(r'[^a-zA-Z0-9]', '_', clean_title[:16]).lower()
         raw_mp4 = self.output_dir / f"RAW_UNIVERSAL_{slug.upper()}.mp4"
 
@@ -114,7 +114,7 @@ class UniversalMeeshoEngine:
             "ffmpeg", "-y",
             "-loop", "1", "-i", str(frame_path),
             "-t", "8",
-            "-vf", "scale=1080:1920,fps=60",
+            "-vf", "scale=1080:1920,zoompan=z='min(zoom+0.0006,1.05)':d=480:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=60",
             "-c:v", "libx264", "-pix_fmt", "yuv420p",
             str(raw_mp4)
         ]
@@ -188,21 +188,51 @@ class UniversalMeeshoEngine:
     def _resolve_product_image(self, clean_title: str, image_path: str | Path | None) -> Path:
         if image_path and Path(image_path).exists():
             return Path(image_path)
-        # Check if we have cropped images matching title
+            
+        public_img_dir = Path(__file__).resolve().parent.parent.parent / "public" / "images"
         scraped_dir = Path(__file__).resolve().parent.parent / "data" / "scraped_products"
-        t = clean_title.lower()
-        if "sweater" in t and (scraped_dir / "meesho_flame_sweater_purple.jpg").exists():
-            return scraped_dir / "meesho_flame_sweater_purple.jpg"
-        elif ("baby tee" in t or "raglan" in t or "top" in t) and (scraped_dir / "meesho_raglan_baby_tee.jpg").exists():
-            return scraped_dir / "meesho_raglan_baby_tee.jpg"
-        elif "ring" in t and (scraped_dir / "meesho_chunky_rings.jpg").exists():
-            return scraped_dir / "meesho_chunky_rings.jpg"
-        elif "striped" in t and (scraped_dir / "meesho_striped_baby_tee.jpg").exists():
-            return scraped_dir / "meesho_striped_baby_tee.jpg"
         
-        # Default high-res fallback
-        fallback = Path(__file__).resolve().parent.parent / "data" / "ref_frame1.jpg"
-        return fallback if fallback.exists() else (scraped_dir / "meesho_flame_sweater_purple.jpg")
+        t = clean_title.lower()
+        
+        # 1. Check public images first (high-res webp/jpg)
+        if public_img_dir.exists():
+            if any(w in t for w in ["kurti", "anarkali", "suit", "chikankari", "ethnic"]):
+                for candidate in ["meesho-kurti-set.webp", "meesho-kurti-dailywear-hgyjn7-view-front.webp", "meesho-peach-embroidered-tunic.webp"]:
+                    if (public_img_dir / candidate).exists():
+                        return public_img_dir / candidate
+            elif any(w in t for w in ["dress", "bodycon", "maxi"]):
+                for candidate in ["meesho-dress-bg1m56.webp", "meesho-dress-ae6lv9.webp", "meesho-dress-b38f6j.webp"]:
+                    if (public_img_dir / candidate).exists():
+                        return public_img_dir / candidate
+            elif any(w in t for w in ["sweater", "puffer", "jacket", "cardigan"]):
+                for candidate in ["meesho-hot-pink-puffer.webp", "meesho-black-cardigan.webp", "meesho-puffer-vest.webp"]:
+                    if (public_img_dir / candidate).exists():
+                        return public_img_dir / candidate
+            elif any(w in t for w in ["ring", "jewelry", "earring", "jewellery", "jhumka"]):
+                for candidate in ["meesho-flower-earrings.webp", "meesho-earrings-combo.webp", "gold-hoops.jpg"]:
+                    if (public_img_dir / candidate).exists():
+                        return public_img_dir / candidate
+            elif any(w in t for w in ["top", "tee", "crop", "western", "shirt"]):
+                for candidate in ["meesho-western-party-top.webp", "meesho-western-korean-top.webp", "meesho-casual-beige-girls-top.webp"]:
+                    if (public_img_dir / candidate).exists():
+                        return public_img_dir / candidate
+            
+            # General fallback to any valid meesho image in public
+            webp_files = list(public_img_dir.glob("meesho-*.webp"))
+            if webp_files:
+                return webp_files[0]
+
+        # 2. Check scraped products dir
+        if scraped_dir.exists():
+            for f in scraped_dir.glob("*.jpg"):
+                return f
+        
+        # 3. Model character sheet fallback
+        char_sheet = Path(__file__).resolve().parent.parent.parent / "model_character_sheet_v2.jpg"
+        if char_sheet.exists():
+            return char_sheet
+
+        raise FileNotFoundError(f"No product image found for title: {clean_title}")
 
     def _render_luxury_frame(
         self,
@@ -229,38 +259,36 @@ class UniversalMeeshoEngine:
             draw.rectangle([0, y, w, y + 6], fill=(r, g, b, 255))
 
         # Main Real Product Showcase
-        try:
-            raw_img = Image.open(img_path).convert("RGBA")
-            tw, th = 900, 1080
-            aspect = tw / th
-            img_aspect = raw_img.width / raw_img.height
-            if img_aspect > aspect:
-                nw = int(raw_img.height * aspect)
-                left = (raw_img.width - nw) // 2
-                raw_img = raw_img.crop((left, 0, left + nw, raw_img.height))
-            else:
-                nh = int(raw_img.width / aspect)
-                top = (raw_img.height - nh) // 2
-                raw_img = raw_img.crop((0, top, raw_img.width, top + nh))
+        raw_img = Image.open(img_path).convert("RGBA")
+        tw, th = 920, 1140
+        aspect = tw / th
+        img_aspect = raw_img.width / raw_img.height
+        if img_aspect > aspect:
+            nw = int(raw_img.height * aspect)
+            left = (raw_img.width - nw) // 2
+            raw_img = raw_img.crop((left, 0, left + nw, raw_img.height))
+        else:
+            nh = int(raw_img.width / aspect)
+            top = (raw_img.height - nh) // 2
+            raw_img = raw_img.crop((0, top, raw_img.width, top + nh))
 
-            raw_img = raw_img.resize((tw, th), Image.Resampling.LANCZOS)
-            mask = Image.new("L", (tw, th), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([0, 0, tw, th], radius=28, fill=255)
+        raw_img = raw_img.resize((tw, th), Image.Resampling.LANCZOS)
+        mask = Image.new("L", (tw, th), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, tw, th], radius=32, fill=255)
 
-            draw.rounded_rectangle([86, 426, 86 + tw + 8, 426 + th + 8], radius=32, fill=(0, 0, 0, 140))
-            canvas.paste(raw_img, (90, 430), mask)
-            draw.rounded_rectangle([90, 430, 90 + tw, 430 + th], radius=28, outline=(255, 255, 255, 220), width=3)
-        except Exception as e:
-            log.warning("Universal frame image notice: %s", e)
+        # Drop shadow and border
+        draw.rounded_rectangle([76, 406, 76 + tw + 8, 406 + th + 8], radius=36, fill=(0, 0, 0, 160))
+        canvas.paste(raw_img, (80, 410), mask)
+        draw.rounded_rectangle([80, 410, 80 + tw, 410 + th], radius=32, outline=(255, 255, 255, 230), width=4)
 
         # Top Pill: Category Tag
-        draw.rounded_rectangle([300, 120, 780, 190], radius=18, fill=(244, 63, 94, 255))
-        draw.text((540, 155), f"🔥 {category_tag.upper()} • MEESHO FIND", fill=(255, 255, 255, 255), font=_get_font(26, bold=True), anchor="mm")
+        draw.rounded_rectangle([280, 120, 800, 190], radius=18, fill=(244, 63, 94, 255))
+        draw.text((540, 155), f"VIRAL {category_tag.upper()} • MEESHO FIND", fill=(255, 255, 255, 255), font=_get_font(26, bold=True), anchor="mm")
 
         # Aesthetic Headline
-        font_h = _get_font(52, bold=True)
-        draw.text((542, 262), headline, fill=(0, 0, 0, 220), font=font_h, anchor="mm")
-        draw.text((540, 260), headline, fill=(255, 255, 255, 255), font=font_h, anchor="mm")
+        font_h = _get_font(50, bold=True)
+        draw.text((542, 262), headline.replace("✨", "").strip(), fill=(0, 0, 0, 220), font=font_h, anchor="mm")
+        draw.text((540, 260), headline.replace("✨", "").strip(), fill=(255, 255, 255, 255), font=font_h, anchor="mm")
 
         # Subtitle Product Title
         draw.rounded_rectangle([180, 320, 900, 375], radius=16, fill=(25, 20, 30, 220), outline=(255, 255, 255, 140), width=2)
@@ -268,11 +296,11 @@ class UniversalMeeshoEngine:
 
         # Bottom Price Card
         draw.rounded_rectangle([90, 1540, 990, 1750], radius=26, fill=(15, 12, 18, 235), outline=(255, 255, 255, 180), width=2)
-        price_text = f"💰 {price}  (MRP {mrp} • {discount})"
+        price_text = f"DEAL: {price}  |  MRP {mrp}  ({discount})"
         draw.text((540, 1600), price_text, fill=(255, 230, 100, 255), font=_get_font(34, bold=True), anchor="mm")
 
-        draw.text((540, 1665), f"🧵 {fabric_info[:52]}...", fill=(220, 215, 230, 255), font=_get_font(22), anchor="mm")
-        draw.text((540, 1715), "👉 Comment 'LINK' for direct Wishlink DM!", fill=(244, 63, 94, 255), font=_get_font(22, bold=True), anchor="mm")
+        draw.text((540, 1665), f"Fabric: {fabric_info[:52]}...", fill=(220, 215, 230, 255), font=_get_font(22), anchor="mm")
+        draw.text((540, 1715), "Comment 'LINK' below or Check Bio To Shop", fill=(244, 63, 94, 255), font=_get_font(24, bold=True), anchor="mm")
 
         slug = re.sub(r'[^a-zA-Z0-9]', '_', title[:15]).lower()
         out_f = self.output_dir / f"universal_frame_{slug}.png"

@@ -27,6 +27,7 @@ import {
   detectStore,
 } from './data.js';
 import { getCloudProducts } from './services/supabaseClient.js';
+import './components/DashboardView.css';
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
@@ -325,33 +326,32 @@ function DashboardView({
   const totalClicks = analytics?.total_clicks ?? 2237;
 
   return (
-    <div className="admin-catalog-view" style={{ padding: '0 0 60px' }}>
+    <div className="dashboard-view">
       {/* ── SaaS Command Center Header ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', marginBottom: '28px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#a348a2', background: 'rgba(163, 72, 162, 0.1)', padding: '3px 8px', borderRadius: '6px' }}>
+      <div className="dashboard-header">
+        <div className="dashboard-header-left">
+          <div className="dashboard-header-title">
+            <span className="dashboard-header-badge">
               COMMERCE COMMAND CENTER
             </span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', fontWeight: 700, color: '#16a34a', background: 'rgba(34, 197, 94, 0.12)', padding: '3px 10px', borderRadius: '999px' }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }} />
+            <span className="dashboard-header-status">
+              <span className="dashboard-header-status-dot" />
               Live System Active
             </span>
           </div>
-          <h1 style={{ fontSize: '30px', fontWeight: 800, color: 'var(--ink)', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+          <h1 className="dashboard-header-greeting">
             Welcome back, {creatorName} 👋
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--muted)', margin: 0, maxWidth: '680px', lineHeight: 1.5 }}>
+          <p className="dashboard-header-description">
             Real-time control over shopper bookings, 193 curated Meesho outfits, AI lookbook renders, and live affiliate commission tracking.
           </p>
         </div>
 
         {/* Top Header Quick Actions */}
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="dashboard-header-actions">
           <button
             type="button"
-            className="button"
-            style={{ background: 'linear-gradient(135deg, #a348a2, #882b87)', color: '#fff', boxShadow: '0 4px 14px rgba(163, 72, 162, 0.25)', gap: '6px' }}
+            className="button dashboard-header-action-btn"
             onClick={() => {
               window.location.hash = '#wishlink';
             }}
@@ -360,288 +360,276 @@ function DashboardView({
           </button>
           <button
             type="button"
-            className="button button-dark"
+            className="button button-dark dashboard-header-action-btn"
             onClick={onOpenPublic}
-            style={{ gap: '6px' }}
           >
             <Icon name="eye" size={16} /> View Storefront
           </button>
           <button
             type="button"
-            className="button button-light"
+            className="button button-light dashboard-header-action-btn"
             onClick={() => onNavigate?.('AI Media Studio')}
-            style={{ gap: '6px' }}
           >
             <span>📸</span> Launch AI Studio
           </button>
         </div>
       </div>
 
-      {/* ── System Status Telemetry Strip ── */}
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px', padding: '12px 18px', background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '14px', alignItems: 'center', fontSize: '12.5px', color: 'var(--ink)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginRight: '12px' }}>
-          <span style={{ fontSize: '14px' }}>⚡</span>
-          <strong>FastAPI Engine:</strong>
-          <span style={{ color: '#16a34a', fontWeight: 700 }}>● Online (127.0.0.1:8787)</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginRight: '12px' }}>
-          <span style={{ fontSize: '14px' }}>🤖</span>
-          <strong>Telegram Bot:</strong>
-          <span style={{ color: '#16a34a', fontWeight: 700 }}>● Active (@Ubstabot)</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginRight: '12px' }}>
-          <span style={{ fontSize: '14px' }}>🔗</span>
-          <strong>Meesho Creator Tag:</strong>
-          <span style={{ color: '#a348a2', fontWeight: 700 }}>374453404 (Monetized)</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
-          <span style={{ fontSize: '14px' }}>💾</span>
-          <strong>Database:</strong>
-          <span style={{ color: 'var(--muted)', fontWeight: 600 }}>SQLite (catalog.sqlite3)</span>
-        </div>
+       {/* ── System Status Telemetry Strip ── */}
+       <div className="dashboard-telemetry">
+         <div className="dashboard-telemetry-item">
+           <span className="dashboard-telemetry-item-icon">⚡</span>
+           <strong className="dashboard-telemetry-item-label">FastAPI Engine:</strong>
+           <span className="dashboard-telemetry-item-value fastapi-engine">● Online (127.0.0.1:8787)</span>
+         </div>
+         <div className="dashboard-telemetry-item">
+           <span className="dashboard-telemetry-item-icon">🤖</span>
+           <strong className="dashboard-telemetry-item-label">Telegram Bot:</strong>
+           <span className="dashboard-telemetry-item-value telegram-bot">● Active (@Ustabot)</span>
+         </div>
+         <div className="dashboard-telemetry-item">
+           <span className="dashboard-telemetry-item-icon">🔗</span>
+           <strong className="dashboard-telemetry-item-label">Meesho Creator Tag:</strong>
+           <span className="dashboard-telemetry-item-value meesho-creator">374453404 (Monetized)</span>
+         </div>
+         <div className="dashboard-telemetry-item" style={{ marginLeft: 'auto' }}>
+           <span className="dashboard-telemetry-item-icon">💾</span>
+           <strong className="dashboard-telemetry-item-label">Database:</strong>
+           <span className="dashboard-telemetry-item-value database">SQLite (catalog.sqlite3)</span>
+         </div>
       </div>
 
-      {/* ── 4 Top SaaS Metric Cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px', marginBottom: '28px' }}>
-        {/* Metric 1 */}
-        <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '20px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Est. Affiliate Earnings</span>
-            <span style={{ fontSize: '20px', background: 'rgba(163, 72, 162, 0.1)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>💰</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em', marginBottom: '6px' }}>
-            ₹{Number(estEarnings).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-          </div>
-          <div style={{ fontSize: '12.5px', color: '#16a34a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span>↑ 12% commission rate</span>
-            <span style={{ color: 'var(--muted)', fontWeight: 400 }}>· placed orders</span>
-          </div>
-        </div>
+       {/* ── 4 Top SaaS Metric Cards ── */}
+       <div className="dashboard-metrics">
+         {/* Metric 1 */}
+         <div className="dashboard-metric">
+           <div className="dashboard-metric-header">
+             <span className="dashboard-metric-label">Est. Affiliate Earnings</span>
+             <span className="dashboard-metric-icon">💰</span>
+           </div>
+           <div className="dashboard-metric-value">
+             ₹{Number(estEarnings).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+           </div>
+           <div className="dashboard-metric-delta">
+             <span>↑ 12% commission rate</span>
+             <span className="dashboard-metric-detail">· placed orders</span>
+           </div>
+         </div>
 
-        {/* Metric 2 */}
-        <div 
-          onClick={() => onNavigate?.('Customer Orders')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '20px', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'transform 0.2s ease', position: 'relative' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Customer Orders</span>
-            <span style={{ fontSize: '20px', background: 'rgba(34, 197, 94, 0.1)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📦</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em', marginBottom: '6px' }}>
-            {recentOrders.length} Bookings
-          </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontWeight: 600 }}>
-            {recentOrders.filter(o => o.status === 'Pending').length} Pending · {recentOrders.filter(o => o.status === 'Confirmed').length} Confirmed
-          </div>
-        </div>
+         {/* Metric 2 */}
+         <div 
+           className="dashboard-metric"
+           onClick={() => onNavigate?.('Customer Orders')}
+         >
+           <div className="dashboard-metric-header">
+             <span className="dashboard-metric-label">Customer Orders</span>
+             <span className="dashboard-metric-icon">📦</span>
+           </div>
+           <div className="dashboard-metric-value">
+             {recentOrders.length} Bookings
+           </div>
+            <div className="dashboard-metric-delta">
+              {recentOrders.filter(o => o.status === 'Pending').length} Pending · {recentOrders.filter(o => o.status === 'Confirmed').length} Confirmed
+            </div>
+         </div>
 
-        {/* Metric 3 */}
-        <div 
-          onClick={() => onNavigate?.('Master Catalog')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '20px', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Active Catalog</span>
-            <span style={{ fontSize: '20px', background: 'rgba(56, 189, 248, 0.1)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👗</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em', marginBottom: '6px' }}>
-            {uniqueProducts.length} Outfits
-          </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontWeight: 600 }}>
-            {liveCount} live on Storefront · 100% Monetized
-          </div>
-        </div>
+         {/* Metric 3 */}
+         <div 
+           className="dashboard-metric"
+           onClick={() => onNavigate?.('Master Catalog')}
+         >
+           <div className="dashboard-metric-header">
+             <span className="dashboard-metric-label">Active Catalog</span>
+             <span className="dashboard-metric-icon">👗</span>
+           </div>
+           <div className="dashboard-metric-value">
+             {uniqueProducts.length} Outfits
+           </div>
+            <div className="dashboard-metric-delta">
+              {liveCount} live on Storefront · 100% Monetized
+            </div>
+         </div>
 
-        {/* Metric 4 */}
-        <div 
-          onClick={() => onNavigate?.('Analytics')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '20px', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Tracked Views & Clicks</span>
-            <span style={{ fontSize: '20px', background: 'rgba(238, 74, 115, 0.1)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👁️</span>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em', marginBottom: '6px' }}>
-            {Number(totalClicks).toLocaleString('en-IN')}
-          </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontWeight: 600 }}>
-            Across Pinterest, Reels & Direct Links
-          </div>
-        </div>
-      </div>
+         {/* Metric 4 */}
+         <div 
+           className="dashboard-metric"
+           onClick={() => onNavigate?.('Analytics')}
+         >
+           <div className="dashboard-metric-header">
+             <span className="dashboard-metric-label">Tracked Views & Clicks</span>
+             <span className="dashboard-metric-icon">👁️</span>
+           </div>
+           <div className="dashboard-metric-value">
+             {Number(totalClicks).toLocaleString('en-IN')}
+           </div>
+            <div className="dashboard-metric-delta">
+              Across Pinterest, Reels & Direct Links
+            </div>
+         </div>
+       </div>
 
-      {/* ── Live Customer Bookings Table (Recent Snapshot) ── */}
-      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '20px', padding: '24px', marginBottom: '28px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
-            <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>📦</span> Recent Customer Bookings (Live from SQLite)
-              <span style={{ fontSize: '11px', background: 'rgba(34, 197, 94, 0.15)', color: '#16a34a', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                {recentOrders.length} Total
-              </span>
-            </h2>
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
-              Shoppers who ordered via WhatsApp Checkout or Instant COD on your storefront.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="button button-light button-sm"
-            onClick={() => onNavigate?.('Customer Orders')}
-            style={{ fontWeight: 700 }}
-          >
-            Manage All Orders ➔
-          </button>
-        </div>
+       {/* ── Live Customer Bookings Table (Recent Snapshot) ── */}
+       <div className="dashboard-bookings">
+         <div className="dashboard-bookings-header">
+           <div>
+             <h2 className="dashboard-bookings-title">
+               <span>📦</span> Recent Customer Bookings (Live from SQLite)
+               <span className="dashboard-bookings-count">
+                 {recentOrders.length} Total
+               </span>
+             </h2>
+             <p className="dashboard-bookings-description">
+               Shoppers who ordered via WhatsApp Checkout or Instant COD on your storefront.
+             </p>
+           </div>
+           <button
+             type="button"
+             className="button button-light button-sm"
+             onClick={() => onNavigate?.('Customer Orders')}
+             style={{ fontWeight: 700 }}
+           >
+             Manage All Orders ➔
+           </button>
+         </div>
 
-        {recentOrders.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '36px 20px', background: 'var(--canvas)', borderRadius: '14px', border: '1px dashed var(--line)' }}>
-            <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}>📭</span>
-            <strong style={{ fontSize: '14px', color: 'var(--ink)' }}>No Customer Orders Yet</strong>
-            <p style={{ fontSize: '12.5px', color: 'var(--muted)', margin: '4px 0 0' }}>
-              When shoppers tap "WhatsApp COD Order" on your storefront or Wishlink page, bookings appear here automatically.
-            </p>
-          </div>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
-              <thead>
-                <tr style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--line)', color: 'var(--muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '12px 14px' }}>Order Ref</th>
-                  <th style={{ padding: '12px 14px' }}>Customer</th>
-                  <th style={{ padding: '12px 14px' }}>Product</th>
-                  <th style={{ padding: '12px 14px' }}>Amount</th>
-                  <th style={{ padding: '12px 14px' }}>Status</th>
-                  <th style={{ padding: '12px 14px', textAlign: 'right' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.slice(0, 4).map((order) => (
-                  <tr key={order.id} style={{ borderBottom: '1px solid var(--line)' }}>
-                    <td style={{ padding: '14px', fontWeight: 700, color: 'var(--ink)' }}>
-                      {order.id}
-                    </td>
-                    <td style={{ padding: '14px' }}>
-                      <div style={{ fontWeight: 700, color: 'var(--ink)' }}>{order.customer || 'Shopper'}</div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>{order.phone || 'WhatsApp'}</div>
-                    </td>
-                    <td style={{ padding: '14px', maxWidth: '240px' }}>
-                      <div style={{ fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {order.product || 'Fashion Item'}
-                      </div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Size: {order.size || 'M'}</div>
-                    </td>
-                    <td style={{ padding: '14px', fontWeight: 800, color: 'var(--ink)' }}>
-                      ₹{Number(order.price || 0).toLocaleString('en-IN')}
-                    </td>
-                    <td style={{ padding: '14px' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '3px 10px',
-                        borderRadius: '999px',
-                        fontSize: '11.5px',
-                        fontWeight: 700,
-                        background: order.status === 'Confirmed' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(234, 179, 8, 0.15)',
-                        color: order.status === 'Confirmed' ? '#16a34a' : '#ca8a04'
-                      }}>
-                        {order.status || 'Pending'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px', textAlign: 'right' }}>
-                      <button
-                        type="button"
-                        className="button button-light button-sm"
-                        onClick={() => onNavigate?.('Customer Orders')}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+         {recentOrders.length === 0 ? (
+           <div className="dashboard-bookings-empty">
+             <span className="dashboard-bookings-empty-icon">📭</span>
+             <strong className="dashboard-bookings-empty-title">No Customer Orders Yet</strong>
+             <p className="dashboard-bookings-empty-description">
+               When shoppers tap "WhatsApp COD Order" on your storefront or Wishlink page, bookings appear here automatically.
+             </p>
+           </div>
+         ) : (
+           <div className="dashboard-bookings-table-wrapper">
+             <table className="dashboard-bookings-table">
+               <thead>
+                 <tr>
+                   <th>Order Ref</th>
+                   <th>Customer</th>
+                   <th>Product</th>
+                   <th>Amount</th>
+                   <th>Status</th>
+                   <th style={{ textAlign: 'right' }}>Action</th>
+                 </tr>
+               </thead>
+                <tbody>
+                 {recentOrders.slice(0, 4).map((order) => (
+                   <tr key={order.id}>
+                     <td className="id-cell">
+                       {order.id}
+                     </td>
+                     <td className="customer-cell">
+                       <div className="customer-name">{order.customer || 'Shopper'}</div>
+                       <div className="customer-phone">{order.phone || 'WhatsApp'}</div>
+                     </td>
+                     <td className="product-cell">
+                       <div className="product-name">{order.product || 'Fashion Item'}</div>
+                       <div className="product-size">{order.size || 'M'}</div>
+                     </td>
+                     <td className="price-cell">
+                       ₹{Number(order.price || 0).toLocaleString('en-IN')}
+                     </td>
+                     <td className="status-cell">
+                       <span className={`status-badge ${order.status === 'Confirmed' ? 'status-badge-confirmed' : 'status-badge-pending'}`}>
+                         {order.status || 'Pending'}
+                       </span>
+                     </td>
+                     <td className="action-cell">
+                       <button
+                         type="button"
+                         className="button button-light button-sm"
+                         onClick={() => onNavigate?.('Customer Orders')}
+                       >
+                         View Details
+                       </button>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* ── Studio Operations & Workflows Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '28px' }}>
-        {/* Workflow 1 */}
-        <div 
-          onClick={() => onNavigate?.('AI Media Studio')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '26px' }}>📸</span>
-            <span style={{ fontSize: '11px', background: 'rgba(163, 72, 162, 0.12)', color: '#a348a2', padding: '3px 8px', borderRadius: '6px', fontWeight: 800 }}>
-              FLUX Tier 1
-            </span>
-          </div>
-          <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 6px', color: 'var(--ink)' }}>AI Media Studio</h3>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 16px', lineHeight: 1.5, flex: 1 }}>
-            Convert flat catalog photos into high-fashion studio lookbooks, Pinterest viral pins, and 9:16 vertical video reels.
-          </p>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: '#a348a2', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            Launch AI Studio ➔
-          </span>
+       {/* ── Studio Operations & Workflows Grid ── */}
+       <div className="dashboard-workflows">
+         {/* Workflow 1 */}
+         <div 
+           className="dashboard-workflow"
+           onClick={() => onNavigate?.('AI Media Studio')}
+         >
+           <div className="dashboard-workflow-header">
+             <span className="dashboard-workflow-icon">📸</span>
+             <span className="dashboard-workflow-badge">
+               FLUX Tier 1
+             </span>
+           </div>
+           <h3 className="dashboard-workflow-title">AI Media Studio</h3>
+           <p className="dashboard-workflow-description">
+             Convert flat catalog photos into high-fashion studio lookbooks, Pinterest viral pins, and 9:16 vertical video reels.
+           </p>
+           <span className="dashboard-workflow-action">
+             Launch AI Studio ➔
+           </span>
         </div>
 
         {/* Workflow 2 */}
         <div 
+          className="dashboard-workflow"
           onClick={() => { window.location.hash = '#wishlink'; }}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '26px' }}>🌸</span>
-            <span style={{ fontSize: '11px', background: 'rgba(238, 74, 115, 0.12)', color: '#ee4a73', padding: '3px 8px', borderRadius: '6px', fontWeight: 800 }}>
+          <div className="dashboard-workflow-header">
+            <span className="dashboard-workflow-icon">🌸</span>
+            <span className="dashboard-workflow-badge">
               Instagram Bio
             </span>
           </div>
-          <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 6px', color: 'var(--ink)' }}>Wishlink Creator Haul</h3>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 16px', lineHeight: 1.5, flex: 1 }}>
+          <h3 className="dashboard-workflow-title">Wishlink Creator Haul</h3>
+          <p className="dashboard-workflow-description">
             Dedicated influencer haul page with 1-click Meesho code copy, direct affiliate links, and WhatsApp COD order assistance.
           </p>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: '#ee4a73', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="dashboard-workflow-action">
             Open Wishlink Page ➔
           </span>
         </div>
 
         {/* Workflow 3 */}
         <div 
+          className="dashboard-workflow"
           onClick={() => onNavigate?.('Ingest Inbox')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '26px' }}>📥</span>
-            <span style={{ fontSize: '11px', background: 'rgba(34, 197, 94, 0.12)', color: '#16a34a', padding: '3px 8px', borderRadius: '6px', fontWeight: 800 }}>
+          <div className="dashboard-workflow-header">
+            <span className="dashboard-workflow-icon">📥</span>
+            <span className="dashboard-workflow-badge">
               Auto-Scraper
             </span>
           </div>
-          <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 6px', color: 'var(--ink)' }}>Ingest Inbox & Scraper</h3>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 16px', lineHeight: 1.5, flex: 1 }}>
+          <h3 className="dashboard-workflow-title">Ingest Inbox & Scraper</h3>
+          <p className="dashboard-workflow-description">
             Paste any Meesho or Myntra link to auto-crawl high-res images, vendor colorways, and wholesale prices directly into your catalog.
           </p>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="dashboard-workflow-action">
             Open Scraper Inbox ➔
           </span>
         </div>
 
         {/* Workflow 4 */}
         <div 
+          className="dashboard-workflow"
           onClick={() => onNavigate?.('Pinterest Traffic Hub')}
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '18px', padding: '22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'all 0.2s ease' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '26px' }}>📌</span>
-            <span style={{ fontSize: '11px', background: 'rgba(234, 88, 12, 0.12)', color: '#ea580c', padding: '3px 8px', borderRadius: '6px', fontWeight: 800 }}>
+          <div className="dashboard-workflow-header">
+            <span className="dashboard-workflow-icon">📌</span>
+            <span className="dashboard-workflow-badge">
               Syndication
             </span>
           </div>
-          <h3 style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 6px', color: 'var(--ink)' }}>Pinterest Traffic Hub</h3>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 16px', lineHeight: 1.5, flex: 1 }}>
+          <h3 className="dashboard-workflow-title">Pinterest Traffic Hub</h3>
+          <p className="dashboard-workflow-description">
             Viral pin descriptions, high-CTR reel hooks, and direct Telegram channel drops to syndicate content automatically.
           </p>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: '#ea580c', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span className="dashboard-workflow-action">
             Open Traffic Hub ➔
           </span>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import Icon from './Icon.jsx';
 import { detectStore } from '../data.js';
+import './AdminCatalogView.css';
 
 const CATEGORY_GROUPS = [
   'All Categories',
@@ -22,6 +23,21 @@ const MARKETPLACES = ['All Stores', 'Amazon', 'Flipkart', 'Myntra', 'Meesho', 'P
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;
+}
+
+function getStatusBadgeClass(status) {
+  switch (status) {
+    case 'live':
+    case 'published':
+      return 'status-badge-live';
+    case 'draft':
+    case 'pending_review':
+      return 'status-badge-draft';
+    case 'archived':
+      return 'status-badge-archived';
+    default:
+      return '';
+  }
 }
 
 export default function AdminCatalogView({
@@ -326,262 +342,249 @@ export default function AdminCatalogView({
   };
 
   return (
-    <div className="admin-catalog-view" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 20px' }}>
-      {/* Top Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>📦 Master Catalog Control</span>
-            <span style={{ fontSize: '12px', background: 'var(--green-pale)', color: 'var(--green-deep)', border: '1px solid var(--line)', padding: '3px 10px', borderRadius: '999px', fontWeight: '700' }}>
-              {products.length} Real Database Products
-            </span>
-          </h1>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>
-            Live SQLite Database &amp; Catalog Management · Filter, categorize, bulk archive, delete, and match Creator affiliate links.
-          </p>
-        </div>
+    <div className="admin-catalog-view">
+       {/* Top Header */}
+       <div className="admin-catalog-header">
+         <div>
+           <h1 className="admin-catalog-title">
+             <span>📦 Master Catalog Control</span>
+             <span className="admin-catalog-tag">
+               {products.length} Real Database Products
+             </span>
+           </h1>
+         </div>
+       </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleCSVUpload} 
-            accept=".csv" 
-            style={{ display: 'none' }} 
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="button button-light"
-            style={{ fontSize: '12.5px', padding: '9px 14px' }}
-            title="Import Meesho extension CSV or affiliate link batch"
-          >
-            <Icon name="download" size={15} /> Batch Import CSV
-          </button>
-          <button
-            type="button"
-            onClick={onOpenAddProduct}
-            className="button button-dark"
-            style={{ fontSize: '12.5px', padding: '9px 16px' }}
-          >
-            <Icon name="plus" size={15} /> Add Product
-          </button>
-          <button
-            type="button"
-            onClick={exportCSV}
-            className="button button-light"
-            style={{ fontSize: '12.5px', padding: '9px 14px' }}
-          >
-            Export CSV
-          </button>
-        </div>
+         <div className="admin-filters">
+           <input 
+             type="file" 
+             ref={fileInputRef} 
+             onChange={handleCSVUpload} 
+             accept=".csv" 
+             className="file-input-hidden"
+           />
+           <button
+             type="button"
+             onClick={() => fileInputRef.current?.click()}
+             className="button button-light filter-select"
+             title="Import Meesho extension CSV or affiliate link batch"
+           >
+             <Icon name="download" size={15} /> Batch Import CSV
+           </button>
+           <button
+             type="button"
+             onClick={onOpenAddProduct}
+             className="button button-dark filter-select-sm"
+           >
+             <Icon name="plus" size={15} /> Add Product
+           </button>
+           <button
+             type="button"
+             onClick={exportCSV}
+             className="button button-light filter-select"
+           >
+             Export CSV
+           </button>
+         </div>
       </div>
 
-      {/* Import Notice Alert */}
-      {importNotice && (
-        <div style={{ background: 'var(--green-pale)', border: '1px solid var(--green)', color: 'var(--green-deep)', padding: '10px 16px', borderRadius: '10px', marginBottom: '16px', fontSize: '13px', fontWeight: '600' }}>
-          {importNotice}
-        </div>
-      )}
+       {/* Import Notice Alert */}
+       {importNotice && (
+         <div className="import-notice">
+           {importNotice}
+         </div>
+       )}
 
       {/* Real Summary Status Pills */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('all'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'all' ? ' is-active' : ''}`}
-        >
-          All ({products.length})
-        </button>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('published'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'published' ? ' is-active' : ''}`}
-        >
-          ● Live Storefront ({activeCount})
-        </button>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('draft'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'draft' ? ' is-active' : ''}`}
-        >
-          ⏳ Drafts / Review ({draftCount})
-        </button>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('archived'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'archived' ? ' is-active' : ''}`}
-        >
-          📁 Archive / Trash ({archivedCount})
-        </button>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('missing_link'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'missing_link' ? ' is-active' : ''}`}
-        >
-          ⚠️ Missing Affiliate Link ({missingLinkCount})
-        </button>
-        <button 
-          type="button" 
-          onClick={() => { setStatusFilter('ai_flagged'); setPage(1); }}
-          className={`filter-chip${statusFilter === 'ai_flagged' ? ' is-active' : ''}`}
-          style={aiFlaggedCount > 0 ? {
-            borderColor: '#ef4444',
-            color: statusFilter === 'ai_flagged' ? '#fff' : '#dc2626',
-            background: statusFilter === 'ai_flagged' ? '#dc2626' : 'rgba(239, 68, 68, 0.08)',
-            fontWeight: '700'
-          } : {}}
-        >
-          🚨 AI Flagged ({aiFlaggedCount})
-        </button>
-      </div>
+       {/* Real Summary Status Pills */}
+       <div className="filter-chips">
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('all'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'all' ? ' is-active' : ''}`}
+         >
+           All ({products.length})
+         </button>
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('published'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'published' ? ' is-active' : ''}`}
+         >
+           ● Live Storefront ({activeCount})
+         </button>
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('draft'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'draft' ? ' is-active' : ''}`}
+         >
+           ⏳ Drafts / Review ({draftCount})
+         </button>
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('archived'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'archived' ? ' is-active' : ''}`}
+         >
+           📁 Archive / Trash ({archivedCount})
+         </button>
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('missing_link'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'missing_link' ? ' is-active' : ''}`}
+         >
+           ⚠️ Missing Affiliate Link ({missingLinkCount})
+         </button>
+         <button 
+           type="button" 
+           onClick={() => { setStatusFilter('ai_flagged'); setPage(1); }}
+           className={`filter-chip${statusFilter === 'ai_flagged' ? ' is-active' : ''} ai-flagged-chip`}
+         >
+           🚨 AI Flagged ({aiFlaggedCount})
+         </button>
+       </div>
 
-      {/* Filter Control Bar */}
-      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', padding: '16px', marginBottom: '20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr', gap: '10px', alignItems: 'center' }}>
-          {/* Search */}
-          <div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-              placeholder="Search by title, category, ext_id, product ID..."
-              style={{ width: '100%', borderRadius: '10px', padding: '9px 14px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '13px' }}
-            />
-          </div>
+       {/* Filter Control Bar */}
+       <div className="filter-control-bar">
+         <div className="filter-grid">
+           {/* Search */}
+           <div>
+             <input
+               type="text"
+               value={searchQuery}
+               onChange={e => setSearchQuery(e.target.value)}
+               placeholder="Search products..."
+               className="search-input"
+             />
+           </div>
 
-          {/* Category Dropdown */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
-            style={{ borderRadius: '10px', padding: '9px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '12px' }}
-          >
-            {CATEGORY_GROUPS.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
+           {/* Category Dropdown */}
+           <select
+             value={selectedCategory}
+             onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
+             className="filter-select"
+           >
+             {CATEGORY_GROUPS.map((cat) => (
+               <option key={cat} value={cat}>{cat}</option>
+             ))}
+           </select>
 
-          {/* Store Dropdown */}
-          <select
-            value={selectedStore}
-            onChange={(e) => { setSelectedStore(e.target.value); setPage(1); }}
-            style={{ borderRadius: '10px', padding: '9px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '12px' }}
-          >
-            {MARKETPLACES.map((st) => (
-              <option key={st} value={st}>{st}</option>
-            ))}
-          </select>
+           {/* Store Dropdown */}
+           <select
+             value={selectedStore}
+             onChange={(e) => { setSelectedStore(e.target.value); setPage(1); }}
+             className="filter-select"
+           >
+             {MARKETPLACES.map((st) => (
+               <option key={st} value={st}>{st}</option>
+             ))}
+           </select>
 
-          {/* Min Rating */}
-          <select
-            value={minRatingFilter}
-            onChange={(e) => { setMinRatingFilter(Number(e.target.value)); setPage(1); }}
-            style={{ borderRadius: '10px', padding: '9px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '12px' }}
-          >
-            <option value="0">All Ratings</option>
-            <option value="3.8">⭐ 3.8+ Quality</option>
-            <option value="4.0">⭐ 4.0+ High Quality</option>
-            <option value="4.3">⭐ 4.3+ Top Rated</option>
-          </select>
+           {/* Min Rating */}
+           <select
+             value={minRatingFilter}
+             onChange={(e) => { setMinRatingFilter(Number(e.target.value)); setPage(1); }}
+             className="filter-select"
+           >
+             <option value="0">All Ratings</option>
+             <option value="3.8">⭐ 3.8+ Quality</option>
+             <option value="4.0">⭐ 4.0+ High Quality</option>
+             <option value="4.3">⭐ 4.3+ Top Rated</option>
+           </select>
         </div>
       </div>
 
-      {/* Bulk Action Toolbar */}
-      {selectedIds.size > 0 && (
-        <div style={{ background: 'var(--paper-raised, var(--paper))', border: '1px solid var(--green)', borderRadius: '12px', padding: '12px 18px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '13px', fontWeight: '750', color: 'var(--green-deep)' }}>
-              ✓ {selectedIds.size} Selected
-            </span>
-            <button
-              type="button"
-              onClick={toggleSelectAllFiltered}
-              style={{ fontSize: '11.5px', background: 'none', border: 'none', color: 'var(--ink)', textDecoration: 'underline', cursor: 'pointer' }}
-            >
-              {selectedIds.size === filteredProducts.length ? 'Deselect all' : `Select all ${filteredProducts.length} filtered`}
-            </button>
-          </div>
+       {/* Bulk Action Toolbar */}
+       {selectedIds.size > 0 && (
+         <div className="bulk-action-toolbar">
+           <div className="bulk-action-left">
+             <span className="bulk-action-count">
+               ✓ {selectedIds.size} Selected
+             </span>
+             <button
+               type="button"
+               onClick={toggleSelectAllFiltered}
+               className="bulk-action-link"
+             >
+               {selectedIds.size === filteredProducts.length ? 'Deselect all' : `Select all ${filteredProducts.length} filtered`}
+             </button>
+           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Category target */}
-            <select
-              value={bulkCategoryTarget}
-              onChange={(e) => setBulkCategoryTarget(e.target.value)}
-              style={{ borderRadius: '8px', padding: '6px 10px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '11.5px' }}
-            >
-              {CATEGORY_GROUPS.filter(c => c !== 'All Categories' && !c.includes('📌')).map(c => (
-                <option key={c} value={c}>Move to: {c}</option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={handleBulkChangeCategory}
-              className="button button-light"
-              style={{ fontSize: '11.5px', padding: '6px 10px' }}
-            >
-              Apply Category
-            </button>
+           <div className="bulk-action-right">
+             {/* Category target */}
+             <select
+               value={bulkCategoryTarget}
+               onChange={(e) => setBulkCategoryTarget(e.target.value)}
+               className="bulk-category-select"
+             >
+               {CATEGORY_GROUPS.filter(c => c !== 'All Categories' && !c.includes('📌')).map(c => (
+                 <option key={c} value={c}>Move to: {c}</option>
+               ))}
+             </select>
+             <button
+               type="button"
+               onClick={handleBulkChangeCategory}
+               className="button button-light bulk-action-button"
+             >
+               Apply Category
+             </button>
 
-            {statusFilter === 'archived' ? (
-              <button
-                type="button"
-                onClick={handleBulkRestore}
-                className="button button-dark"
-                style={{ fontSize: '11.5px', padding: '6px 12px' }}
-              >
-                Restore to Live
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleBulkArchive}
-                className="button button-light"
-                style={{ fontSize: '11.5px', padding: '6px 12px' }}
-              >
-                📁 Move to Archive
-              </button>
-            )}
+             {statusFilter === 'archived' ? (
+               <button
+                 type="button"
+                 onClick={handleBulkRestore}
+                 className="button button-dark bulk-action-button"
+               >
+                 Restore to Live
+               </button>
+             ) : (
+               <button
+                 type="button"
+                 onClick={handleBulkArchive}
+                 className="button button-light bulk-action-button"
+               >
+                 📁 Move to Archive
+               </button>
+             )}
 
-            <button
-              type="button"
-              onClick={handleBulkPermanentDelete}
-              style={{ background: 'rgba(220, 38, 38, 0.1)', color: '#dc2626', border: '1px solid rgba(220, 38, 38, 0.3)', borderRadius: '8px', padding: '6px 12px', fontSize: '11.5px', fontWeight: '700', cursor: 'pointer' }}
-            >
-              🗑️ Delete Permanently
-            </button>
-          </div>
-        </div>
-      )}
+             <button
+               type="button"
+               onClick={handleBulkPermanentDelete}
+               className="action-button"
+             >
+               🗑️ Delete Permanently
+             </button>
+           </div>
+         </div>
+       )}
 
-      {/* Main Table */}
-      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
-          <thead>
-            <tr style={{ background: 'var(--canvas)', borderBottom: '1px solid var(--line)', color: 'var(--muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              <th style={{ padding: '12px 16px', width: '40px' }}>
-                <input
-                  type="checkbox"
-                  checked={paginatedProducts.length > 0 && paginatedProducts.every(p => selectedIds.has(p.id))}
-                  onChange={toggleSelectPage}
-                  aria-label="Select page"
-                />
-              </th>
-              <th style={{ padding: '12px 10px', width: '88px' }}>Photos</th>
-              <th style={{ padding: '12px 14px' }}>Product Title &amp; Details</th>
-              <th style={{ padding: '12px 14px', width: '140px' }}>Category</th>
-              <th style={{ padding: '12px 14px', width: '90px' }}>Price</th>
-              <th style={{ padding: '12px 14px', width: '120px' }}>Affiliate Link</th>
-              <th style={{ padding: '12px 14px', width: '100px' }}>Status</th>
-              <th style={{ padding: '12px 14px', width: '90px', textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedProducts.length === 0 ? (
-              <tr>
-                <td colSpan={8} style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--muted)' }}>
-                  No matching products found. Try clearing filters or search query.
-                </td>
-              </tr>
+       {/* Main Table */}
+       <div className="main-table-container">
+         <table className="product-table">
+           <thead>
+             <tr className="product-table-header">
+               <th className="table-th">
+                 <input
+                   type="checkbox"
+                   checked={paginatedProducts.length > 0 && paginatedProducts.every(p => selectedIds.has(p.id))}
+                   onChange={toggleSelectPage}
+                   aria-label="Select page"
+                 />
+               </th>
+               <th className="table-th table-th-photos">Photos</th>
+               <th className="table-th table-th-title">Product Title &amp; Details</th>
+               <th className="table-th table-th-category" width="140px">Category</th>
+               <th className="table-th table-th-price" width="90px">Price</th>
+               <th className="table-th table-th-affiliate" width="120px">Affiliate Link</th>
+               <th className="table-th table-th-status" width="100px">Status</th>
+               <th className="table-th table-th-actions" width="90px" textAlign="right">Actions</th>
+             </tr>
+           </thead>
+           <tbody>
+             {paginatedProducts.length === 0 ? (
+               <tr>
+                 <td colSpan={8} className="empty-state">
+                   No matching products found. Try clearing filters or search query.
+                 </td>
+               </tr>
             ) : (
               paginatedProducts.map((p) => {
                 const isSelected = selectedIds.has(p.id);
@@ -596,231 +599,170 @@ export default function AdminCatalogView({
                   : 0;
                 const currentImg = productImages[activeImgIdx] || productImages[0];
 
-                return (
-                  <tr
-                    key={p.id}
-                    style={{
-                      borderBottom: '1px solid var(--line)',
-                      background: isSelected ? 'var(--green-pale)' : p.aiFlagged ? 'rgba(239, 68, 68, 0.03)' : 'transparent',
-                      transition: 'background 0.15s ease'
-                    }}
-                  >
-                    <td style={{ padding: '12px 16px' }}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(p.id)}
-                        aria-label={`Select ${p.title}`}
-                      />
-                    </td>
-                    <td style={{ padding: '10px' }}>
-                      <div style={{ position: 'relative', width: '56px', height: '70px', borderRadius: '8px', overflow: 'hidden', background: 'var(--canvas)', border: p.aiFlagged ? '2px solid #ef4444' : '1px solid var(--line)', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
-                        <img
-                          src={currentImg}
-                          alt={p.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          loading="lazy"
-                        />
-                        {p.aiFlagged && (
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: '2px',
-                              left: '2px',
-                              background: '#ef4444',
-                              color: '#fff',
-                              fontSize: '8px',
-                              fontWeight: '800',
-                              padding: '1px 3px',
-                              borderRadius: '3px',
-                              letterSpacing: '0.02em',
-                              lineHeight: '1.2'
-                            }}
-                            title={p.aiFlagReason || 'AI Image Flagged'}
-                          >
-                            AI
-                          </span>
-                        )}
-                        {productImages.length > 1 && (
-                          <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1px 2px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', color: '#fff', fontSize: '9px', fontWeight: '700' }}>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setImageIndexMap(prev => ({
-                                  ...prev,
-                                  [p.id]: (activeImgIdx - 1 + productImages.length) % productImages.length
-                                }));
-                              }}
-                              style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 2px', fontSize: '11px', lineHeight: '1' }}
-                              title="Previous Photo Variation"
-                            >
-                              ‹
-                            </button>
-                            <span style={{ fontSize: '8px' }}>{activeImgIdx + 1}/{productImages.length}</span>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setImageIndexMap(prev => ({
-                                  ...prev,
-                                  [p.id]: (activeImgIdx + 1) % productImages.length
-                                }));
-                              }}
-                              style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 2px', fontSize: '11px', lineHeight: '1' }}
-                              title="Next Photo Variation"
-                            >
-                              ›
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setManageImagesProduct(p)}
-                        style={{
-                          marginTop: '4px',
-                          fontSize: '9.5px',
-                          padding: '2px 5px',
-                          background: 'var(--canvas)',
-                          border: '1px solid var(--line)',
-                          borderRadius: '5px',
-                          cursor: 'pointer',
-                          color: 'var(--ink)',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '2px',
-                          fontWeight: '600',
-                          whiteSpace: 'nowrap'
-                        }}
-                        title="Add or manage images / color variations"
-                      >
-                        <span>➕ {productImages.length > 1 ? `${productImages.length} Imgs` : 'Add'}</span>
-                      </button>
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <strong style={{ display: 'block', color: 'var(--ink)', fontSize: '13px', lineHeight: '1.4' }}>
-                        {p.title}
-                      </strong>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', fontSize: '11px', color: 'var(--muted)', flexWrap: 'wrap' }}>
-                        <span>Store: {p.store || 'Meesho'}</span>
-                        <span>·</span>
-                        <span>ID: {p.ext_id || p.id}</span>
-                        {p.rating && <span>· ⭐ {p.rating}</span>}
-                        {productImages.length > 1 && (
-                          <span style={{ color: 'var(--green-deep)', fontWeight: '600' }}>
-                            · 📸 {productImages.length} Variations
-                          </span>
-                        )}
-                      </div>
-                      {p.aiFlagged && (
-                        <div style={{
-                          marginTop: '6px',
-                          padding: '4px 8px',
-                          borderRadius: '6px',
-                          background: 'rgba(239, 68, 68, 0.08)',
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
-                          color: '#dc2626',
-                          fontSize: '11px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          flexWrap: 'wrap'
-                        }}>
-                          <span style={{ fontWeight: '700' }}>🚨 AI / Low-Res Image Detected:</span>
-                          <span style={{ opacity: 0.9, fontSize: '10.5px' }}>{p.aiFlagReason || 'Synthetic AI Watermark'}</span>
-
-                          <button
-                            type="button"
-                            onClick={() => setManageImagesProduct(p)}
-                            style={{
-                              marginLeft: 'auto',
-                              background: '#dc2626',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '4px',
-                              padding: '2px 8px',
-                              fontSize: '10px',
-                              fontWeight: '700',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Replace Photo
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <span style={{ display: 'inline-block', padding: '3px 8px', borderRadius: '6px', background: 'var(--canvas)', border: '1px solid var(--line)', color: 'var(--ink)', fontSize: '11px', fontWeight: '600' }}>
-                        {p.category || 'Fashion'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <strong style={{ color: 'var(--ink)', fontSize: '13px' }}>
-                        {money(p.price)}
-                      </strong>
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      {hasAffiliate ? (
-                        <button
-                          type="button"
-                          onClick={() => copyAffiliate(p.id, p.affiliateUrl)}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--green-pale)', color: 'var(--green-deep)', border: '1px solid var(--green)', borderRadius: '6px', padding: '4px 8px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
-                          title="Click to copy affiliate link"
-                        >
-                          {copiedId === p.id ? '✓ Copied' : '🔗 Link Ready'}
-                        </button>
-                      ) : (
-                        <span style={{ color: '#d97706', fontSize: '11px', fontWeight: '600' }}>
-                          ⚠️ Missing Link
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        background: p.status === 'archived' ? 'rgba(100,116,139,0.15)' : (p.status === 'draft' || p.status === 'pending_review') ? 'rgba(234,179,8,0.15)' : 'rgba(34,197,94,0.15)',
-                        color: p.status === 'archived' ? 'var(--muted)' : (p.status === 'draft' || p.status === 'pending_review') ? '#b45309' : '#15803d'
-                      }}>
-                        {p.status === 'archived' ? 'Archived' : (p.status === 'draft' || p.status === 'pending_review') ? 'Draft' : 'Live'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px 14px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                        <button
-                          type="button"
-                          onClick={() => onOpenEditProduct?.(p)}
-                          style={{ background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '6px', width: '28px', height: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--ink)' }}
-                          title="Edit Product"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setConfirmModal({
-                              title: 'Delete Product',
-                              message: `Are you sure you want to delete "${p.title}"?`,
-                              count: 1,
-                              confirmLabel: 'Delete',
-                              confirmColor: '#dc2626',
-                              onConfirm: async () => {
-                                await onDeleteProduct?.(p.id);
-                                setConfirmModal(null);
-                              }
-                            });
-                          }}
-                          style={{ background: 'rgba(220, 38, 38, 0.08)', border: '1px solid rgba(220, 38, 38, 0.2)', borderRadius: '6px', width: '28px', height: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#dc2626' }}
-                          title="Delete Product"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
+                 return (
+                   <tr
+                     key={p.id}
+                     className={`${isSelected ? 'selected-row' : ''} ${p.aiFlagged ? 'ai-flagged-row' : ''}`}
+                   >
+                     <td className="table-td">
+                       <input
+                         type="checkbox"
+                         checked={isSelected}
+                         onChange={() => toggleSelect(p.id)}
+                         aria-label={`Select ${p.title}`}
+                       />
+                     </td>
+                     <td className="table-td table-td-photos">
+                       <div className="product-images-container${p.aiFlagged ? ' flagged' : ''}">
+                         <img
+                           src={currentImg}
+                           alt={p.title}
+                           className="product-image"
+                           loading="lazy"
+                         />
+                         {p.aiFlagged && (
+                           <span className="ai-flag-badge"
+                                 title={p.aiFlagReason || 'AI Image Flagged'}
+                           >
+                             AI
+                           </span>
+                         )}
+                         {productImages.length > 1 && (
+                           <div className="image-overlay">
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 setImageIndexMap(prev => ({
+                                   ...prev,
+                                   [p.id]: (activeImgIdx - 1 + productImages.length) % productImages.length
+                                 }));
+                               }}
+                               className="image-nav-button"
+                               title="Previous Photo Variation"
+                             >
+                               ‹
+                             </button>
+                             <span className="image-counter">{activeImgIdx + 1}/{productImages.length}</span>
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 setImageIndexMap(prev => ({
+                                   ...prev,
+                                   [p.id]: (activeImgIdx + 1) % productImages.length
+                                 }));
+                               }}
+                               className="image-nav-button"
+                               title="Next Photo Variation"
+                             >
+                               ›
+                             </button>
+                           </div>
+                         )}
+                       </div>
+                       <button
+                         type="button"
+                         onClick={() => setManageImagesProduct(p)}
+                         className="manage-images-button"
+                         title="Add or manage images / color variations"
+                       >
+                         <span>➕ {productImages.length > 1 ? `${productImages.length} Imgs` : 'Add'}</span>
+                       </button>
+                     </td>
+                     <td className="table-td table-td-title">
+                       <strong className="product-title">
+                         {p.title}
+                       </strong>
+                       <div className="product-details">
+                         <span>Store: {p.store || 'Meesho'}</span>
+                         <span>·</span>
+                         <span>ID: {p.ext_id || p.id}</span>
+                         {p.rating && <span>· ⭐ {p.rating}</span>}
+                         {productImages.length > 1 && (
+                           <span className="product-variations">
+                             · 📸 {productImages.length} Variations
+                           </span>
+                         )}
+                       </div>
+                       {p.aiFlagged && (
+                         <div className="ai-flag-warning">
+                           <span className="ai-flag-icon">🚨</span>
+                           <span className="ai-flag-text">AI / Low-Res Image Detected:</span>
+                           <span className="ai-flag-reason">{p.aiFlagReason || 'Synthetic AI Watermark'}</span>
+                           <button
+                             type="button"
+                             onClick={() => setManageImagesProduct(p)}
+                             className="ai-flag-button"
+                           >
+                             Manage Images
+                           </button>
+                         </div>
+                       )}
+                     </td>
+                     <td className="table-td table-td-category">
+                       <span className="category-tag">
+                         {p.category || 'Fashion'}
+                       </span>
+                     </td>
+                     <td className="table-td table-td-price">
+                       <strong className="price-value">
+                         {money(p.price)}
+                       </strong>
+                     </td>
+                     <td className="table-td table-td-affiliate">
+                       {hasAffiliate ? (
+                         <button
+                           type="button"
+                           onClick={() => copyAffiliate(p.id, p.affiliateUrl)}
+                           className="affiliate-button"
+                           title="Click to copy affiliate link"
+                         >
+                           {copiedId === p.id ? '✓ Copied' : '🔗 Link Ready'}
+                         </button>
+                       ) : (
+                         <span className="missing-link-badge">
+                           ⚠️ Missing Link
+                         </span>
+                       )}
+                     </td>
+                     <td className="table-td table-td-status">
+                       <span className={`status-badge ${getStatusBadgeClass(p.status)}`}>
+                         {p.status === 'archived' ? 'Archived' : (p.status === 'draft' || p.status === 'pending_review') ? 'Draft' : 'Live'}
+                       </span>
+                     </td>
+                     <td className="table-td table-td-actions" textAlign="right">
+                       <div className="action-buttons">
+                         <button
+                           type="button"
+                           onClick={() => onOpenEditProduct?.(p)}
+                           className="action-button-view"
+                           title="Edit Product"
+                         >
+                           ✏️
+                         </button>
+                         <button
+                           type="button"
+                           onClick={() => {
+                             setConfirmModal({
+                               title: 'Delete Product',
+                               message: `Are you sure you want to delete "${p.title}"?`,
+                               count: 1,
+                               confirmLabel: 'Delete',
+                               confirmColor: '#dc2626',
+                               onConfirm: async () => {
+                                 await onDeleteProduct?.(p.id);
+                                 setConfirmModal(null);
+                               }
+                             });
+                           }}
+                           className="action-button-delete"
+                           title="Delete Product"
+                         >
+                           🗑️
+                         </button>
+                       </div>
+                     </td>
                   </tr>
                 );
               })
@@ -828,63 +770,61 @@ export default function AdminCatalogView({
           </tbody>
         </table>
 
-        {/* Pagination Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', borderTop: '1px solid var(--line)', background: 'var(--canvas)', flexWrap: 'wrap', gap: '10px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
-            Showing {filteredProducts.length > 0 ? (page - 1) * pageSize + 1 : 0} - {Math.min(page * pageSize, filteredProducts.length)} of {filteredProducts.length} filtered items
-          </span>
+         {/* Pagination Bar */}
+         <div className="table-pagination">
+           <span className="pagination-info">
+             Showing {filteredProducts.length > 0 ? (page - 1) * pageSize + 1 : 0} - {Math.min(page * pageSize, filteredProducts.length)} of {filteredProducts.length} filtered items
+           </span>
 
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              className="button button-light"
-              style={{ fontSize: '12px', padding: '5px 10px', opacity: page <= 1 ? 0.4 : 1 }}
-            >
-              Previous
-            </button>
-            <span style={{ fontSize: '12px', color: 'var(--ink)', padding: '0 8px' }}>
-              Page {page} of {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={page >= totalPages}
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              className="button button-light"
-              style={{ fontSize: '12px', padding: '5px 10px', opacity: page >= totalPages ? 0.4 : 1 }}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+           <div className="pagination-controls">
+             <button
+               type="button"
+               disabled={page <= 1}
+               onClick={() => setPage(p => Math.max(1, p - 1))}
+               className="button button-light pagination-button"
+             >
+               Previous
+             </button>
+             <span className="pagination-page">
+               Page {page} of {totalPages}
+             </span>
+             <button
+               type="button"
+               disabled={page >= totalPages}
+               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+               className="button button-light pagination-button"
+             >
+               Next
+             </button>
+           </div>
+         </div>
       </div>
 
-      {/* Confirmation Modal */}
-      {confirmModal && (
-        <div className="modal-backdrop" style={{ zIndex: 10002 }} onClick={() => setConfirmModal(null)}>
-          <div className="modal-card" style={{ maxWidth: '440px', padding: '24px' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontSize: '18px', margin: '0 0 10px', color: 'var(--ink)' }}>{confirmModal.title}</h3>
-            <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: '1.5', margin: '0 0 20px' }}>{confirmModal.message}</p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                className="button button-light"
-                onClick={() => setConfirmModal(null)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                style={{ background: confirmModal.confirmColor || 'var(--ink)', color: '#fff', border: 'none', borderRadius: '10px', padding: '8px 16px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
-                onClick={confirmModal.onConfirm}
-              >
-                {confirmModal.confirmLabel || 'Confirm'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       {/* Confirmation Modal */}
+       {confirmModal && (
+         <div className="modal-backdrop" onClick={() => setConfirmModal(null)}>
+           <div className="modal-card" onClick={e => e.stopPropagation()}>
+             <h3 className="modal-title">{confirmModal.title}</h3>
+             <p className="modal-message">{confirmModal.message}</p>
+             <div className="modal-actions">
+               <button
+                 type="button"
+                 className="button button-light"
+                 onClick={() => setConfirmModal(null)}
+               >
+                 Cancel
+               </button>
+               <button
+                 type="button"
+                 className="modal-button"
+                 onClick={confirmModal.onConfirm}
+               >
+                 {confirmModal.confirmLabel || 'Confirm'}
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
 
       {/* Multi-Image Variation Management Modal */}
       {manageImagesProduct && (
@@ -949,32 +889,32 @@ function ManageImagesModal({ product, onClose, onSave }) {
     }
   };
 
-  return (
-    <div className="modal-backdrop" style={{ zIndex: 10003 }} onClick={onClose}>
-      <div className="modal-card" style={{ maxWidth: '640px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--ink)' }}>
-              📸 Manage Product Images &amp; Variations
-            </h3>
-            <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '4px 0 0' }}>
-              {product.title}
-            </p>
-          </div>
-          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--muted)' }}>✕</button>
+   return (
+     <div className="modal-backdrop" onClick={onClose}>
+       <div className="modal-card manage-images-modal-card" onClick={e => e.stopPropagation()}>
+         <div className="modal-header">
+           <div>
+             <h3 className="modal-title">
+               📸 Manage Product Images &amp; Variations
+             </h3>
+             <p className="modal-subtitle">
+               {product.title}
+             </p>
+           </div>
+           <button type="button" className="modal-close-button" onClick={onClose}>✕</button>
         </div>
 
         {/* Existing Images Grid */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>
+        <div className="image-grid-section">
+          <label className="image-grid-label">
             Current Photos ({imageList.length}) · Leftmost is Primary
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
+          <div className="image-grid">
             {imageList.map((imgUrl, idx) => (
-              <div key={idx} style={{ position: 'relative', width: '100%', height: '115px', borderRadius: '8px', overflow: 'hidden', border: idx === 0 ? '2px solid var(--green)' : '1px solid var(--line)', background: 'var(--canvas)' }}>
-                <img src={imgUrl} alt={`Photo ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div key={idx} className={`image-item ${idx === 0 ? 'primary' : ''}`}>
+                <img src={imgUrl} alt={`Photo ${idx + 1}`} className="image-preview" />
                 {idx === 0 && (
-                  <span style={{ position: 'absolute', bottom: '3px', left: '3px', right: '3px', textAlign: 'center', background: 'var(--green-deep)', color: '#fff', fontSize: '8.5px', fontWeight: '800', borderRadius: '3px', padding: '1px 0' }}>
+                  <span className="cover-badge">
                     COVER
                   </span>
                 )}
@@ -982,7 +922,7 @@ function ManageImagesModal({ product, onClose, onSave }) {
                   type="button"
                   onClick={() => handleRemoveImage(idx)}
                   title="Remove this photo"
-                  style={{ position: 'absolute', top: '3px', right: '3px', background: 'rgba(220, 38, 38, 0.85)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'grid', placeItems: 'center', fontSize: '11px', cursor: 'pointer' }}
+                  className="remove-button"
                 >
                   ✕
                 </button>
@@ -992,8 +932,8 @@ function ManageImagesModal({ product, onClose, onSave }) {
         </div>
 
         {/* Add New URLs Form */}
-        <div style={{ background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '12px', padding: '14px', marginBottom: '20px' }}>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: 'var(--ink)', marginBottom: '6px' }}>
+        <div className="add-urls-form">
+          <label className="form-label">
             ➕ Add More Image URLs (Meesho / Myntra / Amazon variation links)
           </label>
           <textarea
@@ -1001,14 +941,13 @@ function ManageImagesModal({ product, onClose, onSave }) {
             value={urlsInput}
             onChange={e => setUrlsInput(e.target.value)}
             placeholder="Paste image URLs here (one per line or comma-separated)&#10;e.g. https://images.meesho.com/images/products/..."
-            style={{ width: '100%', padding: '8px 10px', fontSize: '12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--paper)', color: 'var(--ink)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+            className="image-urls-textarea"
           />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+          <div className="form-actions">
             <button
               type="button"
               onClick={handleAddUrls}
               className="button button-light"
-              style={{ fontSize: '12px', padding: '6px 12px' }}
             >
               Add to Photos
             </button>
@@ -1016,16 +955,15 @@ function ManageImagesModal({ product, onClose, onSave }) {
         </div>
 
         {/* Modal Actions */}
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+        <div className="modal-actions">
           <button type="button" className="button button-light" onClick={onClose} disabled={saving}>
             Cancel
           </button>
           <button
             type="button"
-            className="button button-dark"
+            className="button button-dark save-button"
             onClick={handleSave}
             disabled={saving}
-            style={{ padding: '8px 18px', fontSize: '13px' }}
           >
             {saving ? 'Saving...' : '💾 Save Photos & Clear AI Flag'}
           </button>

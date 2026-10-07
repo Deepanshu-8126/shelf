@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Icon from './Icon.jsx';
 import { cleanDisplayTitle } from './ProductCard.jsx';
+import './AIMediaStudioView.css';
 
 function money(v) {
   return `₹${Number(v || 0).toLocaleString('en-IN')}`;
@@ -290,183 +291,129 @@ export default function AIMediaStudioView({
     }
   };
 
-  return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 20px' }}>
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--ink)' }}>
-              🎨 AI Media Studio &amp; Photoshoot Lab
-            </h1>
-            <span style={{ fontSize: '11.5px', background: 'rgba(34, 197, 94, 0.12)', color: '#16a34a', border: '1px solid rgba(34, 197, 94, 0.25)', padding: '3px 10px', borderRadius: '999px', fontWeight: 700 }}>
-              🟢 FLUX / Gemini Active
-            </span>
-          </div>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>
-            Transform product photos into high-fashion editorials. Preserves exact garment silhouette and colors with zero anime/CGI drift.
-          </p>
-        </div>
+   return (
+     <div className="aim-studio-view">
+       {/* ── Header ── */}
+       <div className="studio-header">
+         <div>
+           <div className="header-left">
+             <h1 className="studio-title">
+               🎨 AI Media Studio &amp; Photoshoot Lab
+             </h1>
+             <span className="studio-badge">
+               🟢 FLUX / Gemini Active
+             </span>
+           </div>
+           <p className="studio-description">
+             Transform product photos into high-fashion editorials. Preserves exact garment silhouette and colors with zero anime/CGI drift.
+           </p>
+         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px', background: 'var(--paper)', border: '1px solid var(--line)', padding: '6px 12px', borderRadius: '8px', fontWeight: 600, color: 'var(--ink)' }}>
-            ⚡ Quota: <strong>500 / 500</strong> Free Daily Images
-          </span>
-        </div>
-      </div>
+         <div className="header-right">
+           <span className="active-products-badge">
+             ⚡ Quota: <strong>500 / 500</strong> Free Daily Images
+           </span>
+         </div>
+       </div>
 
-      {/* ── Sub Navigation Tabs ── */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--line)', marginBottom: '24px' }}>
-        <button
-          type="button"
-          onClick={() => setActiveTab('studio')}
-          style={{
-            padding: '12px 18px',
-            fontSize: '13.5px',
-            fontWeight: activeTab === 'studio' ? 800 : 600,
-            color: activeTab === 'studio' ? 'var(--ink)' : 'var(--muted)',
-            borderBottom: activeTab === 'studio' ? '2px solid var(--ink)' : '2px solid transparent',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          📷 Photoshoot Studio
-        </button>
+       {/* ── Sub Navigation Tabs ── */}
+       <div className="tab-container">
+         <button
+           type="button"
+           className={`${activeTab === 'studio' ? 'tab-button active' : 'tab-button'}`}
+           onClick={() => setActiveTab('studio')}
+         >
+           📷 Photoshoot Studio
+         </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('gallery')}
-          style={{
-            padding: '12px 18px',
-            fontSize: '13.5px',
-            fontWeight: activeTab === 'gallery' ? 800 : 600,
-            color: activeTab === 'gallery' ? 'var(--ink)' : 'var(--muted)',
-            borderBottom: activeTab === 'gallery' ? '2px solid var(--ink)' : '2px solid transparent',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          🖼️ Generated Gallery ({photosList.length})
-        </button>
+         <button
+           type="button"
+           className={`${activeTab === 'gallery' ? 'tab-button active' : 'tab-button'}`}
+           onClick={() => setActiveTab('gallery')}
+         >
+           🖼️ Image Gallery ({photosList.length})
+         </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('videos')}
-          style={{
-            padding: '12px 18px',
-            fontSize: '13.5px',
-            fontWeight: activeTab === 'videos' ? 800 : 600,
-            color: activeTab === 'videos' ? 'var(--ink)' : 'var(--muted)',
-            borderBottom: activeTab === 'videos' ? '2px solid var(--ink)' : '2px solid transparent',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          🎬 Video Reels Hub ({videosList.length})
-        </button>
-      </div>
+         <button
+           type="button"
+           className={`${activeTab === 'videos' ? 'tab-button active' : 'tab-button'}`}
+           onClick={() => setActiveTab('videos')}
+         >
+           🎬 Video Reels Hub ({videosList.length})
+         </button>
+       </div>
 
-      {/* ── Tab 1: Photoshoot Studio (Clean 2-Column Canvas) ── */}
-      {activeTab === 'studio' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1fr) minmax(420px, 1.3fr)', gap: '24px', alignItems: 'start' }}>
-          {/* Left Column: 3-Step Guided Controls */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Engine Selection Bar */}
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  ⚡ AI Photoshoot Engine
-                </span>
-                <span style={{ fontSize: '11px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '999px', fontWeight: 700 }}>
-                  {selectedEngine === 'arena' ? 'LM Arena (FLUX) Active' : selectedEngine === 'gemini' ? 'Google AI Studio Active' : selectedEngine.toUpperCase()}
-                </span>
+       {/* ── Tab 1: Photoshoot Studio (Clean 2-Column Canvas) ── */}
+       {activeTab === 'studio' && (
+         <div className="studio-main-content">
+           {/* Left Column: 3-Step Guided Controls */}
+           <div className="left-panel">
+             {/* Engine Selection Bar */}
+             <div className="preview-card">
+               <div className="preview-header">
+                 <span className="preview-label">
+                   ⚡ AI Photoshoot Engine
+                 </span>
+                 <span className="preview-badge">
+                   {selectedEngine === 'arena' ? 'LM Arena (FLUX) Active' : selectedEngine === 'gemini' ? 'Google AI Studio Active' : selectedEngine.toUpperCase()}
+                 </span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+               <div className="preview-grid">
                 {[
                   { id: 'arena', label: 'LM Arena', tag: 'FLUX Tier 1' },
                   { id: 'gemini', label: 'Google AI', tag: 'Gemini 3.8' },
                   { id: 'cloudflare', label: 'Cloudflare', tag: 'FLUX Schnell' },
                   { id: 'pexels', label: 'Pexels Stock', tag: 'Editorial' }
-                ].map((eng) => (
-                  <button
-                    key={eng.id}
-                    type="button"
-                    onClick={() => setSelectedEngine(eng.id)}
-                    style={{
-                      padding: '8px 4px',
-                      borderRadius: '10px',
-                      border: selectedEngine === eng.id ? '2px solid var(--primary, #6366f1)' : '1px solid var(--line)',
-                      background: selectedEngine === eng.id ? 'rgba(99, 102, 241, 0.08)' : 'var(--canvas)',
-                      cursor: 'pointer',
-                      textAlign: 'center'
-                    }}
-                  >
-                    <strong style={{ fontSize: '11.5px', color: 'var(--ink)', display: 'block' }}>{eng.label}</strong>
-                    <span style={{ fontSize: '9.5px', color: 'var(--muted)', display: 'block' }}>{eng.tag}</span>
-                  </button>
-                ))}
+             ].map((eng) => (
+                   <button
+                     key={eng.id}
+                     type="button"
+                     className={`${selectedEngine === eng.id ? 'engine-button active' : 'engine-button'}`}
+                     onClick={() => setSelectedEngine(eng.id)}
+                   >
+                     <strong className="engine-label">{eng.label}</strong>
+                     <span className="engine-tag">{eng.tag}</span>
+                   </button>
+                 ))}
               </div>
             </div>
 
-            {/* Step 1: Select Outfit or Upload Custom Photo */}
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <span style={{ background: 'var(--ink)', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
-                  1
-                </span>
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>
-                  Reference Garment Photo
-                </h3>
+             {/* Step 1: Select Outfit or Upload Custom Photo */}
+             <div className="product-card">
+               <div className="step-header">
+                 <span className="step-number">
+                   1
+                 </span>
+                 <h3 className="step-title">
+                   Reference Garment Photo
+                 </h3>
               </div>
 
-              {/* Source Switcher Tabs */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-                <button
-                  type="button"
-                  onClick={() => setGarmentSource('catalog')}
-                  style={{
-                    flex: 1,
-                    padding: '7px 10px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    border: garmentSource === 'catalog' ? '1px solid var(--ink)' : '1px solid var(--line)',
-                    background: garmentSource === 'catalog' ? 'var(--ink)' : 'var(--canvas)',
-                    color: garmentSource === 'catalog' ? '#fff' : 'var(--ink)'
-                  }}
-                >
-                  🛍️ From Catalog
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGarmentSource('custom')}
-                  style={{
-                    flex: 1,
-                    padding: '7px 10px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    border: garmentSource === 'custom' ? '1px solid var(--ink)' : '1px solid var(--line)',
-                    background: garmentSource === 'custom' ? 'var(--ink)' : 'var(--canvas)',
-                    color: garmentSource === 'custom' ? '#fff' : 'var(--ink)'
-                  }}
-                >
-                  📤 Upload / Custom Photo
-                </button>
-              </div>
+               {/* Source Switcher Tabs */}
+               <div className="source-tabs">
+                 <button
+                   type="button"
+                   className={`${garmentSource === 'catalog' ? 'source-tab active' : 'source-tab'}`}
+                   onClick={() => setGarmentSource('catalog')}
+                 >
+                   🛍️ From Catalog
+                 </button>
+                 <button
+                   type="button"
+                   className={`${garmentSource === 'custom' ? 'source-tab active' : 'source-tab'}`}
+                   onClick={() => setGarmentSource('custom')}
+                 >
+                   📤 Upload / Custom Photo
+                 </button>
+               </div>
 
               {garmentSource === 'catalog' ? (
                 <>
-                  <select
-                    value={selectedProductId}
-                    onChange={(e) => handleProductChange(e.target.value)}
-                    style={{ width: '100%', height: '42px', borderRadius: '10px', border: '1px solid var(--line)', padding: '0 12px', fontSize: '13px', background: 'var(--canvas)', color: 'var(--ink)', cursor: 'pointer', marginBottom: '12px' }}
-                  >
+                   <select
+                     value={selectedProductId}
+                     onChange={(e) => handleProductChange(e.target.value)}
+                     className="product-select"
+                   >
                     {products.map((p) => (
                       <option key={p.id} value={p.id}>
                         {cleanDisplayTitle(p.title)} ({money(p.price)})
@@ -475,260 +422,210 @@ export default function AIMediaStudioView({
                   </select>
 
                   {activeProduct && (
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: 'var(--canvas)', padding: '10px', borderRadius: '12px', border: '1px solid var(--line)' }}>
-                      <img
-                        src={activeProduct.image}
-                        alt=""
-                        style={{ width: '50px', height: '62px', objectFit: 'cover', borderRadius: '6px' }}
-                        onError={(e) => { e.currentTarget.src = '/images/meesho-peach-short-kurti.webp'; }}
-                      />
-                      <div>
-                        <strong style={{ fontSize: '13px', color: 'var(--ink)', display: 'block' }}>
-                          {cleanDisplayTitle(activeProduct.title)}
-                        </strong>
-                        <div style={{ display: 'flex', gap: '8px', fontSize: '12px', marginTop: '2px' }}>
-                          <span style={{ color: '#16a34a', fontWeight: 700 }}>{money(activeProduct.price)}</span>
-                          <span style={{ color: 'var(--muted)' }}>·</span>
-                          <span style={{ color: 'var(--muted)' }}>{activeProduct.category || 'Fashion'}</span>
-                        </div>
-                      </div>
+                     <div className="product-preview-wrapper">
+                       <img
+                         src={activeProduct.image}
+                         alt=""
+                         className="product-thumbnail-img"
+                         onError={(e) => { e.currentTarget.src = '/images/meesho-peach-short-kurti.webp'; }}
+                       />
+                       <div className="product-info">
+                         <strong className="product-title">{cleanDisplayTitle(activeProduct.title)}</strong>
+                         <div className="product-meta">
+                           <span className="product-price">{money(activeProduct.price)}</span>
+                           <span className="product-divider">·</span>
+                           <span className="product-category">{activeProduct.category || 'Fashion'}</span>
+                         </div>
+                       </div>
                     </div>
                   )}
                 </>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--line)', borderRadius: '12px', padding: '16px', background: 'var(--canvas)', cursor: 'pointer' }}>
-                    <span style={{ fontSize: '24px', marginBottom: '4px' }}>📷</span>
-                    <strong style={{ fontSize: '12.5px', color: 'var(--ink)' }}>Choose Image File</strong>
-                    <span style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>PNG, JPG or WEBP from your device</span>
-                    <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
-                  </label>
+               ) : (
+                 <div className="custom-input-section">
+                    <label className="image-upload-label">
+                      <span className="upload-icon">📷</span>
+                      <strong className="upload-title">Choose Image File</strong>
+                      <span className="upload-hint">PNG, JPG or WEBP from your device</span>
+                      <input type="file" accept="image/*" onChange={handleFileUpload} className="file-input" />
+                    </label>
 
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>OR URL:</span>
-                    <input
-                      type="text"
-                      placeholder="Paste Meesho / Pinterest Image URL..."
-                      value={customImage.startsWith('data:') ? '' : customImage}
-                      onChange={(e) => {
-                        setCustomImage(e.target.value);
-                        setActiveEditorialResult(null);
-                      }}
-                      style={{ flex: 1, height: '34px', borderRadius: '8px', border: '1px solid var(--line)', padding: '0 10px', fontSize: '12px', background: 'var(--canvas)', color: 'var(--ink)' }}
-                    />
-                  </div>
+                   <div className="url-section">
+                     <span className="url-label">OR URL:</span>
+                     <input
+                       type="text"
+                       placeholder="Paste Meesho / Pinterest Image URL..."
+                       value={customImage.startsWith('data:') ? '' : customImage}
+                       onChange={(e) => {
+                         setCustomImage(e.target.value);
+                         setActiveEditorialResult(null);
+                       }}
+                       className="url-input"
+                     />
+                   </div>
 
-                  <input
-                    type="text"
-                    placeholder="Garment name (e.g. Burgundy Velvet Zari Saree)..."
-                    value={customTitle}
-                    onChange={(e) => setCustomTitle(e.target.value)}
-                    style={{ width: '100%', height: '34px', borderRadius: '8px', border: '1px solid var(--line)', padding: '0 10px', fontSize: '12px', background: 'var(--canvas)', color: 'var(--ink)' }}
-                  />
+                   <input
+                     type="text"
+                     placeholder="Garment name (e.g. Burgundy Velvet Zari Saree)..."
+                     value={customTitle}
+                     onChange={(e) => setCustomTitle(e.target.value)}
+                     className="custom-title-input"
+                   />
 
-                  {customImage && (
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(99, 102, 241, 0.06)', padding: '8px 12px', borderRadius: '10px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-                      <img src={customImage} alt="Custom Preview" style={{ width: '42px', height: '52px', objectFit: 'cover', borderRadius: '6px' }} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--ink)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {customTitle || 'Custom Outfit'}
-                        </span>
-                        <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: 600 }}>
-                          ✓ Garment Anchor Attached • Gemini Vision Ready
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                   {customImage && (
+                     <div className="custom-preview">
+                       <img src={customImage} alt="Custom Preview" className="custom-preview-img" />
+                       <div className="custom-preview-info">
+                         <span className="custom-title">{customTitle || 'Custom Outfit'}</span>
+                         <span className="custom-status">
+                           ✓ Garment Anchor Attached • Gemini Vision Ready
+                         </span>
+                       </div>
+                     </div>
+                   )}
                 </div>
               )}
             </div>
 
-            {/* Step 2: Editorial Atmosphere & Vibe */}
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <span style={{ background: 'var(--ink)', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
-                  2
-                </span>
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>
-                  Choose Editorial Style &amp; Atmosphere
-                </h3>
-              </div>
+             {/* Step 2: Editorial Atmosphere & Vibe */}
+             <div className="product-card">
+               <div className="step-header">
+                 <span className="step-number">2</span>
+                 <h3 className="step-title">Choose Editorial Style &amp; Atmosphere</h3>
+               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+               <div className="style-grid">
                 {EDITORIAL_STYLES.map((style) => {
                   const isSelected = selectedStyleId === style.id;
                   return (
-                    <button
-                      key={style.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedStyleId(style.id);
-                        setIsPromptCustomized(false);
-                      }}
-                      style={{
-                        padding: '12px',
-                        borderRadius: '12px',
-                        border: isSelected ? '2px solid var(--primary, #6366f1)' : '1px solid var(--line)',
-                        background: isSelected ? 'rgba(99, 102, 241, 0.06)' : 'var(--canvas)',
-                        textAlign: 'left',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <div style={{ fontSize: '18px', marginBottom: '4px' }}>{style.icon}</div>
-                      <strong style={{ fontSize: '13px', color: 'var(--ink)', display: 'block' }}>{style.name}</strong>
-                      <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', marginTop: '2px', lineHeight: 1.3 }}>
-                        {style.desc}
-                      </span>
+                     <button
+                       key={style.id}
+                       className={`${isSelected ? 'style-button active' : 'style-button'}`}
+                       onClick={() => {
+                         setSelectedStyleId(style.id);
+                         setIsPromptCustomized(false);
+                       }}
+                     >
+                       <div className="style-icon-large">{style.icon}</div>
+                       <strong className="style-name">{style.name}</strong>
+                       <span className="style-desc">{style.desc}</span>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Aspect Ratio */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Aspect Ratio:</span>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {['4:5', '9:16', '1:1'].map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setAspectRatio(r)}
-                      style={{
-                        padding: '5px 12px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        border: aspectRatio === r ? '1px solid var(--ink)' : '1px solid var(--line)',
-                        background: aspectRatio === r ? 'var(--ink)' : 'var(--canvas)',
-                        color: aspectRatio === r ? '#fff' : 'var(--ink)'
-                      }}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
+               {/* Aspect Ratio */}
+               <div className="aspect-ratio-section">
+                 <span className="aspect-ratio-label">Aspect Ratio:</span>
+                 <div className="aspect-ratio-options">
+                   {['4:5', '9:16', '1:1'].map((r) => (
+                     <button
+                       key={r}
+                       className={`${aspectRatio === r ? 'aspect-ratio-button active' : 'aspect-ratio-button'}`}
+                       onClick={() => setAspectRatio(r)}
+                     >
+                       {r}
+                     </button>
+                   ))}
+                 </div>
+               </div>
             </div>
 
-            {/* Step 3: Vision Direction & Generate */}
-            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '16px', padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: 'var(--ink)', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
-                    3
-                  </span>
-                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>
-                    Prompt &amp; Generation
-                  </h3>
-                </div>
+             {/* Step 3: Vision Direction & Generate */}
+             <div className="product-card">
+               <div className="step-header">
+                  <div className="prompt-editor-header">
+                   <span className="step-number">
+                     3
+                   </span>
+                   <h3 className="step-title">
+                     Prompt &amp; Generation
+                   </h3>
+                 </div>
                 {isPromptCustomized && (
-                  <button
-                    type="button"
-                    onClick={() => setIsPromptCustomized(false)}
-                    style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Reset Prompt
-                  </button>
+                   <button
+                     type="button"
+                     className="reset-prompt-button"
+                     onClick={() => setIsPromptCustomized(false)}
+                   >
+                     Reset Prompt
+                   </button>
                 )}
               </div>
 
-              <textarea
-                rows={4}
-                value={customPrompt}
-                onChange={(e) => {
-                  setCustomPrompt(e.target.value);
-                  setIsPromptCustomized(true);
-                }}
-                placeholder="Editorial direction prompt..."
-                style={{ width: '100%', borderRadius: '10px', border: '1px solid var(--line)', padding: '10px', fontSize: '12px', background: 'var(--canvas)', color: 'var(--ink)', resize: 'vertical', lineHeight: 1.4, marginBottom: '14px' }}
-              />
+               <textarea
+                 rows={4}
+                 value={customPrompt}
+                 onChange={(e) => {
+                   setCustomPrompt(e.target.value);
+                   setIsPromptCustomized(true);<|tool_calls_section_begin|>assistant
+<|reserved_token_163653|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>str_replace<|tool_calls_section_begin|><|tool_call_begin|>scrol
 
-              <button
-                type="button"
-                disabled={isGenerating || !activeProduct}
-                onClick={handleGenerate}
-                style={{
-                  width: '100%',
-                  height: '46px',
-                  borderRadius: '12px',
-                  background: isGenerating ? 'var(--muted)' : 'linear-gradient(135deg, #181b1e 0%, #374151 100%)',
-                  color: '#fff',
-                  fontSize: '13.5px',
-                  fontWeight: 800,
-                  border: 'none',
-                  cursor: isGenerating ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                {isGenerating ? (
-                  <span>⚙️ Rendering Step {generationStep}/4...</span>
-                ) : (
-                  <>
-                    <span>🚀</span> Generate Fashion Editorial
-                  </>
-                )}
-              </button>
+               <button
+                 type="button"
+                 className={`${isGenerating || !activeProduct ? 'generate-button disabled' : 'generate-button'}`}
+                 disabled={isGenerating || !activeProduct}
+                 onClick={handleGenerate}
+               >
+                 {isGenerating ? (
+                   <span>⚙️ Rendering Step {generationStep}/4...</span>
+                 ) : (
+                   <>
+                     <span className="generate-icon">🚀</span> Generate Fashion Editorial
+                   </>
+                 )}
+               </button>
             </div>
           </div>
 
-          {/* Right Column: Visual Canvas & Real Output */}
-          <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: '20px', padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--ink)' }}>
-                  Visual Output Comparison
-                </h3>
-                <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }}>
-                  Side-by-side verification: Original product vs AI photoshoot.
-                </p>
-              </div>
+           {/* Right Column: Visual Canvas & Real Output */}
+           <div className="visual-output-card">
+             <div className="visual-output-header">
+               <div>
+                 <h3 className="visual-output-title">
+                   Visual Output Comparison
+                 </h3>
+                 <p className="visual-output-description">
+                   Side-by-side verification: Original product vs AI photoshoot.
+                 </p>
+               </div>
 
-              <label style={{ fontSize: '12px', color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={showWatermark}
-                  onChange={(e) => setShowWatermark(e.target.checked)}
-                />
-                <span>Brand watermark</span>
-              </label>
-            </div>
+               <label className="watermark-label">
+                 <input
+                   type="checkbox"
+                   checked={showWatermark}
+                   onChange={(e) => setShowWatermark(e.target.checked)}
+                 />
+                 <span>Brand watermark</span>
+               </label>
+             </div>
 
-            {/* Side-by-Side Canvas */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-              {/* Original Listing Image */}
-              <div style={{ background: 'var(--canvas)', borderRadius: '14px', border: '1px solid var(--line)', padding: '12px', textAlign: 'center' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Input Reference Garment
-                  </span>
-                  <span style={{ fontSize: '10px', background: 'rgba(99, 102, 241, 0.08)', color: 'var(--primary)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                    RAW ANCHOR
-                  </span>
-                </div>
-                <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: '10px', background: '#fff' }}>
-                  <img
-                    src={activeEditorialResult?.reference_image || (garmentSource === 'custom' ? customImage : activeProduct?.image) || '/images/meesho-peach-short-kurti.webp'}
-                    alt="Original Reference"
-                    style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-                    onError={(e) => { e.currentTarget.src = '/images/meesho-peach-short-kurti.webp'; }}
-                  />
-                </div>
-                <div style={{ fontSize: '11.5px', color: 'var(--muted)', marginTop: '8px' }}>
-                  {garmentSource === 'custom' ? (customTitle || 'Custom Outfit') : cleanDisplayTitle(activeProduct?.title)}
-                </div>
-              </div>
+             {/* Side-by-Side Canvas */}
+             <div className="canvas-grid">
+               {/* Original Listing Image */}
+               <div className="canvas-panel original-panel">
+                 <div className="panel-header">
+                   <span className="panel-title">Input Reference Garment</span>
+                   <span className="panel-badge">RAW ANCHOR</span>
+                 </div>
+                 <div className="canvas-image-wrapper">
+                   <img
+                     src={activeEditorialResult?.reference_image || (garmentSource === 'custom' ? customImage : activeProduct?.image) || '/images/meesho-peach-short-kurti.webp'}
+                     alt="Original Reference"
+                     className="canvas-image"
+                     onError={(e) => { e.currentTarget.src = '/images/meesho-peach-short-kurti.webp'; }}
+                   />
+                 </div>
+                 <div className="panel-footer">
+                   {garmentSource === 'custom' ? (customTitle || 'Custom Outfit') : cleanDisplayTitle(activeProduct?.title)}
+                 </div>
+               </div>
 
-              {/* Generated Fashion Editorial */}
-              <div style={{ background: 'var(--canvas)', borderRadius: '14px', border: activeEditorialResult ? '2px solid #16a34a' : '1px solid var(--line)', padding: '12px', textAlign: 'center', position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: activeEditorialResult ? '#16a34a' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {activeEditorialResult ? '✓ Enhanced Editorial' : 'AI Rendered Result'}
-                  </span>
+               {/* Generated Fashion Editorial */}
+               <div className={`canvas-panel editorial-panel ${activeEditorialResult ? 'has-result' : ''}`}>
+                 <div className="panel-header">
+                   <span className="panel-title">
+                     {activeEditorialResult ? '✓ Enhanced Editorial' : 'AI Rendered Result'}
+                   </span>
                   {activeEditorialResult?.garment_analyzed && (
                     <span style={{ fontSize: '10px', background: 'rgba(34, 197, 94, 0.12)', color: '#16a34a', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
                       VISION PRESERVED
@@ -736,68 +633,67 @@ export default function AIMediaStudioView({
                   )}
                 </div>
 
-                <div style={{ height: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: '10px', background: '#fff', position: 'relative' }}>
-                  {isGenerating ? (
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                      <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>⚙️</span>
-                      <strong style={{ fontSize: '13.5px', color: 'var(--ink)', display: 'block' }}>
-                        Rendering Editorial...
-                      </strong>
-                      <span style={{ fontSize: '11.5px', color: 'var(--muted)', marginTop: '4px', display: 'block' }}>
-                        Step {generationStep}/4 · {selectedEngine === 'arena' ? 'LM Arena (FLUX Tier 1)' : 'Google AI Studio'}
-                      </span>
-                    </div>
+                 <div className="canvas-image-wrapper">
+                   {isGenerating ? (
+                     <div className="generation-state">
+                       <span className="generation-icon">⚙️</span>
+                       <strong className="generation-title">Rendering Editorial...</strong>
+                       <span className="generation-step">
+                         Step {generationStep}/4 · {selectedEngine === 'arena' ? 'LM Arena (FLUX Tier 1)' : 'Google AI Studio'}
+                       </span>
+                     </div>
                   ) : activeEditorialResult ? (
                     <>
-                      <img
-                        src={activeEditorialResult.src}
-                        alt="Generated Editorial"
-                        style={{ height: '100%', width: '100%', objectFit: 'cover' }}
-                      />
-                      {showWatermark && (
-                        <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'rgba(0, 0, 0, 0.65)', color: '#fff', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em' }}>
-                          SHELF EDITORIAL
-                        </div>
-                      )}
+                       <img
+                         src={activeEditorialResult.src}
+                         alt="Generated Editorial"
+                         className="result-image"
+                       />
+                       {showWatermark && (
+                         <div className="watermark">
+                           SHELF EDITORIAL
+                         </div>
+                       )}
                     </>
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--muted)' }}>
-                      <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>✨</span>
-                      <strong style={{ fontSize: '13.5px', color: 'var(--ink)', display: 'block' }}>
-                        Ready to Enhance
-                      </strong>
-                      <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px', lineHeight: 1.4 }}>
-                        Select or upload an outfit, then click "Generate Fashion Editorial" to render via LM Arena or Google AI.
-                      </p>
-                    </div>
+                   ) : (
+                     <div className="empty-state">
+                       <span className="empty-icon">✨</span>
+                       <strong className="empty-title">No Result Yet</strong>
+                       <p className="empty-description">
+                         Generate an AI fashion editorial to see the result here.
+                       </p>
+                     </div>
                   )}
                 </div>
 
                 <div style={{ fontSize: '11.5px', color: activeEditorialResult ? '#16a34a' : 'var(--muted)', marginTop: '8px', fontWeight: activeEditorialResult ? 700 : 500 }}>
                   {activeEditorialResult ? `● ${activeEditorialResult.engine} (${activeEditorialResult.duration})` : `○ Engine: ${selectedEngine.toUpperCase()}`}
-                </div>
-              </div>
-            </div>
+                 </div>
+               </div>
+             </div>
 
-            {/* 1-Click Action Bar for Generated Result */}
-            {activeEditorialResult && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', background: 'rgba(34, 197, 94, 0.08)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(34, 197, 94, 0.25)' }}>
-                <button
-                  type="button"
-                  onClick={handleApplyToStorefront}
-                  className="button button-dark"
-                  style={{ fontSize: '12px', padding: '10px 12px', fontWeight: 700 }}
-                >
-                  ✨ Storefront Cover
-                </button>
+             <div className="engine-info">
+               {activeEditorialResult ? `● ${activeEditorialResult.engine} (${activeEditorialResult.duration})` : `○ Engine: ${selectedEngine.toUpperCase()}`}
+             </div>
 
-                <button
-                  type="button"
-                  onClick={handleApplyToWishlink}
-                  style={{ background: '#ec4899', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '12px', padding: '10px 12px', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  🌸 Wishlink Look
-                </button>
+             {/* 1-Click Action Bar for Generated Result */}
+             {activeEditorialResult && (
+               <div className="action-bar">
+                 <button
+                   type="button"
+                   onClick={handleApplyToStorefront}
+                   className="button button-dark action-button"
+                 >
+                   ✨ Storefront Cover
+                 </button>
+
+                 <button
+                   type="button"
+                   onClick={handleApplyToWishlink}
+                   className="action-button wishlink-button"
+                 >
+                   🌸 Wishlink Look
+                 </button>
 
                 <button
                   type="button"

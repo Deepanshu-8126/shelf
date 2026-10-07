@@ -3,6 +3,7 @@ import Icon from './Icon.jsx';
 import StoreBadge from './StoreBadge.jsx';
 import { storeSearchUrl } from '../data.js';
 import { getProductClickUrl } from '../affiliate.js';
+import './ProductCard.css';
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;
@@ -189,129 +190,79 @@ export default function ProductCard({
 
   return (
     <article
-      className={`product-card${isPublic ? ' product-card-public' : ''}${isOwnerAdmin ? ' has-admin-controls' : ''}`}
-      style={{ opacity: deleting ? 0.3 : 1, transition: 'opacity 0.2s ease' }}
+      className={`product-card${isPublic ? ' product-card-public' : ''}${isOwnerAdmin ? ' has-admin-controls' : ''}${deleting ? ' deleting' : ''}`}
       onMouseMove={handleTilt}
       onMouseLeave={resetTilt}
     >
-      <div
-        className={`product-image-shell tint-${product.tint || 'sage'}`}
-        style={{ cursor: isPublic && onViewDetail ? 'pointer' : 'default' }}
-        onClick={(e) => {
-          if (isPublic && onViewDetail && !e.target.closest('button') && !e.target.closest('a')) {
-            onViewDetail(product);
-          }
-        }}
-        onMouseEnter={() => { if (isPublic && imageSlides.length > 1) setGalleryPaused(true); }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+<div
+      className={`product-image-shell tint-${product.tint || 'sage'}${isPublic && onViewDetail ? ' clickable' : ''}`}
+      onClick={(e) => {
+        if (isPublic && onViewDetail && !e.target.closest('button') && !e.target.closest('a')) {
+          onViewDetail(product);
+        }
+      }}
+      onMouseEnter={() => { if (isPublic && imageSlides.length > 1) setGalleryPaused(true); }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
         {/* ADMIN QUICK ACTION OVERLAY */}
-        {isOwnerAdmin && onDeleteProduct && (
-          <div 
-            className="admin-card-overlay"
-            style={{
-              position: 'absolute',
-              top: '8px',
-              left: '8px',
-              zIndex: 30,
-              display: 'flex',
-              gap: '4px',
-              background: 'rgba(11, 13, 19, 0.85)',
-              backdropFilter: 'blur(10px)',
-              padding: '3px 6px',
-              borderRadius: '999px',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-            }}
-          >
-            <button
-              type="button"
-              onClick={handleDeleteClick}
-              title="Remove product from Storefront"
-              style={{
-                background: 'rgba(239, 68, 68, 0.25)',
-                border: '1px solid rgba(239, 68, 68, 0.5)',
-                color: '#f87171',
-                borderRadius: '50%',
-                width: '24px',
-                height: '24px',
-                display: 'grid',
-                placeItems: 'center',
-                fontSize: '11px',
-                cursor: 'pointer'
-              }}
+{isOwnerAdmin && onDeleteProduct && (
+            <div 
+              className="admin-card-overlay"
             >
-              🗑️
-            </button>
-            {onTogglePublish && (
-              <button
+<button
                 type="button"
-                onClick={handleHideClick}
-                title="Hide / Move to Ingest Drafts"
-                style={{
-                  background: 'rgba(234, 179, 8, 0.25)',
-                  border: '1px solid rgba(234, 179, 8, 0.5)',
-                  color: '#fde047',
-                  borderRadius: '50%',
-                  width: '24px',
-                  height: '24px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontSize: '11px',
-                  cursor: 'pointer'
-                }}
+                onClick={handleDeleteClick}
+                title="Remove product from Storefront"
+                className="admin-delete-btn"
               >
-                👁️
+                🗑️
               </button>
-            )}
-            {onEditProduct && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
-                title="Edit Product Price / Details"
-                style={{
-                  background: 'rgba(56, 189, 248, 0.25)',
-                  border: '1px solid rgba(56, 189, 248, 0.5)',
-                  color: '#38bdf8',
-                  borderRadius: '50%',
-                  width: '24px',
-                  height: '24px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontSize: '11px',
-                  cursor: 'pointer'
-                }}
-              >
-                ✏️
-              </button>
-            )}
+{onTogglePublish && (
+                <button
+                  type="button"
+                  onClick={handleHideClick}
+                  title="Hide / Move to Ingest Drafts"
+                  className="admin-hide-btn"
+                >
+                  👁️
+                </button>
+              )}
+{onEditProduct && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
+                  title="Edit Product Price / Details"
+                  className="admin-edit-btn"
+                >
+                  ✏️
+                </button>
+              )}
           </div>
         )}
-        <img
-          className={`product-photo${(product.galleryUseAsPrimary ? product.galleryImageFit : product.imageFit) === 'contain' ? ' product-photo-contain' : ''}`}
-          src={imageSlides[activeImage] || product.image || '/images/meesho-dress-ae6lv9.webp'}
-          alt={product.title}
-          style={{ objectPosition: product.imagePosition || 'center' }}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          draggable="false"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            const cat = ((product.category || '') + ' ' + (product.title || '')).toLowerCase();
-            if (cat.includes('accessor') || cat.includes('pendant') || cat.includes('airpods') || cat.includes('sunglass') || cat.includes('jewel')) {
-              e.currentTarget.src = '/images/meesho-earrings-combo.webp';
-            } else if (cat.includes('jacket') || cat.includes('bomber') || cat.includes('hoodie') || cat.includes('winter') || cat.includes('cardigan')) {
-              e.currentTarget.src = '/images/meesho-black-cardigan.webp';
-            } else if (cat.includes('top') || cat.includes('tee') || cat.includes('jersey') || cat.includes('corset') || cat.includes('cami') || cat.includes('sweat')) {
-              e.currentTarget.src = '/images/meesho-yellow-side-dori-top.webp';
-            } else if (cat.includes('tote') || cat.includes('bag')) {
-              e.currentTarget.src = '/images/meesho-canvas-tote.webp';
-            } else {
-              e.currentTarget.src = '/images/meesho-dress-ae6lv9.webp';
-            }
-          }}
-        />
+<img
+            className={`product-photo${(product.galleryUseAsPrimary ? product.galleryImageFit : product.imageFit) === 'contain' ? ' product-photo-contain' : ''} product-image-${product.imagePosition || 'center'}`}
+            src={imageSlides[activeImage] || product.image || '/images/meesho-dress-ae6lv9.webp'}
+            alt={product.title}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            draggable="false"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              const cat = ((product.category || '') + ' ' + (product.title || '')).toLowerCase();
+              if (cat.includes('accessor') || cat.includes('pendant') || cat.includes('airpods') || cat.includes('sunglass') || cat.includes('jewel')) {
+                e.currentTarget.src = '/images/meesho-earrings-combo.webp';
+              } else if (cat.includes('jacket') || cat.includes('bomber') || cat.includes('hoodie') || cat.includes('winter') || cat.includes('cardigan')) {
+                e.currentTarget.src = '/images/meesho-black-cardigan.webp';
+              } else if (cat.includes('top') || cat.includes('tee') || cat.includes('jersey') || cat.includes('corset') || cat.includes('cami') || cat.includes('sweat')) {
+                e.currentTarget.src = '/images/meesho-yellow-side-dori-top.webp';
+              } else if (cat.includes('tote') || cat.includes('bag')) {
+                e.currentTarget.src = '/images/meesho-canvas-tote.webp';
+              } else {
+                e.currentTarget.src = '/images/meesho-dress-ae6lv9.webp';
+              }
+            }}
+          />
 
         {/* 3D Specular Reflection Shine Glare Layer */}
         <div className="card-shine-glare" />
@@ -400,53 +351,43 @@ export default function ProductCard({
       <div className="product-card-body">
         <div className="product-eyebrow-row">
           <span className="product-category">{product.seasonalTag ? 'WINTER EDIT' : product.category}</span>
-          {product.colors && Array.isArray(product.colors) && product.colors.length > 1 ? (
-            <span className="colorway-badge" title={product.colors.join(', ')} style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <span className="color-dots-preview" style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
-                {product.colors.slice(0, 4).map((col, idx) => {
-                  const matchingVar = Array.isArray(product.variations) 
-                    ? product.variations.find(v => (v.colorName || '').toLowerCase().includes(col.toLowerCase()))
-                    : null;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      className="card-swatch-dot-btn"
-                      title={`Switch to ${col}`}
-                      style={{
-                        display: 'inline-block',
-                        width: '9px',
-                        height: '9px',
-                        borderRadius: '50%',
-                        background: getColorHex(col),
-                        border: '1.5px solid rgba(255,255,255,0.7)',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        if (matchingVar?.image) {
-                          const sIdx = imageSlides.indexOf(matchingVar.image);
-                          if (sIdx !== -1) setActiveImage(sIdx);
-                          else {
-                            imageSlides.unshift(matchingVar.image);
-                            setActiveImage(0);
-                          }
-                        }
-                      }}
-                    />
-                  );
-                })}
-              </span>
-              <span>{product.colors.length} shades</span>
-            </span>
-          ) : product.rating ? (
-            <span className="rating-chip"><b>★</b> {product.rating}{ratingCount ? ` · ${ratingLabel}` : ''}</span>
-          ) : !isPublic && product.collectionTitle ? (
-            <span className="product-collection-label">{product.collectionTitle}</span>
-          ) : null}
+{product.colors && Array.isArray(product.colors) && product.colors.length > 1 ? (
+                <span className="colorway-badge" title={product.colors.join(', ')}>
+                  <span className="color-dots-preview">
+                    {product.colors.slice(0, 4).map((col, idx) => {
+                      const matchingVar = Array.isArray(product.variations) 
+                        ? product.variations.find(v => (v.colorName || '').toLowerCase().includes(col.toLowerCase()))
+                        : null;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          className="card-swatch-dot-btn"
+                          title={`Switch to ${col}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            if (matchingVar?.image) {
+                              const sIdx = imageSlides.indexOf(matchingVar.image);
+                              if (sIdx !== -1) setActiveImage(sIdx);
+                              else {
+                                imageSlides.unshift(matchingVar.image);
+                                setActiveImage(0);
+                              }
+                            }
+                          }}
+                        >
+                        </button>
+                      );
+                    })}
+                  </span>
+                  <span>{product.colors.length} shades</span>
+                </span>
+              ) : product.rating ? (
+                <span className="rating-chip"><b>★</b> {product.rating}{ratingCount ? ` · ${ratingLabel}` : ''}</span>
+              ) : !isPublic && product.collectionTitle ? (
+                <span className="product-collection-label">{product.collectionTitle}</span>
+              ) : null}
         </div>
         <h3 className="product-title" title={product.title}>
           {isPublic && onViewDetail ? (
