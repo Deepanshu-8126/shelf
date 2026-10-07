@@ -495,10 +495,12 @@ async def render_videosynx_short(query: str | None = None) -> Path:
     print(f"📚 Series: {lesson.series_name} • Episode #{lesson.episode_num}")
     print("=" * 70)
 
-    # 1. Run Python Code in Sandbox to get verified stdout
-    print("🧪 Running code in Python sandbox...")
-    sandbox_result = run_code_in_sandbox(lesson.test_runner_code)
+    # 1. Run Code in Sandbox to get verified stdout
+    lang_name = getattr(lesson, "language", "python")
+    print(f"🧪 Running code in {lang_name} sandbox...")
+    sandbox_result = run_code_in_sandbox(lesson.test_runner_code, language=lang_name)
     print(f"✓ Sandbox executed in {sandbox_result['runtime_ms']}ms: {sandbox_result['output_lines']}")
+
 
     # 2. Build Anchored Timeline & Foley Audio
     print("🎙️ Synthesizing line-anchored Kokoro narration & Cherry MX Foley...")

@@ -25,14 +25,19 @@ def main():
     parser.add_argument("--topic", type=str, default="", help="Coding topic or LeetCode question")
     parser.add_argument("--lesson", type=str, default="", help="Specific lesson ID")
     parser.add_argument("--engine", type=str, default="videosynx", choices=["videosynx", "vox"], help="Rendering engine (videosynx: line-by-line anchored, vox: 4-scene overview)")
+    parser.add_argument("--auto", action="store_true", help="Autonomously curate trending topic and render")
     parser.add_argument("--generate", action="store_true", help="Generate coding short")
     parser.add_argument("--mode", type=str, default="story", help="Video mode")
-    parser.add_argument("--niche", type=str, default="coding", help="Niche")
+    parser.add_argument("--niche", type=str, default="", help="Niche filter (dsa, python, java, ai_tools, sysdesign, web_backend)")
 
     args = parser.parse_args()
 
     topic_query = ""
-    if args.day > 0:
+    if args.auto or (args.niche and not args.topic and not args.day and not args.episode):
+        from ai_curriculum_generator import curate_viral_topic
+        topic_query = curate_viral_topic(args.niche)
+        print(f"🤖 [Autonomous Topic Curator] Curated viral topic ({args.niche or 'any'}): '{topic_query}'")
+    elif args.day > 0:
         topic_query = f"day {args.day}"
     elif args.episode > 0 and args.series:
         topic_query = f"{args.series} {args.episode}"
@@ -46,6 +51,7 @@ def main():
         topic_query = os.getenv("TOPIC_INPUT") or os.getenv("TOPIC") or ""
 
     print(f"🎬 [Channel 7 CLI] Starting generation with engine='{args.engine}', query='{topic_query}'")
+
 
     if args.engine == "videosynx":
         out_video = asyncio.run(render_videosynx_short(topic_query if topic_query.strip() else None))

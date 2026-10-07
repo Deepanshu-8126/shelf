@@ -187,6 +187,56 @@ def render_dynamic_topic_diagram(topic_or_lesson: Any, current_line_idx: int, wi
         draw.rounded_rectangle([40, 175, width - 40, height - 20], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
         draw.text((width // 2, 210), "[✓] MAX PROFIT: +5 • EXECUTED IN A SINGLE O(n) PASS", fill=(20, 83, 45), font=f_mono, anchor="mm")
 
+    elif "ai" in t_lower or "llm" in t_lower or "ollama" in t_lower or "rag" in t_lower or "token" in t_lower:
+        # AI LLMs, Ollama, Vector Search & Token Streaming
+        draw.text((30, 18), "State Visualizer: Token Stream & Embedding Flow", fill=(30, 58, 138), font=f_title)
+        draw.rounded_rectangle([40, 55, width - 40, 115], radius=14, fill=(238, 242, 255), outline=(129, 140, 248), width=2)
+        draw.text((60, 72), "Token Pipeline: [Prompt Input] -> [Vector Space 1536-d] -> [Top-K Match]", fill=(67, 56, 202), font=f_mono)
+        draw.text((60, 95), "Attention Mask: Context Window Buffer Loaded (Flash Attention v2)", fill=(100, 116, 139), font=f_body)
+
+        draw.rounded_rectangle([40, 125, width - 40, 175], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((60, 148), "Generation Stream: '>> Yielding tokens at 84 tokens/sec in real-time'", fill=(20, 83, 45), font=f_mono)
+
+        draw.rounded_rectangle([40, 185, width - 40, height - 15], radius=12, fill=(241, 245, 249))
+        draw.text((width // 2, 220), "[✓] TIME-TO-FIRST-TOKEN: 140ms • ZERO VRAM LEAK VERIFIED", fill=(30, 41, 59), font=f_mono, anchor="mm")
+
+    elif "java" in t_lower or "thread" in t_lower or "jvm" in t_lower:
+        # Java Virtual Threads / Concurrency / JVM Memory
+        draw.text((30, 18), "State Visualizer: Java Virtual Threads vs Platform Threads", fill=(30, 58, 138), font=f_title)
+        draw.rounded_rectangle([40, 55, width - 40, 105], radius=14, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
+        draw.text((60, 78), "Platform OS Thread: 1MB RAM per thread (Spike at 2,000 threads [!])", fill=(185, 28, 28), font=f_mono)
+
+        draw.rounded_rectangle([40, 115, width - 40, 165], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((60, 138), "Virtual Thread (Project Loom): ~1KB heap frame (100,000 Concurrent [✓])", fill=(20, 83, 45), font=f_mono)
+
+        draw.rounded_rectangle([40, 175, width - 40, height - 15], radius=12, fill=(241, 245, 249))
+        draw.text((width // 2, 215), "[✓] FORK-JOIN CARRIER POOL MOUNT/UNMOUNT • ZERO OS CONTEXT SWITCH", fill=(30, 41, 59), font=f_mono, anchor="mm")
+
+    elif "api" in t_lower or "crud" in t_lower or "fastapi" in t_lower or "async" in t_lower:
+        # Non-blocking Async Event Loop & REST Routing
+        draw.text((30, 18), "State Visualizer: Non-Blocking Async Event Loop", fill=(30, 58, 138), font=f_title)
+        draw.rounded_rectangle([40, 55, width - 40, 115], radius=14, fill=(238, 242, 255), outline=(129, 140, 248), width=2)
+        draw.text((60, 72), "Request Pipeline: HTTP GET /api/v1 -> Router -> Dependency Inject", fill=(67, 56, 202), font=f_mono)
+        draw.text((60, 95), "Event Loop Status: Coroutine suspended at await db.fetch() (Zero Idle)", fill=(100, 116, 139), font=f_body)
+
+        draw.rounded_rectangle([40, 125, width - 40, 175], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((60, 148), "Response: 200 OK • Non-blocking JSON Serialization Streamed", fill=(20, 83, 45), font=f_mono)
+
+        draw.rounded_rectangle([40, 185, width - 40, height - 15], radius=12, fill=(241, 245, 249))
+        draw.text((width // 2, 220), "[✓] 10,000+ CONCURRENT CONNECTIONS • ZERO THREAD STARVATION", fill=(30, 41, 59), font=f_mono, anchor="mm")
+
+    elif "sql" in t_lower or "db" in t_lower or "database" in t_lower:
+        # SQL B-Tree Index vs Sequential Scan
+        draw.text((30, 18), "State Visualizer: B-Tree Index Seek vs Table Scan", fill=(30, 58, 138), font=f_title)
+        draw.rounded_rectangle([40, 55, width - 40, 105], radius=14, fill=(254, 226, 226), outline=(248, 113, 113), width=2)
+        draw.text((60, 78), "Sequential Scan: 10,000,000 Rows Scanned (High Disk I/O [!])", fill=(185, 28, 28), font=f_mono)
+
+        draw.rounded_rectangle([40, 115, width - 40, 165], radius=14, fill=(220, 252, 231), outline=(74, 222, 128), width=2)
+        draw.text((60, 138), "B-Tree Index Seek: O(log n) Branch Traversal (3 Seeks Total [✓])", fill=(20, 83, 45), font=f_mono)
+
+        draw.rounded_rectangle([40, 175, width - 40, height - 15], radius=12, fill=(241, 245, 249))
+        draw.text((width // 2, 215), "[✓] 99.8% DISK I/O SAVED • INDEX SCAN VERIFIED OPTIMAL", fill=(30, 41, 59), font=f_mono, anchor="mm")
+
     elif "gen" in t_lower or "memory" in t_lower:
         # Memory Bar Gauge
         draw.text((30, 18), "State Visualizer: Memory Footprint Comparison", fill=(30, 58, 138), font=f_title)
@@ -198,6 +248,7 @@ def render_dynamic_topic_diagram(topic_or_lesson: Any, current_line_idx: int, wi
 
         draw.rounded_rectangle([40, 190, width - 40, height - 15], radius=12, fill=(241, 245, 249))
         draw.text((width // 2, 225), "[✓] O(1) CONSTANT BUFFER ALLOCATION VERIFIED", fill=(30, 41, 59), font=f_mono, anchor="mm")
+
     else:
         # Universal Dynamic Architecture & State Inspector Card
         title_str = custom_title or f"State Visualizer: {topic_id.replace('_', ' ').title()}"
