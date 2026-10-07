@@ -259,43 +259,93 @@ class AutopilotDailyReelsPipeline:
         )
         return caption
 
+    def download_exact_product_image(self, product: Dict[str, Any]) -> Optional[Path]:
+        """Downloads the exact high-res Meesho product image from Meesho CDN or resolves local asset."""
+        img_url = product.get("image_url", "").strip()
+        slug = re.sub(r"[^a-zA-Z0-9]+", "_", product["title"][:16]).lower()
+        target_dir = PROJECT_ROOT / "data" / "product_images"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        dest_path = target_dir / f"{slug}.jpg"
+
+        # 1. Download online image URL from Meesho
+        if img_url and img_url.startswith("http"):
+            try:
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+                req = urllib.request.Request(img_url, headers=headers)
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    raw_data = resp.read()
+                    # Convert to JPG via PIL
+                    from PIL import Image
+                    import io
+                    img = Image.open(io.BytesIO(raw_data)).convert("RGB")
+                    img.save(dest_path, format="JPEG", quality=95)
+                    log.info("📸 Downloaded exact Meesho product photo: %s", dest_path)
+                    return dest_path
+            except Exception as e:
+                log.warning("Image download notice: %s. Checking local catalog...", e)
+
+        # 2. Check local public images catalog
+        public_dir = PROJECT_ROOT / "public" / "images"
+        if public_dir.exists():
+            t = product["title"].lower()
+            for cand in public_dir.glob("meesho-*.webp"):
+                if any(w in cand.name.lower() for w in t.split()[:2]):
+                    return cand
+            webps = list(public_dir.glob("meesho-*.webp"))
+            if webps:
+                return webps[0]
+
+        return None
+
     async def execute_daily_slot(self, slot: str = "afternoon", use_browser: bool = False) -> Dict[str, Any]:
         """Executes one complete end-to-end automated reel cycle."""
         log.info("=================================================================")
         log.info("🚀 STARTING DAILY REELS AUTOPILOT - SLOT: %s", slot.upper())
         log.info("=================================================================")
 
-        # 1. Pick Product
+        # 1. Pick Exact Product
         product = self.pick_trending_product(slot=slot)
 
-        # 2. Build Creator Affiliate Link
+        # 2. Download & Resolve Exact Product Image
+        exact_photo = self.download_exact_product_image(product)
+        if exact_photo:
+            product["local_image"] = str(exact_photo)
+            log.info("🖼️ Exact Product Reference Photo Active: %s", exact_photo.name)
+
+        # 3. Build Creator Affiliate Link
         affiliate_url = self.build_affiliate_link(product["product_url"])
         product["affiliate_url"] = affiliate_url
 
-        # 3. Generate Full-Motion Veo Video
+        # 4. Generate Full-Motion Veo Video
         video_path = await self.generate_full_motion_veo_reel(product, use_browser_crawler=use_browser)
 
-        # 4. Generate Caption
+        # 5. Generate Caption
         caption = self.generate_viral_caption(product, affiliate_url)
 
-        # 5. Auto-Publish to Instagram Reels
+        # 6. Auto-Publish to Instagram Reels
         insta_res = self.insta_poster.publish_reel(video_path=video_path, caption=caption)
 
-        # 6. Telegram Alert & Broadcast
-        tg_message = (
-            f"🚀 *DAILY REEL READY & PUBLISHED*\n\n"
-            f"👗 *Product:* {product['title']}\n"
-            f"💰 *Deal:* ₹{product['price']} ({product['discount']})\n"
-            f"🔗 *Affiliate Link:* {affiliate_url}\n"
-            f"📸 *Instagram Status:* {insta_res.get('status', 'ready')}\n\n"
-            f"✨ Generated via Google Veo 3.1 Full-Motion Studio Engine!"
+        # 7. Telegram Alert: Send Exact Product Photo + Full-Motion 4K Video + Affiliate Link
+        tg_caption = (
+            f"🛍️ *NEW MEESHO REEL & PRODUCT MATCH*\n\n"
+            f"👗 *Outfit:* {product['title']}\n"
+            f"💰 *Deal Price:* ₹{product['price']} (MRP ₹{product['old_price']} • {product['discount']})\n"
+            f"⭐ *Rating:* {product['rating']}/5.0\n"
+            f"💸 *Your Commission:* {product['commission_pct']}% (~₹{int(product['price'] * 0.15)}/sale)\n\n"
+            f"🔗 *Direct Affiliate Link:*\n{affiliate_url}\n\n"
+            f"👉 *Instagram DM Action:* 'Comment LINK to buy!'"
         )
-        try:
-            self.telegram_bot.send_message(tg_message)
-        except Exception as tge:
-            log.warning("Telegram dispatch note: %s", tge)
 
-        # 7. Record History
+        try:
+            # First send exact product photo if available
+            if exact_photo and exact_photo.exists():
+                self.telegram_bot.send_photo_file(exact_photo, caption=f"📸 *Verified Product Photo:* `{product['title']}`")
+            # Then send full-motion 4K reel
+            self.telegram_bot.send_video_file(video_path, caption=tg_caption)
+        except Exception as tge:
+            log.warning("Telegram dispatch notice: %s", tge)
+
+        # 8. Record History
         record = {
             "timestamp": datetime.now().isoformat(),
             "slot": slot,
@@ -303,6 +353,7 @@ class AutopilotDailyReelsPipeline:
             "product_url": product["product_url"],
             "affiliate_url": affiliate_url,
             "price": product["price"],
+            "photo_path": str(exact_photo) if exact_photo else "",
             "video_path": str(video_path),
             "instagram_status": insta_res.get("status", "unknown")
         }

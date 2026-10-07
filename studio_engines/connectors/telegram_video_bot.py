@@ -148,8 +148,55 @@ class TelegramVideoBot:
                 else:
                     log.warning("Telegram API rejected video: %s", res_data)
                     return False
+    def send_photo_file(self, photo_path: Path | str, caption: str = "") -> bool:
+        """Uploads high-res product photo directly to Telegram chat."""
+        path = Path(photo_path)
+        if not path.exists():
+            log.warning("Photo file not found: %s", path)
+            return False
+
+        if not self.bot_token or not self.chat_id:
+            return False
+
+        boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
+        body = io.BytesIO()
+
+        # chat_id field
+        body.write(f"--{boundary}\r\n".encode("utf-8"))
+        body.write(b'Content-Disposition: form-data; name="chat_id"\r\n\r\n')
+        body.write(f"{self.chat_id}\r\n".encode("utf-8"))
+
+        # caption field
+        if caption:
+            body.write(f"--{boundary}\r\n".encode("utf-8"))
+            body.write(b'Content-Disposition: form-data; name="caption"\r\n\r\n')
+            body.write(f"{caption}\r\n".encode("utf-8"))
+
+        # photo file field
+        body.write(f"--{boundary}\r\n".encode("utf-8"))
+        body.write(f'Content-Disposition: form-data; name="photo"; filename="{path.name}"\r\n'.encode("utf-8"))
+        body.write(b"Content-Type: image/jpeg\r\n\r\n")
+        with open(path, "rb") as f:
+            body.write(f.read())
+        body.write(b"\r\n")
+        body.write(f"--{boundary}--\r\n".encode("utf-8"))
+        content_bytes = body.getvalue()
+
+        url = f"https://api.telegram.org/bot{self.bot_token}/sendPhoto"
+        req = urllib.request.Request(
+            url,
+            data=content_bytes,
+            headers={
+                "Content-Type": f"multipart/form-data; boundary={boundary}",
+                "Content-Length": str(len(content_bytes))
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                res_data = json.loads(resp.read().decode("utf-8"))
+                return bool(res_data.get("ok"))
         except Exception as e:
-            log.warning("Telegram video upload failed: %s", e)
+            log.warning("Telegram photo upload failed: %s", e)
             return False
 
     def start_polling_loop(self):
