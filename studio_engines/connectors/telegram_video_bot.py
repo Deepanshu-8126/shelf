@@ -148,6 +148,10 @@ class TelegramVideoBot:
                 else:
                     log.warning("Telegram API rejected video: %s", res_data)
                     return False
+        except Exception as e:
+            log.warning("Telegram video upload failed: %s", e)
+            return False
+
     def send_photo_file(self, photo_path: Path | str, caption: str = "") -> bool:
         """Uploads high-res product photo directly to Telegram chat."""
         path = Path(photo_path)
