@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-10-07 05:51:08",
+  "total_channels": 7,
+  "grand_total_videos": 50,
+  "grand_total_storage_gb": 0.38,
+  "channels": {
+    "1": {
+      "channel_num": 1,
+      "name": "Channel 1: Viral Facts Shorts",
+      "badge": "🎬 FACTS SHORTS",
+      "format": "9:16 Shorts (30-60s)",
+      "folder": "01_facts_shorts",
+      "total_videos": 2,
+      "total_storage_mb": 6.86,
+      "latest_video": {
+        "name": "35-spaghettification-20261005-210936.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\01_facts_shorts\\output\\35-spaghettification-20261005-210936.mp4",
+        "size_mb": 3.02,
+        "modified": "2026-10-05 21:10:33",
+        "mtime": 1791214833.8865695
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "2": {
+      "channel_num": 2,
+      "name": "Channel 2: Story & Gaming Studio",
+      "badge": "🕹️ STORY STUDIO",
+      "format": "16:9 & 9:16 Stories",
+      "folder": "02_story_studio",
+      "total_videos": 3,
+      "total_storage_mb": 7.4,
+      "latest_video": {
+        "name": "storyboard_preview.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\02_story_studio\\data\\packages\\6fa5bbbe43c9\\storyboard_preview.mp4",
+        "size_mb": 1.0,
+        "modified": "2026-10-05 21:41:36",
+        "mtime": 1791216696.5207777
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "3": {
+      "channel_num": 3,
+      "name": "Channel 3: Vox & Geopolitics Studio",
+      "badge": "🌐 VOX LEDGER",
+      "format": "9:16 & 16:9 Map Docs",
+      "folder": "03_vox_studio",
+      "total_videos": 2,
+      "total_storage_mb": 47.31,
+      "latest_video": {
+        "name": "VOX_BERMUDA_TRIANGLE_MASTER.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\03_vox_studio\\output\\VOX_BERMUDA_TRIANGLE_MASTER.mp4",
+        "size_mb": 23.82,
+        "modified": "2026-10-02 19:45:23",
+        "mtime": 1790950523.0685053
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "4": {
+      "channel_num": 4,
+      "name": "Channel 4: Lofi 24/7 Music Studio",
+      "badge": "☕ LOFI AMBIENT",
+      "format": "16:9 Audio DSP Streams",
+      "folder": "04_lofi_studio",
+      "total_videos": 2,
+      "total_storage_mb": 61.24,
+      "latest_video": {
+        "name": "test_live_rain.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\04_lofi_studio\\output\\live\\rain\\test_live_rain.mp4",
+        "size_mb": 3.51,
+        "modified": "2026-10-02 16:26:02",
+        "mtime": 1790938562.82692
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "5": {
+      "channel_num": 5,
+      "name": "Channel 5: Dark Sutra Crime Studio",
+      "badge": "🕵️ DARK SUTRA",
+      "format": "9:16 & 16:9 True Crime",
+      "folder": "05_dark_sutra",
+      "total_videos": 26,
+      "total_storage_mb": 157.79,
+      "latest_video": {
+        "name": "Jack_the_Ripper_SHORT_MASTER.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\05_dark_sutra\\output\\Jack_the_Ripper_SHORT_MASTER.mp4",
+        "size_mb": 16.14,
+        "modified": "2026-10-06 14:02:11",
+        "mtime": 1791275531.2666512
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "6": {
+      "channel_num": 6,
+      "name": "Channel 6: AI Auto Clipper",
+      "badge": "✂️ AI CLIPPER",
+      "format": "9:16 Viral Cuts",
+      "folder": "06_ai_clipper",
+      "total_videos": 11,
+      "total_storage_mb": 99.03,
+      "latest_video": {
+        "name": "final_sample_factshort_dark_moody.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\06_ai_clipper\\video_use_workspace\\final_sample_factshort_dark_moody.mp4",
+        "size_mb": 5.09,
+        "modified": "2026-10-02 10:48:53",
+        "mtime": 1790918333.1260247
+      },
+      "extra_meta": {},
+      "is_ready": true
+    },
+    "7": {
+      "channel_num": 7,
+      "name": "Channel 7: Coding & Tech Studio",
+      "badge": "💻 CODING STUDIO",
+      "format": "9:16 Line-by-Line IDE",
+      "folder": "07_coding_studio",
+      "total_videos": 4,
+      "total_storage_mb": 8.68,
+      "latest_video": {
+        "name": "day1_two_sum_videosynx_master.mp4",
+        "path": "D:\\facts_yt\\super_youtube_agent\\07_coding_studio\\output\\day1_two_sum_videosynx_master.mp4",
+        "size_mb": 2.21,
+        "modified": "2026-10-06 19:13:47",
+        "mtime": 1791294227.0296526
+      },
+      "extra_meta": {
+        "current_day": 1,
+        "secondary_niche": "java"
+      },
+      "is_ready": true
+    }
+  }
+}
