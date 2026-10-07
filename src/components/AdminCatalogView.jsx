@@ -353,7 +353,6 @@ export default function AdminCatalogView({
              </span>
            </h1>
          </div>
-       </div>
 
          <div className="admin-filters">
            <input 
