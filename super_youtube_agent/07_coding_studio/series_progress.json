@@ -1,0 +1,24 @@
+{
+  "core_series": {
+    "name": "100 DAYS OF PYTHON & DSA",
+    "current_day": 1,
+    "max_days": 100,
+    "playlist_title": "100 Days of Python & Algorithms Series"
+  },
+  "secondary_series": {
+    "active_niche": "java",
+    "niches": [
+      "java",
+      "ai_tools",
+      "sysdesign",
+      "web_backend"
+    ],
+    "niche_index": 0
+  },
+  "history": [],
+  "daily_slots": {
+    "slot_1_morning": "core_series",
+    "slot_2_evening": "secondary_series"
+  },
+  "last_rendered": null
+}

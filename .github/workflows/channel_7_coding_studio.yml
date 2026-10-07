@@ -1,53 +1,55 @@
-name: Channel 7 - Coding & Tech Studio (Developer Hacks & AI)
+name: Channel 7 - Coding Studio (2x Daily Schedule & Telegram Bot)
 
 on:
+  schedule:
+    # Twice Daily Automated Schedule (IST = UTC + 5:30)
+    # 03:30 UTC = 09:00 AM IST (Slot 1: Core 100 Days Python/DSA)
+    - cron: '30 3 * * *'
+    # 11:30 UTC = 05:00 PM IST (Slot 2: Evening Multi-Language Java/AI Tools/DevOps)
+    - cron: '30 11 * * *'
+
   workflow_dispatch:
     inputs:
+      action:
+        description: 'Render Mode'
+        required: true
+        type: choice
+        default: 'next'
+        options:
+          - 'next'
+          - 'auto'
+          - 'niche'
+          - 'topic'
+      niche:
+        description: 'Niche for Multi-Language Slot (if action is niche)'
+        required: false
+        type: choice
+        default: 'java'
+        options:
+          - 'java'
+          - 'ai_tools'
+          - 'sysdesign'
+          - 'web_backend'
+          - 'dsa'
+          - 'python'
       topic:
-        description: 'Custom Coding / Tech Topic (e.g. Python vs Rust, Best VS Code Extensions)'
+        description: 'Custom Coding Topic (if action is topic)'
         required: false
         default: ''
-      script:
-        description: 'Custom Coding Script / Code Walkthrough (Optional)'
-        required: false
-        default: ''
-      duration:
-        description: 'Video Target Duration'
-        required: true
-        type: choice
-        default: 'dynamic'
-        options:
-          - 'dynamic'
-          - '30s'
-          - '40s'
-          - '50s'
-      auto_upload:
-        description: 'Upload to YouTube automatically?'
-        required: true
-        type: boolean
-        default: true
-      privacy:
-        description: 'Video Privacy'
-        required: true
-        type: choice
-        default: 'unlisted'
-        options:
-          - 'unlisted'
-          - 'public'
-          - 'private'
 
 permissions:
   contents: write
 
 jobs:
-  generate_and_upload_coding:
+  render_and_publish_coding:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,40 +57,41 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install FFmpeg and TeX Live
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg texlive-latex-extra texlive-fonts-extra
+      - name: Install FFmpeg & System Fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu-core
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r super_youtube_agent/01_facts_shorts/requirements.txt
-          pip install httpx edge-tts pygments
+          pip install httpx pygments pillow numpy soundfile edge-tts
 
-      - name: Setup YouTube Credentials (Coding Channel)
-        env:
-          YT_TOKEN_CODING_B64: ${{ secrets.YT_TOKEN_CODING_B64 || secrets.YT_TOKEN_B64 }}
-          YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
-        run: |
-          mkdir -p super_youtube_agent/01_facts_shorts/credentials
-          [ -n "$YT_TOKEN_CODING_B64" ] && printf '%s' "$YT_TOKEN_CODING_B64" | base64 -d > super_youtube_agent/01_facts_shorts/credentials/token.json || true
-          [ -n "$YT_CLIENT_B64" ]       && printf '%s' "$YT_CLIENT_B64"       | base64 -d > super_youtube_agent/01_facts_shorts/credentials/client_secret.json || true
-          python3 -c "import json; json.load(open('super_youtube_agent/01_facts_shorts/credentials/token.json')); print('✅ token.json is valid JSON for Coding Channel')" 2>/dev/null || echo "ℹ️ token.json pending"
-
-      - name: Generate Pedagogical Coding Short (Live IDE & Terminal Animation)
+      - name: Run Videosynx Pedagogical Coding Engine
         working-directory: super_youtube_agent/07_coding_studio
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          VOICE_PROVIDER: edge
-          VOICE: en-US-JennyNeural
-          TOPIC_INPUT: ${{ github.event.inputs.topic }}
-          SCRIPT_INPUT: ${{ github.event.inputs.script }}
-          DURATION_INPUT: ${{ github.event.inputs.duration }}
-          AUTO_UPLOAD: ${{ github.event.inputs.auto_upload }}
-          PRIVACY_OPT: ${{ github.event.inputs.privacy || 'unlisted' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
+          ACTION_TYPE: ${{ github.event.inputs.action || 'next' }}
+          NICHE_INPUT: ${{ github.event.inputs.niche || 'java' }}
+          CUSTOM_TOPIC: ${{ github.event.inputs.topic || '' }}
         run: |
-          python main.py --generate
+          if [ "$ACTION_TYPE" = "topic" ] && [ -n "$CUSTOM_TOPIC" ]; then
+            echo "🚀 Rendering Custom Topic: $CUSTOM_TOPIC"
+            python main.py --engine videosynx --topic "$CUSTOM_TOPIC"
+          elif [ "$ACTION_TYPE" = "niche" ]; then
+            echo "☕ Rendering Niche Slot: $NICHE_INPUT"
+            python main.py --engine videosynx --niche "$NICHE_INPUT"
+          elif [ "$ACTION_TYPE" = "auto" ]; then
+            echo "🤖 Rendering Autonomous AI Viral Pick"
+            python main.py --engine videosynx --auto
+          else
+            echo "📅 Rendering Next Scheduled Slot (100 Days Playlist / Evening Rotation)"
+            python main.py --engine videosynx --next
+          fi
 
-      - name: 📱 Send Video Directly to Telegram Phone
+      - name: 📱 Send Video & Metadata to Telegram
         if: always()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
@@ -97,10 +100,19 @@ jobs:
         run: |
           python send_to_telegram.py super_youtube_agent/07_coding_studio/output || true
 
-      - name: Save Rendered Video Artifact
+      - name: 📈 Persist Series Progress State
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add super_youtube_agent/07_coding_studio/series_progress.json
+          git commit -m "chore(progress): update series brain state [skip ci]" || echo "No state changes to commit"
+          git push origin HEAD || true
+
+      - name: 📦 Save Rendered Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: channel-7-coding-rendered-videos
+          name: channel-7-rendered-videos
           path: super_youtube_agent/07_coding_studio/output/*.mp4
           retention-days: 14

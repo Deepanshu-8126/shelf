@@ -596,7 +596,15 @@ async def render_videosynx_short(query: str | None = None) -> Path:
         subprocess.run([sys.executable, str(telegram_script), str(out_mp4)], check=False)
         print("✅ Telegram delivery complete!")
 
+    # 6. Record Progress in Series Brain
+    try:
+        from series_progress_tracker import advance_and_record_render
+        advance_and_record_render(lesson, out_mp4)
+    except Exception as e:
+        print(f"⚠️ [Series Tracker] Progress update error: {e}")
+
     return out_mp4
+
 
 
 if __name__ == "__main__":
