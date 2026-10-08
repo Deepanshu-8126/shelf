@@ -17,6 +17,8 @@
     "http://localhost:8787/*",
     "http://127.0.0.1:8787/*",
     "https://*.meesho.com/*",
+    "https://*.pinterest.com/*",
+    "https://*.pinimg.com/*",
     "https://api.telegram.org/*"
   ]
 }

@@ -609,7 +609,7 @@ function scrapeSingleProductPageDOM() {
   let price = 0;
   let old_price = 0;
 
-  const priceEls = Array.from(document.querySelectorAll("h4, span, div")).filter(el => /₹\s*[\d,]+//.test(el.innerText || ""));
+  const priceEls = Array.from(document.querySelectorAll("h4, span, div")).filter(el => /₹\s*[\d,]+/.test(el.innerText || ""));
   if (priceEls.length > 0) {
     price = parseInt(priceEls[0].innerText.replace(/[^\d]/g, ""), 10) || 399;
   }
