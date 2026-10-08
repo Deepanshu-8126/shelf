@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Shelf. All-in-One Creator Suite",
+  "version": "2.0.0",
+  "description": "Unified Master Suite: 1-Click Product Clipper, Page CSV Scraper, Affiliate Link Batcher, and AI Veo Reels Studio for Meesho.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "clipboardWrite"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Shelf. Creator Suite"
+  },
+  "host_permissions": [
+    "http://localhost:8787/*",
+    "http://127.0.0.1:8787/*",
+    "https://*.meesho.com/*",
+    "https://api.telegram.org/*"
+  ]
+}

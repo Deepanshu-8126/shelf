@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shelf. Creator Suite</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-row">
+        <div class="brand-badge">
+          <span class="brand-logo">🧊</span>
+          <div class="brand-info">
+            <span class="brand-name">shelf.</span>
+            <span class="suite-tag">CREATOR SUITE v2.0</span>
+          </div>
+        </div>
+        <div class="status-indicator">
+          <span class="status-dot live"></span>
+          <span class="status-text">AI STUDIO READY</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="clipper">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-label">1-Click Clip</span>
+        </button>
+        <button class="nav-tab" data-tab="scraper">
+          <span class="tab-icon">📊</span>
+          <span class="tab-label">Bulk Scraper</span>
+        </button>
+        <button class="nav-tab" data-tab="batcher">
+          <span class="tab-icon">🔗</span>
+          <span class="tab-label">Affiliate Linker</span>
+        </button>
+        <button class="nav-tab" data-tab="studio">
+          <span class="tab-icon">🎬</span>
+          <span class="tab-label">Veo 3.1 Studio</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-body">
+      <!-- TAB 1: 1-CLICK CLIPPER -->
+      <section id="tab-clipper" class="tab-content active">
+        <div class="action-card auto-detect-card">
+          <button id="clip-active-btn" class="btn-primary glow-pink">
+            <span class="btn-icon">⚡</span>
+            <span>Clip Current Product</span>
+          </button>
+          <div id="clipper-status" class="status-pill info">Open a Meesho product page & click Clip</div>
+        </div>
+
+        <div id="clipper-preview" class="product-preview-card" style="display: none;">
+          <div class="preview-media">
+            <img id="prev-img" src="" alt="Product Preview" class="preview-img">
+            <span id="prev-discount" class="discount-pill">65% OFF</span>
+          </div>
+          <div class="preview-details">
+            <h3 id="prev-title" class="product-title">Product Title</h3>
+            <div class="price-row">
+              <span id="prev-price" class="current-price">₹399</span>
+              <span id="prev-mrp" class="old-mrp">₹1,199</span>
+              <span id="prev-rating" class="rating-badge">⭐ 4.5</span>
+            </div>
+            <div class="detail-tags">
+              <span id="prev-id" class="code-tag">ID: -</span>
+              <span id="prev-commission" class="commission-tag">15% Comm. (~₹60)</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="clipper-actions" class="button-group" style="display: none;">
+          <button id="save-storefront-btn" class="btn-action btn-storefront">
+            <span>🛍️ Save to Shelf Storefront</span>
+          </button>
+          <button id="send-telegram-btn" class="btn-action btn-telegram">
+            <span>📱 Push to Telegram Bot</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 2: PAGE BULK SCRAPER -->
+      <section id="tab-scraper" class="tab-content">
+        <div class="action-card">
+          <div class="card-header">
+            <h4>Bulk Category & Search Scraper</h4>
+            <span class="sub-text">Scrapes all listings from current Meesho page into CSV</span>
+          </div>
+          <button id="scrape-page-btn" class="btn-primary glow-sky">
+            <span class="btn-icon">🔍</span>
+            <span>Scrape Current Meesho Page</span>
+          </button>
+          <div id="scraper-status" class="status-pill info">Navigate to any Meesho category/search page</div>
+        </div>
+
+        <div id="scraper-results" class="results-box" style="display: none;">
+          <div class="results-summary">
+            <span id="scraped-count-pill" class="badge-sky">0 Products Found</span>
+            <span class="sub-text">Images & ratings auto-extracted</span>
+          </div>
+          <textarea id="scraper-csv-text" class="csv-preview" readonly placeholder="CSV preview will appear here..."></textarea>
+          <div class="button-group">
+            <button id="copy-csv-btn" class="btn-secondary">
+              <span>📋 Copy CSV</span>
+            </button>
+            <button id="download-csv-btn" class="btn-secondary glow-green">
+              <span>📥 Download CSV</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: AFFILIATE LINK BATCHER -->
+      <section id="tab-batcher" class="tab-content">
+        <div class="action-card">
+          <div class="card-header">
+            <h4>Creator Affiliate Link Generator</h4>
+            <span class="sub-text">Official pattern: <code>af_invite/374453404:...</code></span>
+          </div>
+          <textarea id="batch-urls-input" class="text-input" rows="4" placeholder="Paste Meesho product URLs (one per line)..."></textarea>
+          <button id="generate-links-btn" class="btn-primary glow-purple">
+            <span class="btn-icon">🔗</span>
+            <span>Generate Tracking Links</span>
+          </button>
+        </div>
+
+        <div id="batcher-results" class="results-box" style="display: none;">
+          <textarea id="batch-links-output" class="csv-preview" readonly></textarea>
+          <div class="button-group">
+            <button id="copy-links-btn" class="btn-secondary">
+              <span>📋 Copy All Links</span>
+            </button>
+            <button id="download-links-btn" class="btn-secondary glow-green">
+              <span>📥 Export CSV</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: VEO 3.1 AI REELS STUDIO -->
+      <section id="tab-studio" class="tab-content">
+        <div class="action-card">
+          <div class="card-header">
+            <h4>Google Veo 3.1 Full-Motion Studio</h4>
+            <span class="sub-text">21yo Indian Creator · 1080x1920 60fps · Pure Cinematic</span>
+          </div>
+
+          <div class="studio-preset-selector">
+            <label class="preset-label">Select Video Mode:</label>
+            <div class="preset-buttons">
+              <button class="preset-btn active" data-mode="unboxing">📦 POV Unboxing</button>
+              <button class="preset-btn" data-mode="tryon">💃 Model Try-On</button>
+              <button class="preset-btn" data-mode="haul">🛏️ Multi-Haul</button>
+            </div>
+          </div>
+
+          <button id="trigger-veo-btn" class="btn-primary glow-rose">
+            <span class="btn-icon">🎬</span>
+            <span>Generate & Push Reel (Google Veo)</span>
+          </button>
+          <div id="studio-status" class="status-pill info">Uses connected @Bbyjihotbot Telegram bot</div>
+        </div>
+
+        <div id="studio-progress" class="studio-status-box" style="display: none;">
+          <div class="spinner-row">
+            <span class="loader-spinner"></span>
+            <span id="studio-stage-text">Connecting to Google Flow Studio...</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="studio-progress-bar" class="progress-bar-fill" style="width: 30%;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="footer-dot"></span>
+        <span class="footer-text">Bot: <b>@Bbyjihotbot</b> · ID: <b>374453404</b></span>
+      </div>
+      <a href="http://localhost:8787" target="_blank" class="footer-link">Open Storefront ↗</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
