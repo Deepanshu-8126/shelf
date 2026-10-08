@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shelf. Creator Suite</title>
+  <title>Shelf. All-in-One Creator Suite</title>
   <link rel="stylesheet" href="popup.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-container">
@@ -15,31 +15,31 @@
     <header class="app-header">
       <div class="brand-row">
         <div class="brand-badge">
-          <span class="brand-logo">🧊</span>
+          <div class="brand-logo-cube">🧊</div>
           <div class="brand-info">
             <span class="brand-name">shelf.</span>
-            <span class="suite-tag">CREATOR SUITE v2.0</span>
+            <span class="suite-tag">ALL-IN-ONE CREATOR PRO</span>
           </div>
         </div>
         <div class="status-indicator">
           <span class="status-dot live"></span>
-          <span class="status-text">AI STUDIO READY</span>
+          <span class="status-text">BOT CONNECTED</span>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
       <nav class="nav-tabs">
-        <button class="nav-tab active" data-tab="clipper">
+        <button class="nav-tab active" data-tab="picker">
+          <span class="tab-icon">✨</span>
+          <span class="tab-label">Visual Picker</span>
+        </button>
+        <button class="nav-tab" data-tab="clipper">
           <span class="tab-icon">⚡</span>
           <span class="tab-label">1-Click Clip</span>
         </button>
-        <button class="nav-tab" data-tab="scraper">
-          <span class="tab-icon">📊</span>
-          <span class="tab-label">Bulk Scraper</span>
-        </button>
         <button class="nav-tab" data-tab="batcher">
           <span class="tab-icon">🔗</span>
-          <span class="tab-label">Affiliate Linker</span>
+          <span class="tab-label">Link Batcher</span>
         </button>
         <button class="nav-tab" data-tab="studio">
           <span class="tab-icon">🎬</span>
@@ -50,14 +50,70 @@
 
     <!-- Main Content Area -->
     <main class="app-body">
-      <!-- TAB 1: 1-CLICK CLIPPER -->
-      <section id="tab-clipper" class="tab-content active">
+      <!-- ========================================== -->
+      <!-- TAB 1: VISUAL PICKER (PINTEREST & MEESHO)  -->
+      <!-- ========================================== -->
+      <section id="tab-picker" class="tab-content active">
+        <div class="action-card">
+          <div class="card-header">
+            <div class="title-with-pill">
+              <h4>Visual Grid Selector</h4>
+              <span id="detected-platform-badge" class="platform-badge meesho">Meesho / Pinterest</span>
+            </div>
+            <span class="sub-text">Select items directly with checkboxes to save or push to Telegram</span>
+          </div>
+
+          <div class="picker-controls-row">
+            <button id="scan-page-btn" class="btn-primary glow-pink">
+              <span class="btn-icon">🔍</span>
+              <span id="scan-btn-text">Scan & Auto-Scroll Page</span>
+            </button>
+          </div>
+
+          <div id="picker-status" class="status-pill info">Open Pinterest or Meesho & click Scan</div>
+        </div>
+
+        <!-- Visual Grid Container -->
+        <div id="visual-grid-section" class="visual-section" style="display: none;">
+          <!-- Selection Toolbar -->
+          <div class="selection-toolbar">
+            <div class="select-actions">
+              <button id="select-all-btn" class="btn-tiny">Select All</button>
+              <button id="deselect-all-btn" class="btn-tiny">Deselect All</button>
+            </div>
+            <span id="selection-counter-badge" class="count-badge">0 / 0 Selected</span>
+          </div>
+
+          <!-- Cards Grid -->
+          <div id="visual-cards-grid" class="cards-grid">
+            <!-- Injected dynamically by JS -->
+          </div>
+
+          <!-- Bulk Action Bar -->
+          <div class="bulk-action-bar">
+            <button id="bulk-save-shelf-btn" class="btn-action btn-storefront">
+              <span>🛍️ Save Selected to Shelf</span>
+            </button>
+            <button id="bulk-push-tg-btn" class="btn-action btn-telegram">
+              <span>📱 Push to Telegram</span>
+            </button>
+            <button id="bulk-export-csv-btn" class="btn-action btn-csv">
+              <span>📥 Export CSV</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: 1-CLICK CLIPPER (SINGLE ITEM DEEP)  -->
+      <!-- ========================================== -->
+      <section id="tab-clipper" class="tab-content">
         <div class="action-card auto-detect-card">
           <button id="clip-active-btn" class="btn-primary glow-pink">
             <span class="btn-icon">⚡</span>
-            <span>Clip Current Product</span>
+            <span>Clip Current Product Page</span>
           </button>
-          <div id="clipper-status" class="status-pill info">Open a Meesho product page & click Clip</div>
+          <div id="clipper-status" class="status-pill info">Auto-detecting active product details...</div>
         </div>
 
         <div id="clipper-preview" class="product-preview-card" style="display: none;">
@@ -76,6 +132,7 @@
               <span id="prev-id" class="code-tag">ID: -</span>
               <span id="prev-commission" class="commission-tag">15% Comm. (~₹60)</span>
             </div>
+            <div id="prev-sizes-container" class="sizes-row"></div>
           </div>
         </div>
 
@@ -89,43 +146,14 @@
         </div>
       </section>
 
-      <!-- TAB 2: PAGE BULK SCRAPER -->
-      <section id="tab-scraper" class="tab-content">
-        <div class="action-card">
-          <div class="card-header">
-            <h4>Bulk Category & Search Scraper</h4>
-            <span class="sub-text">Scrapes all listings from current Meesho page into CSV</span>
-          </div>
-          <button id="scrape-page-btn" class="btn-primary glow-sky">
-            <span class="btn-icon">🔍</span>
-            <span>Scrape Current Meesho Page</span>
-          </button>
-          <div id="scraper-status" class="status-pill info">Navigate to any Meesho category/search page</div>
-        </div>
-
-        <div id="scraper-results" class="results-box" style="display: none;">
-          <div class="results-summary">
-            <span id="scraped-count-pill" class="badge-sky">0 Products Found</span>
-            <span class="sub-text">Images & ratings auto-extracted</span>
-          </div>
-          <textarea id="scraper-csv-text" class="csv-preview" readonly placeholder="CSV preview will appear here..."></textarea>
-          <div class="button-group">
-            <button id="copy-csv-btn" class="btn-secondary">
-              <span>📋 Copy CSV</span>
-            </button>
-            <button id="download-csv-btn" class="btn-secondary glow-green">
-              <span>📥 Download CSV</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 3: AFFILIATE LINK BATCHER -->
+      <!-- ========================================== -->
+      <!-- TAB 3: AFFILIATE LINK BATCHER              -->
+      <!-- ========================================== -->
       <section id="tab-batcher" class="tab-content">
         <div class="action-card">
           <div class="card-header">
             <h4>Creator Affiliate Link Generator</h4>
-            <span class="sub-text">Official pattern: <code>af_invite/374453404:...</code></span>
+            <span class="sub-text">Format: <code>af_invite/374453404:youtube_long_form:12492338</code></span>
           </div>
           <textarea id="batch-urls-input" class="text-input" rows="4" placeholder="Paste Meesho product URLs (one per line)..."></textarea>
           <button id="generate-links-btn" class="btn-primary glow-purple">
@@ -147,28 +175,31 @@
         </div>
       </section>
 
-      <!-- TAB 4: VEO 3.1 AI REELS STUDIO -->
+      <!-- ========================================== -->
+      <!-- TAB 4: VEO 3.1 AI REELS STUDIO             -->
+      <!-- ========================================== -->
       <section id="tab-studio" class="tab-content">
         <div class="action-card">
           <div class="card-header">
             <h4>Google Veo 3.1 Full-Motion Studio</h4>
-            <span class="sub-text">21yo Indian Creator · 1080x1920 60fps · Pure Cinematic</span>
+            <span class="sub-text">21yo Indian Model · 1080x1920 60fps · Zero 2D Fake Banners</span>
           </div>
 
           <div class="studio-preset-selector">
-            <label class="preset-label">Select Video Mode:</label>
+            <label class="preset-label">Select Video Concept:</label>
             <div class="preset-buttons">
               <button class="preset-btn active" data-mode="unboxing">📦 POV Unboxing</button>
               <button class="preset-btn" data-mode="tryon">💃 Model Try-On</button>
-              <button class="preset-btn" data-mode="haul">🛏️ Multi-Haul</button>
+              <button class="preset-btn" data-mode="lookbook">✨ Viral Lookbook</button>
+              <button class="preset-btn" data-mode="fabric">🔍 Fabric Detail</button>
             </div>
           </div>
 
           <button id="trigger-veo-btn" class="btn-primary glow-rose">
             <span class="btn-icon">🎬</span>
-            <span>Generate & Push Reel (Google Veo)</span>
+            <span>Generate & Push Reel (Google Veo 3.1)</span>
           </button>
-          <div id="studio-status" class="status-pill info">Uses connected @Bbyjihotbot Telegram bot</div>
+          <div id="studio-status" class="status-pill info">Direct dispatch to @Bbyjihotbot & Instagram Autopilot</div>
         </div>
 
         <div id="studio-progress" class="studio-status-box" style="display: none;">
@@ -187,9 +218,9 @@
     <footer class="app-footer">
       <div class="footer-left">
         <span class="footer-dot"></span>
-        <span class="footer-text">Bot: <b>@Bbyjihotbot</b> · ID: <b>374453404</b></span>
+        <span class="footer-text">Bot: <b>@Bbyjihotbot</b> · Aff ID: <b>374453404</b></span>
       </div>
-      <a href="http://localhost:8787" target="_blank" class="footer-link">Open Storefront ↗</a>
+      <a href="http://localhost:8787" target="_blank" class="footer-link">Open Shelf Storefront ↗</a>
     </footer>
   </div>
 
