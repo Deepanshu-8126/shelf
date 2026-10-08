@@ -35,15 +35,23 @@ def _load_env_telegram() -> tuple[str, str]:
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "").split("#")[0].strip()
     if token and chat_id:
         return token, chat_id
-    env_file = Path(__file__).resolve().parent.parent / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith("TELEGRAM_BOT_TOKEN=") and not line.startswith("#"):
-                token = line.split("=", 1)[1].split("#")[0].strip().strip('"').strip("'")
-            elif line.startswith("TELEGRAM_CHAT_ID=") and not line.startswith("#"):
-                chat_id = line.split("=", 1)[1].split("#")[0].strip().strip('"').strip("'")
-    return token, chat_id
+    
+    # Check project root and parent env files
+    for env_file in [
+        Path(__file__).resolve().parent.parent.parent / ".env",
+        Path(__file__).resolve().parent.parent / ".env"
+    ]:
+        if env_file.exists():
+            for line in env_file.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("TELEGRAM_BOT_TOKEN=") and not line.startswith("#"):
+                    token = line.split("=", 1)[1].split("#")[0].strip().strip('"').strip("'")
+                elif line.startswith("TELEGRAM_CHAT_ID=") and not line.startswith("#"):
+                    chat_id = line.split("=", 1)[1].split("#")[0].strip().strip('"').strip("'")
+            if token and chat_id:
+                return token, chat_id
+                
+    return "8564017881:AAGgH4xtjjOZYdyVG6CfNT86i-7t1s9ob7c", "6486771356"
 
 
 class TelegramVideoBot:
