@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
   <title>Shelf. All-in-One Creator Suite</title>
   <link rel="stylesheet" href="popup.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,20 +58,30 @@
         <div class="action-card">
           <div class="card-header">
             <div class="title-with-pill">
-              <h4>Visual Grid Selector</h4>
-              <span id="detected-platform-badge" class="platform-badge meesho">Meesho / Pinterest</span>
+              <h4>Visual Grid Selector & Variations</h4>
+              <span id="detected-platform-badge" class="platform-badge meesho">Meesho Active</span>
             </div>
-            <span class="sub-text">Select items directly with checkboxes to save or push to Telegram</span>
+            <span class="sub-text">Choose scroll depth, extract all outfits with sizes & variations, then select what to keep.</span>
+          </div>
+
+          <!-- Auto-Scroll Depth Controls -->
+          <div class="scroll-control-box">
+            <label class="control-label">Scroll Depth:</label>
+            <div class="scroll-pills">
+              <button class="scroll-pill" data-scrolls="1">⚡ 1x (~15 items)</button>
+              <button class="scroll-pill active" data-scrolls="3">📜 3x (~35 items)</button>
+              <button class="scroll-pill" data-scrolls="6">🚀 6x (~60+ items)</button>
+            </div>
           </div>
 
           <div class="picker-controls-row">
             <button id="scan-page-btn" class="btn-primary glow-pink">
               <span class="btn-icon">🔍</span>
-              <span id="scan-btn-text">Scan & Auto-Scroll Page</span>
+              <span id="scan-btn-text">Start Auto-Scroll & Scan Page</span>
             </button>
           </div>
 
-          <div id="picker-status" class="status-pill info">Open Pinterest or Meesho & click Scan</div>
+          <div id="picker-status" class="status-pill info">Open Meesho or Pinterest page & click Scan</div>
         </div>
 
         <!-- Visual Grid Container -->
@@ -78,8 +89,8 @@
           <!-- Selection Toolbar -->
           <div class="selection-toolbar">
             <div class="select-actions">
-              <button id="select-all-btn" class="btn-tiny">Select All</button>
-              <button id="deselect-all-btn" class="btn-tiny">Deselect All</button>
+              <button id="select-all-btn" class="btn-tiny">✓ Select All</button>
+              <button id="deselect-all-btn" class="btn-tiny">✕ Deselect All</button>
             </div>
             <span id="selection-counter-badge" class="count-badge">0 / 0 Selected</span>
           </div>
@@ -92,10 +103,10 @@
           <!-- Bulk Action Bar -->
           <div class="bulk-action-bar">
             <button id="bulk-save-shelf-btn" class="btn-action btn-storefront">
-              <span>🛍️ Save Selected to Shelf</span>
+              <span>🛍️ Save to Shelf</span>
             </button>
             <button id="bulk-push-tg-btn" class="btn-action btn-telegram">
-              <span>📱 Push to Telegram</span>
+              <span>📱 Push to Bot</span>
             </button>
             <button id="bulk-export-csv-btn" class="btn-action btn-csv">
               <span>📥 Export CSV</span>
@@ -118,7 +129,7 @@
 
         <div id="clipper-preview" class="product-preview-card" style="display: none;">
           <div class="preview-media">
-            <img id="prev-img" src="" alt="Product Preview" class="preview-img">
+            <img id="prev-img" src="" alt="Product Preview" class="preview-img" referrerpolicy="no-referrer">
             <span id="prev-discount" class="discount-pill">65% OFF</span>
           </div>
           <div class="preview-details">

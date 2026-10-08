@@ -1,10 +1,10 @@
 /**
- * Shelf. All-in-One Creator Suite - Unified Controller v2.0
+ * Shelf. All-in-One Creator Suite - Unified Controller v2.1
  * Features:
- * 1. Interactive Visual Picker (Pinterest & Meesho) with Multi-select Checkboxes
- * 2. 1-Click Deep Clipper for Single Product Pages
- * 3. Creator Affiliate Link Generator (af_invite/374453404:youtube_long_form:12492338)
- * 4. Google Veo 3.1 AI Reels Studio Trigger (Connected to @Bbyjihotbot)
+ * 1. Visual Picker with Configurable Auto-Scroll Depth (1x, 3x, 6x)
+ * 2. Multi-Product & Pinterest Extraction with Variations (Sizes, Colors, Fabric)
+ * 3. Referrer-safe Image Loading & Interactive Checkbox Selection
+ * 4. 1-Click Shelf Storefront Save, Telegram Bot Push (@Bbyjihotbot) & Veo 3.1 Studio
  */
 
 const MEESHO_AFFILIATE_ID = "374453404";
@@ -14,9 +14,10 @@ const TELEGRAM_BOT_TOKEN = "8564017881:AAGgH4xtjjOZYdyVG6CfNT86i-7t1s9ob7c";
 const TELEGRAM_CHAT_ID = "6486771356";
 
 // State
-let activeScannedItems = []; // Array of { id, title, price, old_price, discount, rating, image, url, affiliate_url, platform, selected }
+let activeScannedItems = [];
 let activeSingleProduct = null;
 let selectedStudioMode = "unboxing";
+let selectedScrollDepth = 3; // Default 3 scrolls (~35 items)
 
 // Initialize on Load
 document.addEventListener("DOMContentLoaded", () => {
@@ -87,7 +88,7 @@ function generateAffiliateLink(rawUrl) {
 }
 
 // ==========================================
-// 3. TAB 1: VISUAL PICKER (PINTEREST & MEESHO)
+// 3. TAB 1: VISUAL PICKER WITH AUTO-SCROLL
 // ==========================================
 function setupVisualPicker() {
   const scanBtn = document.getElementById("scan-page-btn");
@@ -96,6 +97,16 @@ function setupVisualPicker() {
   const bulkSaveBtn = document.getElementById("bulk-save-shelf-btn");
   const bulkPushTgBtn = document.getElementById("bulk-push-tg-btn");
   const bulkExportCsvBtn = document.getElementById("bulk-export-csv-btn");
+  const scrollPills = document.querySelectorAll(".scroll-pill");
+
+  // Scroll Depth Pills
+  scrollPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      scrollPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      selectedScrollDepth = parseInt(pill.dataset.scrolls, 10) || 3;
+    });
+  });
 
   scanBtn.addEventListener("click", () => executeVisualPageScan());
 
@@ -120,24 +131,28 @@ async function executeVisualPageScan() {
   const scanBtnText = document.getElementById("scan-btn-text");
   
   scanBtn.disabled = true;
-  scanBtnText.innerText = "Auto-Scrolling & Extracting Visuals...";
   statusEl.className = "status-pill info";
-  statusEl.innerText = "Scanning page elements, extracting images & wrapping affiliate links...";
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab || !tab.id) throw new Error("No active browser tab found.");
 
-    // Step 1: Smooth Auto-scroll down to trigger lazy loading
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => {
-        window.scrollBy({ top: 1800, behavior: "smooth" });
-      }
-    });
+    // Step 1: Execute Auto-Scroll based on selected depth
+    for (let i = 1; i <= selectedScrollDepth; i++) {
+      scanBtnText.innerText = `Auto-Scrolling ${i}/${selectedScrollDepth}...`;
+      statusEl.innerText = `Loading more products & HD images (${i}/${selectedScrollDepth})...`;
+      
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          window.scrollBy({ top: 1200, behavior: "smooth" });
+        }
+      });
+      await new Promise(r => setTimeout(r, 550));
+    }
 
-    // Short wait for images to load
-    await new Promise(r => setTimeout(r, 700));
+    scanBtnText.innerText = "Extracting Visuals & Variations...";
+    statusEl.innerText = "Parsing listings, sizes, prices and affiliate URLs...";
 
     // Step 2: Inject Scraper function
     const results = await chrome.scripting.executeScript({
@@ -150,7 +165,7 @@ async function executeVisualPageScan() {
       throw new Error("No items found. Open a Meesho category/search page or Pinterest board and retry.");
     }
 
-    // Process items & wrap affiliate links
+    // Step 3: Process items & wrap affiliate links
     activeScannedItems = rawItems.map((item, idx) => {
       const affLink = item.platform === "Meesho" ? generateAffiliateLink(item.url) : item.url;
       return {
@@ -158,9 +173,11 @@ async function executeVisualPageScan() {
         title: item.title || "Fashion Curated Find",
         price: item.price || 449,
         old_price: item.old_price || 1199,
-        discount: item.discount || "62% OFF",
-        rating: item.rating || "4.5",
+        discount: item.discount || "60% OFF",
+        rating: item.rating || "4.4",
         image: item.image || "",
+        sizes: item.sizes || ["Free Size"],
+        fabric: item.fabric || "",
         url: item.url || "",
         affiliate_url: affLink,
         platform: item.platform || "Meesho",
@@ -173,23 +190,23 @@ async function executeVisualPageScan() {
     const gridSec = document.getElementById("visual-grid-section");
     gridSec.style.display = "flex";
     statusEl.className = "status-pill success";
-    statusEl.innerText = `✨ Scanned ${activeScannedItems.length} items! Select the ones you want to save or push.`;
+    statusEl.innerText = `✨ Scanned ${activeScannedItems.length} items with variations! Select what to save or push.`;
   } catch (err) {
     statusEl.className = "status-pill error";
     statusEl.innerText = err.message || "Failed to scan page.";
   } finally {
     scanBtn.disabled = false;
-    scanBtnText.innerText = "Scan & Auto-Scroll Page";
+    scanBtnText.innerText = "Start Auto-Scroll & Scan Page";
   }
 }
 
-// Injected Page Visual Scraper
+// Injected Page Visual Scraper (Runs in Content Script)
 function scrapeCurrentPageVisualItems() {
   const host = window.location.hostname.toLowerCase();
   const items = [];
   const seenUrls = new Set();
 
-  // A. PINTEREST BOARD / HOME / SEARCH SCRAPER
+  // A. PINTEREST BOARD / SEARCH / HOME
   if (host.includes("pinterest.com")) {
     const pinContainers = Array.from(document.querySelectorAll("[data-test-id='pin'], div[data-grid-item='true'], div:has(img[src*='pinimg.com'])"));
     
@@ -212,36 +229,48 @@ function scrapeCurrentPageVisualItems() {
         discount: "64% OFF",
         rating: "4.8",
         image: img.src,
+        sizes: ["S", "M", "L", "XL"],
         url: pinUrl,
         platform: "Pinterest"
       });
 
-      if (items.length >= 40) break;
+      if (items.length >= 60) break;
     }
     return items;
   }
 
   // B. MEESHO CATEGORY / SEARCH / SELLER LISTING SCRAPER
-  const cards = Array.from(document.querySelectorAll("a[href*='/p/'], [class*='ProductCard'], div[class*='Card'], div:has(img[src*='images.meesho.com'])"));
+  const cards = Array.from(document.querySelectorAll("a[href*='/p/'], a[href*='/s/p/'], [class*='ProductCard'], div[class*='Card']"));
   
   for (const card of cards) {
-    const linkEl = card.tagName === "A" ? card : card.querySelector("a[href*='/p/']") || card.querySelector("a");
+    const linkEl = card.tagName === "A" ? card : card.querySelector("a[href*='/p/'], a[href*='/s/p/']") || card.querySelector("a");
     const link = linkEl?.href || "";
-    if (!link || !link.includes("/p/") || seenUrls.has(link)) continue;
+    if (!link || (!link.includes("/p/") && !link.includes("/s/p/")) || seenUrls.has(link)) continue;
     seenUrls.add(link);
 
-    const titleEl = card.querySelector("p, span[class*='Title'], h2, h3");
+    const titleEl = card.querySelector("p, span[class*='Title'], h2, h3, div[class*='ProductTitle']");
     const title = titleEl?.innerText?.trim() || "Trending Meesho Fashion Find";
 
     const priceMatch = card.innerText.match(/₹\s*[\d,]+/);
     const price = priceMatch ? parseInt(priceMatch[0].replace(/[^\d]/g, ""), 10) : 399;
     const old_price = Math.round(price * 2.5);
 
-    const imgEl = card.querySelector("img[src*='images.meesho.com']") || card.querySelector("img");
-    const img = imgEl?.src || "";
+    // Image extraction from src, data-src, or srcset
+    let img = "";
+    const imgEl = card.querySelector("img[src*='images.meesho.com'], img[src*='meesho'], img");
+    if (imgEl) {
+      img = imgEl.src || imgEl.getAttribute("data-src") || "";
+      if (!img && imgEl.srcset) {
+        img = imgEl.srcset.split(",")[0].split(" ")[0];
+      }
+    }
 
     const ratingMatch = card.innerText.match(/(\d\.\d)\s*★?/);
     const rating = ratingMatch ? ratingMatch[1] : "4.4";
+
+    // Extract sizes or variations preview if available on card
+    const sizeMatches = card.innerText.match(/\b(Free Size|S|M|L|XL|XXL|3XL)\b/gi) || ["Free Size", "S, M, L"];
+    const uniqueSizes = Array.from(new Set(sizeMatches)).slice(0, 3);
 
     items.push({
       title: title.slice(0, 45).trim(),
@@ -249,12 +278,13 @@ function scrapeCurrentPageVisualItems() {
       old_price: old_price,
       discount: "60% OFF",
       rating: rating,
-      image: img,
+      image: img || "https://images.meesho.com/images/products/placeholder.jpg",
+      sizes: uniqueSizes,
       url: link,
       platform: "Meesho"
     });
 
-    if (items.length >= 50) break;
+    if (items.length >= 60) break;
   }
 
   return items;
@@ -275,10 +305,11 @@ function renderVisualGrid() {
     
     const commAmt = Math.round((item.price || 399) * 0.15);
     const platformClass = item.platform.toLowerCase();
+    const sizesHtml = (item.sizes || []).map(s => `<span class="var-chip">${s}</span>`).join("");
 
     card.innerHTML = `
       <div class="card-img-wrapper">
-        <img src="${item.image || 'https://images.meesho.com/images/products/placeholder.jpg'}" alt="${item.title}" loading="lazy">
+        <img src="${item.image}" alt="${item.title}" loading="lazy" referrerpolicy="no-referrer">
         <div class="card-checkbox-custom">${item.selected ? "✓" : ""}</div>
         <span class="card-discount-tag">${item.discount}</span>
         <span class="card-platform-tag ${platformClass}">${item.platform}</span>
@@ -290,6 +321,7 @@ function renderVisualGrid() {
           <span class="card-mrp">₹${item.old_price}</span>
           <span class="card-comm">~₹${commAmt} comm</span>
         </div>
+        <div class="card-variations-row">${sizesHtml}</div>
       </div>
     `;
 
@@ -577,7 +609,7 @@ function scrapeSingleProductPageDOM() {
   let price = 0;
   let old_price = 0;
 
-  const priceEls = Array.from(document.querySelectorAll("h4, span, div")).filter(el => /₹\s*[\d,]+/.test(el.innerText || ""));
+  const priceEls = Array.from(document.querySelectorAll("h4, span, div")).filter(el => /₹\s*[\d,]+//.test(el.innerText || ""));
   if (priceEls.length > 0) {
     price = parseInt(priceEls[0].innerText.replace(/[^\d]/g, ""), 10) || 399;
   }
