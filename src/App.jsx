@@ -11,7 +11,6 @@ const ImporterPanel = React.lazy(() => import('./components/ImporterPanel.jsx'))
 const IngestInboxView = React.lazy(() => import('./components/IngestInboxView.jsx'));
 const AdminCatalogView = React.lazy(() => import('./components/AdminCatalogView.jsx'));
 const AdminBannersManager = React.lazy(() => import('./components/AdminBannersManager.jsx'));
-const AIMediaStudioView = React.lazy(() => import('./components/AIMediaStudioView.jsx'));
 const VeoVideoStudioView = React.lazy(() => import('./components/VeoVideoStudioView.jsx'));
 const AdminCustomerOrdersView = React.lazy(() => import('./components/AdminCustomerOrdersView.jsx'));
 const WishlinkView = React.lazy(() => import('./components/WishlinkView.jsx'));
@@ -33,7 +32,6 @@ const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },
   { label: 'Customer Orders', icon: 'check' },
   { label: 'Veo Video Studio', icon: 'sparkles' },
-  { label: 'AI Media Studio', icon: 'sparkles' },
   { label: 'Wishlink Haul', icon: 'link' },
   { label: 'Ingest Inbox', icon: 'download' },
   { label: 'Master Catalog', icon: 'products' },
@@ -365,13 +363,7 @@ function DashboardView({
           >
             <Icon name="eye" size={16} /> View Storefront
           </button>
-          <button
-            type="button"
-            className="button button-light dashboard-header-action-btn"
-            onClick={() => onNavigate?.('AI Media Studio')}
-          >
-            <span>📸</span> Launch AI Studio
-          </button>
+
         </div>
       </div>
 
@@ -1576,7 +1568,7 @@ const HASH_TO_PAGE = {
   '#admin/collections': { page: 'Collections', isPublic: false },
   '#admin/veo': { page: 'Veo Video Studio', isPublic: false },
   '#admin/video': { page: 'Veo Video Studio', isPublic: false },
-  '#admin/studio': { page: 'AI Media Studio', isPublic: false },
+  
   '#admin/wishlink': { page: 'Wishlink Haul', isPublic: false },
   '#admin/pinterest': { page: 'Pinterest Traffic Hub', isPublic: false },
   '#admin/analytics': { page: 'Analytics', isPublic: false },
@@ -1596,7 +1588,7 @@ const PAGE_TO_HASH = {
   'Master Catalog': '#admin/catalog',
   'Products': '#admin/catalog',
   'Collections': '#admin/collections',
-  'AI Media Studio': '#admin/studio',
+  
   'Wishlink Haul': '#admin/wishlink',
   'Wishlink': '#wishlink',
   'Pinterest Traffic Hub': '#admin/pinterest',
@@ -2414,29 +2406,7 @@ export default function App() {
               }}
             />
           )}
-          {activePage === 'AI Media Studio' && (
-            <AIMediaStudioView
-              products={products}
-              onToast={showToast}
-              onUpdateProduct={async (id, updates) => {
-                const existing = products.find((p) => String(p.id) === String(id));
-                if (!existing) return;
-                const nextProduct = { ...existing, ...updates };
-                try {
-                  const res = await fetch('/api/products/update-item', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nextProduct)
-                  });
-                  if (!res.ok) throw new Error('Save failed');
-                  setProducts((prev) => prev.map((p) => (String(p.id) === String(id) ? nextProduct : p)));
-                  showToast(`🎉 Applied photo as storefront cover for "${existing.title.slice(0, 25)}..."!`);
-                } catch (e) {
-                  showToast(`⚠️ Could not save photo update: ${e.message}`);
-                }
-              }}
-            />
-          )}
+
           {activePage === 'Veo Video Studio' && (
             <VeoVideoStudioView
               products={products}
@@ -2473,3 +2443,4 @@ export default function App() {
     </div>
   );
 }
+

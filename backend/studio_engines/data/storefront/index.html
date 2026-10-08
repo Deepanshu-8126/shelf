@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetic Fashion Closet | Curated Fashion Wardrobe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0d13;
+            --card-bg: #1a1622;
+            --accent: #f43f5e;
+            --accent-glow: rgba(244, 63, 94, 0.35);
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 20px 24px;
+            background: linear-gradient(180deg, #1e172a 0%, var(--bg-primary) 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f43f5e, #fb7185);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 24px var(--accent-glow);
+            margin-bottom: 14px;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .creator-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .bio {
+            color: var(--text-muted);
+            font-size: 14px;
+            max-width: 420px;
+            margin: 0 auto 18px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 28px auto 0;
+            padding: 0 16px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        @media (max-width: 580px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1.15;
+            background: #231f2d;
+            overflow: hidden;
+        }
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .img-wrapper img {
+            transform: scale(1.04);
+        }
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .card-info {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .category-tag {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .price-row {
+            margin-top: auto;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .sale-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fde047;
+        }
+        .mrp {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        .buy-btn {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 12px;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+        .buy-btn:hover {
+            opacity: 0.92;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="avatar">P</div>
+        <h1 class="creator-title">Aesthetic Fashion Closet</h1>
+        <p class="bio">Affordable Meesho Outfits, Y2K Finds & Aesthetic Hauls ✨ Tap to shop!</p>
+    </div>
+
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">✨ Trending Meesho Outfits (5 Items)</h2>
+        </div>
+        <div class="product-grid">
+            
+            <div class="product-card">
+                <div class="img-wrapper">
+                    <img src="../scraped_products/meesho_flame_sweater_purple.jpg" alt="[MEESHO] Hi" loading="lazy" />
+                    <span class="discount-badge">65% OFF</span>
+                </div>
+                <div class="card-info">
+                    <span class="category-tag">GenZ Aesthetic Fashion</span>
+                    <h3 class="product-title">[MEESHO] Hi</h3>
+                    <div class="price-row">
+                        <span class="sale-price">₹699</span>
+                        <span class="mrp">₹1999</span>
+                    </div>
+                    <a href="https://www.meesho.com?af_invite=374453404&utm_source=instagram_reels" target="_blank" class="buy-btn">
+                        🛒 Buy on Meesho
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="img-wrapper">
+                    <img src="../scraped_products/meesho_flame_sweater_purple.jpg" alt="Classic Lavender Flame Hem Knit Sweater" loading="lazy" />
+                    <span class="discount-badge">62% OFF</span>
+                </div>
+                <div class="card-info">
+                    <span class="category-tag">Sweaters</span>
+                    <h3 class="product-title">Classic Lavender Flame Hem Knit Sweater</h3>
+                    <div class="price-row">
+                        <span class="sale-price">₹577</span>
+                        <span class="mrp">₹1,499</span>
+                    </div>
+                    <a href="https://www.meesho.com/af_invite/374453404:instagram_reels:0?ext_id=flame&utm_source=instagram_reels" target="_blank" class="buy-btn">
+                        🛒 Buy on Meesho
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="img-wrapper">
+                    <img src="../scraped_products/meesho_raglan_baby_tee.jpg" alt="Trendy Y2K Contrast Raglan Baby Tee" loading="lazy" />
+                    <span class="discount-badge">73% OFF</span>
+                </div>
+                <div class="card-info">
+                    <span class="category-tag">Y2K Tops</span>
+                    <h3 class="product-title">Trendy Y2K Contrast Raglan Baby Tee</h3>
+                    <div class="price-row">
+                        <span class="sale-price">₹187</span>
+                        <span class="mrp">₹699</span>
+                    </div>
+                    <a href="https://www.meesho.com/af_invite/374453404:instagram_reels:0?ext_id=raglan&utm_source=instagram_reels" target="_blank" class="buy-btn">
+                        🛒 Buy on Meesho
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="img-wrapper">
+                    <img src="../scraped_products/meesho_striped_baby_tee.jpg" alt="Pretty 90s Striped Ribbed Knit Top" loading="lazy" />
+                    <span class="discount-badge">77% OFF</span>
+                </div>
+                <div class="card-info">
+                    <span class="category-tag">Y2K Tops</span>
+                    <h3 class="product-title">Pretty 90s Striped Ribbed Knit Top</h3>
+                    <div class="price-row">
+                        <span class="sale-price">₹138</span>
+                        <span class="mrp">₹599</span>
+                    </div>
+                    <a href="https://www.meesho.com/af_invite/374453404:instagram_reels:0?ext_id=striped&utm_source=instagram_reels" target="_blank" class="buy-btn">
+                        🛒 Buy on Meesho
+                    </a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="img-wrapper">
+                    <img src="../scraped_products/meesho_chunky_rings.jpg" alt="Allure Bohemian Chunky Silver Rings Set" loading="lazy" />
+                    <span class="discount-badge">76% OFF</span>
+                </div>
+                <div class="card-info">
+                    <span class="category-tag">Jewelry</span>
+                    <h3 class="product-title">Allure Bohemian Chunky Silver Rings Set</h3>
+                    <div class="price-row">
+                        <span class="sale-price">₹117</span>
+                        <span class="mrp">₹499</span>
+                    </div>
+                    <a href="https://www.meesho.com/af_invite/374453404:instagram_reels:0?ext_id=silver&utm_source=instagram_reels" target="_blank" class="buy-btn">
+                        🛒 Buy on Meesho
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
