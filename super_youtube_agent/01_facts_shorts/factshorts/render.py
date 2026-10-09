@@ -173,23 +173,6 @@ def _zoom_chain(idx: int, seg_len: float, cfg: Config) -> str:
         return f"{base_chain},scale={pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f})+1"
     else:
         return base_chain
-            scale_with_pulse = f"{scale_expr}+{pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f})"
-        else:
-            # Middle segments get pulse added to their zoom
-            base_zoom = "1+{z:.4f}*t/{max(seg_len, 0.1):.3f}" if direction == "in" else "{1 + z:.4f}-{z:.4f}*t/{max(seg_len, 0.1):.3f}"
-            scale_with_pulse = f"max(1.0, 1+({base_zoom})+{pulse_scale}*sin({math.pi * 2}*t/{max(seg_len, 0.1):.3f}))"
-        
-        # Apply the pulsed scale to the base chain
-        pulsed_chain = (
-            f"scale=w='max({cfg.width}, trunc({cfg.width}*({scale_with_pulse})/2)*2)':"
-            f"h='max({cfg.height}, trunc({cfg.height}*({scale_with_pulse})/2)*2)':eval=frame:flags=bicubic,"
-            f"crop={cfg.width}:{cfg.height}:"
-            f"x='max(0, min(in_w-{cfg.width}, (in_w-{cfg.width})/2{drift}))':"
-            f"y='max(0, min(in_h-{cfg.height}, (in_h-{cfg.height})/2))',setsar=1"
-        )
-        return pulsed_chain
-    else:
-        return base_chain
 
 
 TARGET_SECONDS_PER_CLIP = 3.8  # calmer than a hard cut every 1.5s, still snappy

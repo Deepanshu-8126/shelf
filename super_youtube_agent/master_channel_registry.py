@@ -23,7 +23,9 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 CHANNELS_DIR = Path(__file__).resolve().parent
-REGISTRY_CACHE_FILE = CHANNELS_DIR / "master_channels_state.json"
+DATA_DIR = CHANNELS_DIR / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+REGISTRY_CACHE_FILE = DATA_DIR / "master_channels_state.json"
 
 CHANNELS_CONFIG = {
     1: {
@@ -32,8 +34,8 @@ CHANNELS_CONFIG = {
         "badge": "🎬 FACTS SHORTS",
         "folder": "01_facts_shorts",
         "format": "9:16 Shorts (30-60s)",
-        "output_dirs": ["01_facts_shorts/output"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/01_facts_shorts/main.py"],
+        "output_dirs": ["output", "01_facts_shorts/output"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "1"],
         "default_arg": "--demo"
     },
     2: {
@@ -42,8 +44,8 @@ CHANNELS_CONFIG = {
         "badge": "🕹️ STORY STUDIO",
         "folder": "02_story_studio",
         "format": "16:9 & 9:16 Stories",
-        "output_dirs": ["02_story_studio/data/packages", "02_story_studio/data/gaming_sources"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/02_story_studio/server.py"],
+        "output_dirs": ["output", "02_story_studio/data/packages", "02_story_studio/data/gaming_sources"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "2"],
         "default_arg": ""
     },
     3: {
@@ -52,8 +54,8 @@ CHANNELS_CONFIG = {
         "badge": "🌐 VOX LEDGER",
         "folder": "03_vox_studio",
         "format": "9:16 & 16:9 Map Docs",
-        "output_dirs": ["03_vox_studio/output"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/03_vox_studio/cli.py"],
+        "output_dirs": ["output", "03_vox_studio/output"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "3"],
         "default_arg": "--generate"
     },
     4: {
@@ -62,8 +64,8 @@ CHANNELS_CONFIG = {
         "badge": "☕ LOFI AMBIENT",
         "folder": "04_lofi_studio",
         "format": "16:9 Audio DSP Streams",
-        "output_dirs": ["04_lofi_studio/output"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/04_lofi_studio/main_lofi.py"],
+        "output_dirs": ["output", "04_lofi_studio/output"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "4"],
         "default_arg": "--generate"
     },
     5: {
@@ -72,8 +74,8 @@ CHANNELS_CONFIG = {
         "badge": "🕵️ DARK SUTRA",
         "folder": "05_dark_sutra",
         "format": "9:16 & 16:9 True Crime",
-        "output_dirs": ["05_dark_sutra/output"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/05_dark_sutra/main.py"],
+        "output_dirs": ["output", "05_dark_sutra/output"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "5"],
         "default_arg": "--case"
     },
     6: {
@@ -82,8 +84,8 @@ CHANNELS_CONFIG = {
         "badge": "✂️ AI CLIPPER",
         "folder": "06_ai_clipper",
         "format": "9:16 Viral Cuts",
-        "output_dirs": ["06_ai_clipper/Shorts", "06_ai_clipper/video_use_workspace"],
-        "runner_cmd": [sys.executable, "-m", "autoclip.cli"],
+        "output_dirs": ["output", "06_ai_clipper/Shorts", "06_ai_clipper/video_use_workspace"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "6"],
         "default_arg": ""
     },
     7: {
@@ -92,11 +94,12 @@ CHANNELS_CONFIG = {
         "badge": "💻 CODING STUDIO",
         "folder": "07_coding_studio",
         "format": "9:16 Line-by-Line IDE",
-        "output_dirs": ["07_coding_studio/output"],
-        "runner_cmd": [sys.executable, "super_youtube_agent/07_coding_studio/main.py", "--engine", "videosynx"],
+        "output_dirs": ["output", "07_coding_studio/output"],
+        "runner_cmd": [sys.executable, "super_youtube_agent/unified_creative_engine.py", "--channel", "7"],
         "default_arg": "--next"
     }
 }
+
 
 
 def scan_channel_real_metrics(chan_num: int) -> Dict[str, Any]:
@@ -132,7 +135,7 @@ def scan_channel_real_metrics(chan_num: int) -> Dict[str, Any]:
     # Check Channel 7 series progress specifically if applicable
     extra_meta: Dict[str, Any] = {}
     if chan_num == 7:
-        prog_file = CHANNELS_DIR / "07_coding_studio/series_progress.json"
+        prog_file = DATA_DIR / "series_progress.json"
         if prog_file.exists():
             try:
                 p_data = json.loads(prog_file.read_text(encoding="utf-8"))

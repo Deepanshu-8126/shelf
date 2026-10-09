@@ -11,7 +11,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-STATE_FILE = Path(__file__).resolve().parent / "series_progress.json"
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+STATE_FILE = DATA_DIR / "series_progress.json"
 
 DEFAULT_STATE = {
     "core_series": {

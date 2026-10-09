@@ -159,6 +159,28 @@ STUDIO_THEMES: Dict[str, Dict[str, Any]] = {
         "teach_title": (0, 245, 155),
         "teach_text": (240, 255, 245),
         "is_dark": True
+    },
+    "hyperframes_dark": {
+        "bg": (10, 10, 10, 255),
+        "grid_dot": (30, 30, 30, 180),
+        "header_sub": (153, 153, 153),
+        "badge_bg": (20, 20, 20),
+        "badge_border": (38, 38, 38),
+        "badge_text": (124, 58, 237),
+        "headline": (255, 255, 255),
+        "card_bg": (20, 20, 20),
+        "card_border": (38, 38, 38),
+        "card_divider": (30, 30, 30),
+        "file_head": (245, 245, 245),
+        "code_plain": (245, 245, 245),
+        "gutter": (115, 115, 115),
+        "gutter_active": (124, 58, 237),
+        "cursor": (124, 58, 237),
+        "teach_bg": (20, 20, 20),
+        "teach_border": (124, 58, 237),
+        "teach_title": (124, 58, 237),
+        "teach_text": (245, 245, 245),
+        "is_dark": True
     }
 }
 

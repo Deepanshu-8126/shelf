@@ -14,7 +14,7 @@ from typing import Dict, Any, List, Optional
 import httpx
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-TELEMETRY_FILE = Path(__file__).resolve().parent / "github_quota_state.json"
+TELEMETRY_FILE = Path(__file__).resolve().parent / "data" / "github_quota_state.json"
 YT_TOKEN_PATHS = [
     WORKSPACE_ROOT / "super_youtube_agent/01_facts_shorts/credentials/token.json",
     WORKSPACE_ROOT / "super_youtube_agent/07_coding_studio/credentials/token.json",
