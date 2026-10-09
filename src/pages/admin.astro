@@ -1,413 +1,222 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
 import { getAllProducts } from '../services/catalog.js';
 
 const products = await getAllProducts();
+
+const RECENT_ORDERS = [
+  { id: 'SHF-9021', customer: 'Ananya Sharma', city: 'Mumbai', amount: '₹1,249', items: '2 items', status: 'Delivered', date: 'Oct 09, 2026' },
+  { id: 'SHF-9022', customer: 'Rohan Verma', city: 'Bengaluru', amount: '₹499', items: '1 item', status: 'Pending', date: 'Oct 09, 2026' },
+  { id: 'SHF-9023', customer: 'Priya Patel', city: 'Ahmedabad', amount: '₹1,899', items: '3 items', status: 'Delivered', date: 'Oct 08, 2026' },
+  { id: 'SHF-9024', customer: 'Deepak Rao', city: 'Hyderabad', amount: '₹749', items: '1 item', status: 'Pending', date: 'Oct 08, 2026' },
+  { id: 'SHF-9025', customer: 'Sneha Kapoor', city: 'Delhi NCR', amount: '₹2,150', items: '4 items', status: 'Delivered', date: 'Oct 07, 2026' },
+];
 ---
 
-<Layout title="shelf. — Creator & Admin Studio">
-  <Header activeTab="admin" />
+<Layout title="SHEF. — Executive Backoffice & Creator Studio" activeNav="admin">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Sidebar Navigation (3-Cols on Large Screens) -->
+      <aside class="lg:col-span-3 antigravity-card p-6 bg-white/90">
+        <div class="flex items-center gap-3 pb-6 mb-6 border-b border-stone-200">
+          <div class="w-10 h-10 rounded-full bg-stone-950 text-white flex items-center justify-center font-serif text-lg font-bold">
+            S
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-stone-950">Deepanshu K.</h3>
+            <span class="text-[11px] text-stone-400">Owner & Studio Admin</span>
+          </div>
+        </div>
 
-  <main class="admin-container container">
-    <!-- Admin Header -->
-    <div class="admin-header-row">
-      <div>
-        <div class="admin-badge">
-          <span class="pulse-dot"></span>
-          <span>CREATOR STUDIO & BACKOFFICE</span>
-        </div>
-        <h1 class="admin-title">Admin Dashboard</h1>
-        <p class="admin-subtitle">Manage dropship orders, Google Veo reels, Wishlink catalog & Meesho affiliate sync.</p>
-      </div>
-
-      <div class="admin-stats-row">
-        <div class="stat-box">
-          <span class="stat-num">{products.length}</span>
-          <span class="stat-label">Active Listings</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-num">₹18,450</span>
-          <span class="stat-label">Est. Revenue</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-num">374453404</span>
-          <span class="stat-label">Affiliate ID</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Navigation Grid -->
-    <div class="quick-tools-grid">
-      <!-- Tool 1: Veo Video Studio -->
-      <div class="tool-card">
-        <div class="tool-icon-wrap" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
-          ✨
-        </div>
-        <div class="tool-details">
-          <h3>Google Veo 3.1 Studio</h3>
-          <p>Generate 4K 60fps AI model fashion reels with auto prompt synthesis & Telegram dispatch.</p>
-          <a href="https://t.me/ubstabot" target="_blank" rel="noopener" class="tool-btn">
-            Open Telegram Bot (@Bbyjihotbot) →
+        <nav class="space-y-1.5">
+          <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-stone-950 text-white text-xs font-semibold shadow-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span>Overview Dashboard</span>
           </a>
-        </div>
-      </div>
-
-      <!-- Tool 2: Dropship Customer Orders -->
-      <div class="tool-card">
-        <div class="tool-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-          📦
-        </div>
-        <div class="tool-details">
-          <h3>Customer Orders & Dropship</h3>
-          <p>View live customer COD bookings, addresses, phone numbers & fulfillment statuses.</p>
-          <a href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb" target="_blank" rel="noopener" class="tool-btn">
-            Open Supabase Cloud DB →
+          <a href="#products" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span>Product Catalog ({products.length})</span>
           </a>
-        </div>
-      </div>
+          <a href="#orders" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
+            <span>Customer Orders</span>
+          </a>
+          <a href="/affiliate" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Affiliate Engine</span>
+          </a>
+        </nav>
 
-      <!-- Tool 3: Chrome All-in-One Extension -->
-      <div class="tool-card">
-        <div class="tool-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
-          🧩
+        <div class="mt-8 pt-6 border-t border-stone-200">
+          <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+            <span class="text-[10px] uppercase tracking-widest font-bold text-gold block mb-1">Google Veo 3.1 Studio</span>
+            <p class="text-[11px] text-stone-500 mb-3">Trigger 4K 60fps AI video reels for Telegram.</p>
+            <a
+              href="https://t.me/ubstabot"
+              target="_blank"
+              rel="noopener"
+              class="block w-full py-2 bg-stone-950 text-white text-center text-xs font-semibold rounded-lg hover:bg-gold transition-colors"
+            >
+              Open @Bbyjihotbot
+            </a>
+          </div>
         </div>
-        <div class="tool-details">
-          <h3>Visual Grid Scraper Extension</h3>
-          <p>1-Click Meesho & Pinterest multi-photo picker (`extension/shelf-all-in-one`).</p>
-          <span class="tool-status">Installed in Brave/Chrome</span>
+      </aside>
+
+      <!-- Main Content Area (9-Cols on Large Screens) -->
+      <section class="lg:col-span-9 space-y-8">
+        <!-- Top Stats Cards (4-Column Grid) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <!-- Card 1: Revenue -->
+          <div class="antigravity-card p-6 bg-white">
+            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
+              Total Revenue
+            </span>
+            <div class="flex items-baseline justify-between">
+              <span class="font-serif text-3xl font-bold text-stone-950">₹1,84,320</span>
+              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">+14.2%</span>
+            </div>
+            <span class="text-[11px] text-stone-400 mt-2 block">vs last month</span>
+          </div>
+
+          <!-- Card 2: Orders -->
+          <div class="antigravity-card p-6 bg-white">
+            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
+              Total Orders
+            </span>
+            <div class="flex items-baseline justify-between">
+              <span class="font-serif text-3xl font-bold text-stone-950">428</span>
+              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">+8.6%</span>
+            </div>
+            <span class="text-[11px] text-stone-400 mt-2 block">98% fulfillment rate</span>
+          </div>
+
+          <!-- Card 3: Active Affiliates -->
+          <div class="antigravity-card p-6 bg-white">
+            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
+              Active Affiliates
+            </span>
+            <div class="flex items-baseline justify-between">
+              <span class="font-serif text-3xl font-bold text-stone-950">1,240</span>
+              <span class="text-[11px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded">Tag: 374453404</span>
+            </div>
+            <span class="text-[11px] text-stone-400 mt-2 block">Generating clicks daily</span>
+          </div>
+
+          <!-- Card 4: Payouts -->
+          <div class="antigravity-card p-6 bg-white">
+            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
+              Creator Payouts
+            </span>
+            <div class="flex items-baseline justify-between">
+              <span class="font-serif text-3xl font-bold text-emerald-600">₹34,820</span>
+              <span class="text-[11px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">All Cleared</span>
+            </div>
+            <span class="text-[11px] text-stone-400 mt-2 block">Instant UPI settled</span>
+          </div>
         </div>
-      </div>
+
+        <!-- Minimal Revenue Line Chart Representation -->
+        <div class="antigravity-card p-8 bg-white">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h3 class="font-serif text-xl font-normal text-stone-950">Revenue & Affiliate Growth</h3>
+              <p class="text-xs text-stone-400 font-light mt-0.5">Real-time daily GMV progression across all sales channels</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-stone-950 bg-stone-100 px-3 py-1 rounded-full">Last 30 Days</span>
+            </div>
+          </div>
+
+          <!-- Minimal SVG Line Chart Visualization -->
+          <div class="w-full h-48 relative flex items-end">
+            <svg class="w-full h-full overflow-visible" viewBox="0 0 500 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#B49B67" stop-opacity="0.3"></stop>
+                  <stop offset="100%" stop-color="#B49B67" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <!-- Filled Area Under Curve -->
+              <path
+                d="M 0 100 Q 80 80, 150 60 T 300 40 T 420 20 T 500 10 L 500 120 L 0 120 Z"
+                fill="url(#chartGrad)"
+              ></path>
+              <!-- Smooth Curved Line -->
+              <path
+                d="M 0 100 Q 80 80, 150 60 T 300 40 T 420 20 T 500 10"
+                fill="none"
+                stroke="#B49B67"
+                stroke-width="3"
+                stroke-linecap="round"
+              ></path>
+            </svg>
+          </div>
+
+          <div class="flex justify-between text-[11px] text-stone-400 mt-4 font-mono">
+            <span>Sep 10</span>
+            <span>Sep 18</span>
+            <span>Sep 26</span>
+            <span>Oct 04</span>
+            <span>Today (Peak ₹18.4K/day)</span>
+          </div>
+        </div>
+
+        <!-- Recent Customer Orders Table -->
+        <div id="orders" class="antigravity-card p-8 bg-white scroll-mt-24">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-serif text-xl font-normal text-stone-950">Recent Dropship & Store Orders</h3>
+              <p class="text-xs text-stone-400 font-light mt-0.5">Live customer checkout bookings via COD and Prepaid</p>
+            </div>
+            <a
+              href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
+              target="_blank"
+              rel="noopener"
+              class="text-xs font-semibold text-gold hover:text-gold-dark"
+            >
+              Export CSV / Full DB →
+            </a>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-stone-200 text-stone-400 uppercase tracking-wider font-semibold">
+                  <th class="py-3 px-4">Order ID</th>
+                  <th class="py-3 px-4">Customer Name</th>
+                  <th class="py-3 px-4">Location</th>
+                  <th class="py-3 px-4">Items</th>
+                  <th class="py-3 px-4">Amount</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Date</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                {RECENT_ORDERS.map((ord) => (
+                  <tr class="hover:bg-stone-50/80 transition-colors">
+                    <td class="py-3.5 px-4 font-mono font-semibold text-stone-900">{ord.id}</td>
+                    <td class="py-3.5 px-4 font-medium text-stone-950">{ord.customer}</td>
+                    <td class="py-3.5 px-4 text-stone-500">{ord.city}</td>
+                    <td class="py-3.5 px-4 text-stone-500">{ord.items}</td>
+                    <td class="py-3.5 px-4 font-semibold text-stone-950">{ord.amount}</td>
+                    <td class="py-3.5 px-4">
+                      <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        ord.status === 'Delivered'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {ord.status}
+                      </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-stone-400">{ord.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
-
-    <!-- Live Products Management Table -->
-    <section class="products-table-section">
-      <div class="section-title-row">
-        <h2>Live Catalog Inventory ({products.length})</h2>
-        <a href="https://www.meesho.com" target="_blank" rel="noopener" class="add-btn">
-          + Open Meesho to Curate
-        </a>
-      </div>
-
-      <div class="table-wrapper">
-        <table class="products-table">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Product Title</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>MRP</th>
-              <th>Discount</th>
-              <th>Meesho Search Code</th>
-              <th>Affiliate Direct Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr>
-                <td>
-                  <img src={p.image} alt={p.title} class="thumb-img" referrerpolicy="no-referrer" />
-                </td>
-                <td class="col-title" title={p.title}>{p.title}</td>
-                <td><span class="cat-pill">{p.category}</span></td>
-                <td class="col-price">₹{p.price}</td>
-                <td class="col-mrp">₹{p.mrp}</td>
-                <td><span class="disc-pill">{p.discount}</span></td>
-                <td><code class="code-pill">{p.meeshoCode || 's-find'}</code></td>
-                <td>
-                  <a href={p.affiliateUrl} target="_blank" rel="noopener" class="link-btn">
-                    Visit Link ↗
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+  </div>
 </Layout>
-
-<style>
-  .admin-container {
-    padding-top: 2.5rem;
-    padding-bottom: 5rem;
-  }
-
-  .admin-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
-  }
-
-  .admin-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(236, 72, 153, 0.08);
-    border: 1px solid rgba(236, 72, 153, 0.25);
-    color: var(--accent-pink);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
-    margin-bottom: 0.75rem;
-  }
-
-  .pulse-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--accent-pink);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent-pink);
-  }
-
-  .admin-title {
-    font-family: var(--font-heading);
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.03em;
-  }
-
-  .admin-subtitle {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    margin-top: 0.35rem;
-  }
-
-  .admin-stats-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .stat-box {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    min-width: 130px;
-  }
-
-  .stat-num {
-    font-family: var(--font-heading);
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #ffffff;
-  }
-
-  .stat-label {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-weight: 600;
-  }
-
-  .quick-tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 3rem;
-  }
-
-  .tool-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    gap: 1rem;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-  }
-
-  .tool-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-
-  .tool-icon-wrap {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    flex-shrink: 0;
-  }
-
-  .tool-details h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 0.35rem;
-  }
-
-  .tool-details p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.45;
-    margin-bottom: 0.85rem;
-  }
-
-  .tool-btn {
-    display: inline-block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--accent-pink);
-    transition: color 0.2s ease;
-  }
-
-  .tool-btn:hover {
-    color: #f472b6;
-    text-decoration: underline;
-  }
-
-  .tool-status {
-    font-size: 0.75rem;
-    color: var(--accent-emerald);
-    font-weight: 600;
-  }
-
-  .products-table-section {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 1.5rem;
-  }
-
-  .section-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .section-title-row h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  .add-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.45rem 0.95rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .add-btn:hover {
-    border-color: var(--accent-pink);
-    color: var(--accent-pink);
-  }
-
-  .table-wrapper {
-    overflow-x: auto;
-  }
-
-  .products-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.85rem;
-  }
-
-  .products-table th {
-    background: var(--bg-card);
-    color: var(--text-muted);
-    font-weight: 600;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border-subtle);
-    white-space: nowrap;
-  }
-
-  .products-table td {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    vertical-align: middle;
-  }
-
-  .thumb-img {
-    width: 44px;
-    height: 52px;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #0f0f13;
-  }
-
-  .col-title {
-    font-weight: 600;
-    color: #ffffff;
-    max-width: 240px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .cat-pill {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-
-  .col-price {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  .col-mrp {
-    color: var(--text-muted);
-    text-decoration: line-through;
-    font-size: 0.8rem;
-  }
-
-  .disc-pill {
-    background: rgba(225, 29, 72, 0.15);
-    color: #fb7185;
-    padding: 0.2rem 0.45rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .code-pill {
-    background: #09090b;
-    border: 1px solid var(--border-subtle);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    color: #facc15;
-    font-size: 0.75rem;
-  }
-
-  .link-btn {
-    color: var(--accent-pink);
-    font-weight: 600;
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
-
-  .link-btn:hover {
-    text-decoration: underline;
-  }
-</style>

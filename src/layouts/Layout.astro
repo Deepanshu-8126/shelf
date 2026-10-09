@@ -2,96 +2,233 @@
 interface Props {
   title?: string;
   description?: string;
+  activeNav?: string;
 }
 
 const {
-  title = 'shelf. — Curated Meesho Fashion Finds & Creator Drops',
-  description = 'Handpicked aesthetic outfits, trending streetwear, ethnic kurtis & viral reels finds with direct verified Meesho affiliate links.',
+  title = 'SHEF. — Luxury Fashion Reseller & Creator Affiliate Hub',
+  description = 'An airy, minimal, editorial fashion destination curating trending streetwear, luxury ethnic sets & verified Meesho creator deals.',
+  activeNav = 'store',
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    
+    <!-- Google Fonts: Playfair Display + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              stone: {
+                50: '#FAFAF9',
+                100: '#F5F5F4',
+                200: '#E7E5E4',
+                300: '#D6D3D1',
+                400: '#A8A29E',
+                500: '#78716C',
+                600: '#57534E',
+                700: '#44403C',
+                800: '#292524',
+                900: '#1C1917',
+                950: '#0C0A09',
+              },
+              gold: {
+                light: '#E6D5B8',
+                DEFAULT: '#B49B67',
+                dark: '#8C7443',
+              },
+            },
+            fontFamily: {
+              serif: ['"Playfair Display"', 'Georgia', 'serif'],
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
+            boxShadow: {
+              'float': '0 20px 40px -10px rgba(0, 0, 0, 0.05)',
+              'float-hover': '0 30px 60px -12px rgba(0, 0, 0, 0.09)',
+              'glow-gold': '0 0 25px rgba(180, 155, 103, 0.2)',
+            },
+          },
+        },
+      };
+    </script>
+
     <style is:global>
-      :root {
-        --bg-main: #09090b;
-        --bg-surface: #121217;
-        --bg-card: #18181f;
-        --border-subtle: rgba(255, 255, 255, 0.08);
-        --border-focus: rgba(255, 255, 255, 0.2);
-        --text-main: #f4f4f5;
-        --text-muted: #a1a1aa;
-        --accent-pink: #ec4899;
-        --accent-pink-glow: rgba(236, 72, 153, 0.25);
-        --accent-peach: #ffedd5;
-        --accent-emerald: #10b981;
-        --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-        --font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
       body {
-        background-color: var(--bg-main);
-        color: var(--text-main);
-        font-family: var(--font-body);
-        min-height: 100vh;
+        background-color: #FAFAF9;
+        color: #0C0A09;
+        font-family: 'Inter', system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
-        overflow-x: hidden;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
+      .antigravity-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(231, 229, 228, 0.8);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.04);
+        border-radius: 1.25rem;
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
-      button {
-        font-family: inherit;
-        cursor: pointer;
-        border: none;
-        outline: none;
-        background: none;
+      .antigravity-card:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(180, 155, 103, 0.4);
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.08), 0 0 20px rgba(180, 155, 103, 0.12);
       }
 
-      .container {
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 0 1.25rem;
-      }
-
-      /* Specular Glare & Animations */
-      @keyframes floatSlow {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-6px); }
-      }
-
-      .glow-badge {
-        background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(255, 237, 213, 0.05));
-        border: 1px solid rgba(236, 72, 153, 0.3);
-        color: #f472b6;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0.25rem 0.65rem;
-        border-radius: 9999px;
+      .gold-gradient-text {
+        background: linear-gradient(135deg, #0C0A09 30%, #B49B67 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     </style>
   </head>
-  <body>
-    <slot />
+  <body class="bg-stone-50 text-stone-950 min-h-screen flex flex-col selection:bg-gold/20 selection:text-stone-950">
+    <!-- Minimal Glassmorphic Sticky Navbar -->
+    <header class="sticky top-0 z-50 bg-stone-50/80 backdrop-blur-xl border-b border-stone-200/60 transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2 group">
+          <span class="font-serif text-3xl font-medium tracking-tight text-stone-950 group-hover:text-gold transition-colors duration-300">
+            SHEF<span class="text-gold font-sans font-bold">.</span>
+          </span>
+          <span class="text-[9px] uppercase tracking-[0.25em] font-semibold text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full ml-1">
+            HAUTE RESALE
+          </span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1 bg-white/70 p-1.5 rounded-full border border-stone-200/80 shadow-sm backdrop-blur-md">
+          <a
+            href="/"
+            class={`px-6 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ${
+              activeNav === 'store'
+                ? 'bg-stone-950 text-white shadow-sm'
+                : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100/70'
+            }`}
+          >
+            Storefront
+          </a>
+          <a
+            href="/affiliate"
+            class={`px-6 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ${
+              activeNav === 'affiliate'
+                ? 'bg-stone-950 text-white shadow-sm'
+                : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100/70'
+            }`}
+          >
+            Affiliate Hub
+          </a>
+          <a
+            href="/admin"
+            class={`px-6 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ${
+              activeNav === 'admin'
+                ? 'bg-stone-950 text-white shadow-sm'
+                : 'text-stone-600 hover:text-stone-950 hover:bg-stone-100/70'
+            }`}
+          >
+            Studio & Admin
+          </a>
+        </nav>
+
+        <!-- Right Utilities & Cart -->
+        <div class="flex items-center gap-4">
+          <a
+            href="/affiliate"
+            class="hidden sm:flex items-center gap-2 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200/70 px-4 py-2 rounded-full border border-stone-200 transition-all duration-200"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Earn Commission</span>
+          </a>
+
+          <div class="flex items-center gap-2">
+            <!-- Search Trigger -->
+            <button
+              type="button"
+              class="w-10 h-10 rounded-full flex items-center justify-center text-stone-700 hover:text-stone-950 hover:bg-stone-100 transition-colors"
+              title="Search collection"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </svg>
+            </button>
+
+            <!-- Bag Icon -->
+            <a
+              href="/#bag"
+              class="w-10 h-10 rounded-full flex items-center justify-center bg-stone-950 text-white hover:bg-stone-800 transition-all shadow-sm"
+              title="Shopping Bag"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <line x1="3" x2="21" y1="6" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Slot -->
+    <div class="flex-1">
+      <slot />
+    </div>
+
+    <!-- Minimal High-Fashion Footer -->
+    <footer class="bg-white border-t border-stone-200/80 py-16 mt-20">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div class="md:col-span-2">
+          <span class="font-serif text-3xl font-medium tracking-tight text-stone-950">
+            SHEF<span class="text-gold">.</span>
+          </span>
+          <p class="text-stone-500 text-sm mt-3 max-w-sm leading-relaxed font-light">
+            An ultra-curated fashion collective merging haute-minimalism with verified social creator resale mechanics.
+          </p>
+          <div class="flex items-center gap-3 mt-6">
+            <span class="text-xs font-semibold text-stone-400 uppercase tracking-widest">Affiliate Tag:</span>
+            <span class="text-xs font-mono bg-stone-100 border border-stone-200 px-2.5 py-1 rounded text-stone-800">
+              374453404
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900 mb-4">Navigation</h4>
+          <ul class="space-y-2.5 text-xs text-stone-500">
+            <li><a href="/" class="hover:text-stone-950 transition-colors">Curated Storefront</a></li>
+            <li><a href="/affiliate" class="hover:text-stone-950 transition-colors">Wishlink Creator Hub</a></li>
+            <li><a href="/admin" class="hover:text-stone-950 transition-colors">Studio & Backoffice</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900 mb-4">Verified Resale</h4>
+          <p class="text-xs text-stone-500 leading-relaxed font-light">
+            All drops are authenticated from verified merchant catalogs. Direct 1-click links dispatch with secure Cash on Delivery (COD) coverage across India.
+          </p>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-6 pt-12 mt-12 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-400">
+        <p>© 2026 SHEF. Fashion Reseller Inc. All rights reserved.</p>
+        <p class="mt-2 sm:mt-0 font-serif italic text-stone-500">Designed with Antigravity UI Aesthetics.</p>
+      </div>
+    </footer>
   </body>
 </html>

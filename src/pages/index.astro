@@ -1,219 +1,196 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import ProductCard from '../components/ProductCard.astro';
 import { getAllProducts } from '../services/catalog.js';
 
 const products = await getAllProducts();
 
-const categories = [
-  'All',
-  'Tops & Tunics',
-  'Kurtis',
-  'Ethnic Wear',
-  'Women Dresses',
-  'Winter',
-  'Accessories',
+function money(v: number) {
+  return `₹${Number(v || 0).toLocaleString('en-IN')}`;
+}
+
+const CATEGORIES = [
+  {
+    title: 'Women Haute Edit',
+    subtitle: 'Silks, corset tops, ribbed knitwear & flare dresses',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
+    tag: 'EXPLORE WOMEN',
+    filter: 'Women Dresses',
+  },
+  {
+    title: 'Men Minimal Tailoring',
+    subtitle: 'Relaxed oversized tees, boxy jackets & neutrals',
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=900&q=80',
+    tag: 'EXPLORE MEN',
+    filter: 'Tops & Tunics',
+  },
+  {
+    title: 'Sculpted Accessories',
+    subtitle: 'Liquid chrome studs, chunky totes & gold accents',
+    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=900&q=80',
+    tag: 'EXPLORE OBJECTS',
+    filter: 'Accessories',
+  },
 ];
 ---
 
-<Layout title="shelf. — Viral Meesho Fashion & Creator Affiliate Finds">
-  <Header activeTab="store" />
+<Layout title="SHEF. — Luxury Fashion Reseller & Curated Creator Drops" activeNav="store">
+  <!-- Full-Width Editorial Hero Banner -->
+  <section class="relative w-full min-h-[85vh] flex items-center justify-center bg-stone-100 overflow-hidden border-b border-stone-200/80">
+    <div class="absolute inset-0 z-0">
+      <img
+        src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=85"
+        alt="Editorial Fashion Model"
+        class="w-full h-full object-cover object-center opacity-90 scale-105 transition-transform duration-1000 ease-out hover:scale-100"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-stone-950/80 via-stone-950/40 to-transparent"></div>
+    </div>
 
-  <main class="storefront-main container">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-badge">
-        <span class="pulse-dot"></span>
-        <span>CREATOR VERIFIED · 100% DIRECT MEESHO LINKS</span>
-      </div>
-      <h1 class="hero-title">
-        The viral fashion edit,<br />
-        <span class="gradient-text">straight from your feed.</span>
-      </h1>
-      <p class="hero-subtitle">
-        Curated aesthetic tops, kurtis, dresses & winter drops tested on reels with instant verified affiliate deals.
-      </p>
-
-      <!-- Category Filter Pills -->
-      <div class="category-pills" id="categoryFilter">
-        {categories.map((cat, idx) => (
-          <button
-            class={`pill-btn ${idx === 0 ? 'active' : ''}`}
-            data-category={cat}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-    </section>
-
-    <!-- Product Grid -->
-    <section class="catalog-grid" id="productGrid">
-      {products.map((product) => (
-        <div class="grid-item" data-category={product.category}>
-          <ProductCard product={product} />
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full text-white">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1 rounded-full mb-6">
+          <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+          <span class="text-[11px] uppercase tracking-[0.2em] font-medium text-stone-200">
+            AUTUMN / WINTER 2026 DROP
+          </span>
         </div>
-      ))}
-    </section>
-  </main>
 
-  <footer class="site-footer container">
-    <div class="footer-content">
-      <p>© 2026 shelf. · Curated fashion affiliate engine</p>
-      <p class="footer-affiliate-disclaimer">
-        All products are sourced directly from verified Meesho merchants. We may earn a creator commission on qualifying purchases.
+        <h1 class="font-serif text-5xl md:text-7xl font-normal tracking-tight leading-[1.08] mb-6">
+          Elevate Your <br />
+          <span class="italic font-light text-gold-light">Everyday.</span>
+        </h1>
+
+        <p class="text-stone-300 text-base md:text-lg font-light leading-relaxed max-w-lg mb-8">
+          The curated resale collective. Discover high-editorial pieces from verified fashion merchants at authentic lowest wholesale rates.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            href="#trending"
+            class="px-8 py-4 rounded-full bg-white text-stone-950 text-xs uppercase tracking-widest font-semibold hover:bg-gold hover:text-white transition-all duration-300 shadow-lg hover:shadow-gold/20"
+          >
+            Shop The Collection
+          </a>
+          <a
+            href="/affiliate"
+            class="px-8 py-4 rounded-full bg-white/10 backdrop-blur-md border border-white/30 text-white text-xs uppercase tracking-widest font-semibold hover:bg-white/20 transition-all duration-300"
+          >
+            Earn With Wishlink
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Category Grid (3-Column) -->
+  <section class="max-w-7xl mx-auto px-6 py-24">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-gold">CURATED SPACES</span>
+        <h2 class="font-serif text-3xl md:text-4xl font-normal text-stone-950 mt-1">Explore By Category</h2>
+      </div>
+      <p class="text-stone-500 text-xs md:text-sm font-light mt-2 md:mt-0 max-w-xs">
+        Handpicked seasonal edits structured for effortless wardrobe building.
       </p>
     </div>
-  </footer>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {CATEGORIES.map((cat) => (
+        <a href="#trending" class="group relative block aspect-[3/4] rounded-2xl overflow-hidden shadow-float">
+          <img
+            src={cat.image}
+            alt={cat.title}
+            class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/20 to-transparent"></div>
+          
+          <div class="absolute inset-0 p-8 flex flex-col justify-end text-white">
+            <span class="text-[10px] uppercase tracking-[0.25em] font-semibold text-gold mb-2">{cat.tag}</span>
+            <h3 class="font-serif text-2xl font-normal mb-2 leading-tight">{cat.title}</h3>
+            <p class="text-xs text-stone-300 font-light line-clamp-2 mb-4 leading-relaxed">{cat.subtitle}</p>
+            <span class="inline-flex items-center gap-2 text-xs font-medium tracking-wider text-white group-hover:text-gold transition-colors">
+              <span>View Lookbook</span>
+              <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Trending Products (4-Column Fluffy Antigravity Card Grid) -->
+  <section id="trending" class="max-w-7xl mx-auto px-6 py-12 scroll-mt-24">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 border-b border-stone-200/80 pb-6">
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-gold">REEL-APPROVED DROPS</span>
+        <h2 class="font-serif text-3xl md:text-4xl font-normal text-stone-950 mt-1">Trending Curations</h2>
+      </div>
+      <div class="flex items-center gap-2 mt-4 sm:mt-0 overflow-x-auto pb-2 sm:pb-0">
+        <button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-stone-950 text-white shadow-sm">All Picks</button>
+        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Tops</button>
+        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Kurtis</button>
+        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Dresses</button>
+      </div>
+    </div>
+
+    <!-- 4-Column Product Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {products.map((p) => (
+        <div class="antigravity-card overflow-hidden flex flex-col group">
+          <!-- Image Wrapper -->
+          <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden">
+            <img
+              src={p.image}
+              alt={p.title}
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              class="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+            <span class="absolute top-3.5 left-3.5 bg-stone-950/80 backdrop-blur-md text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md">
+              {p.discount}
+            </span>
+            <span class="absolute bottom-3.5 right-3.5 bg-white/90 backdrop-blur-md text-stone-900 text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm border border-stone-200/50">
+              ★ {p.rating}
+            </span>
+          </div>
+
+          <!-- Product Details -->
+          <div class="p-5 flex flex-col flex-1 justify-between gap-3">
+            <div>
+              <div class="flex items-center justify-between text-[11px] text-stone-400 uppercase tracking-widest font-semibold mb-1">
+                <span>SHEF. SELECT</span>
+                <span class="text-gold font-mono lowercase">{p.meeshoCode}</span>
+              </div>
+              <h3 class="font-serif text-base font-normal text-stone-900 line-clamp-1 leading-snug group-hover:text-gold transition-colors">
+                {p.title}
+              </h3>
+            </div>
+
+            <!-- Pricing Stack -->
+            <div class="flex items-baseline justify-between pt-1 border-t border-stone-100">
+              <div class="flex items-baseline gap-2">
+                <span class="font-serif text-lg font-semibold text-stone-950">{money(p.price)}</span>
+                <span class="text-xs text-stone-400 line-through">{money(p.mrp)}</span>
+              </div>
+              <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                SAVE {money(p.mrp - p.price)}
+              </span>
+            </div>
+
+            <!-- Minimal Action Button -->
+            <div class="grid grid-cols-1 gap-2 pt-2">
+              <a
+                href={p.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-full py-2.5 rounded-xl bg-stone-950 text-white text-xs font-medium tracking-wider flex items-center justify-center gap-2 hover:bg-gold transition-colors shadow-sm"
+              >
+                <span>Add to Bag / Buy</span>
+                <span class="text-xs">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
 </Layout>
-
-<script>
-  const filterButtons = document.querySelectorAll('.pill-btn');
-  const gridItems = document.querySelectorAll('.grid-item');
-
-  filterButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const selectedCat = btn.getAttribute('data-category');
-
-      gridItems.forEach((item) => {
-        const itemCat = item.getAttribute('data-category');
-        if (selectedCat === 'All' || itemCat === selectedCat) {
-          (item as HTMLElement).style.display = 'block';
-        } else {
-          (item as HTMLElement).style.display = 'none';
-        }
-      });
-    });
-  });
-</script>
-
-<style>
-  .storefront-main {
-    padding-top: 2.5rem;
-    padding-bottom: 5rem;
-  }
-
-  .hero-section {
-    text-align: center;
-    max-width: 780px;
-    margin: 0 auto 3.5rem auto;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(236, 72, 153, 0.08);
-    border: 1px solid rgba(236, 72, 153, 0.25);
-    color: var(--accent-pink);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
-    margin-bottom: 1.25rem;
-  }
-
-  .pulse-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--accent-pink);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent-pink);
-  }
-
-  .hero-title {
-    font-family: var(--font-heading);
-    font-size: 2.75rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1.15;
-    color: #ffffff;
-    margin-bottom: 1rem;
-  }
-
-  .gradient-text {
-    background: linear-gradient(135deg, #f472b6, #fb7185, #facc15);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero-subtitle {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 2rem;
-  }
-
-  .category-pills {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .pill-btn {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.45rem 1rem;
-    border-radius: 9999px;
-    transition: all 0.2s ease;
-  }
-
-  .pill-btn:hover {
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  .pill-btn.active {
-    background: #ffffff;
-    color: #09090b;
-    border-color: #ffffff;
-    font-weight: 700;
-  }
-
-  .catalog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.25rem;
-  }
-
-  .site-footer {
-    border-top: 1px solid var(--border-subtle);
-    padding: 2.5rem 1.25rem;
-    text-align: center;
-  }
-
-  .footer-content {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .footer-affiliate-disclaimer {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 640px) {
-    .hero-title {
-      font-size: 2rem;
-    }
-    .catalog-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-    }
-  }
-</style>
