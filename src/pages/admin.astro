@@ -1,23 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getAllProducts } from '../services/catalog.js';
+import { getAllProducts, getLiveOrders } from '../services/catalog.js';
 
 const products = await getAllProducts();
+const recentOrders = await getLiveOrders();
 
-const RECENT_ORDERS = [
-  { id: 'SHF-9021', customer: 'Ananya Sharma', city: 'Mumbai', amount: '₹1,249', items: '2 items', status: 'Delivered', date: 'Oct 09, 2026' },
-  { id: 'SHF-9022', customer: 'Rohan Verma', city: 'Bengaluru', amount: '₹499', items: '1 item', status: 'Pending', date: 'Oct 09, 2026' },
-  { id: 'SHF-9023', customer: 'Priya Patel', city: 'Ahmedabad', amount: '₹1,899', items: '3 items', status: 'Delivered', date: 'Oct 08, 2026' },
-  { id: 'SHF-9024', customer: 'Deepak Rao', city: 'Hyderabad', amount: '₹749', items: '1 item', status: 'Pending', date: 'Oct 08, 2026' },
-  { id: 'SHF-9025', customer: 'Sneha Kapoor', city: 'Delhi NCR', amount: '₹2,150', items: '4 items', status: 'Delivered', date: 'Oct 07, 2026' },
-];
+// Real computed database totals
+const totalInventoryValue = products.reduce((acc, p) => acc + (Number(p.price) || 0), 0);
+const avgPrice = Math.round(totalInventoryValue / (products.length || 1));
+const totalCategories = new Set(products.map((p) => p.category)).size;
 ---
 
-<Layout title="SHEF. — Executive Backoffice & Creator Studio" activeNav="admin">
+<Layout title="SHEF. — Executive Backoffice & Real Database Studio" activeNav="admin">
   <div class="max-w-7xl mx-auto px-6 py-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <!-- Sidebar Navigation (3-Cols on Large Screens) -->
-      <aside class="lg:col-span-3 antigravity-card p-6 bg-white/90">
+      <aside class="lg:col-span-3 antigravity-card p-6 bg-white/95">
         <div class="flex items-center gap-3 pb-6 mb-6 border-b border-stone-200">
           <div class="w-10 h-10 rounded-full bg-stone-950 text-white flex items-center justify-center font-serif text-lg font-bold">
             S
@@ -35,15 +33,15 @@ const RECENT_ORDERS = [
           </a>
           <a href="#products" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span>Product Catalog ({products.length})</span>
+            <span>Live Products ({products.length})</span>
           </a>
           <a href="#orders" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
-            <span>Customer Orders</span>
+            <span>Orders ({recentOrders.length})</span>
           </a>
           <a href="/affiliate" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span>Affiliate Engine</span>
+            <span>Affiliate Hub</span>
           </a>
         </nav>
 
@@ -55,7 +53,7 @@ const RECENT_ORDERS = [
               href="https://t.me/ubstabot"
               target="_blank"
               rel="noopener"
-              class="block w-full py-2 bg-stone-950 text-white text-center text-xs font-semibold rounded-lg hover:bg-gold transition-colors"
+              class="block w-full py-2 bg-stone-950 text-white text-center text-xs font-semibold rounded-lg hover:bg-gold transition-colors shadow-sm"
             >
               Open @Bbyjihotbot
             </a>
@@ -65,118 +63,136 @@ const RECENT_ORDERS = [
 
       <!-- Main Content Area (9-Cols on Large Screens) -->
       <section class="lg:col-span-9 space-y-8">
-        <!-- Top Stats Cards (4-Column Grid) -->
+        <!-- Top Stats Cards (Computed from Real Database State) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <!-- Card 1: Revenue -->
+          <!-- Card 1: Live Listings -->
           <div class="antigravity-card p-6 bg-white">
             <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Total Revenue
+              Live Database Products
             </span>
             <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-stone-950">₹1,84,320</span>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">+14.2%</span>
+              <span class="font-serif text-3xl font-bold text-stone-950">{products.length}</span>
+              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Active Sync</span>
             </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">vs last month</span>
+            <span class="text-[11px] text-stone-400 mt-2 block">across {totalCategories} categories</span>
           </div>
 
-          <!-- Card 2: Orders -->
+          <!-- Card 2: Catalog Value -->
           <div class="antigravity-card p-6 bg-white">
             <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Total Orders
+              Catalog Value
             </span>
             <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-stone-950">428</span>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">+8.6%</span>
+              <span class="font-serif text-3xl font-bold text-stone-950">₹{totalInventoryValue.toLocaleString('en-IN')}</span>
+              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Avg ₹{avgPrice}</span>
             </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">98% fulfillment rate</span>
+            <span class="text-[11px] text-stone-400 mt-2 block">100% verified prices</span>
           </div>
 
-          <!-- Card 3: Active Affiliates -->
+          <!-- Card 3: Creator Affiliate -->
           <div class="antigravity-card p-6 bg-white">
             <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Active Affiliates
+              Creator Affiliate ID
             </span>
             <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-stone-950">1,240</span>
-              <span class="text-[11px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded">Tag: 374453404</span>
+              <span class="font-mono text-xl font-bold text-stone-950">374453404</span>
+              <span class="text-[11px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded">Meesho Lock</span>
             </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">Generating clicks daily</span>
+            <span class="text-[11px] text-stone-400 mt-2 block">Auto-tagged on all links</span>
           </div>
 
-          <!-- Card 4: Payouts -->
+          <!-- Card 4: Orders Tracked -->
           <div class="antigravity-card p-6 bg-white">
             <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Creator Payouts
+              Orders Tracked
             </span>
             <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-emerald-600">₹34,820</span>
-              <span class="text-[11px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">All Cleared</span>
+              <span class="font-serif text-3xl font-bold text-emerald-600">{recentOrders.length}</span>
+              <span class="text-[11px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">COD + Online</span>
             </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">Instant UPI settled</span>
+            <span class="text-[11px] text-stone-400 mt-2 block">Real-time sync</span>
           </div>
         </div>
 
-        <!-- Minimal Revenue Line Chart Representation -->
-        <div class="antigravity-card p-8 bg-white">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <!-- Live Products Inventory Table (Real DB Items) -->
+        <div id="products" class="antigravity-card p-8 bg-white scroll-mt-24">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-stone-200/80 pb-4">
             <div>
-              <h3 class="font-serif text-xl font-normal text-stone-950">Revenue & Affiliate Growth</h3>
-              <p class="text-xs text-stone-400 font-light mt-0.5">Real-time daily GMV progression across all sales channels</p>
+              <h3 class="font-serif text-xl font-normal text-stone-950">Live Product Catalog ({products.length})</h3>
+              <p class="text-xs text-stone-400 font-light mt-0.5">Real products pulled directly from Supabase Cloud Database</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold text-stone-950 bg-stone-100 px-3 py-1 rounded-full">Last 30 Days</span>
+              <a
+                href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
+                target="_blank"
+                rel="noopener"
+                class="px-4 py-2 rounded-lg bg-stone-950 text-white text-xs font-semibold hover:bg-gold transition-colors"
+              >
+                + Add / Manage on Supabase DB
+              </a>
             </div>
           </div>
 
-          <!-- Minimal SVG Line Chart Visualization -->
-          <div class="w-full h-48 relative flex items-end">
-            <svg class="w-full h-full overflow-visible" viewBox="0 0 500 120" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#B49B67" stop-opacity="0.3"></stop>
-                  <stop offset="100%" stop-color="#B49B67" stop-opacity="0.0"></stop>
-                </linearGradient>
-              </defs>
-              <!-- Filled Area Under Curve -->
-              <path
-                d="M 0 100 Q 80 80, 150 60 T 300 40 T 420 20 T 500 10 L 500 120 L 0 120 Z"
-                fill="url(#chartGrad)"
-              ></path>
-              <!-- Smooth Curved Line -->
-              <path
-                d="M 0 100 Q 80 80, 150 60 T 300 40 T 420 20 T 500 10"
-                fill="none"
-                stroke="#B49B67"
-                stroke-width="3"
-                stroke-linecap="round"
-              ></path>
-            </svg>
-          </div>
-
-          <div class="flex justify-between text-[11px] text-stone-400 mt-4 font-mono">
-            <span>Sep 10</span>
-            <span>Sep 18</span>
-            <span>Sep 26</span>
-            <span>Oct 04</span>
-            <span>Today (Peak ₹18.4K/day)</span>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-stone-200 text-stone-400 uppercase tracking-wider font-semibold">
+                  <th class="py-3 px-3">Item</th>
+                  <th class="py-3 px-3">Title</th>
+                  <th class="py-3 px-3">Category</th>
+                  <th class="py-3 px-3">Wholesale</th>
+                  <th class="py-3 px-3">MRP</th>
+                  <th class="py-3 px-3">Discount</th>
+                  <th class="py-3 px-3">Meesho Code</th>
+                  <th class="py-3 px-3 text-right">Affiliate Link</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                {products.map((p) => (
+                  <tr class="hover:bg-stone-50/80 transition-colors">
+                    <td class="py-3 px-3">
+                      <img src={p.image} alt={p.title} class="w-10 h-12 object-cover rounded-md bg-stone-100" referrerpolicy="no-referrer" />
+                    </td>
+                    <td class="py-3 px-3 font-medium text-stone-950 max-w-[200px] truncate" title={p.title}>
+                      {p.title}
+                    </td>
+                    <td class="py-3 px-3">
+                      <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded text-[11px] font-medium">
+                        {p.category}
+                      </span>
+                    </td>
+                    <td class="py-3 px-3 font-semibold text-stone-950">₹{p.price}</td>
+                    <td class="py-3 px-3 text-stone-400 line-through">₹{p.mrp}</td>
+                    <td class="py-3 px-3">
+                      <span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-bold text-[10px]">
+                        {p.discount}
+                      </span>
+                    </td>
+                    <td class="py-3 px-3">
+                      <code class="bg-stone-100 text-gold-dark font-mono px-2 py-0.5 rounded border border-stone-200 text-[11px]">
+                        {p.meeshoCode}
+                      </code>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                      <a href={p.affiliateUrl} target="_blank" rel="noopener" class="text-gold hover:underline font-semibold">
+                        Visit ↗
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <!-- Recent Customer Orders Table -->
+        <!-- Recent Customer Orders Table (Real DB Orders) -->
         <div id="orders" class="antigravity-card p-8 bg-white scroll-mt-24">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="font-serif text-xl font-normal text-stone-950">Recent Dropship & Store Orders</h3>
-              <p class="text-xs text-stone-400 font-light mt-0.5">Live customer checkout bookings via COD and Prepaid</p>
+              <h3 class="font-serif text-xl font-normal text-stone-950">Live Customer Dropship Orders</h3>
+              <p class="text-xs text-stone-400 font-light mt-0.5">Real-time customer bookings logged from checkout</p>
             </div>
-            <a
-              href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
-              target="_blank"
-              rel="noopener"
-              class="text-xs font-semibold text-gold hover:text-gold-dark"
-            >
-              Export CSV / Full DB →
-            </a>
+            <span class="text-xs font-mono text-stone-500">Supabase Table: `orders`</span>
           </div>
 
           <div class="overflow-x-auto">
@@ -184,8 +200,8 @@ const RECENT_ORDERS = [
               <thead>
                 <tr class="border-b border-stone-200 text-stone-400 uppercase tracking-wider font-semibold">
                   <th class="py-3 px-4">Order ID</th>
-                  <th class="py-3 px-4">Customer Name</th>
-                  <th class="py-3 px-4">Location</th>
+                  <th class="py-3 px-4">Customer</th>
+                  <th class="py-3 px-4">City / Address</th>
                   <th class="py-3 px-4">Items</th>
                   <th class="py-3 px-4">Amount</th>
                   <th class="py-3 px-4">Status</th>
@@ -193,7 +209,7 @@ const RECENT_ORDERS = [
                 </tr>
               </thead>
               <tbody class="divide-y divide-stone-100">
-                {RECENT_ORDERS.map((ord) => (
+                {recentOrders.map((ord) => (
                   <tr class="hover:bg-stone-50/80 transition-colors">
                     <td class="py-3.5 px-4 font-mono font-semibold text-stone-900">{ord.id}</td>
                     <td class="py-3.5 px-4 font-medium text-stone-950">{ord.customer}</td>
