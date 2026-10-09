@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import ShelfHeader from './ShelfHeader.jsx';
-import ShelfProductStage from './ShelfProductStage.jsx';
-import InstantOrderModal from './InstantOrderModal.jsx';
+import Icon from './ui/Icon.jsx';
+import ShelfHeader from './layout/ShelfHeader.jsx';
+import ShelfProductStage from './modals/ShelfProductStage.jsx';
+import InstantOrderModal from './modals/InstantOrderModal.jsx';
 
 export default function ProductPage({
   productId,

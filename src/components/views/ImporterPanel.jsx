@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import Icon from './Icon.jsx';
+import Icon from '../ui/Icon.jsx';
 
 function lines(value) {
   return value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);

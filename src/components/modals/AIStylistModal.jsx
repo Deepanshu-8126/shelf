@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import ProductCard from './ProductCard.jsx';
+import Icon from '../ui/Icon.jsx';
+import ProductCard from '../ui/ProductCard.jsx';
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import ProductCard from './ProductCard.jsx';
+import Icon from '../ui/Icon.jsx';
+import ProductCard from '../ui/ProductCard.jsx';
 
 export default function GenZStudioModal({ isOpen, onClose, products, savedIds, onToggleSaved, onInstantOrder, onViewDetail }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'jerseys', 'spider', 'accessories', 'cargos', 'dresses'

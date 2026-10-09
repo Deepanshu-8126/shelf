@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import Icon from './Icon.jsx';
+import Icon from '../ui/Icon.jsx';
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;

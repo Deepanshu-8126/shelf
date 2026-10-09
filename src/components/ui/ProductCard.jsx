@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import StoreBadge from './StoreBadge.jsx';
-import { storeSearchUrl } from '../data.js';
-import { getProductClickUrl } from '../affiliate.js';
+import { storeSearchUrl } from '../../data.js';
+import { getProductClickUrl } from '../../affiliate.js';
 import './ProductCard.css';
 
 function money(value) {

@@ -1,22 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Icon from './components/Icon.jsx';
-import OrbitScene from './components/OrbitScene.jsx';
-import ProductCard from './components/ProductCard.jsx';
-import Pagination from './components/Pagination.jsx';
-import CollectionCard from './components/CollectionCard.jsx';
-import StoreBadge from './components/StoreBadge.jsx';
-import Storefront from './components/Storefront.jsx';
-import OwnerLogin from './components/OwnerLogin.jsx';
-const ImporterPanel = React.lazy(() => import('./components/ImporterPanel.jsx'));
-const IngestInboxView = React.lazy(() => import('./components/IngestInboxView.jsx'));
-const AdminCatalogView = React.lazy(() => import('./components/AdminCatalogView.jsx'));
-const AdminBannersManager = React.lazy(() => import('./components/AdminBannersManager.jsx'));
-const VeoVideoStudioView = React.lazy(() => import('./components/VeoVideoStudioView.jsx'));
-const AdminCustomerOrdersView = React.lazy(() => import('./components/AdminCustomerOrdersView.jsx'));
-const WishlinkView = React.lazy(() => import('./components/WishlinkView.jsx'));
-const AdminWishlinkManager = React.lazy(() => import('./components/AdminWishlinkManager.jsx'));
-import { AddCollectionModal, AddProductModal } from './components/Modals.jsx';
-const EarningScopeModal = React.lazy(() => import('./components/EarningScopeModal.jsx'));
+import Icon from './components/ui/Icon.jsx';
+import OrbitScene from './components/layout/OrbitScene.jsx';
+import ProductCard from './components/ui/ProductCard.jsx';
+import Pagination from './components/ui/Pagination.jsx';
+import CollectionCard from './components/ui/CollectionCard.jsx';
+import StoreBadge from './components/ui/StoreBadge.jsx';
+import Storefront from './components/views/Storefront.jsx';
+import OwnerLogin from './components/views/OwnerLogin.jsx';
+const ImporterPanel = React.lazy(() => import('./components/views/ImporterPanel.jsx'));
+const IngestInboxView = React.lazy(() => import('./components/views/IngestInboxView.jsx'));
+const AdminCatalogView = React.lazy(() => import('./components/views/AdminCatalogView.jsx'));
+const AdminBannersManager = React.lazy(() => import('./components/views/AdminBannersManager.jsx'));
+const VeoVideoStudioView = React.lazy(() => import('./components/views/VeoVideoStudioView.jsx'));
+const AdminCustomerOrdersView = React.lazy(() => import('./components/views/AdminCustomerOrdersView.jsx'));
+const WishlinkView = React.lazy(() => import('./components/views/WishlinkView.jsx'));
+const AdminWishlinkManager = React.lazy(() => import('./components/views/AdminWishlinkManager.jsx'));
+import { AddCollectionModal, AddProductModal } from './components/modals/Modals.jsx';
+const EarningScopeModal = React.lazy(() => import('./components/modals/EarningScopeModal.jsx'));
 import {
   INITIAL_COLLECTIONS,
   INITIAL_PRODUCTS,
@@ -26,7 +26,7 @@ import {
   detectStore,
 } from './data.js';
 import { getCloudProducts } from './services/supabaseClient.js';
-import './components/DashboardView.css';
+import './components/views/DashboardView.css';
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: 'overview' },

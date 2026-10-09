@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import Icon from './Icon.jsx';
+import Icon from '../ui/Icon.jsx';
 
 /* ─── Commission rates by store ───────────────────────────────────────── */
 const COMMISSION_RATES = {

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
-import Icon from './Icon.jsx';
-import { detectStore } from '../data.js';
+import Icon from '../ui/Icon.jsx';
+import { detectStore } from '../../data.js';
 import './AdminCatalogView.css';
 
 const CATEGORY_GROUPS = [

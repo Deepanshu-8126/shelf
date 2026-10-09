@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import { cleanDisplayTitle } from './ProductCard.jsx';
+import Icon from '../ui/Icon.jsx';
+import { cleanDisplayTitle } from '../ui/ProductCard.jsx';
 
 function money(v) {
   return `₹${Number(v || 0).toLocaleString('en-IN')}`;

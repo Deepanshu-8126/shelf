@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import { getColorHex } from './ProductCard.jsx';
+import Icon from '../ui/Icon.jsx';
+import { getColorHex } from '../ui/ProductCard.jsx';
 
 export default function InstantOrderModal({ product, onClose }) {
   const [selectedSize, setSelectedSize] = useState(() => product?.selectedSize || product?.sizes?.[0] || 'M');

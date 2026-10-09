@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import { getProductClickUrl } from '../affiliate.js';
+import Icon from '../ui/Icon.jsx';
+import { getProductClickUrl } from '../../affiliate.js';
 
 export default function ShelfProductStage({
   product,

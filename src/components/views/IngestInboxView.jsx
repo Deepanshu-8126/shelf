@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Icon from './Icon';
+import Icon from '../ui/Icon.jsx';
 
 const CATEGORY_CHOICES = [
   'Gen Z Aesthetic & Streetwear',

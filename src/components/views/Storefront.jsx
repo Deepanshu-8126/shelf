@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Icon from './Icon.jsx';
-import ProductCard from './ProductCard.jsx';
-import Pagination from './Pagination.jsx';
-import CollectionCard from './CollectionCard.jsx';
-import InstantOrderModal from './InstantOrderModal.jsx';
-import ProductDetailModal from './ProductDetailModal.jsx';
-import ProductPage from './ProductPage.jsx';
-const OutfitBuilderModal = React.lazy(() => import('./OutfitBuilderModal.jsx'));
-const AIStylistModal = React.lazy(() => import('./AIStylistModal.jsx'));
-const InteractiveShowroomModal = React.lazy(() => import('./InteractiveShowroomModal.jsx'));
-const VirtualTryOnModal = React.lazy(() => import('./VirtualTryOnModal.jsx'));
-const EarningScopeModal = React.lazy(() => import('./EarningScopeModal.jsx'));
-const GenZStudioModal = React.lazy(() => import('./GenZStudioModal.jsx'));
-import { getProductClickUrl } from '../affiliate.js';
+import Icon from '../ui/Icon.jsx';
+import ProductCard from '../ui/ProductCard.jsx';
+import Pagination from '../ui/Pagination.jsx';
+import CollectionCard from '../ui/CollectionCard.jsx';
+import InstantOrderModal from '../modals/InstantOrderModal.jsx';
+import ProductDetailModal from '../modals/ProductDetailModal.jsx';
+import ProductPage from '../ProductPage.jsx';
+const OutfitBuilderModal = React.lazy(() => import('../modals/OutfitBuilderModal.jsx'));
+const AIStylistModal = React.lazy(() => import('../modals/AIStylistModal.jsx'));
+const InteractiveShowroomModal = React.lazy(() => import('../modals/InteractiveShowroomModal.jsx'));
+const VirtualTryOnModal = React.lazy(() => import('../modals/VirtualTryOnModal.jsx'));
+const EarningScopeModal = React.lazy(() => import('../modals/EarningScopeModal.jsx'));
+const GenZStudioModal = React.lazy(() => import('../modals/GenZStudioModal.jsx'));
+import { getProductClickUrl } from '../../affiliate.js';
 
 const HERO_SLIDE_COPY = {
   'Tops & Tunics': {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { STORE_CONFIG } from '../data.js';
+import { STORE_CONFIG } from '../../data.js';
 
 export default function StoreBadge({ store, compact = false }) {
   const config = STORE_CONFIG[store] || { color: '#68726a', pale: '#eef1ec' };

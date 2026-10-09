@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Icon from './Icon.jsx';
+import Icon from '../ui/Icon.jsx';
 
 export default function OwnerLogin({ onLogin, onPublicPreview, configured = true, error = '', busy = false }) {
   const [password, setPassword] = useState('');

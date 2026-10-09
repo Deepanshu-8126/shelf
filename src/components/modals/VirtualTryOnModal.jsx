@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import Icon from './Icon.jsx';
+import Icon from '../ui/Icon.jsx';
 import InstantOrderModal from './InstantOrderModal.jsx';
-import { getProductClickUrl } from '../affiliate.js';
+import { getProductClickUrl } from '../../affiliate.js';
 
 function money(value) {
   return `₹${Number(value || 0).toLocaleString('en-IN')}`;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Icon from './Icon.jsx';
-import StoreBadge from './StoreBadge.jsx';
-import { detectStore, STORES } from '../data.js';
+import Icon from '../ui/Icon.jsx';
+import StoreBadge from '../ui/StoreBadge.jsx';
+import { detectStore, STORES } from '../../data.js';
 
 const categoryCover = {
   Style: ['/images/linen-set.jpg', '/images/crossbody-bag.jpg', '/images/canvas-sneakers.jpg'],

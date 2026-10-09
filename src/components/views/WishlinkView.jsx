@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import Icon from './Icon.jsx';
-import { getProductClickUrl } from '../affiliate.js';
-import { cleanDisplayTitle } from './ProductCard.jsx';
-import InstantOrderModal from './InstantOrderModal.jsx';
+import Icon from '../ui/Icon.jsx';
+import { getProductClickUrl } from '../../affiliate.js';
+import { cleanDisplayTitle } from '../ui/ProductCard.jsx';
+import InstantOrderModal from '../modals/InstantOrderModal.jsx';
 import './WishlinkView.css';
 
 function money(v) {
