@@ -31,6 +31,8 @@ const CATEGORIES = [
     filter: 'Accessories',
   },
 ];
+
+const FILTER_PILLS = ['All Picks', 'Tops & Tunics', 'Kurtis', 'Ethnic Wear', 'Women Dresses', 'Winter', 'Accessories'];
 ---
 
 <Layout title="SHEF. — Luxury Fashion Reseller & Curated Creator Drops" activeNav="store">
@@ -42,7 +44,7 @@ const CATEGORIES = [
         alt="Editorial Fashion Model"
         class="w-full h-full object-cover object-center opacity-90 scale-105 transition-transform duration-1000 ease-out hover:scale-100"
       />
-      <div class="absolute inset-0 bg-gradient-to-r from-stone-950/80 via-stone-950/40 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-stone-950/85 via-stone-950/45 to-transparent"></div>
     </div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full text-white">
@@ -81,7 +83,7 @@ const CATEGORIES = [
     </div>
   </section>
 
-  <!-- Editorial Category Grid (3-Column) -->
+  <!-- Editorial Category Grid (3-Column Spaces) -->
   <section class="max-w-7xl mx-auto px-6 py-24">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
       <div>
@@ -124,18 +126,28 @@ const CATEGORIES = [
         <span class="text-xs font-semibold uppercase tracking-[0.25em] text-gold">REEL-APPROVED DROPS</span>
         <h2 class="font-serif text-3xl md:text-4xl font-normal text-stone-950 mt-1">Trending Curations</h2>
       </div>
-      <div class="flex items-center gap-2 mt-4 sm:mt-0 overflow-x-auto pb-2 sm:pb-0">
-        <button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-stone-950 text-white shadow-sm">All Picks</button>
-        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Tops</button>
-        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Kurtis</button>
-        <button class="px-4 py-1.5 rounded-full text-xs font-medium text-stone-600 bg-white border border-stone-200 hover:text-stone-950">Dresses</button>
+
+      <!-- Filter Buttons -->
+      <div class="flex items-center gap-2 mt-4 sm:mt-0 overflow-x-auto pb-2 sm:pb-0" id="filterContainer">
+        {FILTER_PILLS.map((pill, idx) => (
+          <button
+            class={`pill-filter px-4 py-1.5 rounded-full text-xs transition-all whitespace-nowrap ${
+              idx === 0
+                ? 'active bg-stone-950 text-white font-semibold shadow-sm'
+                : 'bg-white border border-stone-200 text-stone-600 hover:text-stone-950 font-medium'
+            }`}
+            data-category={pill}
+          >
+            {pill}
+          </button>
+        ))}
       </div>
     </div>
 
     <!-- 4-Column Product Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
       {products.map((p) => (
-        <div class="antigravity-card overflow-hidden flex flex-col group">
+        <div class="product-item antigravity-card overflow-hidden flex flex-col group" data-category={p.category}>
           <!-- Image Wrapper -->
           <div class="relative aspect-[4/5] bg-stone-100 overflow-hidden">
             <img
@@ -148,7 +160,7 @@ const CATEGORIES = [
             <span class="absolute top-3.5 left-3.5 bg-stone-950/80 backdrop-blur-md text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md">
               {p.discount}
             </span>
-            <span class="absolute bottom-3.5 right-3.5 bg-white/90 backdrop-blur-md text-stone-900 text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm border border-stone-200/50">
+            <span class="absolute bottom-3.5 right-3.5 bg-white/95 backdrop-blur-md text-stone-900 text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm border border-stone-200/50">
               ★ {p.rating}
             </span>
           </div>
@@ -157,10 +169,10 @@ const CATEGORIES = [
           <div class="p-5 flex flex-col flex-1 justify-between gap-3">
             <div>
               <div class="flex items-center justify-between text-[11px] text-stone-400 uppercase tracking-widest font-semibold mb-1">
-                <span>SHEF. SELECT</span>
+                <span>{p.category}</span>
                 <span class="text-gold font-mono lowercase">{p.meeshoCode}</span>
               </div>
-              <h3 class="font-serif text-base font-normal text-stone-900 line-clamp-1 leading-snug group-hover:text-gold transition-colors">
+              <h3 class="font-serif text-base font-normal text-stone-900 line-clamp-1 leading-snug group-hover:text-gold transition-colors" title={p.title}>
                 {p.title}
               </h3>
             </div>
@@ -176,17 +188,27 @@ const CATEGORIES = [
               </span>
             </div>
 
-            <!-- Minimal Action Button -->
-            <div class="grid grid-cols-1 gap-2 pt-2">
+            <!-- Minimal Action Buttons (Dual Actions: Buy Link + Copy Code) -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-2">
               <a
                 href={p.affiliateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-full py-2.5 rounded-xl bg-stone-950 text-white text-xs font-medium tracking-wider flex items-center justify-center gap-2 hover:bg-gold transition-colors shadow-sm"
+                class="sm:col-span-3 py-2.5 rounded-xl bg-stone-950 text-white text-xs font-medium tracking-wider flex items-center justify-center gap-2 hover:bg-gold transition-colors shadow-sm text-center"
               >
-                <span>Add to Bag / Buy</span>
+                <span>Shop on Meesho</span>
                 <span class="text-xs">→</span>
               </a>
+
+              <button
+                type="button"
+                data-code={p.meeshoCode}
+                onclick={`navigator.clipboard.writeText('${p.meeshoCode}'); const el = this; el.innerText = '✓'; setTimeout(() => { el.innerText = '📋'; }, 1500);`}
+                class="sm:col-span-1 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold flex items-center justify-center transition-colors border border-stone-200"
+                title={`Copy code ${p.meeshoCode} for Meesho app`}
+              >
+                📋
+              </button>
             </div>
           </div>
         </div>
@@ -194,3 +216,32 @@ const CATEGORIES = [
     </div>
   </section>
 </Layout>
+
+<script>
+  // Interactive category pill filtering logic
+  const filterBtns = document.querySelectorAll('.pill-filter');
+  const items = document.querySelectorAll('.product-item');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => {
+        b.classList.remove('active', 'bg-stone-950', 'text-white', 'shadow-sm');
+        b.classList.add('bg-white', 'border', 'border-stone-200', 'text-stone-600');
+      });
+
+      btn.classList.remove('bg-white', 'border', 'border-stone-200', 'text-stone-600');
+      btn.classList.add('active', 'bg-stone-950', 'text-white', 'shadow-sm');
+
+      const selected = btn.getAttribute('data-category');
+
+      items.forEach((item) => {
+        const cat = item.getAttribute('data-category');
+        if (selected === 'All Picks' || cat === selected) {
+          (item as HTMLElement).style.display = 'flex';
+        } else {
+          (item as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
