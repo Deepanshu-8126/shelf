@@ -4,18 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ./node_modules/vite/bin/vite.js --host 0.0.0.0",
-    "api:dev": "python -m uvicorn server.catalog_api:app --host 0.0.0.0 --port 8787",
-    "sync:meesho": "python scripts/sync_meesho_catalog.py",
-    "import:meesho": "python scripts/import_meesho_paste.py",
-    "build": "node ./node_modules/vite/bin/vite.js build",
-    "preview": "node ./node_modules/vite/bin/vite.js preview --host 0.0.0.0",
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0",
     "deploy": "wrangler pages deploy dist --project-name shelf-store",
     "deploy:worker": "wrangler deploy"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.3.4",
     "@supabase/supabase-js": "^2.117.2",
     "@vitejs/plugin-react": "latest",
+    "astro": "^7.3.8",
     "react": "latest",
     "react-dom": "latest",
     "three": "latest",

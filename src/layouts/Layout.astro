@@ -1,0 +1,97 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'shelf. — Curated Meesho Fashion Finds & Creator Drops',
+  description = 'Handpicked aesthetic outfits, trending streetwear, ethnic kurtis & viral reels finds with direct verified Meesho affiliate links.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style is:global>
+      :root {
+        --bg-main: #09090b;
+        --bg-surface: #121217;
+        --bg-card: #18181f;
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-focus: rgba(255, 255, 255, 0.2);
+        --text-main: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --accent-pink: #ec4899;
+        --accent-pink-glow: rgba(236, 72, 153, 0.25);
+        --accent-peach: #ffedd5;
+        --accent-emerald: #10b981;
+        --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        background: none;
+      }
+
+      .container {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+
+      /* Specular Glare & Animations */
+      @keyframes floatSlow {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+
+      .glow-badge {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(255, 237, 213, 0.05));
+        border: 1px solid rgba(236, 72, 153, 0.3);
+        color: #f472b6;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.25rem 0.65rem;
+        border-radius: 9999px;
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

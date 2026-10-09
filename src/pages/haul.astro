@@ -1,0 +1,202 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { getAllProducts } from '../services/catalog.js';
+
+const products = await getAllProducts();
+---
+
+<Layout title="Deepanshu's Creator Haul — Curated Meesho Outfits & Links">
+  <Header activeTab="haul" />
+
+  <main class="haul-container container">
+    <!-- Creator Profile Header (Wishlink / Linktree style) -->
+    <section class="creator-profile-card">
+      <div class="avatar-ring">
+        <span class="avatar-text">D</span>
+      </div>
+      <div class="creator-meta">
+        <h1 class="creator-name">Deepanshu <span class="badge-verified">✓</span></h1>
+        <p class="creator-handle">@deepanshu.fashion</p>
+        <p class="creator-bio">
+          Tested viral Meesho fashion finds, aesthetic streetwear & reel-approved outfits ✨ Tap to shop on Meesho with verified lowest price codes!
+        </p>
+
+        <!-- Social Buttons -->
+        <div class="social-links-row">
+          <a href="https://instagram.com" target="_blank" rel="noopener" class="social-chip">
+            <span>📷 Instagram</span>
+          </a>
+          <a href="https://t.me/ubstabot" target="_blank" rel="noopener" class="social-chip">
+            <span>💬 Telegram Deals</span>
+          </a>
+          <a href="https://youtube.com" target="_blank" rel="noopener" class="social-chip">
+            <span>▶️ YouTube Hauls</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Haul Section Header -->
+    <div class="haul-divider">
+      <span class="divider-text">LATEST REEL FINDS & PICKS ({products.length})</span>
+    </div>
+
+    <!-- Product Feed -->
+    <section class="catalog-grid">
+      {products.map((product) => (
+        <ProductCard product={product} />
+      ))}
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .haul-container {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+    max-width: 900px;
+  }
+
+  .creator-profile-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .avatar-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #facc15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+  }
+
+  .avatar-text {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .creator-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .creator-name {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .badge-verified {
+    font-size: 0.85rem;
+    color: #38bdf8;
+  }
+
+  .creator-handle {
+    font-size: 0.85rem;
+    color: var(--accent-pink);
+    font-weight: 600;
+  }
+
+  .creator-bio {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 0.25rem;
+  }
+
+  .social-links-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .social-chip {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+
+  .social-chip:hover {
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
+  }
+
+  .haul-divider {
+    text-align: center;
+    position: relative;
+    margin: 2rem 0;
+  }
+
+  .haul-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-subtle);
+    z-index: 1;
+  }
+
+  .divider-text {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-main);
+    padding: 0 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .creator-profile-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .creator-name {
+      justify-content: center;
+    }
+    .social-links-row {
+      justify-content: center;
+    }
+    .catalog-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+  }
+</style>
