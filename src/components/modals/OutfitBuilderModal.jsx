@@ -48,9 +48,9 @@ export default function OutfitBuilderModal({ allProducts = [], onClose }) {
     });
     if (accFromProducts.length > 0) return accFromProducts;
     return [
-      { id: 'acc-1', title: 'Vintage Chunky Gold Hoops', category: 'Accessories', price: 199, image: '/images/gold-hoops.jpg' },
-      { id: 'acc-2', title: 'Minimalist Baguette Shoulder Bag', category: 'Accessories', price: 449, image: '/images/crossbody-bag.jpg' },
-      { id: 'acc-3', title: 'Pearl Choker Necklace', category: 'Accessories', price: 249, image: '/images/linen-set.jpg' },
+      { id: 'acc-1', title: 'Delicate Floral Stud Earrings Set', category: 'Accessories', price: 189, image: '/images/meesho-flower-earrings.webp' },
+      { id: 'acc-2', title: 'Canvas Tote With Happy Print', category: 'Accessories', price: 270, image: '/images/meesho-canvas-tote.webp' },
+      { id: 'acc-3', title: '10-Pair Everyday Earrings Edit', category: 'Accessories', price: 155, image: '/images/meesho-earrings-combo.webp' },
     ];
   }, [allProducts]);
 

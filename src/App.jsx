@@ -55,16 +55,16 @@ const DASHBOARD_CATEGORY_CHOICES = [
 ];
 
 const categoryImages = {
-  Fashion: '/images/linen-set.jpg',
+  Fashion: '/images/meesho-side-dori-main.webp',
   'Tops & Tunics': '/images/meesho-side-dori-main.webp',
   Kurtis: '/images/meesho-peach-short-kurti.webp',
   'Ethnic Wear': '/images/meesho-kurti-set.webp',
   'Women Dresses': '/images/meesho-dress-ae6lv9.webp',
-  Bottomwear: '/images/linen-set.jpg',
-  Innerwear: '/images/linen-set.jpg',
-  Beauty: '/images/face-serum.jpg',
-  Home: '/images/ceramic-vases.jpg',
-  Accessories: '/images/gold-hoops.jpg',
+  Bottomwear: '/images/meesho-casual-beige-girls-top.webp',
+  Innerwear: '/images/meesho-casual-beige-girls-top.webp',
+  Beauty: '/images/meesho-flower-earrings.webp',
+  Home: '/images/meesho-jute-lamp.webp',
+  Accessories: '/images/meesho-earrings-combo.webp',
   Winter: '/images/meesho-black-cardigan.webp',
 };
 

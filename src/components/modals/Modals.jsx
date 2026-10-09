@@ -4,16 +4,16 @@ import StoreBadge from '../ui/StoreBadge.jsx';
 import { detectStore, STORES } from '../../data.js';
 
 const categoryCover = {
-  Style: ['/images/linen-set.jpg', '/images/crossbody-bag.jpg', '/images/canvas-sneakers.jpg'],
+  Style: ['/images/meesho-side-dori-main.webp', '/images/meesho-canvas-tote.webp', '/images/meesho-casual-beige-girls-top.webp'],
   'Tops & Tunics': ['/images/meesho-side-dori-main.webp', '/images/meesho-western-square-print-top.webp', '/images/meesho-plaid-bow-peplum-top.webp'],
   Kurtis: ['/images/meesho-peach-short-kurti.webp', '/images/meesho-peach-embroidered-tunic.webp', '/images/meesho-kurti-dailywear-hgyhrb.webp'],
   'Ethnic Wear': ['/images/meesho-kurti-set.webp', '/images/meesho-peach-embroidered-tunic.webp', '/images/meesho-kurti-dailywear-hgyhrb.webp'],
   'Women Dresses': ['/images/meesho-dress-ae6lv9.webp', '/images/meesho-dress-gpc4vn.webp', '/images/meesho-dress-ibsnwj.webp'],
-  Bottomwear: ['/images/linen-set.jpg', '/images/canvas-sneakers.jpg', '/images/crossbody-bag.jpg'],
-  Innerwear: ['/images/linen-set.jpg', '/images/crossbody-bag.jpg', '/images/gold-hoops.jpg'],
-  Beauty: ['/images/face-serum.jpg', '/images/gold-hoops.jpg', '/images/ceramic-vases.jpg'],
-  Home: ['/images/ceramic-vases.jpg', '/images/linen-set.jpg', '/images/face-serum.jpg'],
-  'Under ₹999': ['/images/meesho-earrings-combo.webp', '/images/meesho-canvas-tote.webp', '/images/ceramic-vases.jpg'],
+  Bottomwear: ['/images/meesho-casual-beige-girls-top.webp', '/images/meesho-side-dori-main.webp', '/images/meesho-canvas-tote.webp'],
+  Innerwear: ['/images/meesho-casual-beige-girls-top.webp', '/images/meesho-side-dori-main.webp', '/images/meesho-flower-earrings.webp'],
+  Beauty: ['/images/meesho-flower-earrings.webp', '/images/meesho-earrings-combo.webp', '/images/meesho-jute-lamp.webp'],
+  Home: ['/images/meesho-jute-lamp.webp', '/images/meesho-kashmiri-shawl.webp', '/images/meesho-flower-earrings.webp'],
+  'Under ₹999': ['/images/meesho-earrings-combo.webp', '/images/meesho-canvas-tote.webp', '/images/meesho-checked-peplum-top.webp'],
   Winter: ['/images/meesho-hot-pink-puffer.webp', '/images/meesho-puffer-vest.webp', '/images/meesho-kashmiri-shawl.webp'],
 };
 
@@ -50,7 +50,7 @@ export function AddProductModal({ product, collections, onClose, onSave }) {
       oldPrice: product?.oldPrice || null,
       clicks: product?.clicks || 0,
       commission: product?.commission || 'Add rate',
-      image: product?.image || '/images/crossbody-bag.jpg',
+      image: product?.image || '/images/meesho-canvas-tote.webp',
       imagePosition: product?.imagePosition || 'center',
       imageFit: product?.imageFit || 'cover',
       tint: product?.tint || 'sage',
