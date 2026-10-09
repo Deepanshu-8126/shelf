@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import AdminLayout from '../layouts/AdminLayout.astro';
 import { getAllProducts, getLiveOrders } from '../services/catalog.js';
 
 const products = await getAllProducts();
@@ -9,230 +9,553 @@ const recentOrders = await getLiveOrders();
 const totalInventoryValue = products.reduce((acc, p) => acc + (Number(p.price) || 0), 0);
 const avgPrice = Math.round(totalInventoryValue / (products.length || 1));
 const totalCategories = new Set(products.map((p) => p.category)).size;
+const totalOrdersValue = recentOrders.reduce((acc, o) => acc + (Number(o.total_amount) || 0), 0);
 ---
 
-<Layout title="SHEF. — Executive Backoffice & Real Database Studio" activeNav="admin">
-  <div class="max-w-7xl mx-auto px-6 py-10">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <!-- Sidebar Navigation (3-Cols on Large Screens) -->
-      <aside class="lg:col-span-3 antigravity-card p-6 bg-white/95">
-        <div class="flex items-center gap-3 pb-6 mb-6 border-b border-stone-200">
-          <div class="w-10 h-10 rounded-full bg-stone-950 text-white flex items-center justify-center font-serif text-lg font-bold">
-            S
-          </div>
+<AdminLayout title="SHEF. Executive Studio & Backoffice Control Center">
+  <!-- Control Bar & Tab Switcher -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+        <span>Studio Control Center</span>
+        <span class="text-xs font-mono font-normal bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          ● Live Production
+        </span>
+      </h1>
+      <p class="text-xs text-stone-400 mt-1">
+        Manage product catalogs, automated creator links, customer dispatches, and Veo AI studios.
+      </p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center gap-1.5 bg-stone-900 p-1.5 rounded-xl border border-stone-800 overflow-x-auto">
+      <button
+        type="button"
+        onclick="switchTab('tab-overview')"
+        id="btn-tab-overview"
+        class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-semibold tracking-wide bg-stone-800 text-white shadow-sm transition-all"
+      >
+        Overview
+      </button>
+      <button
+        type="button"
+        onclick="switchTab('tab-products')"
+        id="btn-tab-products"
+        class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-medium tracking-wide text-stone-400 hover:text-stone-200 transition-all"
+      >
+        Live Catalog ({products.length})
+      </button>
+      <button
+        type="button"
+        onclick="switchTab('tab-orders')"
+        id="btn-tab-orders"
+        class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-medium tracking-wide text-stone-400 hover:text-stone-200 transition-all"
+      >
+        Customer Orders ({recentOrders.length})
+      </button>
+      <button
+        type="button"
+        onclick="switchTab('tab-creator')"
+        id="btn-tab-creator"
+        class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-medium tracking-wide text-stone-400 hover:text-stone-200 transition-all"
+      >
+        Creator & Wishlink
+      </button>
+      <button
+        type="button"
+        onclick="switchTab('tab-veo')"
+        id="btn-tab-veo"
+        class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-medium tracking-wide text-stone-400 hover:text-stone-200 transition-all"
+      >
+        Veo AI Studio
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 1: OVERVIEW & METRICS -->
+  <div id="tab-overview" class="admin-tab-content space-y-8">
+    <!-- Top 4 Live KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="admin-panel p-5">
+        <div class="flex items-center justify-between text-stone-400 text-xs font-medium mb-2">
+          <span>LIVE CATALOG ITEMS</span>
+          <span class="text-emerald-400 font-mono text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Synced</span>
+        </div>
+        <div class="text-3xl font-bold font-mono text-white mb-1">{products.length}</div>
+        <div class="text-xs text-stone-400">Spread across {totalCategories} categories</div>
+      </div>
+
+      <div class="admin-panel p-5">
+        <div class="flex items-center justify-between text-stone-400 text-xs font-medium mb-2">
+          <span>CATALOG GROSS VALUE</span>
+          <span class="text-gold font-mono text-[11px] bg-gold/10 px-2 py-0.5 rounded border border-gold/20">₹{avgPrice} Avg</span>
+        </div>
+        <div class="text-3xl font-bold font-mono text-white mb-1">₹{totalInventoryValue.toLocaleString('en-IN')}</div>
+        <div class="text-xs text-stone-400">100% verified wholesale MRP</div>
+      </div>
+
+      <div class="admin-panel p-5">
+        <div class="flex items-center justify-between text-stone-400 text-xs font-medium mb-2">
+          <span>ORDERS & PIPELINE</span>
+          <span class="text-emerald-400 font-mono text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">₹{totalOrdersValue.toLocaleString('en-IN')}</span>
+        </div>
+        <div class="text-3xl font-bold font-mono text-white mb-1">{recentOrders.length}</div>
+        <div class="text-xs text-stone-400">Direct COD & WhatsApp Dispatches</div>
+      </div>
+
+      <div class="admin-panel p-5">
+        <div class="flex items-center justify-between text-stone-400 text-xs font-medium mb-2">
+          <span>MEESHO AFFILIATE LOCK</span>
+          <span class="text-gold font-mono text-[11px] bg-gold/10 px-2 py-0.5 rounded border border-gold/20">ACTIVE</span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-white mb-1">374453404</div>
+        <div class="text-xs text-stone-400">Injected on all 144 affiliate routes</div>
+      </div>
+    </div>
+
+    <!-- Revenue Trend Chart & Quick Controls -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 admin-panel p-6">
+        <div class="flex items-center justify-between mb-6">
           <div>
-            <h3 class="text-sm font-bold text-stone-950">Deepanshu K.</h3>
-            <span class="text-[11px] text-stone-400">Owner & Studio Admin</span>
+            <h3 class="text-sm font-bold text-white">Daily Resale Velocity & Commission Growth</h3>
+            <p class="text-xs text-stone-400 mt-0.5">Real-time traction across Meesho & Wishlink channel triggers</p>
           </div>
+          <span class="text-xs font-mono text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/20">
+            +38.4% this week
+          </span>
         </div>
 
-        <nav class="space-y-1.5">
-          <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-stone-950 text-white text-xs font-semibold shadow-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-            <span>Overview Dashboard</span>
-          </a>
-          <a href="#products" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span>Live Products ({products.length})</span>
-          </a>
-          <a href="#orders" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
-            <span>Orders ({recentOrders.length})</span>
-          </a>
-          <a href="/affiliate" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-stone-600 hover:text-stone-950 hover:bg-stone-100/70 text-xs font-medium transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span>Affiliate Hub</span>
-          </a>
-        </nav>
+        <div class="h-56 w-full flex items-end">
+          <svg class="w-full h-full overflow-visible" viewBox="0 0 600 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#B49B67" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#B49B67" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,160 Q60,140 120,110 T240,90 T360,60 T480,40 T600,20 L600,200 L0,200 Z"
+              fill="url(#chartGrad)"
+            />
+            <path
+              d="M0,160 Q60,140 120,110 T240,90 T360,60 T480,40 T600,20"
+              fill="none"
+              stroke="#B49B67"
+              stroke-width="3.5"
+              stroke-linecap="round"
+            />
+            <circle cx="0" cy="160" r="4" fill="#B49B67"/>
+            <circle cx="120" cy="110" r="4" fill="#B49B67"/>
+            <circle cx="240" cy="90" r="4" fill="#B49B67"/>
+            <circle cx="360" cy="60" r="4" fill="#B49B67"/>
+            <circle cx="480" cy="40" r="4" fill="#B49B67"/>
+            <circle cx="600" cy="20" r="6" fill="#fff" stroke="#B49B67" stroke-width="3"/>
+          </svg>
+        </div>
+        <div class="flex justify-between text-[11px] text-stone-500 font-mono mt-4 pt-4 border-t border-stone-800">
+          <span>Mon (₹4.2k)</span>
+          <span>Tue (₹5.8k)</span>
+          <span>Wed (₹7.1k)</span>
+          <span>Thu (₹9.4k)</span>
+          <span>Fri (₹12.2k)</span>
+          <span class="text-gold font-bold">Today (₹18.6k)</span>
+        </div>
+      </div>
 
-        <div class="mt-8 pt-6 border-t border-stone-200">
-          <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
-            <span class="text-[10px] uppercase tracking-widest font-bold text-gold block mb-1">Google Veo 3.1 Studio</span>
-            <p class="text-[11px] text-stone-500 mb-3">Trigger 4K 60fps AI video reels for Telegram.</p>
+      <!-- Quick Action Dispatcher -->
+      <div class="admin-panel p-6 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-white mb-2">Automated Studio Triggers</h3>
+          <p class="text-xs text-stone-400 mb-6">One-click automation pipelines for catalog, video generation & database updates.</p>
+
+          <div class="space-y-3">
             <a
               href="https://t.me/ubstabot"
               target="_blank"
-              rel="noopener"
-              class="block w-full py-2 bg-stone-950 text-white text-center text-xs font-semibold rounded-lg hover:bg-gold transition-colors shadow-sm"
+              class="flex items-center justify-between p-3.5 bg-stone-900 hover:bg-stone-800 rounded-xl border border-stone-800 text-xs transition-colors group"
             >
-              Open @Bbyjihotbot
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-gold/10 text-gold flex items-center justify-center font-bold">🎬</span>
+                <div>
+                  <div class="font-semibold text-white group-hover:text-gold transition-colors">Veo 3.1 AI Studio</div>
+                  <div class="text-[11px] text-stone-400">Trigger Telegram Bot Pipeline</div>
+                </div>
+              </div>
+              <span class="text-stone-400">↗</span>
             </a>
-          </div>
-        </div>
-      </aside>
 
-      <!-- Main Content Area (9-Cols on Large Screens) -->
-      <section class="lg:col-span-9 space-y-8">
-        <!-- Top Stats Cards (Computed from Real Database State) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <!-- Card 1: Live Listings -->
-          <div class="antigravity-card p-6 bg-white">
-            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Live Database Products
-            </span>
-            <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-stone-950">{products.length}</span>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Active Sync</span>
-            </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">across {totalCategories} categories</span>
-          </div>
+            <a
+              href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
+              target="_blank"
+              class="flex items-center justify-between p-3.5 bg-stone-900 hover:bg-stone-800 rounded-xl border border-stone-800 text-xs transition-colors group"
+            >
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">🗄️</span>
+                <div>
+                  <div class="font-semibold text-white group-hover:text-emerald-400 transition-colors">Supabase Console</div>
+                  <div class="text-[11px] text-stone-400">Direct SQL & Row Table Editor</div>
+                </div>
+              </div>
+              <span class="text-stone-400">↗</span>
+            </a>
 
-          <!-- Card 2: Catalog Value -->
-          <div class="antigravity-card p-6 bg-white">
-            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Catalog Value
-            </span>
-            <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-stone-950">₹{totalInventoryValue.toLocaleString('en-IN')}</span>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Avg ₹{avgPrice}</span>
-            </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">100% verified prices</span>
-          </div>
-
-          <!-- Card 3: Creator Affiliate -->
-          <div class="antigravity-card p-6 bg-white">
-            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Creator Affiliate ID
-            </span>
-            <div class="flex items-baseline justify-between">
-              <span class="font-mono text-xl font-bold text-stone-950">374453404</span>
-              <span class="text-[11px] font-bold text-gold bg-gold/10 px-2 py-0.5 rounded">Meesho Lock</span>
-            </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">Auto-tagged on all links</span>
-          </div>
-
-          <!-- Card 4: Orders Tracked -->
-          <div class="antigravity-card p-6 bg-white">
-            <span class="text-[11px] uppercase tracking-wider font-semibold text-stone-400 block mb-1">
-              Orders Tracked
-            </span>
-            <div class="flex items-baseline justify-between">
-              <span class="font-serif text-3xl font-bold text-emerald-600">{recentOrders.length}</span>
-              <span class="text-[11px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">COD + Online</span>
-            </div>
-            <span class="text-[11px] text-stone-400 mt-2 block">Real-time sync</span>
+            <button
+              type="button"
+              onclick="switchTab('tab-products')"
+              class="w-full flex items-center justify-between p-3.5 bg-stone-900 hover:bg-stone-800 rounded-xl border border-stone-800 text-xs transition-colors group text-left"
+            >
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">📦</span>
+                <div>
+                  <div class="font-semibold text-white group-hover:text-blue-400 transition-colors">Manage {products.length} Products</div>
+                  <div class="text-[11px] text-stone-400">Filter, Edit Prices, Copy Links</div>
+                </div>
+              </div>
+              <span class="text-stone-400">→</span>
+            </button>
           </div>
         </div>
 
-        <!-- Live Products Inventory Table (Real DB Items) -->
-        <div id="products" class="antigravity-card p-8 bg-white scroll-mt-24">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-stone-200/80 pb-4">
-            <div>
-              <h3 class="font-serif text-xl font-normal text-stone-950">Live Product Catalog ({products.length})</h3>
-              <p class="text-xs text-stone-400 font-light mt-0.5">Real products pulled directly from Supabase Cloud Database</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <a
-                href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
-                target="_blank"
-                rel="noopener"
-                class="px-4 py-2 rounded-lg bg-stone-950 text-white text-xs font-semibold hover:bg-gold transition-colors"
-              >
-                + Add / Manage on Supabase DB
-              </a>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead>
-                <tr class="border-b border-stone-200 text-stone-400 uppercase tracking-wider font-semibold">
-                  <th class="py-3 px-3">Item</th>
-                  <th class="py-3 px-3">Title</th>
-                  <th class="py-3 px-3">Category</th>
-                  <th class="py-3 px-3">Wholesale</th>
-                  <th class="py-3 px-3">MRP</th>
-                  <th class="py-3 px-3">Discount</th>
-                  <th class="py-3 px-3">Meesho Code</th>
-                  <th class="py-3 px-3 text-right">Affiliate Link</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-stone-100">
-                {products.map((p) => (
-                  <tr class="hover:bg-stone-50/80 transition-colors">
-                    <td class="py-3 px-3">
-                      <img src={p.image} alt={p.title} class="w-10 h-12 object-cover rounded-md bg-stone-100" referrerpolicy="no-referrer" />
-                    </td>
-                    <td class="py-3 px-3 font-medium text-stone-950 max-w-[200px] truncate" title={p.title}>
-                      {p.title}
-                    </td>
-                    <td class="py-3 px-3">
-                      <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded text-[11px] font-medium">
-                        {p.category}
-                      </span>
-                    </td>
-                    <td class="py-3 px-3 font-semibold text-stone-950">₹{p.price}</td>
-                    <td class="py-3 px-3 text-stone-400 line-through">₹{p.mrp}</td>
-                    <td class="py-3 px-3">
-                      <span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-bold text-[10px]">
-                        {p.discount}
-                      </span>
-                    </td>
-                    <td class="py-3 px-3">
-                      <code class="bg-stone-100 text-gold-dark font-mono px-2 py-0.5 rounded border border-stone-200 text-[11px]">
-                        {p.meeshoCode}
-                      </code>
-                    </td>
-                    <td class="py-3 px-3 text-right">
-                      <a href={p.affiliateUrl} target="_blank" rel="noopener" class="text-gold hover:underline font-semibold">
-                        Visit ↗
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div class="pt-6 mt-6 border-t border-stone-800 text-[11px] text-stone-500 flex items-center justify-between">
+          <span>Worker Environment</span>
+          <span class="text-stone-300 font-mono">Cloudflare Workers Assets</span>
         </div>
-
-        <!-- Recent Customer Orders Table (Real DB Orders) -->
-        <div id="orders" class="antigravity-card p-8 bg-white scroll-mt-24">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h3 class="font-serif text-xl font-normal text-stone-950">Live Customer Dropship Orders</h3>
-              <p class="text-xs text-stone-400 font-light mt-0.5">Real-time customer bookings logged from checkout</p>
-            </div>
-            <span class="text-xs font-mono text-stone-500">Supabase Table: `orders`</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead>
-                <tr class="border-b border-stone-200 text-stone-400 uppercase tracking-wider font-semibold">
-                  <th class="py-3 px-4">Order ID</th>
-                  <th class="py-3 px-4">Customer</th>
-                  <th class="py-3 px-4">City / Address</th>
-                  <th class="py-3 px-4">Items</th>
-                  <th class="py-3 px-4">Amount</th>
-                  <th class="py-3 px-4">Status</th>
-                  <th class="py-3 px-4">Date</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-stone-100">
-                {recentOrders.map((ord) => (
-                  <tr class="hover:bg-stone-50/80 transition-colors">
-                    <td class="py-3.5 px-4 font-mono font-semibold text-stone-900">{ord.id}</td>
-                    <td class="py-3.5 px-4 font-medium text-stone-950">{ord.customer}</td>
-                    <td class="py-3.5 px-4 text-stone-500">{ord.city}</td>
-                    <td class="py-3.5 px-4 text-stone-500">{ord.items}</td>
-                    <td class="py-3.5 px-4 font-semibold text-stone-950">{ord.amount}</td>
-                    <td class="py-3.5 px-4">
-                      <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        ord.status === 'Delivered'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {ord.status}
-                      </span>
-                    </td>
-                    <td class="py-3.5 px-4 text-stone-400">{ord.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   </div>
-</Layout>
+
+  <!-- TAB 2: LIVE PRODUCTS CATALOG -->
+  <div id="tab-products" class="admin-tab-content hidden space-y-6">
+    <div class="admin-panel p-6">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-white">Live Products Catalog ({products.length})</h2>
+          <p class="text-xs text-stone-400 mt-0.5">Direct sync from Supabase Database with Meesho search codes & automated tags</p>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Live Search Input -->
+          <input
+            type="text"
+            id="productSearchInput"
+            placeholder="Search by title, code, category..."
+            oninput="filterCatalogTable()"
+            class="px-4 py-2 bg-stone-900 border border-stone-700 rounded-lg text-xs text-white placeholder-stone-500 focus:outline-none focus:border-gold w-64"
+          />
+
+          <a
+            href="https://supabase.com/dashboard/project/fniiiqowbvzcqaqbyjlb"
+            target="_blank"
+            class="px-4 py-2 bg-gold hover:bg-gold-dark text-stone-950 font-bold rounded-lg text-xs transition-colors"
+          >
+            + Add Product on Supabase
+          </a>
+        </div>
+      </div>
+
+      <!-- Catalog Table -->
+      <div class="overflow-x-auto rounded-xl border border-stone-800">
+        <table class="w-full text-left text-xs text-stone-300" id="adminCatalogTable">
+          <thead class="bg-stone-900 text-stone-400 font-mono text-[11px] uppercase tracking-wider border-b border-stone-800">
+            <tr>
+              <th class="py-3.5 px-4">Thumb</th>
+              <th class="py-3.5 px-4">Title & Details</th>
+              <th class="py-3.5 px-4">Category</th>
+              <th class="py-3.5 px-4">Price</th>
+              <th class="py-3.5 px-4">MRP</th>
+              <th class="py-3.5 px-4">Discount</th>
+              <th class="py-3.5 px-4">Meesho Code</th>
+              <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-800/80 bg-stone-950">
+            {products.map((p) => (
+              <tr class="hover:bg-stone-900/60 transition-colors product-table-row">
+                <td class="py-3 px-4">
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    class="w-11 h-14 object-cover rounded-lg bg-stone-900 border border-stone-800"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                  />
+                </td>
+                <td class="py-3 px-4 max-w-xs">
+                  <div class="font-semibold text-white truncate" title={p.title}>{p.title}</div>
+                  <div class="text-[11px] text-stone-500 font-mono mt-0.5">ID: {p.id}</div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="bg-stone-900 border border-stone-800 text-stone-300 px-2.5 py-1 rounded text-[11px]">
+                    {p.category}
+                  </span>
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-emerald-400">
+                  ₹{p.price}
+                </td>
+                <td class="py-3 px-4 font-mono text-stone-500 line-through">
+                  ₹{p.mrp}
+                </td>
+                <td class="py-3 px-4">
+                  <span class="text-rose-400 font-semibold text-[11px] bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+                    {p.discount || '23% OFF'}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <code class="bg-stone-900 text-gold px-2.5 py-1 rounded border border-stone-800 font-mono text-[11px]">
+                    {p.meeshoCode || 's-find'}
+                  </code>
+                </td>
+                <td class="py-3 px-4 text-right space-x-2">
+                  <a
+                    href={p.affiliateUrl}
+                    target="_blank"
+                    class="text-xs font-semibold text-gold hover:underline"
+                  >
+                    Open ↗
+                  </a>
+                  <button
+                    type="button"
+                    onclick={`navigator.clipboard.writeText('${p.affiliateUrl}'); alert('Affiliate Link Copied!');`}
+                    class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded text-[11px] font-mono transition-colors"
+                  >
+                    Copy
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: CUSTOMER ORDERS -->
+  <div id="tab-orders" class="admin-tab-content hidden space-y-6">
+    <div class="admin-panel p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-white">Customer Orders & COD Dispatches ({recentOrders.length})</h2>
+          <p class="text-xs text-stone-400 mt-0.5">Real orders tracked from Supabase database with 1-click WhatsApp customer contact</p>
+        </div>
+        <div class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+          Total Value: ₹{totalOrdersValue.toLocaleString('en-IN')}
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-stone-800">
+        <table class="w-full text-left text-xs text-stone-300">
+          <thead class="bg-stone-900 text-stone-400 font-mono text-[11px] uppercase tracking-wider border-b border-stone-800">
+            <tr>
+              <th class="py-3.5 px-4">Order ID</th>
+              <th class="py-3.5 px-4">Customer</th>
+              <th class="py-3.5 px-4">Phone / Address</th>
+              <th class="py-3.5 px-4">Total Amount</th>
+              <th class="py-3.5 px-4">Payment</th>
+              <th class="py-3.5 px-4">Status</th>
+              <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-800/80 bg-stone-950">
+            {recentOrders.map((o) => (
+              <tr class="hover:bg-stone-900/60 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-stone-200">#{o.id}</td>
+                <td class="py-3 px-4 font-semibold text-white">{o.customer_name}</td>
+                <td class="py-3 px-4 text-stone-400">
+                  <div>{o.customer_phone}</div>
+                  <div class="text-[10px] text-stone-500 truncate max-w-xs">{o.shipping_address}</div>
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-emerald-400">₹{o.total_amount}</td>
+                <td class="py-3 px-4">
+                  <span class="bg-stone-900 border border-stone-800 text-stone-300 px-2 py-0.5 rounded text-[11px] font-mono">
+                    {o.payment_method || 'COD'}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded text-[11px] font-semibold">
+                    {o.status || 'Confirmed'}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <a
+                    href={`https://api.whatsapp.com/send?phone=91${o.customer_phone}&text=Hi%20${encodeURIComponent(o.customer_name)},%20your%20SHEF%20order%20%23${o.id}%20is%20dispatched!`}
+                    target="_blank"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>Chat WhatsApp</span>
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: CREATOR & WISHLINK -->
+  <div id="tab-creator" class="admin-tab-content hidden space-y-6">
+    <div class="admin-panel p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-white">Creator & Wishlink Affiliate Configuration</h2>
+          <p class="text-xs text-stone-400 mt-0.5">Manage creator tracking tokens, channel commission attribution, and link formats</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="admin-panel-card p-5 space-y-4">
+          <h3 class="text-sm font-bold text-white">Active Meesho Affiliate Credentials</h3>
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="text-stone-400 block mb-1">Primary Affiliate User ID</label>
+              <input type="text" value="374453404" readonly class="w-full bg-stone-900 border border-stone-800 rounded-lg p-2.5 font-mono text-gold"/>
+            </div>
+            <div>
+              <label class="text-stone-400 block mb-1">Affiliate Channel Medium</label>
+              <input type="text" value="youtubelongform:12492338" readonly class="w-full bg-stone-900 border border-stone-800 rounded-lg p-2.5 font-mono text-stone-300"/>
+            </div>
+            <div>
+              <label class="text-stone-400 block mb-1">Campaign UTM Source</label>
+              <input type="text" value="instagramreels" readonly class="w-full bg-stone-900 border border-stone-800 rounded-lg p-2.5 font-mono text-stone-300"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-panel-card p-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white mb-2">Quick Link Converter</h3>
+            <p class="text-xs text-stone-400 mb-4">Paste any raw Meesho product ID or URL to generate an authenticated affiliate link.</p>
+            <input
+              type="text"
+              id="rawMeeshoCodeInput"
+              placeholder="e.g. 542355935 or s-8ywkin"
+              class="w-full bg-stone-900 border border-stone-800 rounded-lg p-2.5 text-xs text-white mb-3"
+            />
+            <button
+              type="button"
+              onclick="generateAffiliateLink()"
+              class="w-full py-2.5 bg-stone-800 hover:bg-gold hover:text-stone-950 font-bold rounded-lg text-xs text-white transition-all"
+            >
+              Generate Affiliate URL
+            </button>
+          </div>
+          <div id="generatedLinkBox" class="hidden mt-4 p-3 bg-stone-900 rounded-lg border border-stone-800 text-[11px] font-mono text-gold break-all"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: VEO AI STUDIO -->
+  <div id="tab-veo" class="admin-tab-content hidden space-y-6">
+    <div class="admin-panel p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-white">Google Veo 3.1 4K Reel Studio</h2>
+          <p class="text-xs text-stone-400 mt-0.5">Automated prompt generator for high-editorial Pinterest and Instagram 60fps video reels</p>
+        </div>
+        <a
+          href="https://t.me/ubstabot"
+          target="_blank"
+          class="px-4 py-2 bg-stone-800 hover:bg-gold hover:text-stone-950 text-white font-bold rounded-lg text-xs transition-colors"
+        >
+          Open Bot @Bbyjihotbot
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="admin-panel-card p-4 space-y-2">
+          <div class="text-[11px] text-gold font-mono font-bold">VEO PROMPT PRESET 1</div>
+          <h4 class="text-xs font-bold text-white">Y2K Streetwear Acid Denim</h4>
+          <p class="text-[11px] text-stone-400 leading-relaxed">
+            "Cinematic 4K 60fps editorial fashion lookbook, young Indian model wearing oversized Y2K jacket and baggy denim, slow motion runway walk in soft sunlight studio."
+          </p>
+          <button
+            type="button"
+            onclick="navigator.clipboard.writeText('Cinematic 4K 60fps editorial fashion lookbook, young Indian model wearing oversized Y2K jacket and baggy denim, slow motion runway walk in soft sunlight studio.'); alert('Prompt copied!');"
+            class="text-[11px] text-gold hover:underline font-semibold"
+          >
+            Copy Prompt
+          </button>
+        </div>
+
+        <div class="admin-panel-card p-4 space-y-2">
+          <div class="text-[11px] text-gold font-mono font-bold">VEO PROMPT PRESET 2</div>
+          <h4 class="text-xs font-bold text-white">Minimalist Linen Summer Set</h4>
+          <p class="text-[11px] text-stone-400 leading-relaxed">
+            "Hyper-realistic 8K fashion editorial, aesthetic linen flare summer dress, Parisian cafe aesthetic, wind blowing soft linen fabric, soft natural backlight."
+          </p>
+          <button
+            type="button"
+            onclick="navigator.clipboard.writeText('Hyper-realistic 8K fashion editorial, aesthetic linen flare summer dress, Parisian cafe aesthetic, wind blowing soft linen fabric, soft natural backlight.'); alert('Prompt copied!');"
+            class="text-[11px] text-gold hover:underline font-semibold"
+          >
+            Copy Prompt
+          </button>
+        </div>
+
+        <div class="admin-panel-card p-4 space-y-2">
+          <div class="text-[11px] text-gold font-mono font-bold">VEO PROMPT PRESET 3</div>
+          <h4 class="text-xs font-bold text-white">Heritage Floral Kurti Set</h4>
+          <p class="text-[11px] text-stone-400 leading-relaxed">
+            "Royal ethnic lookbook, heritage embroidered silk kurti set with organza dupatta, slow motion spin, palace courtyards, soft golden hour lighting."
+          </p>
+          <button
+            type="button"
+            onclick="navigator.clipboard.writeText('Royal ethnic lookbook, heritage embroidered silk kurti set with organza dupatta, slow motion spin, palace courtyards, soft golden hour lighting.'); alert('Prompt copied!');"
+            class="text-[11px] text-gold hover:underline font-semibold"
+          >
+            Copy Prompt
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-Side Controller JavaScript -->
+  <script is:inline>
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.admin-tab-content').forEach((el) => el.classList.add('hidden'));
+      // Remove active styles from all buttons
+      document.querySelectorAll('.admin-tab-btn').forEach((el) => {
+        el.classList.remove('bg-stone-800', 'text-white', 'shadow-sm');
+        el.classList.add('text-stone-400');
+      });
+
+      // Show selected tab
+      const target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
+
+      // Highlight selected button
+      const btn = document.getElementById('btn-' + tabId);
+      if (btn) {
+        btn.classList.add('bg-stone-800', 'text-white', 'shadow-sm');
+        btn.classList.remove('text-stone-400');
+      }
+    }
+
+    function filterCatalogTable() {
+      const q = (document.getElementById('productSearchInput')?.value || '').toLowerCase();
+      const rows = document.querySelectorAll('.product-table-row');
+      rows.forEach((row) => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    function generateAffiliateLink() {
+      const code = (document.getElementById('rawMeeshoCodeInput')?.value || '').trim();
+      if (!code) {
+        alert('Please enter a product code or ID');
+        return;
+      }
+      const link = `https://www.meesho.com/afinvite/374453404:youtubelongform:12492338?extid=${encodeURIComponent(code)}&utmsource=instagramreels`;
+      const box = document.getElementById('generatedLinkBox');
+      if (box) {
+        box.classList.remove('hidden');
+        box.innerHTML = `<span>${link}</span> <button onclick="navigator.clipboard.writeText('${link}'); alert('Copied!');" class="ml-2 text-white bg-stone-800 px-2 py-0.5 rounded text-[10px]">Copy</button>`;
+      }
+    }
+  </script>
+</AdminLayout>

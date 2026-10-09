@@ -4,7 +4,7 @@ import { getAllProducts } from '../services/catalog.js';
 
 const products = await getAllProducts();
 
-function money(v: number) {
+function money(v) {
   return `₹${Number(v || 0).toLocaleString('en-IN')}`;
 }
 
@@ -90,7 +90,7 @@ const PLATFORMS = ['All Platforms', 'Meesho Hub', 'Myntra Studio', 'Zara Edits',
       {products.map((p) => {
         const estCommission = Math.round(p.price * 0.12);
         return (
-          <div class="antigravity-card overflow-hidden flex flex-col justify-between p-4 group">
+          <div class="antigravity-card overflow-hidden flex flex-col justify-between p-4 group bg-white">
             <!-- Image & Commission Badge -->
             <div class="relative aspect-[4/5] bg-stone-100 rounded-xl overflow-hidden mb-4">
               <img
@@ -98,55 +98,43 @@ const PLATFORMS = ['All Platforms', 'Meesho Hub', 'Myntra Studio', 'Zara Edits',
                 alt={p.title}
                 loading="lazy"
                 referrerpolicy="no-referrer"
-                class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              
-              <!-- Commission Highlight Badge -->
-              <div class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] font-bold tracking-wider px-3 py-1 rounded-full shadow-md">
-                Earn {money(estCommission)}
+              <div class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                Earn ~{money(estCommission)} / sale
               </div>
-
-              <!-- Store Tag -->
-              <span class="absolute bottom-3 right-3 bg-white/95 text-stone-900 text-[10px] font-semibold px-2 py-0.5 rounded border border-stone-200">
-                Meesho 374453404
-              </span>
             </div>
 
-            <!-- Content Area -->
+            <!-- Content -->
             <div>
-              <div class="flex items-center justify-between text-[10px] text-stone-400 uppercase tracking-widest font-semibold mb-1">
+              <div class="flex items-center justify-between text-[11px] text-stone-400 mb-1">
                 <span>{p.category}</span>
-                <span class="text-gold font-mono">{p.meeshoCode}</span>
+                <span class="font-mono text-gold-dark font-semibold">{p.meeshoCode}</span>
               </div>
-              <h3 class="font-serif text-sm font-normal text-stone-900 line-clamp-1 leading-snug mb-2">
+              <h3 class="font-serif text-sm font-normal text-stone-900 line-clamp-1 mb-2">
                 {p.title}
               </h3>
               <div class="flex items-baseline gap-2 mb-4">
-                <span class="font-serif text-base font-semibold text-stone-950">{money(p.price)}</span>
+                <span class="font-serif text-base font-bold text-stone-950">{money(p.price)}</span>
                 <span class="text-xs text-stone-400 line-through">{money(p.mrp)}</span>
-                <span class="text-[10px] font-bold text-rose-600 ml-auto">{p.discount}</span>
               </div>
             </div>
 
-            <!-- Creator Action Buttons: Copy Link + WhatsApp Share -->
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+            <!-- Action Row -->
+            <div class="grid grid-cols-2 gap-2 pt-3 border-t border-stone-100">
               <button
                 type="button"
-                data-link={p.affiliateUrl}
-                onclick={`navigator.clipboard.writeText('${p.affiliateUrl}'); const el = this; el.innerText = 'Copied! ✓'; setTimeout(() => { el.innerText = 'Copy Link'; }, 2000);`}
-                class="py-2.5 px-3 rounded-lg bg-stone-100 text-stone-900 hover:bg-stone-200 text-xs font-semibold tracking-wide transition-colors text-center"
+                onclick={`navigator.clipboard.writeText('${p.affiliateUrl}'); alert('Affiliate Link Copied!');`}
+                class="py-2 px-3 bg-stone-900 hover:bg-gold text-white text-[11px] font-semibold rounded-lg text-center transition-colors"
               >
-                Copy Link
+                Copy Link 🔗
               </button>
-
               <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this trending outfit at ₹${p.price} (${p.discount}): ${p.affiliateUrl}`)}`}
+                href={`https://api.whatsapp.com/send?text=Check%20out%20this%20stunning%20piece%20on%20SHEF:%20${encodeURIComponent(p.affiliateUrl)}`}
                 target="_blank"
-                rel="noopener noreferrer"
-                class="py-2.5 px-3 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-semibold tracking-wide transition-colors text-center flex items-center justify-center gap-1"
+                class="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg text-center border border-emerald-200 transition-colors"
               >
-                <span>Share</span>
-                <span>↗</span>
+                Share WA 📱
               </a>
             </div>
           </div>
