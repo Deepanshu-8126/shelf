@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(WORKSPACE_ROOT / ".env")
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "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"
 
 # =============================================================================
 # 1. BANNED AI CLICHES (INSTANT REJECTION FILTER)

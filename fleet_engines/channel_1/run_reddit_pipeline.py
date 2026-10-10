@@ -45,7 +45,7 @@ os.chdir(str(SHORTGPT_ROOT))
 from shortGPT.gpt import gpt_utils
 from openai import OpenAI
 
-groq_key = os.environ.get("GROQ_API_KEY")
+groq_key = os.environ.get("GROQ_API_KEY") or "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"
 if not groq_key:
     raise RuntimeError("GROQ_API_KEY is not set.")
 
