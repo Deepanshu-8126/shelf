@@ -9,8 +9,21 @@ import json
 import random
 from pathlib import Path
 from typing import List, Dict, Optional, Any
-from moviepy import ImageClip, VideoFileClip, CompositeVideoClip
-from moviepy.video.fx import Resize, FadeOut
+try:
+    from moviepy import ImageClip, VideoFileClip, CompositeVideoClip, vfx
+    Resize = getattr(vfx, "Resize", None) or getattr(vfx, "resize", None)
+    FadeOut = getattr(vfx, "FadeOut", None) or getattr(vfx, "fadeout", None)
+except Exception:
+    try:
+        from moviepy.editor import ImageClip, VideoFileClip, CompositeVideoClip, vfx
+        Resize = getattr(vfx, "Resize", None) or getattr(vfx, "resize", None)
+        FadeOut = getattr(vfx, "FadeOut", None) or getattr(vfx, "fadeout", None)
+    except Exception:
+        ImageClip = Any
+        VideoFileClip = Any
+        CompositeVideoClip = Any
+        Resize = None
+        FadeOut = None
 from PIL import Image, ImageDraw, ImageFont
 import io
 
