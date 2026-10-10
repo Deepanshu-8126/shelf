@@ -84,7 +84,7 @@ jobs:
       - name: Install Required Python Packages
         run: |
           python -m pip install --upgrade pip
-          pip install httpx pillow numpy soundfile edge-tts openai opencv-python-headless openai-whisper python-dotenv requests moviepy google-api-python-client google-auth-oauthlib google-auth-httplib2
+          pip install httpx pillow numpy soundfile edge-tts openai opencv-python-headless openai-whisper python-dotenv requests moviepy google-api-python-client google-auth-oauthlib google-auth-httplib2 pyyaml tinydb tinymongo pandas yt-dlp tiktoken tqdm progress questionary
 
       - name: Setup Multi-Channel YouTube Credentials from GitHub Secrets
         run: |
