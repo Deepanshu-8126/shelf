@@ -345,13 +345,19 @@ if __name__ == "__main__":
     )
     
     yt_url = None
-    title = args.title or (args.topic or f"Mystery Shorts #{args.pillar}")
-    desc = f"Story from Channel 2 Mystery Studio.\n\n#mystery #unsolved #shorts #viral"
+    raw_title = args.title.strip() if args.title else (args.topic.strip() if args.topic else f"Duniya Ka Sabse Bada Rahasya")
+    title = f"{raw_title} 😱 #shorts #mystery"
+    desc = (
+        f"🕵️ {raw_title}\n\n"
+        f"Kya aapko is anokhi ghatna ka sach pata tha? Apni raye comment me zaroor batayein! 👇\n\n"
+        f"#shorts #mystery #unsolved #facts #amazingfacts #hindifacts #sciencefacts #viral #trending #youtubeshorts"
+    )
+    tags = ["mystery", "unsolved", "facts", "amazing facts", "hindi facts", "science facts", "shorts", "viral shorts", "trending"]
     
     if args.upload and rendered_path:
         from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
         video_p = Path(rendered_path)
-        res = upload_short_to_youtube(video_p, f"{title} #shorts", desc, channel=2, privacy_status=args.privacy)
+        res = upload_short_to_youtube(video_p, title, desc, channel=2, privacy_status=args.privacy)
         if res:
             yt_url = res.get("video_url")
             
@@ -360,9 +366,9 @@ if __name__ == "__main__":
         send_fleet_video_to_telegram(
             video_path=Path(rendered_path),
             channel=2,
-            title=f"{title} #shorts",
+            title=title,
             description=desc,
-            tags=["mystery", "unsolved", "facts", "science"],
+            tags=tags,
             youtube_url=yt_url,
             privacy=args.privacy
         )

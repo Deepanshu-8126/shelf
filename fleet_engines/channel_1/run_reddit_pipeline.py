@@ -578,9 +578,14 @@ if __name__ == "__main__":
     
     vid_path = run(args.bg, custom_title=args.title, custom_script=args.script)
     pkg = _viral_story_cache or {}
-    title = f"{pkg.get('question', 'Entitled Boss Gets Instant Karma')} #shorts #redditstories"
-    desc = f"True story from Reddit: {pkg.get('question', '')}\n\n#redditstories #pettyrevenge #shorts #viral"
-    tags = ["reddit", "reddit stories", "petty revenge", "shorts", "viral"]
+    raw_title = args.title.strip() if args.title else pkg.get('question', 'Entitled Boss Gets Instant Karma')
+    title = f"{raw_title} 🤯 #shorts #redditstories"
+    desc = (
+        f"🔥 True story from Reddit r/pettyrevenge:\n{raw_title}\n\n"
+        f"Did they take it too far or did they get what they deserved? Drop your comments below! 👇\n\n"
+        f"#redditstories #pettyrevenge #shorts #viral #storytime #karma #reddit #drama #youtubeshorts"
+    )
+    tags = ["reddit", "reddit stories", "petty revenge", "shorts", "viral shorts", "karma", "storytime", "askreddit", "youtubeshorts"]
     yt_url = None
     
     if args.upload and vid_path:
