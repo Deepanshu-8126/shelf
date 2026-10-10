@@ -1,5 +1,0 @@
-output/*.mp4
-output/temp/
-assets/downloads/
-*.pyc
-__pycache__/
