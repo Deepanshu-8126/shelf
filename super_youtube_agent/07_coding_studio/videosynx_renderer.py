@@ -190,6 +190,54 @@ def get_theme_palette(name: str) -> Dict[str, Any]:
     return STUDIO_THEMES.get(n, STUDIO_THEMES["onedark"])
 
 
+def draw_syntax_tokens(draw, x: int, y: int, text: str, font, default_color: Tuple[int, int, int], is_dark: bool = True):
+    """
+    Renders syntax-highlighted code tokens inspired by Motion Canvas & modern IDEs.
+    """
+    import re
+    token_pattern = re.compile(r'(\#[^\n]*)|("[^"\\]*(?:\\.[^"\\]*)*"|\'[^\'\\]*(?:\\.[^\'\\]*)*\')|(\b[a-zA-Z_]\w*\b)|(\d+)|(\s+)|([^\s\w])')
+    
+    KEYWORD_SET = {"def", "class", "return", "yield", "if", "else", "elif", "for", "in", "while", "import", "from", "with", "as", "try", "except", "pass", "break", "continue", "async", "await", "lambda"}
+    TYPE_SET = {"int", "str", "float", "bool", "list", "dict", "set", "tuple", "len", "range", "enumerate", "zip", "print", "self", "None", "True", "False"}
+
+    cur_x = x
+    for match in token_pattern.finditer(text):
+        comment, string, word, number, space, symbol = match.groups()
+        token_str = match.group(0)
+        
+        if comment:
+            col = (92, 99, 112) if is_dark else (100, 116, 139)
+        elif string:
+            col = (152, 195, 121) if is_dark else (22, 101, 52)
+        elif number:
+            col = (209, 154, 102) if is_dark else (194, 65, 12)
+        elif word:
+            if word in KEYWORD_SET:
+                col = (198, 120, 221) if is_dark else (126, 34, 206)
+            elif word in TYPE_SET:
+                col = (229, 192, 123) if is_dark else (180, 83, 9)
+            elif text[match.end():match.end()+1] == '(':
+                col = (97, 175, 239) if is_dark else (3, 105, 161)
+            else:
+                col = default_color
+        elif symbol:
+            if symbol in "()[]{}":
+                col = (229, 192, 123) if is_dark else (67, 56, 202)
+            elif symbol in "=+-*/<>!":
+                col = (86, 182, 194) if is_dark else (13, 148, 136)
+            else:
+                col = default_color
+        else:
+            col = default_color
+
+        draw.text((cur_x, y), token_str, fill=col, font=font)
+        try:
+            cur_x += font.getlength(token_str)
+        except Exception:
+            cur_x += len(token_str) * 15
+
+
+
 def render_anchored_frame(
     frame_idx: int,
     total_frames: int,
@@ -379,17 +427,29 @@ def render_anchored_frame(
             if is_active:
                 if is_typing_now:
                     slide_offset = int((1.0 - typed_char_fraction) * -20)
-                pulse = math.sin(sec * 5.0) * 0.5 + 0.5
-                spot_border_w = 3 if pulse > 0.5 else 2
-                if t_cfg["is_dark"]:
-                    spot_col = (45, 35, 15) if sched.highlight else (30, 41, 59)
-                    spot_border = (245, 158, 11) if sched.highlight else t_cfg["gutter_active"]
-                else:
-                    spot_col = (254, 243, 199) if sched.highlight else (238, 242, 255)
-                    spot_border = (245, 158, 11) if sched.highlight else (129, 140, 248)
-                draw.rounded_rectangle([card_x + 24, ly - 6, card_x + card_w - 24, ly + 38], radius=10, fill=spot_col, outline=spot_border, width=spot_border_w)
+                pulse = math.sin(sec * 6.0) * 0.5 + 0.5
+                spot_border_w = 2 if pulse > 0.5 else 1
 
-            # Gutter
+                # Motion Canvas Glowing Aura & Spotlight
+                if t_cfg["is_dark"]:
+                    aura_col = (50, 40, 20) if sched.highlight else (30, 41, 59)
+                    spot_col = (38, 30, 15) if sched.highlight else (24, 32, 47)
+                    laser_col = (245, 158, 11) if sched.highlight else (97, 175, 239)
+                    spot_border = (245, 158, 11) if sched.highlight else (97, 175, 239)
+                else:
+                    aura_col = (254, 243, 199) if sched.highlight else (224, 231, 255)
+                    spot_col = (255, 251, 235) if sched.highlight else (238, 242, 255)
+                    laser_col = (245, 158, 11) if sched.highlight else (79, 70, 229)
+                    spot_border = (245, 158, 11) if sched.highlight else (129, 140, 248)
+
+                # Outer soft glowing aura
+                draw.rounded_rectangle([card_x + 18, ly - 8, card_x + card_w - 18, ly + 40], radius=14, fill=aura_col)
+                # Inner spotlight capsule
+                draw.rounded_rectangle([card_x + 22, ly - 6, card_x + card_w - 22, ly + 38], radius=10, fill=spot_col, outline=spot_border, width=spot_border_w)
+                # Motion Canvas Laser Accent Pill on left border
+                draw.rounded_rectangle([card_x + 22, ly - 4, card_x + 28, ly + 36], radius=3, fill=laser_col)
+
+            # Gutter Line Number
             gutter_col = t_cfg["gutter_active"] if is_active else t_cfg["gutter"]
             draw.text((card_x + 55, ly + 4), f"{idx + 1:2d}", fill=gutter_col, font=fonts["gutter"], anchor="rm")
 
@@ -405,29 +465,13 @@ def render_anchored_frame(
             else:
                 disp_text = ""
 
-            if t_cfg["is_dark"]:
-                txt_col = t_cfg["code_plain"]
-                if "def " in disp_text or "class " in disp_text:
-                    txt_col = (210, 168, 255)
-                elif "if " in disp_text or "return " in disp_text or "for " in disp_text:
-                    txt_col = (255, 123, 114)
-                elif "=" in disp_text or "in " in disp_text:
-                    txt_col = (126, 231, 135)
-                elif '"' in disp_text or "'" in disp_text or any(c.isdigit() for c in disp_text):
-                    txt_col = (165, 214, 255)
-            else:
-                txt_col = (15, 23, 42)
-                if "def " in disp_text:
-                    txt_col = (147, 51, 234)
-                elif "if " in disp_text or "return " in disp_text:
-                    txt_col = (225, 29, 72)
-                elif "=" in disp_text:
-                    txt_col = (30, 58, 138)
-
             line_x = card_x + 85 + slide_offset
-            draw.text((line_x, ly + 4), disp_text, fill=txt_col, font=fonts["code"])
 
-            # Cursor
+            # Motion Canvas Multi-Token Syntax Highlighting
+            if disp_text:
+                draw_syntax_tokens(draw, line_x, ly + 4, disp_text, fonts["code"], t_cfg["code_plain"], is_dark=t_cfg["is_dark"])
+
+            # Pulsing Motion Canvas Cursor
             if is_active:
                 try:
                     txt_w = fonts["code"].getlength(disp_text)
@@ -452,17 +496,18 @@ def render_anchored_frame(
         diag_img = render_dynamic_topic_diagram(lesson, current_line_idx, width=card_w, height=300)
         img.paste(diag_img, (card_x, diag_y), diag_img)
 
-        # Teacher Insight Box
+        # Motion Canvas Floating Teacher Insight Card
         teach_y, teach_h = 1500, 290
-        for off, a in [(12, 12), (4, 20)]:
-            draw.rounded_rectangle([card_x, teach_y + off, card_x + card_w, teach_y + teach_h + off], radius=22, fill=(0, 0, 0, a))
-        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=22, fill=t_cfg["teach_bg"], outline=t_cfg["teach_border"], width=2)
+        for off, a in [(16, 12), (6, 22)]:
+            draw.rounded_rectangle([card_x, teach_y + off, card_x + card_w, teach_y + teach_h + off], radius=24, fill=(0, 0, 0, a))
+        draw.rounded_rectangle([card_x, teach_y, card_x + card_w, teach_y + teach_h], radius=24, fill=t_cfg["teach_bg"], outline=t_cfg["teach_border"], width=2)
 
-        draw.rounded_rectangle([card_x + 28, teach_y + 24, card_x + 80, teach_y + 76], radius=14, fill=(245, 158, 11))
-        draw.text((card_x + 54, teach_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
+        # Glowing Pill Badge
+        draw.rounded_rectangle([card_x + 28, teach_y + 24, card_x + 84, teach_y + 76], radius=14, fill=(245, 158, 11))
+        draw.text((card_x + 56, teach_y + 50), "AI", fill=(255, 255, 255), font=fonts["hud_badge"], anchor="mm")
 
-        tag_title = active_sched.tip if (active_sched and active_sched.tip) else "Algorithm Walkthrough"
-        draw.text((card_x + 96, teach_y + 36), f"TEACHER INSIGHT • {tag_title.upper()}", fill=t_cfg["teach_title"], font=fonts["teach_title"])
+        tag_title = active_sched.tip if (active_sched and active_sched.tip) else "Senior Walkthrough"
+        draw.text((card_x + 100, teach_y + 36), f"TEACHER INSIGHT • {tag_title.upper()}", fill=t_cfg["teach_title"], font=fonts["teach_title"])
 
         spoken_txt = active_sched.narration_text if active_sched else lesson.intro_narration
         s_lines = wrap_text_lines(spoken_txt, max_chars=44)

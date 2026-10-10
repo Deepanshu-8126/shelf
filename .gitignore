@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+output/
+*.wav
+*.mp4
+.env
+venv/
+.tempmediaStorage/
