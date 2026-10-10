@@ -87,8 +87,10 @@ def render_reddit_card(story_info: Dict[str, str], out_path: Path):
     draw.text((card_x + 105, card_y + 42), story_info.get("subreddit", "r/AskReddit"), fill=(215, 218, 220), font_size=28)
     draw.text((card_x + 105, card_y + 76), f"Posted by u/{story_info.get('user', 'anonymous')} • 8h ago", fill=(129, 131, 132), font_size=20)
 
-    # Post Title with line wrapping
-    words = story_info.get("hook", "").split()
+    # Post Title with line wrapping & character sanitization
+    raw_title = story_info.get("hook", "")
+    clean_title = raw_title.replace("é", "e").replace("É", "E").replace("’", "'").replace("“", '"').replace("”", '"')
+    words = clean_title.split()
     lines = []
     cur = []
     for w in words:
@@ -103,13 +105,13 @@ def render_reddit_card(story_info: Dict[str, str], out_path: Path):
     for idx, l in enumerate(lines[:3]):
         draw.text((card_x + 38, card_y + 130 + idx * 46), l, fill=(240, 246, 252), font_size=32)
 
-    # Upvotes and Comments badges
+    # Upvotes and Comments badges (clean ASCII arrows so no missing glyph boxes)
     badge_y = card_y + card_h - 75
     draw.rounded_rectangle([card_x + 38, badge_y, card_x + 230, badge_y + 54], radius=18, fill=(38, 38, 40))
-    draw.text((card_x + 60, badge_y + 14), f"▲  {story_info.get('upvotes', '24k')}  ▼", fill=(215, 218, 220), font_size=20)
+    draw.text((card_x + 60, badge_y + 14), f"^  {story_info.get('upvotes', '24k')}  v", fill=(215, 218, 220), font_size=20)
 
     draw.rounded_rectangle([card_x + 250, badge_y, card_x + 500, badge_y + 54], radius=18, fill=(38, 38, 40))
-    draw.text((card_x + 275, badge_y + 14), f"💬 {story_info.get('comments', '3.1k')} Comments", fill=(215, 218, 220), font_size=20)
+    draw.text((card_x + 275, badge_y + 14), f"[C] {story_info.get('comments', '3.1k')} Comments", fill=(215, 218, 220), font_size=20)
 
     img.save(str(out_path))
     return out_path
@@ -182,13 +184,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         en_sec = cur_t + dur
         cur_t = en_sec
         
-        m_s, s_s = divmod(st_sec, 60)
-        m_e, s_e = divmod(en_sec, 60)
-        t_start = f"{int(m_s):02d}:{s_s:05.2f}"
-        t_end = f"{int(m_e):02d}:{s_e:05.2f}"
+        h_s, rem_s = divmod(st_sec, 3600)
+        m_s, s_s = divmod(rem_s, 60)
+        h_e, rem_e = divmod(en_sec, 3600)
+        m_e, s_e = divmod(rem_e, 60)
+        t_start = f"{int(h_s):01d}:{int(m_s):02d}:{s_s:05.2f}"
+        t_end = f"{int(h_e):01d}:{int(m_e):02d}:{s_e:05.2f}"
         
         # Hormozi bold text with active word pop
-        clean_word = w.upper().replace('"', '').replace("'", "")
+        clean_word = w.upper().replace('"', '').replace("'", "").replace("’", "").replace("É", "E")
         events.append(f"Dialogue: 0,{t_start},{t_end},Hormozi,,0,0,0,,{{\\c&H0022FFFF\\t(0,100,\\fscx115\\fscy115)}}{clean_word}")
 
     out_path.write_text(header + "\n".join(events), encoding="utf-8")
