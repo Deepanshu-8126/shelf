@@ -13,18 +13,22 @@ if str(_FLEET_DIR) not in sys.path:
 
 from llm_engine import (  # noqa: F401  (re-exported)
     generate_channel2_script as generate_humanized_script,
+    generate_channel3_script,
     sanitize_script,
     BANNED_AI_PHRASES,
+    HINDI_SLOP_REPLACEMENTS,
     GROQ_API_KEY,
     llm_complete,
     llm_json,
 )
 
-# Backwards-compatible alias used by run_channel_2.py
+# Backwards-compatible aliases
 __all__ = [
     "generate_humanized_script",
+    "generate_channel3_script",
     "sanitize_script",
     "BANNED_AI_PHRASES",
+    "HINDI_SLOP_REPLACEMENTS",
     "GROQ_API_KEY",
     "llm_complete",
     "llm_json",

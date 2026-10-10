@@ -40,7 +40,7 @@ load_dotenv(WORKSPACE_ROOT / ".env")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY") or "Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT"
 OUTPUT_DIR = WORKSPACE_ROOT / "fleet_engines/output/channel_3_cosmic_what_if"
 
-from llm_engine import generate_channel2_script as generate_humanized_script, extract_keywords_llm
+from llm_engine import generate_channel3_script, extract_keywords_llm
 from cloned_voice_engine import generate_cloned_voice
 import whisper
 
@@ -90,11 +90,11 @@ def render_channel_3_short(pillar_id: int = 1, topic: str = "", lang: str = "hi"
         title = custom_title or target_topic
         pkg = {"title": title, "script": custom_script}
     else:
-        pkg = generate_humanized_script(
+        pkg = generate_channel3_script(
             topic=target_topic,
-            niche_context=pillar["name"],
+            pillar_name=pillar["name"],
             lang=lang,
-            word_count_target=85
+            word_count_target=75,
         )
         if custom_title: pkg["title"] = custom_title
         

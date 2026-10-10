@@ -159,6 +159,23 @@ def llm_json(
         except Exception:
             pass
 
+    # Robust regex key extractor (recovers keys even if JSON has unclosed brackets or syntax errors)
+    extracted = {}
+    for key in ["title", "hook", "script", "cta", "question", "story"]:
+        m = re.search(rf'"{key}"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', cleaned_raw)
+        if m:
+            try:
+                extracted[key] = m.group(1).encode().decode("unicode_escape", errors="replace")
+            except Exception:
+                extracted[key] = m.group(1)
+    if "script" in extracted or "story" in extracted:
+        log.info(f"[LLM] Recovered {list(extracted.keys())} via regex key extractor.")
+        if fallback is not None:
+            merged = fallback.copy()
+            merged.update(extracted)
+            return merged
+        return extracted
+
     if fallback is not None:
         log.warning(f"[LLM] JSON parse failed, using fallback. Raw start: {raw[:200]}")
         return fallback
@@ -176,15 +193,55 @@ BANNED_AI_PHRASES = [
     "unraveling", "a stark reminder", "game changer", "revolutionary",
     "like and subscribe", "don't forget to subscribe",
     "namaskar dosto", "kripya channel ko subscribe karein", "swagat hai aapka",
-    "aaj hum baat karenge", "aaiye jaante hain",
+    "aaj hum baat karenge", "aaiye jaante hain", "like share subscribe",
+    "लाइक, शेयर और सब्सक्राइब", "लाइक शेयर सब्सक्राइब", "सब्सक्राइब करना ना भूलें",
 ]
+
+# Mapping of textbook robotic Hindi slop to natural spoken colloquial Hindi
+HINDI_SLOP_REPLACEMENTS = {
+    # Robotic openings & thought experiments
+    "सोचिए, एक रात": "अगर आज रात",
+    "सोचिए,": "जरा सोचो,",
+    "सोचिए": "कभी सोचा है",
+    "कल्पना कीजिए": "अगर ऐसा हो कि",
+    "मान लीजिए": "मान लो",
+    "प्रतीत होता है": "लगता है",
+    
+    # Robotic textbook vocabulary -> Natural spoken creator words
+    "अदृश्य हो जाए": "गायब हो जाए",
+    "अदृश्य": "गायब",
+    "मनुष्य": "इंसान",
+    "मानव जाति": "इंसान",
+    "मानव": "इंसान",
+    "अराजकता": "तबाही",
+    "ज्वार‑भाटा": "समुद्र की भयानक लहरें",
+    "ज्वार-भाटा": "समुद्र की भयानक लहरें",
+    "ज्वार भाटा": "समुद्र की भयानक लहरें",
+    "भय से कांपते": "दहशत में आ जाएंगे",
+    "भय से कांपने": "दहशत में आने",
+    "भयभीत": "खौफजदा",
+    "विनाशकारी": "खौफनाक",
+    "अंधकार": "अंधेरा",
+    "अनंत": "हमेशा के लिए",
+    "संचार टूटते": "फोन और इंटरनेट बंद हो जाएंगे",
+    "पवन पैटर्न": "हवाओं का रुख",
+    "बायो‑रिद्म": "शरीर की घड़ी",
+    "बायो-रिद्म": "शरीर की घड़ी",
+    "मनोवैज्ञानिक": "दिमागी",
+}
 
 
 def sanitize_script(text: str) -> str:
-    """Strips leaked AI cliches and markdown formatting."""
+    """Strips leaked AI cliches, markdown formatting, and transforms robotic Hindi to natural spoken Hindi."""
     cleaned = text
+    # 1. Strip banned English & Hindi creator cliches
     for phrase in BANNED_AI_PHRASES:
         cleaned = re.sub(re.escape(phrase), "", cleaned, flags=re.IGNORECASE)
+
+    # 2. Automatically replace robotic/textbook Hindi slop with natural spoken creator words
+    for robotic_word, spoken_word in HINDI_SLOP_REPLACEMENTS.items():
+        cleaned = re.sub(re.escape(robotic_word), spoken_word, cleaned)
+
     cleaned = re.sub(r"[*_#]", "", cleaned)
     cleaned = re.sub(r"^\s*\d+[.)]\s*", "", cleaned, flags=re.MULTILINE)
     return re.sub(r"\s+", " ", cleaned).strip()
@@ -355,6 +412,78 @@ def generate_channel2_script(
         prompt=user_prompt,
         system=_VOX_SYSTEM,
         temp=0.70,
+        fallback=fallback,
+    )
+
+    data["script"] = sanitize_script(data.get("script", ""))
+    data["hook"] = sanitize_script(data.get("hook", ""))
+    data["cta"] = sanitize_script(data.get("cta", ""))
+    data["lang"] = lang
+    return data
+
+
+# ---------------------------------------------------------------------------
+# CHANNEL 3: Cosmic What-If & Dark Science Script Generator
+# ---------------------------------------------------------------------------
+_COSMIC_SYSTEM = (
+    "You are India's #1 viral YouTube Shorts creator and dark science storyteller (style: FactTechz, Dhruv Rathee, Zack D. Films).\n"
+    "You write spoken, nail-biting, ultra-realistic conversational Hindi in Devanagari script.\n\n"
+    "CRITICAL STORYTELLING RULES:\n"
+    "1. Speak like a real human YouTuber talking into a mic with intense urgency. Every word must sound natural when spoken out loud.\n"
+    "2. ABSOLUTELY BANNED ROBOTIC/TEXTBOOK/ACADEMIC WORDS (NEVER USE):\n"
+    "   - BANNED: सोचिए, कल्पना कीजिए, अदृश्य, मनुष्य, मानव, अराजकता, ज्वार-भाटा, भयभीत, भय से कांपते, विनाशकारी, अंधकार, अनंत, प्रतीत होता है, बायो‑रिद्म, पवन पैटर्न, मनोवैज्ञानिक, स्वास्थ्य पर असर, लाइक, शेयर, सब्सक्राइब.\n"
+    "3. USE VISCERAL, CONCRETE SENSORY EVENTS:\n"
+    "   - Use dramatic concrete facts: '300 फीट ऊंची सुनामी', 'माइनस 50 डिग्री ठंड', 'धरती पागलों की तरह डगमगाने लगेगी', 'आसमान का सारा उजाला गायब'.\n"
+    "4. Natural hooks: 'अगर आज रात अचानक...', 'कभी सोचा है कि...'\n"
+    "5. CTA MUST BE A PROVOCATIVE DEBATE QUESTION (NO 'लाइक शेयर सब्सक्राइब'): Ask something that forces viewers to argue in comments.\n"
+    "6. Length: Exactly 70 to 80 words (Devanagari script).\n"
+    "7. Output strictly valid JSON with keys: title, hook, script, cta\n\n"
+    "GOLD STANDARD BENCHMARK (Replicate this exact energy and conversational Hindi):\n"
+    "{\n"
+    "  \"title\": \"अगर चाँद गायब हो जाए? #shorts\",\n"
+    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में धरती पर क्या होगा?\",\n"
+    "  \"script\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में धरती पर कयामत आ जाएगी! सबसे पहले, समंदर में 300 फीट ऊंची सुनामी उठेगी और दुनिया भर के तटीय शहर पानी में डूब जाएंगे। चाँद का गुरुत्वाकर्षण खत्म होते ही हमारी पृथ्वी अपनी धुरी पर पागलों की तरह डगमगाने लगेगी। मौसम बेकाबू हो जाएगा और तापमान माइनस 50 डिग्री तक गिर जाएगा। और सबसे खौफनाक बात? शायद इंसान कभी अगली सुबह देख ही ना पाए!\",\n"
+    "  \"cta\": \"क्या आपको लगता है कि इस तबाही में कोई इंसान जिंदा बच पाएगा? नीचे कमेंट्स में बताओ।\"\n"
+    "}"
+)
+
+
+def generate_channel3_script(
+    topic: str,
+    pillar_name: str = "Cosmic What-If & Dark Science",
+    lang: str = "hi",
+    word_count_target: int = 75,
+) -> Dict[str, str]:
+    """
+    Generates {title, hook, script, cta, lang} for Channel 3 with anti-slop conversational Devanagari Hindi.
+    """
+    user_prompt = (
+        f"Topic: {topic}\n"
+        f"Niche: {pillar_name}\n"
+        f"Target Length: Exactly {word_count_target} to {word_count_target + 8} words in spoken Devanagari Hindi.\n\n"
+        "Output strictly valid JSON:\n"
+        '{"title": "Viral 5-word title with #shorts", '
+        '"hook": "Opening 0-3 second hook sentence", '
+        '"script": "Full continuous spoken script in natural Devanagari Hindi", '
+        '"cta": "Closing provocative debate question"}'
+    )
+
+    fallback = {
+        "title": f"अगर {topic} सच हो जाए? #shorts",
+        "hook": f"अगर आज रात अचानक {topic}, तो क्या होगा?",
+        "script": (
+            f"अगर आज रात अचानक {topic}, तो अगले 24 घंटे में धरती पर कयामत आ जाएगी! "
+            "सबसे पहले, समंदर में भयानक लहरें उठेंगी और तटीय शहर पानी में डूब जाएंगे। "
+            "धरती का संतुलन बिगड़ते ही मौसम पूरी तरह बेकाबू हो जाएगा और तापमान पागलों की तरह गिरेगा। "
+            "और सबसे खौफनाक बात? शायद इंसान कभी अगली सुबह देख ही ना पाए!"
+        ),
+        "cta": "क्या आपको लगता है कि इस तबाही में कोई इंसान जिंदा बच पाएगा? नीचे बताओ।",
+    }
+
+    data = llm_json(
+        prompt=user_prompt,
+        system=_COSMIC_SYSTEM,
+        temp=0.65,
         fallback=fallback,
     )
 
