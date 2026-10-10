@@ -83,6 +83,17 @@ def generate_psychology_facts_short(custom_topic: str = ""):
     brief_file = OUTPUT_DIR / f"{slug}_brief.json"
     brief_file.write_text(json.dumps(brief, indent=2), encoding="utf-8")
     print(f"✓ Production brief ready: {brief_file.name}")
+
+    # Synthesize Master Audio Stem with Fluent Bi-lingual Bridge
+    try:
+        from fluent_speech_synthesizer import generate_audio_sync
+        audio_stem = OUTPUT_DIR / f"{slug}_audio.mp3"
+        generate_audio_sync(hook, str(audio_stem), language="hi")
+        print(f"🎙️ [Fluent Audio Stem Generated] {audio_stem.name}")
+        brief["audio_file"] = str(audio_stem)
+    except Exception as e:
+        print(f"⚠️ Voice generation notice: {e}")
+
     return brief
 
 if __name__ == "__main__":
