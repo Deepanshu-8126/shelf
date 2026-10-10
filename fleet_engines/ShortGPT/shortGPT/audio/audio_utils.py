@@ -70,12 +70,20 @@ def ChunkForAudio(alltext, chunk_size=2500):
 
 
 def audioToText(filename, model_size="base"):
-    from whisper_timestamped import load_model, transcribe_timestamped
     global WHISPER_MODEL
-    if (WHISPER_MODEL == None):
-        WHISPER_MODEL = load_model(model_size)
-    gen = transcribe_timestamped(WHISPER_MODEL, filename, verbose=False, fp16=False)
-    return gen
+    try:
+        from whisper_timestamped import load_model, transcribe_timestamped
+        if (WHISPER_MODEL == None):
+            WHISPER_MODEL = load_model(model_size)
+        gen = transcribe_timestamped(WHISPER_MODEL, filename, verbose=False, fp16=False)
+        return gen
+    except Exception as e:
+        print(f"⚠️ Falling back to standard whisper: {e}", flush=True)
+        import whisper
+        if WHISPER_MODEL is None:
+            WHISPER_MODEL = whisper.load_model(model_size)
+        gen = WHISPER_MODEL.transcribe(filename, verbose=False, fp16=False, word_timestamps=True)
+        return gen
 
 
 def getWordsPerSec(filename):
