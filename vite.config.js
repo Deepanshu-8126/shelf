@@ -11,7 +11,7 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     allowedHosts: true,
-    proxy: { '/api': { target: 'http://127.0.0.1:8787', changeOrigin: true } },
+    proxy: { '/api':  { target: 'http://127.0.0.1:8787', changeOrigin: true } },
   },
   build: { chunkSizeWarningLimit: 800 },
 });

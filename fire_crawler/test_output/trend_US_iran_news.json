@@ -1,8 +1,0 @@
-{
-  "trending_title": "iran news",
-  "search_traffic": "20000+",
-  "geo_region": "US",
-  "news_source": "The Washington Post",
-  "source_url": "https://www.washingtonpost.com/national-security/2026/10/01/pentagon-prepares-potential-surge-naval-forces-middle-east/",
-  "markdown_content": "Wikimedia Error\n\n[![Wikimedia](https://www.wikimedia.org/static/images/wmf-logo.png) ](https://www.wikimedia.org)\n\n# Error\n\nToo many requests. Please respect our robot policy https://w.wiki/4wJS. (fabf13e)\n\nIf you report this error to the Wikimedia System Administrators, please include the details below.\n\n`Request served via cp5021 cp5021, Varnish XID 89526424  \nUpstream caches: cp5021 int  \nError: 429, Too many requests. Please respect our robot policy https://w.wiki/4wJS. (fabf13e) at Fri, 02 Oct 2026 13:40:44 GMT  \nSensitive client informationIP address: 2401:4900:8856:2a73:d4b:9b8d:6f46:f8c8`"
-}

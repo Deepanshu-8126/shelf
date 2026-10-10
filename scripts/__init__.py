@@ -1,1 +1,0 @@
-"""Shelf Storefront Scripts Package."""
