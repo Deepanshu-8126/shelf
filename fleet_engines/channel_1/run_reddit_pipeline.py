@@ -38,7 +38,9 @@ WORKSPACE_ROOT = FLEET_DIR.parent
 load_dotenv(WORKSPACE_ROOT / ".env")
 
 SHORTGPT_ROOT = FLEET_DIR / "ShortGPT"
-sys.path.insert(0, str(SHORTGPT_ROOT))
+for p in [str(CHANNEL_DIR), str(FLEET_DIR), str(WORKSPACE_ROOT), str(SHORTGPT_ROOT)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 os.chdir(str(SHORTGPT_ROOT))
 
 # 1. Fast LLM completion via Groq
@@ -401,10 +403,10 @@ def extract_keywords_via_groq(story_text: str, video_duration: float) -> list:
     if not groq_key:
         return extract_keywords_local_fallback(story_text, video_duration)
 
-    system = """Extract 3-4 high-impact visual nouns from this story for popup overlays.
-Return ONLY valid JSON array: [{"keyword": "...", "timestamp": float, "sfx": "whoosh|cash|boom|click"}]
-Timestamps should be spread across the video duration (0 to {duration}s).
-SFX mapping: visual objects=whoosh, money=cash, dramatic twist=boom, photo/evidence=click.""".format(duration=video_duration)
+    system = f"""Extract 3-4 high-impact visual nouns from this story for popup overlays.
+Return ONLY valid JSON array: [{{"keyword": "...", "timestamp": float, "sfx": "whoosh|cash|boom|click"}}]
+Timestamps should be spread across the video duration (0 to {video_duration:.1f}s).
+SFX mapping: visual objects=whoosh, money=cash, dramatic twist=boom, photo/evidence=click."""
 
     prompt = f"Story: {story_text}\nVideo duration: ~{video_duration:.1f}s"
 
