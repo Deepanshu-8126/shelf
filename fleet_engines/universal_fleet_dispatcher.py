@@ -111,18 +111,16 @@ def dispatch_channel(channel_id: int, topic: str = "", dry_run: bool = False):
         if not shortgpt_dir.exists():
             print("❌ ShortGPT directory missing!")
             return False
-        from channel_1_reddit_profile import generate_reddit_drama_short
-        generate_reddit_drama_short(custom_story=topic)
+        sys.path.insert(0, str(FLEET_DIR))
+        from channel_1.run_reddit_pipeline import run as run_reddit_pipeline
+        run_reddit_pipeline(background_choice=topic or "Subway Surfers")
         return True
 
-    elif engine == "moneyprinter_turbo":
-        mp_dir = FLEET_DIR / "MoneyPrinterTurbo"
-        print(f"🎬 [MoneyPrinterTurbo Route] Running 4K Pexels Facts & Motivation pipeline...")
-        if not mp_dir.exists():
-            print("❌ MoneyPrinterTurbo directory missing!")
-            return False
-        print(f"✓ MoneyPrinterTurbo engine connected at {mp_dir}")
-        print(f"✓ Generating video for niche: {target_channel.get('niche')}")
+    elif engine in ["moneyprinter_turbo", "vox_mystery", "vox", "viral_facts_motivation"]:
+        print(f"🎬 [Channel 2 Route] Running Vox Documentary Pipeline (run_channel_2)...")
+        sys.path.insert(0, str(FLEET_DIR / "channel_2"))
+        from channel_2.run_channel_2 import render_short
+        render_short(pillar_id=1, topic=topic, lang="hi")
         return True
 
     elif engine == "videosynx":

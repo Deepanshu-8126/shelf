@@ -23,7 +23,7 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-FLEET_DIR = Path(__file__).resolve().parent
+FLEET_DIR = Path(__file__).resolve().parent.parent
 WORKSPACE_ROOT = FLEET_DIR.parent
 SHORTGPT_DIR = FLEET_DIR / "ShortGPT"
 OUTPUT_DIR = FLEET_DIR / "output" / "channel_1_reddit"

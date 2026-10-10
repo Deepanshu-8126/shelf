@@ -10,3 +10,5 @@ venv/
 .database/
 .logs/
 .gradio/
+credentials/
+
