@@ -107,11 +107,58 @@ def render_channel_3_short(pillar_id: int = 1, topic: str = "", lang: str = "hi"
     with TemporaryDirectory() as tmp_str:
         tmp = Path(tmp_str)
         
-        # 1. Cloned Bella Voiceover (Atmospheric Female Storytelling)
-        audio_file = tmp / "voice.wav"
-        print("🎙️ Generating Cloned Bella Voiceover (Offline/Free)...")
-        generate_cloned_voice(pkg["script"], voice_type="bella", output_path=audio_file, lang=lang)
+        # 1. Real ElevenLabs Bella Voiceover
+        audio_file = tmp / "voice.mp3"
+        print("🎙️ Generating Real ElevenLabs Bella Voiceover (EXAVITQu4vr4xnSDxMaL)...")
         
+        # Check ElevenLabs key pool from .env
+        el_keys = [
+            os.getenv("ELEVENLABS_API_KEY"),
+            os.getenv("ELEVENLABS_API_KEY_2"),
+            os.getenv("ELEVENLABS_API_KEY_3")
+        ]
+        el_keys = [k for k in el_keys if k and k.strip()]
+        
+        voice_success = False
+        for k_idx, el_key in enumerate(el_keys):
+            headers = {"xi-api-key": el_key, "Content-Type": "application/json"}
+            payload = {
+                "text": pkg["script"],
+                "model_id": "eleven_multilingual_v2",
+                "voice_settings": {"stability": 0.55, "similarity_boost": 0.82}
+            }
+            try:
+                r_el = requests.post("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL", json=payload, headers=headers, timeout=25)
+                if r_el.status_code == 200:
+                    audio_file.write_bytes(r_el.content)
+                    print(f"✅ ElevenLabs Bella generated successfully via Key #{k_idx+1}!")
+                    voice_success = True
+                    break
+                else:
+                    print(f"⚠️ Key #{k_idx+1} response {r_el.status_code}: {r_el.text[:80]}")
+            except Exception as e:
+                print(f"⚠️ Key #{k_idx+1} exception: {e}")
+                
+        if not voice_success:
+            print("⚠️ ElevenLabs quota reached or keys unavailable. Using Studio-Mastered Neural Voice...")
+            import edge_tts
+            raw_tmp = tmp / "raw_edge.mp3"
+            async def _get_swara():
+                c = edge_tts.Communicate(pkg["script"], "hi-IN-SwaraNeural", rate="-5%", pitch="-2Hz")
+                await c.save(str(raw_tmp))
+            import asyncio
+            asyncio.run(_get_swara())
+            
+            # Studio mastering chain: warm chest resonance + breathy air
+            af = (
+                "equalizer=f=180:width_type=h:width=120:g=3.5,"
+                "equalizer=f=3200:width_type=h:width=600:g=2.5,"
+                "equalizer=f=10000:width_type=h:width=1500:g=4.0,"
+                "acompressor=threshold=-20dB:ratio=3.5:attack=15:release=120"
+            )
+            subprocess.run(["ffmpeg", "-y", "-i", str(raw_tmp), "-af", af, str(audio_file)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            print("✅ Studio-Mastered Neural Voice ready!")
+            
         dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_file)]
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
         print(f"⏱️ Duration: {total_dur:.1f}s")

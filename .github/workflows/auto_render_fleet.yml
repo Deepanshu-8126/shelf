@@ -64,6 +64,9 @@ jobs:
       YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY || 'sk_f27562b3dda4dd4c2b6bda43c7205548e5a35bc966403310' }}
+      ELEVENLABS_API_KEY_2: ${{ secrets.ELEVENLABS_API_KEY_2 }}
+      ELEVENLABS_API_KEY_3: ${{ secrets.ELEVENLABS_API_KEY_3 }}
 
     steps:
       - name: Checkout Repository
@@ -124,11 +127,15 @@ jobs:
           elif [ "$CHANNEL" = "2" ]; then
             python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           elif [ "$CHANNEL" = "3" ]; then
-            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT"
+            echo "🌌 Channel 3: Rendering Daily Video 1 (Cosmic Supervoids)..."
+            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT"
+            echo "🌌 Channel 3: Rendering Daily Video 2 (Mind-Bending What-Ifs)..."
+            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
           else
-            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K)!"
+            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (2 Cosmic 4K Videos)!"
             python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
-            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT"
+            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG"
+            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
           fi
 
       - name: Upload Rendered Videos & Metadata Artifact
