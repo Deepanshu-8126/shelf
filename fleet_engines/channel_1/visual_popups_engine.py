@@ -10,18 +10,24 @@ import random
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 try:
-    from moviepy import ImageClip, VideoFileClip, CompositeVideoClip, vfx
+    from moviepy import ImageClip, VideoFileClip, CompositeVideoClip, vfx  # type: ignore
     Resize = getattr(vfx, "Resize", None) or getattr(vfx, "resize", None)
     FadeOut = getattr(vfx, "FadeOut", None) or getattr(vfx, "fadeout", None)
 except Exception:
     try:
-        from moviepy.editor import ImageClip, VideoFileClip, CompositeVideoClip, vfx
+        from moviepy.editor import ImageClip, VideoFileClip, CompositeVideoClip, vfx  # type: ignore
         Resize = getattr(vfx, "Resize", None) or getattr(vfx, "resize", None)
         FadeOut = getattr(vfx, "FadeOut", None) or getattr(vfx, "fadeout", None)
     except Exception:
-        ImageClip = Any
-        VideoFileClip = Any
-        CompositeVideoClip = Any
+        class ImageClip:  # type: ignore
+            def __init__(self, *args: Any, **kwargs: Any) -> None: pass
+            def with_effects(self, *args: Any, **kwargs: Any) -> Any: return self
+            def with_position(self, *args: Any, **kwargs: Any) -> Any: return self
+            def with_start(self, *args: Any, **kwargs: Any) -> Any: return self
+        class VideoFileClip:  # type: ignore
+            pass
+        class CompositeVideoClip:  # type: ignore
+            def __init__(self, *args: Any, **kwargs: Any) -> None: pass
         Resize = None
         FadeOut = None
 from PIL import Image, ImageDraw, ImageFont
