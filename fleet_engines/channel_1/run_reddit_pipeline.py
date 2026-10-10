@@ -487,7 +487,16 @@ def patch_caption_renderer():
 patch_caption_renderer()
 
 
-def run(background_choice=None):
+def run(background_choice=None, custom_title=None, custom_script=None):
+    global _viral_story_cache
+    if custom_title or custom_script:
+        _viral_story_cache = {
+            "question": custom_title or "Entitled Boss Gets Instant Karma",
+            "story": custom_script or "I worked overtime for 3 weeks and my boss refused to pay me. So I quit right before the biggest audit of the year."
+        }
+        print(f"📌 [CUSTOM TITLE]: {_viral_story_cache['question']}", flush=True)
+        print(f"📜 [CUSTOM SCRIPT]: {_viral_story_cache['story'][:80]}...", flush=True)
+
     print("=" * 70, flush=True)
     print("🎬 STARTING 100% OFFICIAL SHORTGPT REDDIT SHORT ENGINE [CHANNEL 1]", flush=True)
     print("🚀 VIRAL ENHANCEMENTS: Popups | SFX | Kinetic Subs | Progress Bar | NLP", flush=True)
@@ -560,15 +569,35 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Channel 1 Reddit Drama Pipeline")
     parser.add_argument("bg", nargs="?", default="Subway Surfers", help="Background game theme")
+    parser.add_argument("--title", type=str, default="", help="Custom story title")
+    parser.add_argument("--script", type=str, default="", help="Custom story script text")
     parser.add_argument("--upload", action="store_true", help="Auto upload to YouTube Channel 1")
+    parser.add_argument("--telegram", action="store_true", default=True, help="Send video & metadata to Telegram")
     parser.add_argument("--privacy", type=str, default="unlisted", choices=["public", "unlisted", "private"])
     args = parser.parse_args()
     
-    vid_path = run(args.bg)
+    vid_path = run(args.bg, custom_title=args.title, custom_script=args.script)
+    pkg = _viral_story_cache or {}
+    title = f"{pkg.get('question', 'Entitled Boss Gets Instant Karma')} #shorts #redditstories"
+    desc = f"True story from Reddit: {pkg.get('question', '')}\n\n#redditstories #pettyrevenge #shorts #viral"
+    tags = ["reddit", "reddit stories", "petty revenge", "shorts", "viral"]
+    yt_url = None
+    
     if args.upload and vid_path:
         from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
-        pkg = _viral_story_cache or {}
-        title = f"{pkg.get('question', 'Entitled Boss Gets Instant Karma')} #shorts #redditstories"
-        desc = f"True Reddit confession.\n\n#redditstories #shorts #viral"
-        upload_short_to_youtube(Path(vid_path), title, desc, channel=1, privacy_status=args.privacy)
+        res = upload_short_to_youtube(Path(vid_path), title, desc, channel=1, privacy_status=args.privacy)
+        if res:
+            yt_url = res.get("video_url")
+            
+    if args.telegram and vid_path:
+        from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
+        send_fleet_video_to_telegram(
+            video_path=Path(vid_path),
+            channel=1,
+            title=title,
+            description=desc,
+            tags=tags,
+            youtube_url=yt_url,
+            privacy=args.privacy
+        )
 

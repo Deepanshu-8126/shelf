@@ -217,15 +217,23 @@ def download_pexels_clip(query: str, out_path: Path) -> bool:
         pass
     return False
 
-def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en") -> str:
+def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_script: str = "", custom_title: str = "") -> str:
     print("=" * 75)
     print(f"🎬 CHANNEL 2: RENDERING VOX SHORT (PILLAR #{pillar_id})")
     print("=" * 75)
     
     # 1. Script
-    pkg = generate_script(pillar_id, topic, lang)
-    print(f"📌 Title: {pkg['title']}")
-    print(f"📜 Script: {pkg['script']}\n")
+    if custom_script:
+        title = custom_title or (topic if topic else PILLARS.get(pillar_id, PILLARS[1])["default_topic"])
+        pkg = {"title": title, "script": custom_script}
+        print(f"📌 Custom Title: {pkg['title']}")
+        print(f"📜 Custom Script: {pkg['script']}\n")
+    else:
+        pkg = generate_script(pillar_id, topic, lang)
+        if custom_title:
+            pkg["title"] = custom_title
+        print(f"📌 Title: {pkg['title']}")
+        print(f"📜 Script: {pkg['script']}\n")
     
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     final_video = OUTPUT_DIR / f"vox_pillar_{pillar_id}_{lang}_{int(time.time())}.mp4"
@@ -320,15 +328,41 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Unified Channel 2 Engine")
     parser.add_argument("--pillar", type=int, default=1, choices=[1, 2, 3, 4])
     parser.add_argument("--topic", type=str, default="")
+    parser.add_argument("--title", type=str, default="", help="Custom Title override")
+    parser.add_argument("--script", type=str, default="", help="Custom Script text override")
     parser.add_argument("--lang", type=str, default="en", choices=["en", "hi"])
     parser.add_argument("--upload", action="store_true", help="Auto upload to YouTube after rendering (unlisted)")
+    parser.add_argument("--telegram", action="store_true", default=True, help="Send video & metadata to Telegram")
     parser.add_argument("--privacy", type=str, default="unlisted", choices=["public", "unlisted", "private"])
     args = parser.parse_args()
     
-    rendered_path = render_short(pillar_id=args.pillar, topic=args.topic, lang=args.lang)
+    rendered_path = render_short(
+        pillar_id=args.pillar,
+        topic=args.topic,
+        lang=args.lang,
+        custom_script=args.script,
+        custom_title=args.title
+    )
+    
+    yt_url = None
+    title = args.title or (args.topic or f"Mystery Shorts #{args.pillar}")
+    desc = f"Story from Channel 2 Mystery Studio.\n\n#mystery #unsolved #shorts #viral"
     
     if args.upload and rendered_path:
         from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
         video_p = Path(rendered_path)
-        topic_title = args.topic or f"Mystery Shorts #{args.pillar}"
-        upload_short_to_youtube(video_p, f"{topic_title} #shorts", "Story by Channel 2 Mystery Engine", privacy_status=args.privacy)
+        res = upload_short_to_youtube(video_p, f"{title} #shorts", desc, channel=2, privacy_status=args.privacy)
+        if res:
+            yt_url = res.get("video_url")
+            
+    if args.telegram and rendered_path:
+        from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
+        send_fleet_video_to_telegram(
+            video_path=Path(rendered_path),
+            channel=2,
+            title=f"{title} #shorts",
+            description=desc,
+            tags=["mystery", "unsolved", "facts", "science"],
+            youtube_url=yt_url,
+            privacy=args.privacy
+        )

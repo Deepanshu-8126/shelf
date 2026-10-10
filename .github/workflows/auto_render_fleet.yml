@@ -24,13 +24,18 @@ on:
         required: false
         default: ''
         type: string
+      script:
+        description: 'Custom Script Text (Optional - Leave empty for Auto AI Storyteller)'
+        required: false
+        default: ''
+        type: string
       auto_upload:
-        description: 'Auto-Upload to YouTube?'
+        description: 'Auto-Upload to YouTube? (Unlisted Default)'
         required: true
         default: true
         type: boolean
       privacy:
-        description: 'YouTube Video Privacy (unlisted/public/private)'
+        description: 'YouTube Video Privacy'
         required: true
         default: 'unlisted'
         type: choice
@@ -101,44 +106,24 @@ jobs:
         run: |
           CHANNEL="${{ github.event.inputs.channel || '2' }}"
           TOPIC="${{ github.event.inputs.topic || '' }}"
+          CUSTOM_SCRIPT="${{ github.event.inputs.script || '' }}"
           LANG="${{ github.event.inputs.lang || 'hi' }}"
+          PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
+          UPLOAD_FLAG=""
+          if [ "${{ github.event.inputs.auto_upload }}" != "false" ]; then
+            UPLOAD_FLAG="--upload"
+          fi
           
-          echo "🚀 Starting Automated Render: Channel $CHANNEL | Lang $LANG | Topic $TOPIC"
+          echo "🚀 Starting Automated Render: Channel $CHANNEL | Lang $LANG"
           
           if [ "$CHANNEL" = "1" ]; then
-            python fleet_engines/channel_1/run_reddit_pipeline.py "Subway Surfers"
+            python fleet_engines/channel_1/run_reddit_pipeline.py "Subway Surfers" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           else
-            python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC"
-          fi
-
-      - name: Auto-Upload to YouTube
-        if: ${{ github.event.inputs.auto_upload != 'false' }}
-        run: |
-          CHANNEL="${{ github.event.inputs.channel || '2' }}"
-          LATEST_VIDEO=$(ls -t fleet_engines/output/**/*.mp4 2>/dev/null | head -n 1)
-          PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
-          TOKEN_PATH="credentials/channel_${CHANNEL}_token.json"
-          if [ ! -f "$TOKEN_PATH" ] && [ "$CHANNEL" = "2" ]; then
-            TOKEN_PATH="credentials/token.json"
-          fi
-          
-          if [ -n "$LATEST_VIDEO" ] && [ -f "$TOKEN_PATH" ]; then
-            echo "📤 Uploading $LATEST_VIDEO to YouTube Channel $CHANNEL ($PRIVACY)..."
-            python fleet_engines/channel_2/youtube_uploader.py --video "$LATEST_VIDEO" --privacy "$PRIVACY" || echo "⚠️ YouTube upload failed, check logs"
-          else
-            echo "ℹ️ Skipping auto-upload: either no video found or credentials pending for Channel $CHANNEL."
-          fi
-
-      - name: Send Video to Telegram
-        if: always()
-        run: |
-          LATEST_VIDEO=$(ls -t fleet_engines/output/**/*.mp4 2>/dev/null | head -n 1)
-          if [ -n "$LATEST_VIDEO" ] && [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-            echo "📱 Delivering video directly to Telegram..."
-            curl -s -F "chat_id=$TELEGRAM_CHAT_ID" -F "video=@$LATEST_VIDEO" -F "caption=🎬 New Fleet Short Ready! ($LATEST_VIDEO)" "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendVideo" || true
+            python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           fi
 
       - name: Upload Rendered Videos & Metadata Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: youtube-ready-shorts
