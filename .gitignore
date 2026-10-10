@@ -7,3 +7,5 @@ output/
 .env
 venv/
 .tempmediaStorage/
+.database/
+.logs/

@@ -29,37 +29,37 @@ SHORTGPT_DIR = FLEET_DIR / "ShortGPT"
 OUTPUT_DIR = FLEET_DIR / "output" / "channel_1_reddit"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Curated High-Engagement Viral Reddit Stories
-VIRAL_REDDIT_STORIES = [
-    {
-        "hook": "AITA for canceling my wedding 3 days before after finding my fiancé's secret notebook?",
-        "subreddit": "r/AmItheAsshole",
-        "user": "throwaway_bride99",
-        "upvotes": "34.2k",
-        "comments": "4.8k",
-        "script": (
-            "AITA for canceling my wedding 3 days before after finding my fiancé's secret notebook? "
-            "We were supposed to get married this Saturday. Everything was paid for, until I found a leather notebook in his closet. "
-            "Inside, he had a numbered list of all my flaws, rating my physical looks at 6 out of 10, and stating he was only settling for me because his ex got married. "
-            "I packed my bags and canceled the venue immediately. Now his entire family is calling me insane for throwing away thousands of dollars over private notes. "
-            "So tell me, AITA?"
-        )
-    },
-    {
-        "hook": "My neighbor kept complaining about noise, so I set up a hidden camera and caught this...",
-        "subreddit": "r/TrueOffMyChest",
-        "user": "quiet_neighbor_42",
-        "upvotes": "28.9k",
-        "comments": "3.1k",
-        "script": (
-            "My neighbor kept complaining about noise, so I set up a hidden camera and caught this. "
-            "Every single night at 2 AM, she banged on my door claiming I was throwing parties, even though I live completely alone and work night shifts. "
-            "When the landlord threatened to evict me, I pointed a camera at my front door. "
-            "Turns out, it was her own son sleepwalking and kicking my wall from the hallway while dreaming. "
-            "She hasn't looked me in the eye since."
-        )
+def fetch_official_shortgpt_story() -> Dict[str, str]:
+    """
+    Generates dynamic Reddit question, story, and metadata using ShortGPT's
+    official trained prompt templates:
+      - prompt_templates/reddit_generate_question.yaml
+      - prompt_templates/reddit_generate_script.yaml
+      - prompt_templates/reddit_username.yaml
+    """
+    if str(SHORTGPT_DIR) not in sys.path:
+        sys.path.insert(0, str(SHORTGPT_DIR))
+    from shortGPT.gpt import reddit_gpt
+
+    print("🤖 Calling official ShortGPT trained prompt pipeline...")
+    question = reddit_gpt.getInterestingRedditQuestion().strip().replace('"', '')
+    print(f"📌 [Official Question Generated]: {question}")
+    
+    script = reddit_gpt.createRedditScript(question).strip()
+    print(f"📜 [Official Story Generated]: {script[:90]}...")
+    
+    title, header, n_comments, n_upvotes = reddit_gpt.generateRedditPostMetadata(question)
+    user_part = header.split(" - ")[0] if " - " in header else header
+    user_part = user_part.replace("u/", "").strip()
+    
+    return {
+        "hook": question,
+        "subreddit": "r/AskReddit",
+        "user": user_part,
+        "upvotes": n_upvotes,
+        "comments": n_comments,
+        "script": script
     }
-]
 
 
 def render_reddit_card(story_info: Dict[str, str], out_path: Path):
@@ -118,10 +118,20 @@ def render_reddit_card(story_info: Dict[str, str], out_path: Path):
 
 
 def generate_reddit_drama_short(custom_story: str = "") -> Dict[str, Any]:
-    import random
-    story_data = random.choice(VIRAL_REDDIT_STORIES)
-    hook = custom_story or story_data["hook"]
-    full_script = story_data["script"] if not custom_story else custom_story
+    if custom_story:
+        story_data = {
+            "hook": custom_story[:60],
+            "subreddit": "r/AskReddit",
+            "user": "redditor_voice",
+            "upvotes": "29.4k",
+            "comments": "3.8k",
+            "script": custom_story
+        }
+    else:
+        story_data = fetch_official_shortgpt_story()
+
+    hook = story_data["hook"]
+    full_script = story_data["script"]
     slug = "".join([c if c.isalnum() else "_" for c in hook[:20]]).strip("_")
 
     print("=" * 75)

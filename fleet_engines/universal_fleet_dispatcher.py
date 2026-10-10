@@ -107,14 +107,12 @@ def dispatch_channel(channel_id: int, topic: str = "", dry_run: bool = False):
     # Engine Router
     if engine == "shortgpt":
         shortgpt_dir = FLEET_DIR / "ShortGPT"
-        print(f"🎬 [ShortGPT Route] Running automated Reddit/Story pipeline...")
-        # Check ShortGPT directory
+        print(f"🎬 [ShortGPT Route] Running official ShortGPT Reddit pipeline...")
         if not shortgpt_dir.exists():
             print("❌ ShortGPT directory missing!")
             return False
-        print(f"✓ ShortGPT engine connected at {shortgpt_dir}")
-        print(f"✓ Generating video for niche: {target_channel.get('niche')}")
-        # In real execution, calls shortgpt runner script
+        from channel_1_reddit_profile import generate_reddit_drama_short
+        generate_reddit_drama_short(custom_story=topic)
         return True
 
     elif engine == "moneyprinter_turbo":
