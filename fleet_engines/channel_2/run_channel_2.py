@@ -251,10 +251,11 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
     with TemporaryDirectory() as tmp_str:
         tmp = Path(tmp_str)
         
-        # 2. Voiceover & Whisper
-        audio_file = tmp / "voice.mp3"
-        print("🎙️ Generating EdgeTTS voiceover...")
-        asyncio.run(create_voiceover(pkg["script"], str(audio_file), lang))
+        # 2. Cloned Voiceover (Adam Baritone)
+        audio_file = tmp / "voice.wav"
+        print("🎙️ Generating Cloned Adam Voiceover (Offline/Free)...")
+        from cloned_voice_engine import generate_cloned_voice
+        generate_cloned_voice(pkg["script"], voice_type="adam", output_path=audio_file, lang=lang)
         
         dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_file)]
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
@@ -263,69 +264,137 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         print("🧠 Transcribing with Whisper for word captions...")
         whisper_data = whisper.load_model("tiny").transcribe(str(audio_file), word_timestamps=True)
         ass_file = tmp / "subtitles.ass"
-        build_mrbeast_ass(whisper_data["segments"], ass_file)
         
-        # 3. Dynamic Cuts (Cut every 2.5s)
-        total_cuts = max(int(total_dur / 2.5), 4)
+        # Kinetic Subtitles with Nirmala UI Bold and 380px safe margin
+        header = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: CineText,Nirmala UI,72,&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,5,3,2,60,60,380,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+        events = []
+        all_words = [w for s in whisper_data.get("segments", []) for w in s.get("words", [])]
+        def fmt(t): return f"{int(t//3600):01d}:{int((t%3600)//60):02d}:{t%60:05.2f}"
+        for i in range(0, len(all_words), 3):
+            chunk = all_words[i:i+3]
+            if not chunk: continue
+            for act_idx, w in enumerate(chunk):
+                w_start, w_end = w["start"], w["end"]
+                if act_idx < len(chunk) - 1:
+                    next_st = chunk[act_idx+1]["start"]
+                    if next_st > w_end and next_st - w_end < 0.25:
+                        w_end = next_st
+                parts = []
+                for idx_c, cw in enumerate(chunk):
+                    word_clean = cw["word"].strip()
+                    if idx_c == act_idx:
+                        parts.append(f"{{\\c&H0000FFFF&}}{word_clean}")
+                    else:
+                        parts.append(f"{{\\c&H00FFFFFF&}}{word_clean}")
+                events.append(f"Dialogue: 0,{fmt(w_start)},{fmt(w_end)},CineText,,0,0,0,,{' '.join(parts)}")
+        ass_file.write_text(header + "\n".join(events) + "\n", encoding="utf-8")
+        
+        # 3. 100% Real 4K Visual Cuts (Zero Synthetic Drawings)
+        total_cuts = max(int(total_dur / 3.0), 3)
         cut_dur = total_dur / total_cuts
-        print(f"✂️ Visual Cuts: {total_cuts} rapid cuts ({cut_dur:.2f}s each)")
+        print(f"✂️ Visual Cuts: {total_cuts} 100% Real 4K Cuts ({cut_dur:.2f}s each)")
         
         segments = []
         pillar_terms = PILLARS.get(pillar_id, PILLARS[1])["search_terms"]
+        
+        # Extract dynamic semantic queries from title/script
+        kw_list = extract_keywords_llm(pkg["script"], total_dur) if pkg.get("script") else []
+        combined_queries = kw_list + pillar_terms
         
         for idx in range(total_cuts):
             seg_out = tmp / f"seg_{idx}.mp4"
             segments.append(seg_out)
             
-            if idx == 0:
-                print(f"🗺️ Scene {idx+1}: Animated Vox Map...")
-                make_animated_map(seg_out, cut_dur)
-            elif idx == 1:
-                print(f"📰 Scene {idx+1}: Archival Highlighter...")
-                make_highlighter_document(seg_out, cut_dur)
-            else:
-                q = pillar_terms[(idx - 2) % len(pillar_terms)]
-                print(f"🎥 Scene {idx+1}: 4K Pexels Video ('{q}')...")
-                b_path = tmp / f"stock_{idx}.mp4"
-                if not download_pexels_clip(q, b_path):
-                    b_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4"
-                cmd = [
-                    "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(b_path),
-                    "-filter_complex", "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[v]",
-                    "-map", "[v]", "-t", f"{cut_dur:.2f}",
-                    "-c:v", "libx264", "-preset", "fast", "-threads", "2", str(seg_out)
-                ]
-                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            q = combined_queries[idx % len(combined_queries)]
+            print(f"🎥 Scene {idx+1}/{total_cuts}: Real 4K Footage ('{q}')...")
+            b_path = tmp / f"stock_{idx}.mp4"
+            if not download_pexels_clip(q, b_path):
+                # Fallback to general suspense query
+                download_pexels_clip("dark mystery suspense atmospheric", b_path)
+            
+            if not b_path.exists() or b_path.stat().st_size < 10000:
+                b_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4"
                 
-        # 4. Concat
+            # Apply subtle camera drift + Netflix Noir grading + Vignette
+            drift_dir = "down" if idx % 2 == 0 else "up"
+            if drift_dir == "down":
+                crop_expr = f"crop=1080:1920:x='(in_w-out_w)/2':y='(in_h-out_h)*(t/{cut_dur:.2f})'"
+            else:
+                crop_expr = f"crop=1080:1920:x='(in_w-out_w)/2':y='(in_h-out_h)*(1-t/{cut_dur:.2f})'"
+                
+            vf = (
+                f"scale=1188:2112:force_original_aspect_ratio=increase,"
+                f"{crop_expr},"
+                f"eq=contrast=1.18:brightness=-0.03:saturation=0.90,"
+                f"vignette=PI/4"
+            )
+            cmd = [
+                "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(b_path),
+                "-vf", vf,
+                "-t", f"{cut_dur:.2f}",
+                "-r", "30",
+                "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+                "-an", str(seg_out)
+            ]
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            
+        # 4. Concat Real Clips
         concat_txt = tmp / "concat.txt"
         with open(concat_txt, "w") as f:
             for s in segments: f.write(f"file '{s.name}'\n")
         concat_mp4 = tmp / "concat.mp4"
         subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_txt), "-c", "copy", str(concat_mp4)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         
-        # 5. Burn ASS Subtitles & Mix Audio
-        sub_escaped = str(ass_file).replace("\\", "/").replace(":", "\\:")
-        ambient = WORKSPACE_ROOT / "fleet_engines/ShortGPT/public/audio/ambient_drone.mp3"
+        # 5. Dark Suspense Drone BGM
+        bgm_file = tmp / "ambient_drone.mp3"
+        drone_cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "anoisesrc=c=pink:r=44100:a=0.05",
+            "-f", "lavfi", "-i", "sine=f=50:r=44100",
+            "-f", "lavfi", "-i", "sine=f=75:r=44100",
+            "-filter_complex",
+            f"[0:a]lowpass=f=180,volume=0.25[noise];"
+            f"[1:a]volume=0.35[sub];"
+            f"[2:a]volume=0.22[mid];"
+            f"[noise][sub][mid]amix=inputs=3,afade=t=in:ss=0:d=1.0,afade=t=out:st={total_dur-1.5:.2f}:d=1.5",
+            "-t", f"{total_dur:.2f}",
+            str(bgm_file)
+        ]
+        subprocess.run(drone_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         
-        if ambient.exists():
-            final_cmd = [
-                "ffmpeg", "-y",
-                "-i", str(concat_mp4), "-i", str(audio_file), "-stream_loop", "-1", "-i", str(ambient),
-                "-filter_complex", f"[0:v]ass='{sub_escaped}'[vout];[2:a]volume=0.08[drone];[1:a][drone]amix=inputs=2:duration=first[aout]",
-                "-map", "[vout]", "-map", "[aout]",
-                "-c:v", "libx264", "-preset", "fast", "-c:a", "aac", "-threads", "2", str(final_video)
-            ]
-        else:
-            final_cmd = [
-                "ffmpeg", "-y",
-                "-i", str(concat_mp4), "-i", str(audio_file),
-                "-filter_complex", f"[0:v]ass='{sub_escaped}'[vout]",
-                "-map", "[vout]", "-map", "1:a",
-                "-c:v", "libx264", "-preset", "fast", "-c:a", "aac", "-threads", "2", str(final_video)
-            ]
-            
-        print("⚡ Final Assembly...")
+        # 6. Burn Subtitles & Mix Audio (Voice at 1.0, BGM at 0.08)
+        sub_escaped = str(ass_file).replace("\\", "/").replace(":", "\\:")
+        full_filter = (
+            f"[0:v]ass='{sub_escaped}'[vout];"
+            f"[1:a]volume=1.0[voice];"
+            f"[2:a]volume=0.08[drone];"
+            f"[voice][drone]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        )
+        final_cmd = [
+            "ffmpeg", "-y",
+            "-i", str(concat_mp4),
+            "-i", str(audio_file),
+            "-i", str(bgm_file),
+            "-filter_complex", full_filter,
+            "-map", "[vout]",
+            "-map", "[aout]",
+            "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+            "-c:a", "aac", "-b:a", "192k",
+            "-shortest",
+            str(final_video)
+        ]
+        print("⚡ Final 4K Cinematic Assembly...")
         subprocess.run(final_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         
     print("=" * 75)
