@@ -1,0 +1,78 @@
+{
+  "fleet_version": "2.0.0",
+  "description": "Master Multi-Channel Fleet Registry with Pluggable Video Engines",
+  "channels": [
+    {
+      "id": 1,
+      "name": "Reddit Confessions & Drama Shorts",
+      "badge": "🎭 REDDIT SHORTS",
+      "engine": "shortgpt",
+      "niche": "reddit_drama",
+      "format": "9:16 Shorts (30-60s)",
+      "target_audience": "Story & drama lovers",
+      "content_type": "askreddit_confessions",
+      "background_gameplay": "minecraft_parkour",
+      "voice_preset": "en_us_001",
+      "captions_style": "mrbeast_bold_bouncy",
+      "output_dir": "fleet_engines/output/channel_1_reddit"
+    },
+    {
+      "id": 2,
+      "name": "Daily Viral Facts & Stoic Motivation",
+      "badge": "⚡ FACTS & MOTIVATION",
+      "engine": "moneyprinter_turbo",
+      "niche": "viral_facts_motivation",
+      "format": "9:16 Shorts (30-60s)",
+      "target_audience": "Self-improvement & curiosity",
+      "content_type": "psychology_wealth_facts",
+      "background_video": "4k_pexels_cinematic",
+      "language": "hi",
+      "voice_preset": "hindi_deep_stoic",
+      "captions_style": "active_word_highlight",
+      "output_dir": "fleet_engines/output/channel_2_facts"
+    },
+    {
+      "id": 3,
+      "name": "Coding Studio & LeetCode Visualizer",
+      "badge": "💻 CODING STUDIO",
+      "engine": "videosynx",
+      "niche": "dsa_programming",
+      "format": "9:16 IDE Shorts (45-60s)",
+      "target_audience": "Software engineers & students",
+      "content_type": "python_algorithms",
+      "theme": "onedark_motion_canvas",
+      "voice_preset": "hm_omega_kokoro",
+      "captions_style": "ide_anchored_hud",
+      "output_dir": "super_youtube_agent/07_coding_studio/output"
+    },
+    {
+      "id": 4,
+      "name": "Midnight Horror Creepypasta",
+      "badge": "👻 MIDNIGHT HORROR",
+      "engine": "shortgpt",
+      "niche": "scary_stories",
+      "format": "9:16 Shorts (45-60s)",
+      "target_audience": "Horror & thriller fans",
+      "content_type": "nosleep_creepypasta",
+      "background_gameplay": "subway_dark_runner",
+      "voice_preset": "deep_whisper_dark",
+      "captions_style": "creepy_red_glow",
+      "output_dir": "fleet_engines/output/channel_4_horror"
+    },
+    {
+      "id": 5,
+      "name": "Ancient Indian & World Mysteries",
+      "badge": "🏛️ ANCIENT MYSTERIES",
+      "engine": "moneyprinter_turbo",
+      "niche": "history_archaeology",
+      "format": "9:16 Shorts (45-60s)",
+      "target_audience": "History & mythology enthusiasts",
+      "content_type": "unsolved_historical_enigmas",
+      "background_video": "ancient_temples_drones",
+      "language": "hi",
+      "voice_preset": "hindi_documentary_narrator",
+      "captions_style": "cinematic_gold_subtitles",
+      "output_dir": "fleet_engines/output/channel_5_mysteries"
+    }
+  ]
+}

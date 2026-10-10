@@ -1,0 +1,61 @@
+name: Multi-Channel Cloud Video Render Factory
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Select Channel to Render'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1' # Reddit Confessions (ShortGPT)
+          - '2' # Viral Facts & Motivation (MoneyPrinterTurbo)
+          - '3' # Coding Studio (Videosynx Motion Canvas)
+          - '4' # Midnight Horror (ShortGPT)
+          - '5' # Ancient Mysteries (MoneyPrinterTurbo)
+      topic:
+        description: 'Custom Topic / Title (Optional)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  render_video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install FFmpeg & System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libsm6 libxext6
+
+      - name: Install Base Python Requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx pillow numpy soundfile edge-tts
+
+      - name: Dispatch Channel Video Render
+        run: |
+          python fleet_engines/universal_fleet_dispatcher.py --channel ${{ github.event.inputs.channel }} --topic "${{ github.event.inputs.topic }}"
+
+      - name: Upload Rendered Videos as GitHub Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-${{ github.event.inputs.channel }}-rendered-video
+          path: |
+            fleet_engines/output/**/*.mp4
+            super_youtube_agent/07_coding_studio/output/*.mp4
+          retention-days: 14
