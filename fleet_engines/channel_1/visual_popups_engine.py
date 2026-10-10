@@ -10,7 +10,7 @@ import random
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 from moviepy import ImageClip, VideoFileClip, CompositeVideoClip
-from moviepy.video.fx import Resize
+from moviepy.video.fx import Resize, FadeOut
 from PIL import Image, ImageDraw, ImageFont
 import io
 
@@ -69,12 +69,13 @@ def find_sticker_path(keyword: str) -> Optional[Path]:
     filename = KEYWORD_STICKER_MAP.get(keyword.lower())
     if not filename:
         return None
-    path = STICKERS_DIR / filename
+    path = (STICKERS_DIR / filename).resolve()
     if path.exists():
         return path
 
     # Auto-generate procedural sticker if missing
-    return generate_procedural_sticker(keyword.lower(), filename)
+    res = generate_procedural_sticker(keyword.lower(), filename)
+    return res.resolve() if res else None
 
 
 def generate_procedural_sticker(keyword: str, filename: str) -> Path:
@@ -280,46 +281,28 @@ def create_sticker_clip(sticker_path: str, start_time: float, duration: float = 
     Create an animated sticker clip with bounce-in effect.
     Entry: scale 0.7 -> 1.0 over 0.15s with drop shadow
     """
-    img = ImageClip(sticker_path, duration=duration + 0.5)  # extra buffer for fade out
+    img = ImageClip(str(Path(sticker_path).resolve()), duration=duration)
 
-    # Resize to target size maintaining aspect ratio
-    img = img.with_effects([Resize(newsize=STICKER_SIZE)])
+    # Resize to target size (MoviePy v2: positional or new_size)
+    img = img.with_effects([Resize(STICKER_SIZE), FadeOut(0.3)])
 
     # Position at upper-third quadrant
     def position_func(t):
-        # t is relative to clip start (0 to duration)
         if t < BOUNCE_DURATION:
-            # Bounce in: scale from 0.7 to 1.0 with overshoot
             progress = t / BOUNCE_DURATION
-            # Ease-out bounce
             scale = 0.7 + 0.3 * (1 - (1 - progress) ** 3)
-            # Slight overshoot at the end
             if progress > 0.8:
                 scale = 1.0 + 0.05 * (progress - 0.8) / 0.2
         else:
             scale = 1.0
 
-        # Calculate position (center x, fixed y)
         w, h = STICKER_SIZE
         x = (1080 - w * scale) / 2
-        y = STICKER_POSITION[1] - (h * (scale - 1)) / 2  # keep centered vertically during scale
-
+        y = STICKER_POSITION[1] - (h * (scale - 1)) / 2
         return (x, y)
 
-    # Apply position animation
     img = img.with_position(position_func, relative=False)
-
-    # Set start time
     img = img.with_start(start_time)
-
-    # Add subtle fade out at end
-    def opacity_func(t):
-        if t > duration:
-            return max(0, 1 - (t - duration) / 0.3)
-        return 1.0
-
-    img = img.with_opacity(opacity_func)
-
     return img
 
 
@@ -328,12 +311,15 @@ def create_popup_composite(base_video: VideoFileClip, popups: List[Dict]) -> Com
     clips = [base_video]
 
     for popup in popups:
-        sticker_clip = create_sticker_clip(
-            popup["sticker_path"],
-            popup["timestamp"],
-            STICKER_DURATION
-        )
-        clips.append(sticker_clip)
+        try:
+            sticker_clip = create_sticker_clip(
+                popup["sticker_path"],
+                popup["timestamp"],
+                STICKER_DURATION
+            )
+            clips.append(sticker_clip)
+        except Exception as e:
+            print(f"⚠️ Skipping popup {popup.get('keyword')}: {e}", flush=True)
 
     return CompositeVideoClip(clips, size=base_video.size)
 

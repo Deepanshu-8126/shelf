@@ -33,7 +33,7 @@ def get_sfx_clip(sfx_type: str) -> Optional[AudioFileClip]:
     if not config:
         return None
 
-    path = SFX_DIR / config["file"]
+    path = (SFX_DIR / config["file"]).resolve()
     if path.exists():
         try:
             clip = AudioFileClip(str(path))
