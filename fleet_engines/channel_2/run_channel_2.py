@@ -66,9 +66,11 @@ PILLARS = {
     }
 }
 
-# Import Universal Anti-AI-Slop Humanized Script & CTA Writer
-sys.path.insert(0, str(WORKSPACE_ROOT / "fleet_engines"))
-from universal_humanized_writer import generate_humanized_script
+# Import from centralized LLM engine (single source of truth)
+_FLEET_DIR = str(WORKSPACE_ROOT / "fleet_engines")
+if _FLEET_DIR not in sys.path:
+    sys.path.insert(0, _FLEET_DIR)
+from llm_engine import generate_channel2_script as generate_humanized_script, extract_keywords_llm
 
 # =============================================================================
 # 2. SCRIPT GENERATOR (UNIVERSAL HUMANIZED STORYTELLER)
