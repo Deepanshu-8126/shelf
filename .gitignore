@@ -9,3 +9,4 @@ venv/
 .tempmediaStorage/
 .database/
 .logs/
+.gradio/
