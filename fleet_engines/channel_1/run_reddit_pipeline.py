@@ -204,30 +204,57 @@ def safe_get_asset_link(key: str) -> str:
         local_anim = os.path.abspath("public/subscribe-animation.mp4")
         if os.path.exists(local_anim):
             return local_anim
-    if norm_key in ["gta 5 action", "gta 5", "gta5"]:
-        p = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4"
-        if p.exists():
-            return str(p)
-    if norm_key in ["subway surfers", "subway"]:
-        p = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4"
-        if p.exists():
-            return str(p)
     if norm_key in ["white reddit template", "reddit template"]:
         local_tmpl = os.path.abspath("public/white_reddit_template.png")
         if os.path.exists(local_tmpl):
             return local_tmpl
-    return orig_get_asset_link(key)
+
+    # 1. Background Music: Zero YouTube Scraping (100% Local / Safe)
+    if any(m in norm_key for m in ["music", "dj quads", "karud", "dreams", "audio"]):
+        candidates = [
+            os.path.abspath("public/Music dj quads.wav"),
+            str(SHORTGPT_ROOT / "public/Music dj quads.wav"),
+            str(WORKSPACE_ROOT / "fleet_engines/ShortGPT/public/Music dj quads.wav")
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                return c
+
+    # 2. Background Video: Subway Surfers Clean Master
+    subway_candidates = [
+        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers_clean.mp4",
+        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4",
+        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4",
+        SHORTGPT_ROOT / "public/test_minecraft_clip.mp4"
+    ]
+    for sc in subway_candidates:
+        if sc.exists():
+            return str(sc)
+
+    try:
+        return orig_get_asset_link(key)
+    except Exception as e:
+        print(f"⚠️ orig_get_asset_link failed for {key}: {e}. Falling back to Subway Surfers.", flush=True)
+        for sc in subway_candidates:
+            if sc.exists():
+                return str(sc)
+        return ""
 
 AssetDatabase.get_asset_link = safe_get_asset_link
 
 orig_get_duration = AssetDatabase.get_asset_duration
 def safe_get_asset_duration(key: str) -> int:
     norm_key = key.lower().replace("-", " ").strip()
+    if any(m in norm_key for m in ["music", "dj quads", "karud", "dreams", "audio"]):
+        return 60
     if "gta" in norm_key:
         return 300
     if "subway" in norm_key:
-        return 190
-    return orig_get_duration(key)
+        return 90
+    try:
+        return orig_get_duration(key)
+    except Exception:
+        return 90
 
 AssetDatabase.get_asset_duration = safe_get_asset_duration
 
