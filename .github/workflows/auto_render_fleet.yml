@@ -6,13 +6,14 @@ on:
       channel:
         description: 'Select Channel to Render'
         required: true
-        default: '2'
+        default: 'both'
         type: choice
         options:
-          - '1' # Channel 1: Reddit Drama & Confessions
-          - '2' # Channel 2: Vox Mystery & Documentary
+          - 'both' # Render BOTH Channel 1 & Channel 2 in 1 run
+          - '1'    # Channel 1: Reddit Drama (Funcyous)
+          - '2'    # Channel 2: Hindi Vox Mystery
       lang:
-        description: 'Language (Hindi or English)'
+        description: 'Language for Channel 2 (hi or en)'
         required: true
         default: 'hi'
         type: choice
@@ -104,7 +105,7 @@ jobs:
 
       - name: Render Video via Fleet Dispatcher
         run: |
-          CHANNEL="${{ github.event.inputs.channel || '2' }}"
+          CHANNEL="${{ github.event.inputs.channel || 'both' }}"
           TOPIC="${{ github.event.inputs.topic || '' }}"
           CUSTOM_SCRIPT="${{ github.event.inputs.script || '' }}"
           LANG="${{ github.event.inputs.lang || 'hi' }}"
@@ -114,11 +115,15 @@ jobs:
             UPLOAD_FLAG="--upload"
           fi
           
-          echo "🚀 Starting Automated Render: Channel $CHANNEL | Lang $LANG"
+          echo "🚀 Event: ${{ github.event_name }} | Channel: $CHANNEL | Lang: $LANG"
           
           if [ "$CHANNEL" = "1" ]; then
             python fleet_engines/channel_1/run_reddit_pipeline.py "Subway Surfers" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
+          elif [ "$CHANNEL" = "2" ]; then
+            python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           else
+            echo "🔥 Full Fleet Autopilot: Rendering BOTH Channel 1 & Channel 2!"
+            python fleet_engines/channel_1/run_reddit_pipeline.py "Subway Surfers" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
             python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           fi
 
