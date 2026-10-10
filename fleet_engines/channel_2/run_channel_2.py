@@ -36,6 +36,9 @@ for p in [str(CHANNEL_DIR), str(FLEET_DIR), str(WORKSPACE_ROOT)]:
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 
+import thermal_guard
+thermal_guard.apply_cool_mode()
+
 import edge_tts
 import whisper
 from openai import OpenAI

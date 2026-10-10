@@ -13,6 +13,9 @@ import soundfile as sf
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
+import thermal_guard
+thermal_guard.apply_cool_mode()
+
 def generate_cloned_voice(text: str, voice_type: str = "adam", output_path: Path = None, lang: str = "hi") -> Path:
     """
     Generates high-fidelity cloned speech locally via Kokoro-82M.
