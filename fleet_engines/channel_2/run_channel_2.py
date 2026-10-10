@@ -25,6 +25,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from PIL import Image, ImageDraw, ImageFont
 
+# Ensure project root is in sys.path
+CHANNEL_DIR = Path(__file__).resolve().parent
+FLEET_DIR = CHANNEL_DIR.parent
+WORKSPACE_ROOT = FLEET_DIR.parent
+for p in [str(CHANNEL_DIR), str(FLEET_DIR), str(WORKSPACE_ROOT)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 

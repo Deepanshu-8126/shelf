@@ -119,23 +119,40 @@ def llm_json(
     system_with_json = (
         (system or "") + "\nReturn ONLY valid JSON. No markdown fences. No explanation."
     )
-    raw = llm_complete(
-        prompt=prompt,
-        system=system_with_json,
-        temp=temp,
-        max_tokens=max_tokens,
-        conversation=conversation,
-        remove_nl=False,
-    )
+    try:
+        raw = llm_complete(
+            prompt=prompt,
+            system=system_with_json,
+            temp=temp,
+            max_tokens=max_tokens,
+            conversation=conversation,
+            remove_nl=False,
+        )
+    except Exception as e:
+        log.warning(f"[LLM] llm_complete error: {e}")
+        if fallback is not None:
+            return fallback
+        raise
+
+    # Clean markdown fences if present
+    cleaned_raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
+    cleaned_raw = re.sub(r"\s*```$", "", cleaned_raw.strip(), flags=re.MULTILINE)
+
+    # Try direct parse
+    try:
+        return json.loads(cleaned_raw)
+    except Exception:
+        pass
+
     # Try object form
-    match = re.search(r"\{.*\}", raw, re.DOTALL)
+    match = re.search(r"\{.*\}", cleaned_raw, re.DOTALL)
     if match:
         try:
             return json.loads(match.group(0))
         except Exception:
             pass
     # Try array form
-    match_arr = re.search(r"\[.*\]", raw, re.DOTALL)
+    match_arr = re.search(r"\[.*\]", cleaned_raw, re.DOTALL)
     if match_arr:
         try:
             return json.loads(match_arr.group(0))
