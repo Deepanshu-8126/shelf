@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Engine Studio | Triple-Channel Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+
+    <div class="app-layout">
+        <!-- Top Navbar -->
+        <header class="top-header">
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>FLEET STUDIO <span>PRO</span></h1>
+                    <p>Triple-Channel Autonomous YouTube Shorts Engine</p>
+                </div>
+            </div>
+
+            <div class="system-pills">
+                <div class="pill active" id="pill-pexels">
+                    <span class="dot"></span> 4K Pexels: <strong>ONLINE</strong>
+                </div>
+                <div class="pill active" id="pill-bgm">
+                    <span class="dot"></span> Tuned BGM: <strong>6 TRACKS</strong>
+                </div>
+                <div class="pill active" id="pill-thermal">
+                    <span class="dot"></span> Cool Mode: <strong>ACTIVE</strong>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+            <!-- Left Panel: Channel & Control Panel -->
+            <section class="control-panel glass-panel">
+                <!-- Channel Selector Tabs -->
+                <div class="section-label">SELECT YOUTUBE CHANNEL</div>
+                <div class="channel-tabs">
+                    <button class="channel-btn" data-channel="1">
+                        <span class="ch-badge">CH 1</span>
+                        <div class="ch-info">
+                            <span class="ch-name">Reddit Drama</span>
+                            <span class="ch-sub">Storytime & Gameplay</span>
+                        </div>
+                    </button>
+                    <button class="channel-btn active" data-channel="2">
+                        <span class="ch-badge ch-vox">CH 2</span>
+                        <div class="ch-info">
+                            <span class="ch-name">Vox Noir</span>
+                            <span class="ch-sub">Crime & Psychology (4K)</span>
+                        </div>
+                    </button>
+                    <button class="channel-btn" data-channel="3">
+                        <span class="ch-badge ch-cosmic">CH 3</span>
+                        <div class="ch-info">
+                            <span class="ch-name">Cosmic What-If</span>
+                            <span class="ch-sub">Deep Space & Sci-Fi</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Mode Switcher -->
+                <div class="mode-toggle-container">
+                    <div class="section-label">GENERATION MODE</div>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btn-mode-manual" onclick="setMode('manual')">
+                            ✍️ Manual Script Studio (Paste Your Own)
+                        </button>
+                        <button class="mode-btn" id="btn-mode-auto" onclick="setMode('autopilot')">
+                            🤖 Full AI Autopilot (1-Click RAG)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MANUAL MODE FORM -->
+                <div id="manual-controls" class="input-form">
+                    <div class="form-group">
+                        <label for="input-title">Custom Title / Hook:</label>
+                        <input type="text" id="input-title" placeholder="e.g. The FBI 4-Second Silence Rule" value="The FBI 4-Second Silence Rule">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="input-script">Your Custom Script (50-60 words or more):</label>
+                            <span class="word-counter" id="word-count">24 words (~9s)</span>
+                        </div>
+                        <textarea id="input-script" rows="5" placeholder="Paste your 50-60 words custom script here...">Four seconds of absolute silence can break any human mind. When federal agents interrogate a suspect, they never argue. They just stare.</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="select-pillar-manual">Visual Theme / Pillar:</label>
+                            <select id="select-pillar-manual">
+                                <option value="2">Pillar 2: Forensic Interrogation & Lie Detection</option>
+                                <option value="1">Pillar 1: Forbidden Places & Coordinates</option>
+                                <option value="3">Pillar 3: Cosmic Void & JWST Anomalies</option>
+                                <option value="4">Pillar 4: Dark Mind Hacks & Psychology</option>
+                            </select>
+                        </div>
+                        <div class="form-group half">
+                            <label for="select-lang-manual">Voice Language:</label>
+                            <select id="select-lang-manual">
+                                <option value="en">English (Deep Baritone Adam / Christopher)</option>
+                                <option value="hi">Hindi (Native Madhur Neural + Mastering)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUTOPILOT MODE FORM (Hidden by default) -->
+                <div id="autopilot-controls" class="input-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="select-pillar-auto">Select Viral Pillar:</label>
+                        <select id="select-pillar-auto">
+                            <option value="2">Pillar 2: Forensic Interrogation Psychology (Highest Retention)</option>
+                            <option value="1">Pillar 1: Forbidden Coordinates & Disappearances</option>
+                            <option value="3">Pillar 3: Deep Space Paradoxes & Webb Supervoids</option>
+                            <option value="4">Pillar 4: Dark Mind Hacks & Subconscious Glitches</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-topic">Topic Override (Optional - leave blank for auto viral prompt):</label>
+                        <input type="text" id="input-topic" placeholder="e.g. How eye dilation reveals subconscious attraction">
+                    </div>
+                </div>
+
+                <!-- Audio & BGM Settings -->
+                <div class="audio-settings-box">
+                    <div class="slider-header">
+                        <span>🎵 Real Tuned BGM Volume: <strong id="vol-display">52%</strong></span>
+                        <span class="tag">Smart Cueing Active</span>
+                    </div>
+                    <input type="range" id="input-bgm-volume" min="10" max="80" value="52" oninput="updateVol(this.value)">
+                </div>
+
+                <!-- Submit Button -->
+                <button class="primary-render-btn" id="render-btn" onclick="triggerRender()">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">RENDER 100% 4K VIRAL SHORT</span>
+                </button>
+            </section>
+
+            <!-- Right Panel: Live Execution Monitor & Video Player -->
+            <section class="monitor-panel glass-panel">
+                <div class="panel-header">
+                    <div class="section-label">LIVE EXECUTION & PREVIEW</div>
+                    <span class="status-badge" id="job-status-badge">READY</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-wrapper">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-meta">
+                        <span id="current-step-label">Awaiting Trigger...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                </div>
+
+                <!-- Live Stream Terminal -->
+                <div class="terminal-box" id="terminal-output">
+                    <div class="log-line sys">[SYSTEM] Fleet Studio Command Center Online. Ready for Channel 1, 2, or 3.</div>
+                    <div class="log-line sys">[INFO] Pexels 4K stock engine authenticated. Zero gaming slop in Ch 2/3.</div>
+                    <div class="log-line sys">[AUDIO] 6 Master Tuned Orchestral Drones loaded with Smart Cue detection.</div>
+                </div>
+
+                <!-- Video Preview Box -->
+                <div class="video-preview-card" id="video-preview-container" style="display: none;">
+                    <div class="preview-header">
+                        <span>🎬 Generated 4K Short:</span>
+                        <a id="download-link" href="#" download class="download-btn">⬇️ Download MP4</a>
+                    </div>
+                    <div class="player-wrapper">
+                        <video id="preview-player" controls autoplay playsinline loop></video>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Gallery: Recent Renders Across Fleet -->
+        <section class="gallery-section glass-panel">
+            <div class="panel-header">
+                <div class="section-label">RECENT GENERATED SHORTS ACROSS FLEET</div>
+                <button class="refresh-btn" onclick="fetchRecentVideos()">🔄 Refresh Gallery</button>
+            </div>
+            <div class="video-grid" id="video-gallery">
+                <!-- Dynamically populated via app.js -->
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

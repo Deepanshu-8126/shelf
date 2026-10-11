@@ -82,10 +82,14 @@ def send_fleet_video_to_telegram(
         channel_name = "Channel 1: Funcyous"
         channel_badge = "🎭 VIRAL REDDIT DRAMA & CONFESSIONS"
         extra_tags = "#shorts #redditstories #reddit #drama #viral"
-    else:
-        channel_name = "Channel 2: Mystery & Curiosity"
-        channel_badge = "🕵️ ZACK D. FILMS / VOX HINDI MYSTERY"
+    elif channel == 2:
+        channel_name = "Channel 2: Vox Noir Mystery"
+        channel_badge = "🕵️ VOX NOIR / CRIME & PSYCHOLOGY"
         extra_tags = "#shorts #mystery #unsolved #facts #science #viral"
+    else:
+        channel_name = "Channel 3: Cosmic What-If"
+        channel_badge = "🌌 COSMIC WHAT-IF & DEEP UNIVERSE"
+        extra_tags = "#shorts #cosmic #space #science #whatif #universe #hindi"
 
     caption_card = [
         f"🎬 *{channel_badge}*",

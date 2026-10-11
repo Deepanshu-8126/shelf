@@ -448,21 +448,19 @@ def generate_channel2_script(
 # CHANNEL 3: Cosmic What-If & Dark Science Script Generator (Real Logic + Ultra-Simple Hindi)
 # ---------------------------------------------------------------------------
 _COSMIC_SYSTEM = (
-    "You are India's #1 viral science storyteller (style: Dhruv Rathee, FactTechz, Kurzgesagt in Hindi).\n"
-    "Explain mind-bending what-if scenarios with 100% REAL SCIENTIFIC LOGIC in ULTRA-SIMPLE 5th-grade spoken Hindi.\n\n"
-    "RULES FOR LOGIC & SIMPLICITY:\n"
-    "1. REAL CAUSE-AND-EFFECT LOGIC (No fake drama like 'phones stopped working'):\n"
-    "   - Explain real physics simply: The moon controls Earth's spin speed and ocean water balance.\n"
-    "   - Without moon: Earth spins 3x faster, 24-hour day shrinks to 6-8 hours, 400 km/h hyper winds, seasons go wild.\n"
-    "2. ULTRA-SIMPLE EVERYDAY SPOKEN WORDS (NO SANSKRIT/TEXTBOOK WORDS):\n"
-    "   - BANNED: घूर्णन, अस्थिर, ध्वनि, चक्र, संचार, अस्तित्व, प्रकोप, तटवर्ती, ज्वार-भाटा, अदृश्य, मनुष्य, मानव, अराजकता, लाइक, शेयर, सब्सक्राइब.\n"
-    "   - USE: घूमने की रफ़्तार, बेकाबू, आवाज़, हिसाब, तबाही, सुनामी, गायब, इंसान, लोग, तेज़ हवाएं, दिन-रात.\n"
-    "3. NATURAL CONVERSATIONAL HOOK & CADENCE:\n"
-    "   - Talk like explaining an unbelievable truth to a friend over tea.\n"
-    "4. CTA: Always a provocative comment debate question (NEVER 'लाइक शेयर सब्सक्राइब').\n"
-    "5. Length: Exactly 65 to 75 words.\n"
-    "6. Output JSON with keys: title, hook, script, cta\n\n"
-    "GOLD STANDARD BENCHMARK (Replicate this exact real logic and simple Hindi):\n"
+    "You are India's #1 viral science storyteller writing YouTube Shorts in spoken Hindi.\n"
+    "Write ONE unbroken flowing paragraph — exactly like a real viral Hindi short transcript.\n\n"
+    "WRITING STYLE — copy this structure exactly:\n"
+    "Open with a direct punchy question ('अगर आज रात अचानक...'). Then immediately give the first "
+    "physical shock in simple words — what breaks first, concretely. Then reveal the real hidden "
+    "science with specific numbers (e.g. 3x faster, 6-8 hours, 400 km/h, 300 feet). Escalate to "
+    "climax naturally. End with a chilling debate question that makes viewers comment. Write like "
+    "explaining to a friend over chai — one continuous breath, zero lecture tone.\n\n"
+    "BANNED WORDS — never use: घूर्णन, अस्थिर, ध्वनि, चक्र, संचार, अस्तित्व, प्रकोप, तटवर्ती, "
+    "ज्वार-भाटा, अदृश्य, मनुष्य, मानव, अराजकता, लाइक, शेयर, सब्सक्राइब.\n"
+    "USE INSTEAD: घूमने की रफ़्तार, बेकाबू, आवाज़, तबाही, सुनामी, गायब, इंसान, लोग, तेज़ हवाएं, दिन-रात.\n\n"
+    "LENGTH: Exactly 65 to 75 words in Devanagari script. Output strict JSON: title, hook, script, cta.\n\n"
+    "GOLD STANDARD — clone this exact cadence and logic depth:\n"
     "{\n"
     "  \"title\": \"अगर चाँद गायब हो जाए? #shorts\",\n"
     "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो क्या होगा?\",\n"
@@ -509,14 +507,14 @@ def generate_channel3_script(
 
     fallback = {
         "title": f"अगर {topic} सच हो जाए? #shorts",
-        "hook": f"अगर आज रात अचानक {topic}, तो क्या होगा?",
+        "hook": f"अगर आज रात अचानक {topic}, तो सबसे पहला झटका धरती को लगेगा!",
         "script": (
-            f"अगर आज रात अचानक {topic}, तो अगले 24 घंटे में धरती पर कयामत आ जाएगी! "
-            "सबसे पहले, समंदर में भयानक लहरें उठेंगी और तटीय शहर पानी में डूब जाएंगे। "
-            "धरती का संतुलन बिगड़ते ही मौसम पूरी तरह बेकाबू हो जाएगा और तापमान पागलों की तरह गिरेगा। "
-            "और सबसे खौफनाक बात? शायद इंसान कभी अगली सुबह देख ही ना पाए!"
+            f"अगर आज रात अचानक {topic}, तो सबसे पहला झटका धरती को लगेगा—धरती 400 किलोमीटर प्रति घंटा की रफ्तार से घूमने लगेगी! "
+            "6 घंटे में दिन-रात का चक्र बेकाबू हो जाएगा, हवाएं 3 गुना तेज़ बहेंगी और समंदर में 100 मीटर ऊंची लहरें उठेंगी। "
+            "तापमान 50 डिग्री तक गिरेगा और पूरी धरती बर्फ में जम जाएगी। "
+            "लेकिन सबसे बड़ा सच: चांद का गुरुत्व ही धरती को सीधा रखता था—बिना उसके धरती 90 डिग्री झुक जाएगी और मौसम हमेशा के लिए खत्म!"
         ),
-        "cta": "क्या आपको लगता है कि इस तबाही में कोई इंसान जिंदा बच पाएगा? नीचे बताओ।",
+        "cta": "क्या इंसान इस नई धरती पर जी पाएंगे या ये हमारा अंत है? नीचे बताओ।",
     }
 
     data = llm_json(

@@ -215,19 +215,41 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 # 5. MASTER VIDEO COMPOSITING (ZERO SLOP, RAPID CUTS)
 # =============================================================================
 def download_pexels_clip(query: str, out_path: Path) -> bool:
-    if not PEXELS_API_KEY: return False
+    api_key = os.getenv("PEXELS_API_KEY") or "Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT"
+    if not api_key: return False
     try:
-        url = f"https://api.pexels.com/videos/search?query={requests.utils.quote(query)}&orientation=portrait&per_page=3"
-        r = requests.get(url, headers={"Authorization": PEXELS_API_KEY}, timeout=12).json()
-        for v in r.get("videos", []):
-            for f in v.get("video_files", []):
-                if f.get("height", 0) > f.get("width", 0) and f.get("link"):
-                    dl = requests.get(f["link"], stream=True, timeout=20)
-                    with open(out_path, "wb") as fo:
-                        for chunk in dl.iter_content(chunk_size=1024*1024): fo.write(chunk)
-                    return True
-    except Exception:
-        pass
+        urls = [
+            f"https://api.pexels.com/videos/search?query={requests.utils.quote(query)}&orientation=portrait&per_page=5",
+            f"https://api.pexels.com/videos/search?query={requests.utils.quote(query)}&per_page=5"
+        ]
+        for url in urls:
+            r = requests.get(url, headers={"Authorization": api_key}, timeout=12)
+            if r.status_code != 200:
+                continue
+            videos = r.json().get("videos", [])
+            if not videos:
+                continue
+            for v in videos:
+                # 1. Prefer portrait files
+                for f in v.get("video_files", []):
+                    if f.get("height", 0) > f.get("width", 0) and f.get("link"):
+                        dl = requests.get(f["link"], stream=True, timeout=20)
+                        if dl.status_code == 200:
+                            with open(out_path, "wb") as fo:
+                                for chunk in dl.iter_content(chunk_size=1024*1024): fo.write(chunk)
+                            if out_path.exists() and out_path.stat().st_size > 50000:
+                                return True
+                # 2. Accept HD landscape (ffmpeg auto crops to 9:16)
+                for f in v.get("video_files", []):
+                    if f.get("link") and (f.get("width", 0) >= 720 or f.get("height", 0) >= 720):
+                        dl = requests.get(f["link"], stream=True, timeout=20)
+                        if dl.status_code == 200:
+                            with open(out_path, "wb") as fo:
+                                for chunk in dl.iter_content(chunk_size=1024*1024): fo.write(chunk)
+                            if out_path.exists() and out_path.stat().st_size > 50000:
+                                return True
+    except Exception as e:
+        print(f"Pexels fetch warning for '{query}': {e}")
     return False
 
 def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_script: str = "", custom_title: str = "") -> str:
@@ -322,12 +344,24 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             q = combined_queries[idx % len(combined_queries)]
             print(f"🎥 Scene {idx+1}/{total_cuts}: Real 4K Footage ('{q}')...")
             b_path = tmp / f"stock_{idx}.mp4"
-            if not download_pexels_clip(q, b_path):
-                # Fallback to general suspense query
-                download_pexels_clip("dark mystery suspense atmospheric", b_path)
+            downloaded = download_pexels_clip(q, b_path)
+            if not downloaded:
+                for alt_q in ["dark interrogation room", "clock ticking dramatic", "noir mystery smoke", "dark cinematic suspense"]:
+                    if download_pexels_clip(alt_q, b_path):
+                        downloaded = True
+                        break
             
-            if not b_path.exists() or b_path.stat().st_size < 10000:
-                b_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4"
+            if not downloaded or not b_path.exists() or b_path.stat().st_size < 10000:
+                print("⚠️ Generating procedural cinematic noir background...")
+                b_path = tmp / f"procedural_noir_{idx}.mp4"
+                proc_cmd = [
+                    "ffmpeg", "-y", "-f", "lavfi",
+                    "-i", f"color=c=0x07090e:s=1080x1920:d={cut_dur+2:.2f}:r=30",
+                    "-vf", "noise=alls=12:allf=t+u,vignette=PI/3.5,eq=contrast=1.3:brightness=-0.05",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-t", f"{cut_dur+1:.2f}",
+                    str(b_path)
+                ]
+                subprocess.run(proc_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
                 
             # Apply subtle camera drift + Netflix Noir grading + Vignette
             drift_dir = "down" if idx % 2 == 0 else "up"
@@ -359,29 +393,54 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         concat_mp4 = tmp / "concat.mp4"
         subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_txt), "-c", "copy", str(concat_mp4)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         
-        # 5. Dark Suspense Drone BGM
+        # 5. Master Tuned BGM with Dynamic Smart Cueing (Skipping dead intros)
         bgm_file = tmp / "ambient_drone.mp3"
-        drone_cmd = [
-            "ffmpeg", "-y",
-            "-f", "lavfi", "-i", "anoisesrc=c=pink:r=44100:a=0.05",
-            "-f", "lavfi", "-i", "sine=f=50:r=44100",
-            "-f", "lavfi", "-i", "sine=f=75:r=44100",
-            "-filter_complex",
-            f"[0:a]lowpass=f=180,volume=0.25[noise];"
-            f"[1:a]volume=0.35[sub];"
-            f"[2:a]volume=0.22[mid];"
-            f"[noise][sub][mid]amix=inputs=3,afade=t=in:ss=0:d=1.0,afade=t=out:st={total_dur-1.5:.2f}:d=1.5",
-            "-t", f"{total_dur:.2f}",
-            str(bgm_file)
-        ]
-        subprocess.run(drone_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        bgm_dir = WORKSPACE_ROOT / "fleet_engines/assets/bgm"
+        available_bgms = sorted(list(bgm_dir.glob("*.mp3"))) if bgm_dir.exists() else []
         
-        # 6. Burn Subtitles & Mix Audio (Voice at 1.0, BGM at 0.08)
+        pillar_bgm_map = {
+            1: "03_mystery_lightless_dawn.mp3",
+            2: "01_forensic_the_dread.mp3",
+            3: "06_cosmic_deep_noise.mp3",
+            4: "02_psychology_echoes_of_time.mp3"
+        }
+        chosen_bgm = None
+        target_name = pillar_bgm_map.get(pillar_id, "")
+        for b in available_bgms:
+            if target_name and target_name in b.name:
+                chosen_bgm = b
+                break
+        if not chosen_bgm and available_bgms:
+            import random
+            chosen_bgm = random.choice(available_bgms)
+            
+        bgm_volume = 0.52
+        if chosen_bgm and chosen_bgm.exists():
+            from dynamic_bgm_slicer import prepare_synced_bgm
+            bgm_file, bgm_volume = prepare_synced_bgm(chosen_bgm, total_dur, bgm_file)
+        else:
+            drone_cmd = [
+                "ffmpeg", "-y",
+                "-f", "lavfi", "-i", "anoisesrc=c=pink:r=44100:a=0.05",
+                "-f", "lavfi", "-i", "sine=f=50:r=44100",
+                "-f", "lavfi", "-i", "sine=f=75:r=44100",
+                "-filter_complex",
+                f"[0:a]lowpass=f=180,volume=0.25[noise];"
+                f"[1:a]volume=0.35[sub];"
+                f"[2:a]volume=0.22[mid];"
+                f"[noise][sub][mid]amix=inputs=3,afade=t=in:ss=0:d=1.0,afade=t=out:st={total_dur-1.5:.2f}:d=1.5",
+                "-t", f"{total_dur:.2f}",
+                str(bgm_file)
+            ]
+            subprocess.run(drone_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            bgm_volume = 0.50
+        
+        # 6. Burn Subtitles & Mix Audio (Voice at 1.0, Tuned BGM at dynamic volume)
         sub_escaped = str(ass_file).replace("\\", "/").replace(":", "\\:")
         full_filter = (
             f"[0:v]ass='{sub_escaped}'[vout];"
             f"[1:a]volume=1.0[voice];"
-            f"[2:a]volume=0.08[drone];"
+            f"[2:a]volume={bgm_volume:.2f}[drone];"
             f"[voice][drone]amix=inputs=2:duration=first:dropout_transition=2[aout]"
         )
         final_cmd = [
