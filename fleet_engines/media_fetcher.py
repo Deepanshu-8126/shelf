@@ -185,9 +185,17 @@ HINDI_SEMANTIC_DICTIONARY = [
     (r"बिजली|lightning", "dramatic lightning thunderstorm dark sky"),
     (r"इंसान|लोग|human|people", "person looking up shocked fear eyes"),
     (r"जिंदा|जीवन|survive|life|बच", "human eye looking close up drama"),
-    (r"डर|खौफ|panic|terror", "terrified scared person in shock"),
-    (r"गायब|vanish|disappear", "dark empty cosmic void silence")
+    (r"डर|खौफ|panic|terror|darr|darawani", "terrified scared person in shock"),
+    (r"गायब|vanish|disappear", "dark empty cosmic void silence"),
+    (r"आवाज़|awaaz|sound|noise|hum|frequency|hertz", "sound wave glowing audio frequency dark"),
+    (r"कान|kaan|sun|hear|listen|ear", "human ear listening in silence eerie"),
+    (r"डॉक्टर|doctor|science|research|study", "scientist laboratory microscope dark research"),
+    (r"दिमाग|dimaag|brain|amygdala|scan", "glowing human brain scan medical x-ray"),
+    (r"कमरा|room|ghar|house|akela|alone", "dark room alone silhouette eerie blue light"),
+    (r"सड़क|road|sheher|city|desert|town", "empty desert road night street lights fog cinematic"),
+    (r"सिरदर्द|neend|headache|sleep|dard", "person holding head headache pain darkness")
 ]
+
 
 FALLBACK_COSMIC_BEATS = [
     "full glowing moon night sky", "massive tsunami wave crashing ocean", "flooded city buildings storm",
@@ -214,9 +222,12 @@ def build_timed_words(sentences: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 def plan_beat_visuals(total_dur: float, timed_data: List[Dict[str, Any]], script: str, target_cut_dur: float = 1.9) -> List[Dict[str, Any]]:
-    """Calculates 1.5 - 2.2s cuts and returns exact queries synchronized with spoken words."""
+    """Calculates rapid cuts (1.5 - 2.2s for shorts, 2.5 - 3.2s for 2-3 min docs) synchronized with spoken words."""
+    if total_dur > 75 and target_cut_dur < 2.5:
+        target_cut_dur = 2.8
     num_cuts = max(int(round(total_dur / target_cut_dur)), 6)
     actual_cut_dur = total_dur / num_cuts
+
     if timed_data and "word" in timed_data[0]:
         timed_words = timed_data
     else:
