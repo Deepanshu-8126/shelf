@@ -77,31 +77,32 @@ PILLARS = {
 # 1. PURE DEVANAGARI SUBTITLE ENGINE (ZERO WHISPER URDU HALLUCINATIONS)
 # =============================================================================
 async def synthesize_voice_with_boundaries(script: str, voice: str, out_raw: Path):
-    """Generates studio voice and simultaneously extracts exact sentence timestamps."""
+    """Generates studio voice and simultaneously extracts exact word timestamps directly from Edge-TTS."""
     import edge_tts
-    # Punchy +3% pacing for retention
-    c = edge_tts.Communicate(script, voice, rate="+3%")
-    sentences = []
+    # Punchy +3% pacing for retention, WordBoundary for exact subtitle synchronization
+    c = edge_tts.Communicate(script, voice, rate="+3%", boundary="WordBoundary")
+    words = []
     with open(out_raw, "wb") as f:
         async for chunk in c.stream():
             if chunk["type"] == "audio":
                 f.write(chunk["data"])
-            elif chunk["type"] == "SentenceBoundary":
+            elif chunk["type"] == "WordBoundary":
                 st_s = chunk["offset"] / 10_000_000.0
                 dur_s = chunk["duration"] / 10_000_000.0
-                sentences.append({
+                words.append({
                     "start": st_s,
                     "end": st_s + dur_s,
                     "duration": dur_s,
-                    "text": chunk.get("text", "").strip()
+                    "word": chunk.get("text", "").strip()
                 })
-    return sentences
+    return words
 
 
-def build_pure_hindi_ass(sentences: list, ass_file: Path):
+def build_pure_hindi_ass(words: list, ass_file: Path):
     """
     Creates kinetic ASS subtitles using 100% clean Devanagari Hindi text.
     Active word is bold bright yellow (&H0000FFFF&), inactive words white with heavy black stroke.
+    Groups into natural 2-3 word phrases without cutting across speech pauses.
     """
     header = """[Script Info]
 ScriptType: v4.00+
@@ -115,32 +116,44 @@ Style: CosmicHindi,Nirmala UI,76,&H00FFFFFF,&H0000FFFF,&H00000000,&H90000000,-1,
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    events = []
     def fmt(t): return f"{int(t//3600):01d}:{int((t%3600)//60):02d}:{t%60:05.2f}"
 
-    all_timed_words = []
-    for s in sentences:
-        words = [w for w in re.split(r"\s+", s["text"]) if w.strip()]
-        if not words: continue
-        total_chars = sum(len(w) for w in words)
-        curr_t = s["start"]
-        for w in words:
-            w_dur = max(0.18, (len(w) / max(total_chars, 1)) * s["duration"])
-            w_start = curr_t
-            w_end = min(curr_t + w_dur, s["end"])
-            all_timed_words.append({
-                "word": w,
-                "start": w_start,
-                "end": w_end
-            })
-            curr_t = w_end
+    if not words:
+        ass_file.write_text(header, encoding="utf-8")
+        return
 
-    # Group into punchy 2-3 word chunks
-    for i in range(0, len(all_timed_words), 3):
-        chunk = all_timed_words[i:i+3]
-        if not chunk: continue
+    # Group into natural phrases based on word count and speech pauses
+    chunks = []
+    current_chunk = []
+
+    for i, w in enumerate(words):
+        current_chunk.append(w)
+        is_last = (i == len(words) - 1)
+        pause_after = False
+        if not is_last:
+            gap = words[i+1]["start"] - w["end"]
+            if gap >= 0.28:
+                pause_after = True
+
+        if len(current_chunk) >= 3 or pause_after or is_last:
+            chunks.append(current_chunk)
+            current_chunk = []
+
+    events = []
+    for c_idx, chunk in enumerate(chunks):
         for act_idx, w in enumerate(chunk):
-            w_start, w_end = w["start"], w["end"]
+            w_start = w["start"]
+            if act_idx < len(chunk) - 1:
+                w_end = chunk[act_idx + 1]["start"]
+            else:
+                hold = 0.20
+                if c_idx < len(chunks) - 1:
+                    next_start = chunks[c_idx + 1][0]["start"]
+                    w_end = min(w["end"] + hold, next_start - 0.05)
+                else:
+                    w_end = w["end"] + hold
+            w_end = max(w_end, w_start + 0.15)
+
             parts = []
             for idx_c, cw in enumerate(chunk):
                 clean_w = cw["word"]
@@ -148,7 +161,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     parts.append(f"{{\\c&H0000FFFF&}}{clean_w}")
                 else:
                     parts.append(f"{{\\c&H00FFFFFF&}}{clean_w}")
-            events.append(f"Dialogue: 0,{fmt(w_start)},{fmt(w_end)},CosmicHindi,,0,0,0,,{' '.join(parts)}")
+            joined_text = " ".join(parts)
+            events.append(f"Dialogue: 0,{fmt(w_start)},{fmt(w_end)},CosmicHindi,,0,0,0,,{joined_text}")
 
     ass_file.write_text(header + "\n".join(events) + "\n", encoding="utf-8")
 
@@ -228,12 +242,12 @@ def render_channel_3_short(
     with TemporaryDirectory() as tmp_str:
         tmp = Path(tmp_str)
 
-        # 1. Voice Synthesis & Sentence Boundary Extraction
+        # 1. Voice Synthesis & Word Boundary Extraction
         print(f"🎙️ Generating High-Fidelity Voiceover ({voice_label})...")
         raw_tmp = tmp / "raw_edge.mp3"
         audio_file = tmp / "voice.mp3"
 
-        sentences = asyncio.run(
+        timed_words = asyncio.run(
             synthesize_voice_with_boundaries(pkg["script"], edge_voice, raw_tmp)
         )
 
@@ -255,11 +269,11 @@ def render_channel_3_short(
         # 2. Build Clean Devanagari Kinetic Subtitles
         print("📝 Generating Pure Devanagari Hindi Kinetic Subtitles...")
         ass_file = tmp / "subtitles.ass"
-        build_pure_hindi_ass(sentences, ass_file)
+        build_pure_hindi_ass(timed_words, ass_file)
 
         # 3. Rapid Beat Visual Planning (1.5 - 2.2s cuts)
         print("⚡ Planning Rapid 1.5 - 2.2s Visual Beats with Word-Level Semantic Sync...")
-        beats = plan_beat_visuals(total_dur, sentences, pkg["script"], target_cut_dur=1.9)
+        beats = plan_beat_visuals(total_dur, timed_words, pkg["script"], target_cut_dur=1.9)
         print(f"🎬 Directed {len(beats)} Rapid Beats (Mixing Videos & 4K Photos):")
         for b in beats:
             print(f"   [{b['start']}s - {b['end']}s] ({b['media_type'].upper()}): Spoken: '{b['spoken_hindi'][:35]}' -> Query: '{b['query']}'")

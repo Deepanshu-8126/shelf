@@ -213,11 +213,14 @@ def build_timed_words(sentences: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return timed_words
 
 
-def plan_beat_visuals(total_dur: float, sentences: List[Dict[str, Any]], script: str, target_cut_dur: float = 1.9) -> List[Dict[str, Any]]:
+def plan_beat_visuals(total_dur: float, timed_data: List[Dict[str, Any]], script: str, target_cut_dur: float = 1.9) -> List[Dict[str, Any]]:
     """Calculates 1.5 - 2.2s cuts and returns exact queries synchronized with spoken words."""
     num_cuts = max(int(round(total_dur / target_cut_dur)), 6)
     actual_cut_dur = total_dur / num_cuts
-    timed_words = build_timed_words(sentences)
+    if timed_data and "word" in timed_data[0]:
+        timed_words = timed_data
+    else:
+        timed_words = build_timed_words(timed_data)
 
     beats = []
     for i in range(num_cuts):
