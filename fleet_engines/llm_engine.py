@@ -19,8 +19,10 @@ Exported helpers:
 """
 
 import os
+import sys
 import re
 import json
+
 import time
 import random
 import logging
@@ -33,10 +35,16 @@ from dotenv import load_dotenv
 # ---------------------------------------------------------------------------
 # Bootstrap
 # ---------------------------------------------------------------------------
-_WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+_FLEET_DIR = Path(__file__).resolve().parent
+_WORKSPACE_ROOT = _FLEET_DIR.parent
+for _p in [str(_FLEET_DIR), str(_WORKSPACE_ROOT)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 load_dotenv(_WORKSPACE_ROOT / ".env")
 
 log = logging.getLogger("llm_engine")
+
 
 # ---------------------------------------------------------------------------
 # Config - edit ONLY here, never in individual channel scripts
@@ -44,11 +52,13 @@ log = logging.getLogger("llm_engine")
 GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
 # Model cascade: tries each in order until one succeeds
-# Models discovered from live Groq account: openai/gpt-oss-120b, openai/gpt-oss-20b
+# Primary: Qwen 3 (27B) - Top-tier creative multilingual & Hindi storytelling
 _MODEL_CASCADE = [
-    "openai/gpt-oss-120b",   # Primary: highest quality
-    "openai/gpt-oss-20b",    # Fast fallback
+    "qwen/qwen3.8-27b",      # Primary: highest quality for Hindi/multilingual storytelling
+    "openai/gpt-oss-120b",   # Secondary: high parameter reasoning fallback
+    "openai/gpt-oss-20b",    # Tertiary: fast fallback
 ]
+
 
 _GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 

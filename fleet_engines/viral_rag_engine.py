@@ -18,7 +18,8 @@ FLEET_DIR = Path(__file__).resolve().parent
 if str(FLEET_DIR) not in sys.path:
     sys.path.insert(0, str(FLEET_DIR))
 
-from llm_engine import llm_json, sanitize_script
+from llm_engine import llm_json, llm_complete, sanitize_script
+
 
 log = logging.getLogger("viral_rag_engine")
 
@@ -67,8 +68,11 @@ def generate_rag_viral_script(
     word_count_target: int = 72,
 ) -> Dict[str, Any]:
     """
-    Generates a viral YouTube Shorts script by retrieving a real 15M+ view
-    reference transcript and instructing the LLM to clone its exact human cadence.
+    Generates a viral YouTube Shorts script using an Agentic 3-Step Storyteller pipeline:
+      STEP 1: Causal Beat Outline (Hook -> First Shock -> Real Physics Numbers -> Climax Twist)
+      STEP 2: Spoken Hindi Drafter (Flowing conversational paragraph without robotic jargon)
+      STEP 3: Slop Reviewer & Polish (Enforces negative constraints, verifies word count & strict JSON)
+    Clones authentic human cadence from real 15M+ view viral references.
     """
     ref = retrieve_best_transcript(topic, niche=niche)
     ref_transcript = ref.get("transcript", "")
@@ -76,48 +80,84 @@ def generate_rag_viral_script(
     ref_notes = ref.get("style_notes", "")
     ref_views = ref.get("views", "15M")
 
-    system_prompt = (
-        "You are an elite Indian YouTube Shorts storyteller cloning the cadence of real viral videos.\n\n"
-        "HERE IS A REAL VIRAL YOUTUBE SHORT TRANSCRIPT (VERIFIED " + ref_views + " VIEWS):\n"
-        "\"\"\"\n"
-        f"Topic: {ref.get('topic', '')}\n"
-        f"Transcript: {ref_transcript}\n"
-        f"Style: {ref_notes}\n"
-        "\"\"\"\n\n"
-        "HOW TO WRITE THE SCRIPT — CONTINUOUS FLOWING PARAGRAPH (like the reference above):\n"
-        "- Write ONE unbroken paragraph. NO numbered sections, NO bullet points, NO headers.\n"
-        "- Open with a punchy curiosity question ('अगर आज रात अचानक...').\n"
-        "- Immediately give the first physical shock in simple tangible words.\n"
-        "- Insert real cause-and-effect science with specific numbers (e.g. 3x faster, 6 hours, 400 km/h).\n"
-        "- Escalate to climax naturally — speed, wind, freeze, or total chaos.\n"
-        "- End with a chilling debate question that makes viewers comment.\n"
-        "- The whole script must read like one breath — exactly like the verified reference above.\n\n"
-        "STRICT NEGATIVE CONSTRAINTS:\n"
-        "- NEVER use weird translated metaphors (NO 'सॉस की बोतल', NO 'पक्षी गड़बड़ाए').\n"
-        "- ZERO ROBOTIC SANSKRIT/TEXTBOOK WORDS: Never say घूर्णन, अस्थिर, ध्वनि, चक्र, संचार, अस्तित्व, अदृश्य, मनुष्य, अराजकता.\n"
-        "- USE ULTRA-SIMPLE 5th-grade spoken Hindi: घूमना, डगमगाना, आवाज़, हिसाब, तबाही, लोग, इंसान, सुनामी, अंधेरा.\n"
-        f"- LENGTH: Exactly {word_count_target - 5} to {word_count_target + 5} words in Devanagari script.\n"
-        "- Output strict JSON with keys: title, hook, script, cta"
-    )
-
-    user_prompt = (
-        f"Target Topic: {topic}\n"
-        f"Clone the real viral reference style for this topic. Write spoken natural Devanagari Hindi."
-    )
-
     fallback = {
         "title": f"अगर {topic} सच हो जाए? #shorts",
         "hook": ref_hook or f"अगर {topic}, तो क्या होगा?",
-        "script": ref_transcript,
+        "script": ref_transcript or f"अगर आज रात अचानक {topic}, तो सबसे पहला झटका धरती को लगेगा! 400 किलोमीटर की तूफानी हवाएं चलेंगी और दिन-रात का चक्र बेकाबू हो जाएगा। क्या इंसान ऐसी दुनिया में ज़िंदा रह पाएगा? नीचे बताओ।",
         "cta": ref.get("cta", "आपकी क्या राय है? नीचे कमेंट में बताओ।"),
     }
 
-    data = llm_json(
-        prompt=user_prompt,
-        system=system_prompt,
-        temp=0.45,  # Lower temperature for tight adherence to reference style
-        fallback=fallback,
-    )
+    try:
+        # -------------------------------------------------------------------
+        # STEP 1: Causal Beat Outline (Causal Planning & Tension Architecture)
+        # -------------------------------------------------------------------
+        log.info(f"[StoryTeller-Step1] Planning 4-beat outline for '{topic}'...")
+        step1_prompt = (
+            f"Topic: {topic}\n"
+            f"Niche: {niche}\n"
+            "Create a high-retention 4-beat story outline for a 30-second viral YouTube Short:\n"
+            "Beat 1 (Hook 0-3s): Impossible curiosity question / instant physical mystery.\n"
+            "Beat 2 (First Physical Shock): What breaks first physically in tangible everyday words.\n"
+            "Beat 3 (Escalating Chaos & Real Numbers): Cause-and-effect physics with concrete numbers (e.g., 3x faster, 6 hours, 400 km/h, -50°C).\n"
+            "Beat 4 (Climax Twist & Debate Question): Terrifying consequence + spicy question that forces comments.\n"
+            "Keep each beat 1 short punchy sentence."
+        )
+        outline = llm_complete(
+            prompt=step1_prompt,
+            system="You are a master viral suspense story architect.",
+            temp=0.65,
+            max_tokens=350,
+            remove_nl=False,
+        )
+
+        # -------------------------------------------------------------------
+        # STEP 2: Spoken Hindi Drafter (Converting beats to continuous flow)
+        # -------------------------------------------------------------------
+        log.info(f"[StoryTeller-Step2] Drafting spoken conversational Hindi script...")
+        step2_prompt = (
+            f"Story Outline:\n{outline}\n\n"
+            f"VERIFIED VIRAL REFERENCE STYLE (from {ref_views} views video):\n"
+            f"\"{ref_transcript}\"\n\n"
+            "INSTRUCTIONS:\n"
+            "- Write ONE unbroken flowing spoken script in natural Devanagari Hindi.\n"
+            "- Single continuous paragraph — like explaining to a friend over chai in one breath.\n"
+            "- Open with a direct punchy question ('अगर आज रात अचानक...').\n"
+            "- NO robotic Sanskrit/textbook words (NO घूर्णन, चक्र, अस्तित्व, मनुष्य, अराजकता).\n"
+            "- USE ultra-simple words: घूमना, अंधेरा, इंसान, लोग, तेज़ हवाएं, तबाही.\n"
+            f"- TARGET LENGTH: Exactly {word_count_target - 5} to {word_count_target + 5} words in Devanagari.\n"
+            "- Output ONLY the Hindi script paragraph, nothing else."
+        )
+        draft = llm_complete(
+            prompt=step2_prompt,
+            system="You are India's top YouTube Shorts narrator writing spoken Hindi.",
+            temp=0.55,
+            max_tokens=350,
+            remove_nl=False,
+        )
+
+        # -------------------------------------------------------------------
+        # STEP 3: Slop Reviewer, Negative Filter & Polish
+        # -------------------------------------------------------------------
+        log.info(f"[StoryTeller-Step3] Reviewing, purging AI slop & polishing JSON...")
+        step3_prompt = (
+            f"Draft Script to Review:\n\"{draft}\"\n\n"
+            "CRITIQUE & POLISH CHECKLIST:\n"
+            "1. Remove any robotic/textbook words (घूर्णन -> घूमने की रफ़्तार, अस्तित्व -> जान/वजूद, चक्र -> हिसाब, मनुष्य -> इंसान).\n"
+            "2. Make sure sentences are punchy and breathless (30-second spoken short).\n"
+            f"3. Ensure script length is between {word_count_target - 8} and {word_count_target + 8} Devanagari words.\n"
+            "4. Output STRICT JSON with keys: title, hook, script, cta.\n"
+            "Format:\n"
+            '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script", "cta": "Provocative debate question"}'
+        )
+        data = llm_json(
+            prompt=step3_prompt,
+            system="You are an elite script editor. Return ONLY valid JSON with zero conversational filler.",
+            temp=0.35,
+            fallback=fallback,
+        )
+    except Exception as e:
+        log.error(f"[StoryTeller] Error in 3-step pipeline: {e}. Using fallback.")
+        data = fallback
 
     data["script"] = sanitize_script(data.get("script", ""))
     data["hook"] = sanitize_script(data.get("hook", ""))
@@ -125,8 +165,10 @@ def generate_rag_viral_script(
     data["reference_used"] = ref.get("id", "default")
     data["views_cloned"] = ref_views
     data["word_count"] = len(data["script"].split())
+    data["pipeline"] = "3-step-agentic-storyteller"
 
     return data
+
 
 
 if __name__ == "__main__":
