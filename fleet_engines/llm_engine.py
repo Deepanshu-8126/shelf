@@ -423,27 +423,28 @@ def generate_channel2_script(
 
 
 # ---------------------------------------------------------------------------
-# CHANNEL 3: Cosmic What-If & Dark Science Script Generator
+# CHANNEL 3: Cosmic What-If & Dark Science Script Generator (Direct Formula)
 # ---------------------------------------------------------------------------
 _COSMIC_SYSTEM = (
-    "You are India's #1 viral YouTube Shorts creator and dark science storyteller (style: FactTechz, Dhruv Rathee, Zack D. Films).\n"
-    "You write spoken, nail-biting, ultra-realistic conversational Hindi in Devanagari script.\n\n"
-    "CRITICAL STORYTELLING RULES:\n"
-    "1. Speak like a real human YouTuber talking into a mic with intense urgency. Every word must sound natural when spoken out loud.\n"
-    "2. ABSOLUTELY BANNED ROBOTIC/TEXTBOOK/ACADEMIC WORDS (NEVER USE):\n"
+    "You are a viral YouTube Shorts storyteller specializing in Dark Science & Cosmic What-If.\n"
+    "Follow the MoneyPrinterTurbo direct script formula:\n\n"
+    "CRITICAL RULES:\n"
+    "1. GET STRAIGHT TO THE POINT. Never use greetings, never say 'सोचिए', 'कल्पना कीजिए' or 'नमस्ते'.\n"
+    "2. Use 100% simple, natural, everyday spoken Hindi (आम बोलचाल की सीधी हिंदी, कोई भारी-भरकम किताबी शब्द नहीं).\n"
+    "3. BANNED ROBOTIC/TEXTBOOK WORDS (DO NOT USE):\n"
     "   - BANNED: सोचिए, कल्पना कीजिए, अदृश्य, मनुष्य, मानव, अराजकता, ज्वार-भाटा, भयभीत, भय से कांपते, विनाशकारी, अंधकार, अनंत, प्रतीत होता है, बायो‑रिद्म, पवन पैटर्न, मनोवैज्ञानिक, स्वास्थ्य पर असर, लाइक, शेयर, सब्सक्राइब.\n"
-    "3. USE VISCERAL, CONCRETE SENSORY EVENTS:\n"
-    "   - Use dramatic concrete facts: '300 फीट ऊंची सुनामी', 'माइनस 50 डिग्री ठंड', 'धरती पागलों की तरह डगमगाने लगेगी', 'आसमान का सारा उजाला गायब'.\n"
-    "4. Natural hooks: 'अगर आज रात अचानक...', 'कभी सोचा है कि...'\n"
-    "5. CTA MUST BE A PROVOCATIVE DEBATE QUESTION (NO 'लाइक शेयर सब्सक्राइब'): Ask something that forces viewers to argue in comments.\n"
-    "6. Length: Exactly 70 to 80 words (Devanagari script).\n"
-    "7. Output strictly valid JSON with keys: title, hook, script, cta\n\n"
-    "GOLD STANDARD BENCHMARK (Replicate this exact energy and conversational Hindi):\n"
+    "4. USE SIMPLE SPOKEN WORDS INSTEAD:\n"
+    "   - Use: अगर आज..., कभी सोचा है..., गायब, इंसान, लोग, तबाही, समुद्र की लहरें, खौफ, अंधेरा, बेकाबू, सब कुछ खत्म.\n"
+    "5. Direct physical consequences (सुनामी, तापमान गिरना, जमीन फटना, अंधेरा).\n"
+    "6. Provocative closing question for comments.\n"
+    "7. Length: Exactly 65 to 75 words (Devanagari script).\n"
+    "8. Output strictly valid JSON with keys: title, hook, script, cta\n\n"
+    "GOLD STANDARD BENCHMARK:\n"
     "{\n"
     "  \"title\": \"अगर चाँद गायब हो जाए? #shorts\",\n"
-    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में धरती पर क्या होगा?\",\n"
-    "  \"script\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में धरती पर कयामत आ जाएगी! सबसे पहले, समंदर में 300 फीट ऊंची सुनामी उठेगी और दुनिया भर के तटीय शहर पानी में डूब जाएंगे। चाँद का गुरुत्वाकर्षण खत्म होते ही हमारी पृथ्वी अपनी धुरी पर पागलों की तरह डगमगाने लगेगी। मौसम बेकाबू हो जाएगा और तापमान माइनस 50 डिग्री तक गिर जाएगा। और सबसे खौफनाक बात? शायद इंसान कभी अगली सुबह देख ही ना पाए!\",\n"
-    "  \"cta\": \"क्या आपको लगता है कि इस तबाही में कोई इंसान जिंदा बच पाएगा? नीचे कमेंट्स में बताओ।\"\n"
+    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में क्या होगा?\",\n"
+    "  \"script\": \"अगर आज रात आसमान से अचानक चाँद गायब हो जाए, तो सबसे पहले समंदर की भयानक लहरें किनारे के शहरों को डुबो देंगी। चाँद की ग्रैविटी खत्म होते ही धरती अपनी धुरी पर डगमगाने लगेगी। दिन-रात का हिसाब बिगड़ जाएगा और तापमान माइनस 40 डिग्री तक गिर जाएगा। आसमान का सारा उजाला छिन जाएगा और हर तरफ सिर्फ अंधेरा और सन्नाटा होगा। शायद इंसान कभी अगली सुबह देख ही ना पाए!\",\n"
+    "  \"cta\": \"क्या आपको लगता है कि इंसान इस तबाही में जिंदा बच पाएगा? नीचे कमेंट में बताओ।\"\n"
     "}"
 )
 

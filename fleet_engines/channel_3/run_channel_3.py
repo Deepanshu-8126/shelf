@@ -107,65 +107,32 @@ def render_channel_3_short(pillar_id: int = 1, topic: str = "", lang: str = "hi"
     with TemporaryDirectory() as tmp_str:
         tmp = Path(tmp_str)
         
-        # 1. Real ElevenLabs Bella Voiceover
+        # 1. Native Hindi Documentary Voiceover (Madhur Neural - FactTechz / Dark Science Style)
         audio_file = tmp / "voice.mp3"
-        print("🎙️ Generating Real ElevenLabs Bella Voiceover (EXAVITQu4vr4xnSDxMaL)...")
+        print("🎙️ Generating Native Hindi Documentary Voiceover (hi-IN-MadhurNeural)...")
+        import edge_tts, asyncio
+        raw_tmp = tmp / "raw_edge.mp3"
+        async def _get_voice():
+            c = edge_tts.Communicate(pkg["script"], "hi-IN-MadhurNeural", rate="+2%")
+            await c.save(str(raw_tmp))
+        asyncio.run(_get_voice())
         
-        # Check ElevenLabs key pool from .env
-        el_keys = [
-            os.getenv("ELEVENLABS_API_KEY"),
-            os.getenv("ELEVENLABS_API_KEY_2"),
-            os.getenv("ELEVENLABS_API_KEY_3")
-        ]
-        el_keys = [k for k in el_keys if k and k.strip()]
-        
-        voice_success = False
-        for k_idx, el_key in enumerate(el_keys):
-            headers = {"xi-api-key": el_key, "Content-Type": "application/json"}
-            payload = {
-                "text": pkg["script"],
-                "model_id": "eleven_multilingual_v2",
-                "voice_settings": {"stability": 0.55, "similarity_boost": 0.82}
-            }
-            try:
-                r_el = requests.post("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL", json=payload, headers=headers, timeout=25)
-                if r_el.status_code == 200:
-                    audio_file.write_bytes(r_el.content)
-                    print(f"✅ ElevenLabs Bella generated successfully via Key #{k_idx+1}!")
-                    voice_success = True
-                    break
-                else:
-                    print(f"⚠️ Key #{k_idx+1} response {r_el.status_code}: {r_el.text[:80]}")
-            except Exception as e:
-                print(f"⚠️ Key #{k_idx+1} exception: {e}")
-                
-        if not voice_success:
-            print("⚠️ ElevenLabs quota reached or keys unavailable. Using Studio-Mastered Neural Voice...")
-            import edge_tts
-            raw_tmp = tmp / "raw_edge.mp3"
-            async def _get_swara():
-                c = edge_tts.Communicate(pkg["script"], "hi-IN-SwaraNeural", rate="-5%", pitch="-2Hz")
-                await c.save(str(raw_tmp))
-            import asyncio
-            asyncio.run(_get_swara())
-            
-            # Studio mastering chain: warm chest resonance + breathy air
-            af = (
-                "equalizer=f=180:width_type=h:width=120:g=3.5,"
-                "equalizer=f=3200:width_type=h:width=600:g=2.5,"
-                "equalizer=f=10000:width_type=h:width=1500:g=4.0,"
-                "acompressor=threshold=-20dB:ratio=3.5:attack=15:release=120"
-            )
-            subprocess.run(["ffmpeg", "-y", "-i", str(raw_tmp), "-af", af, str(audio_file)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            print("✅ Studio-Mastered Neural Voice ready!")
+        # Studio mastering chain: warm chest resonance + crystal clarity
+        af = (
+            "equalizer=f=120:width_type=h:width=80:g=2.5,"
+            "equalizer=f=3200:width_type=h:width=600:g=2.0,"
+            "acompressor=threshold=-18dB:ratio=3.0:attack=10:release=100"
+        )
+        subprocess.run(["ffmpeg", "-y", "-i", str(raw_tmp), "-af", af, str(audio_file)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print("✅ Native Hindi Voiceover Mastered Successfully!")
             
         dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_file)]
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
         print(f"⏱️ Duration: {total_dur:.1f}s")
         
-        # 2. Whisper Word Timestamps
-        print("🧠 Transcribing with Whisper for word captions...")
-        whisper_data = whisper.load_model("tiny").transcribe(str(audio_file), word_timestamps=True)
+        # 2. Whisper Base Model with Hindi Language Lock
+        print("🧠 Transcribing with Whisper Base for accurate Hindi word captions...")
+        whisper_data = whisper.load_model("base").transcribe(str(audio_file), language="hi", word_timestamps=True)
         ass_file = tmp / "subtitles.ass"
         
         header = """[Script Info]
@@ -175,7 +142,7 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: CosmicText,Nirmala UI,72,&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,5,3,2,60,60,380,1
+Style: CosmicText,Nirmala UI,76,&H00FFFFFF,&H0000FFFF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,6,3,2,60,60,360,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
