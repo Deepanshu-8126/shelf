@@ -476,11 +476,26 @@ def generate_channel3_script(
     topic: str,
     pillar_name: str = "Cosmic What-If & Dark Science",
     lang: str = "hi",
-    word_count_target: int = 75,
+    word_count_target: int = 72,
 ) -> Dict[str, str]:
     """
-    Generates {title, hook, script, cta, lang} for Channel 3 with anti-slop conversational Devanagari Hindi.
+    Generates {title, hook, script, cta, lang} for Channel 3 using
+    Viral Transcripts RAG (cloning real 15M+ view human creator cadence).
     """
+    try:
+        from viral_rag_engine import generate_rag_viral_script
+        rag_data = generate_rag_viral_script(
+            topic=topic,
+            niche="cosmic_what_if",
+            lang=lang,
+            word_count_target=word_count_target,
+        )
+        if rag_data and rag_data.get("script"):
+            rag_data["lang"] = lang
+            return rag_data
+    except Exception as e:
+        log.warning(f"[RAG] Fallback to standard prompt due to: {e}")
+
     user_prompt = (
         f"Topic: {topic}\n"
         f"Niche: {pillar_name}\n"
@@ -507,7 +522,7 @@ def generate_channel3_script(
     data = llm_json(
         prompt=user_prompt,
         system=_COSMIC_SYSTEM,
-        temp=0.65,
+        temp=0.55,
         fallback=fallback,
     )
 
