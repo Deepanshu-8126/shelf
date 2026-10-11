@@ -47,8 +47,8 @@ from dotenv import load_dotenv
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 load_dotenv(WORKSPACE_ROOT / ".env")
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "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"
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY") or "Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 OUTPUT_DIR = WORKSPACE_ROOT / "fleet_engines/output/channel_2_vox_mystery"
 
 # =============================================================================

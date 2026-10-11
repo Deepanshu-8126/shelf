@@ -41,10 +41,7 @@ log = logging.getLogger("llm_engine")
 # ---------------------------------------------------------------------------
 # Config - edit ONLY here, never in individual channel scripts
 # ---------------------------------------------------------------------------
-GROQ_API_KEY: str = (
-    os.getenv("GROQ_API_KEY")
-    or "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"
-)
+GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
 # Model cascade: tries each in order until one succeeds
 # Models discovered from live Groq account: openai/gpt-oss-120b, openai/gpt-oss-20b
