@@ -207,10 +207,33 @@ HINDI_SLOP_REPLACEMENTS = {
     "मान लीजिए": "मान लो",
     "प्रतीत होता है": "लगता है",
     
-    # Robotic textbook vocabulary -> Natural spoken creator words
+    # Hard Sanskrit / Textbook words -> Simple natural spoken words
+    "घूर्णन अस्थिर": "संतुलन बिगड़ना",
+    "घूर्णन": "घूमना",
+    "अस्थिर": "बेकाबू",
+    "अनियंत्रित": "बेकाबू",
+    "सुनामी जैसी ध्वनि आएगी": "भयंकर सुनामी शहरों को बहा ले जाएगी",
+    "ध्वनि आएगी": "आवाज़ गूंजेगी",
+    "ध्वनि": "आवाज़",
+    "दिन-रात का चक्र": "दिन और रात का हिसाब",
+    "चक्र बिगड़": "हिसाब बिगड़",
+    "संचार टूट जाएगा": "सारे फोन, इंटरनेट और बिजली बंद हो जाएंगे",
+    "संचार टूटते": "फोन और इंटरनेट बंद होते",
+    "संचार": "फोन और इंटरनेट",
+    "लोग बिखरते देखेंगे": "चारों तरफ चीख-पुकार मच जाएगी",
+    "तटवर्ती शहरों को धकेलेंगी": "किनारे के शहरों को डूबा देंगी",
+    "तटवर्ती": "किनारे के",
+    "तट के": "किनारे के",
+    "तटों": "किनारों",
+    "तट": "किनारे",
+    "प्रकोप": "तबाही",
+    "खिंचाव": "ग्रैविटी",
+    "गुरुत्वाकर्षण": "ग्रैविटी",
+    "कक्षा": "रास्ता",
+    "अस्तित्व": "नामोनिशान",
     "अदृश्य हो जाए": "गायब हो जाए",
     "अदृश्य": "गायब",
-    "मनुष्य": "इंसान",
+    "मनुष्य": "लोग",
     "मानव जाति": "इंसान",
     "मानव": "इंसान",
     "अराजकता": "तबाही",
@@ -223,7 +246,6 @@ HINDI_SLOP_REPLACEMENTS = {
     "विनाशकारी": "खौफनाक",
     "अंधकार": "अंधेरा",
     "अनंत": "हमेशा के लिए",
-    "संचार टूटते": "फोन और इंटरनेट बंद हो जाएंगे",
     "पवन पैटर्न": "हवाओं का रुख",
     "बायो‑रिद्म": "शरीर की घड़ी",
     "बायो-रिद्म": "शरीर की घड़ी",
@@ -423,27 +445,29 @@ def generate_channel2_script(
 
 
 # ---------------------------------------------------------------------------
-# CHANNEL 3: Cosmic What-If & Dark Science Script Generator (Direct Formula)
+# CHANNEL 3: Cosmic What-If & Dark Science Script Generator (4-Stage Natural Structure)
 # ---------------------------------------------------------------------------
 _COSMIC_SYSTEM = (
-    "You are a viral YouTube Shorts storyteller specializing in Dark Science & Cosmic What-If.\n"
-    "Follow the MoneyPrinterTurbo direct script formula:\n\n"
-    "CRITICAL RULES:\n"
-    "1. GET STRAIGHT TO THE POINT. Never use greetings, never say 'सोचिए', 'कल्पना कीजिए' or 'नमस्ते'.\n"
-    "2. Use 100% simple, natural, everyday spoken Hindi (आम बोलचाल की सीधी हिंदी, कोई भारी-भरकम किताबी शब्द नहीं).\n"
-    "3. BANNED ROBOTIC/TEXTBOOK WORDS (DO NOT USE):\n"
-    "   - BANNED: सोचिए, कल्पना कीजिए, अदृश्य, मनुष्य, मानव, अराजकता, ज्वार-भाटा, भयभीत, भय से कांपते, विनाशकारी, अंधकार, अनंत, प्रतीत होता है, बायो‑रिद्म, पवन पैटर्न, मनोवैज्ञानिक, स्वास्थ्य पर असर, लाइक, शेयर, सब्सक्राइब.\n"
-    "4. USE SIMPLE SPOKEN WORDS INSTEAD:\n"
-    "   - Use: अगर आज..., कभी सोचा है..., गायब, इंसान, लोग, तबाही, समुद्र की लहरें, खौफ, अंधेरा, बेकाबू, सब कुछ खत्म.\n"
-    "5. Direct physical consequences (सुनामी, तापमान गिरना, जमीन फटना, अंधेरा).\n"
-    "6. Provocative closing question for comments.\n"
-    "7. Length: Exactly 65 to 75 words (Devanagari script).\n"
-    "8. Output strictly valid JSON with keys: title, hook, script, cta\n\n"
+    "You are a viral YouTube Shorts storyteller for Dark Science & What-If mysteries.\n"
+    "Speak like a real Indian YouTuber talking into a mic with natural suspense, NOT a school textbook or professor.\n\n"
+    "STRICT 4-STAGE VIRAL SCRIPT STRUCTURE:\n"
+    "1. [0-3s] HOOK: Punchy curiosity question ('अगर आज रात अचानक आसमान से [Topic] गायब हो जाए, तो क्या होगा?')\n"
+    "2. [3-12s] FIRST HIT: First big physical impact in simple words ('सबसे पहले, समंदर में 300 फीट ऊंची सुनामी उठेगी और किनारे के शहर डूब जाएंगे।')\n"
+    "3. [12-25s] ESCALATING CHAOS: Things get worse in simple words ('धरती बुरी तरह डगमगाने लगेगी, दिन-रात का हिसाब बिगड़ जाएगा और तापमान माइनस 40 डिग्री तक गिर जाएगा।')\n"
+    "4. [25-33s] CLIMAX & CTA: Chilling finish & comment debate question ('सारे फोन, इंटरनेट और बिजली ठप... क्या आपको लगता है इंसान बच पाएगा? नीचे बताओ।')\n\n"
+    "STRICT LANGUAGE RULES (KEEP WORDS ULTRA-SIMPLE):\n"
+    "- Use 5th-grade simple spoken Hindi that any ordinary person understands instantly.\n"
+    "- STRICTLY BANNED HARD SANSKRIT/TEXTBOOK WORDS (DO NOT USE):\n"
+    "  घूर्णन, अस्थिर, ध्वनि, चक्र, संचार, अस्तित्व, प्रकोप, तटवर्ती, ज्वार-भाटा, अदृश्य, मनुष्य, मानव, अराजकता, भयभीत, भय से कांपते, अंधकार.\n"
+    "- USE SIMPLE SPOKEN REPLACEMENTS:\n"
+    "  डगमगाना, बेकाबू, आवाज़, हिसाब, फोन और इंटरनेट, तबाही, किनारे के शहर, सुनामी, गायब, इंसान, लोग, अंधेरा, ठंड.\n"
+    "- Length: Exactly 65 to 75 words in Devanagari script.\n"
+    "- Output strictly valid JSON with keys: title, hook, script, cta\n\n"
     "GOLD STANDARD BENCHMARK:\n"
     "{\n"
     "  \"title\": \"अगर चाँद गायब हो जाए? #shorts\",\n"
-    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो अगले 24 घंटे में क्या होगा?\",\n"
-    "  \"script\": \"अगर आज रात आसमान से अचानक चाँद गायब हो जाए, तो सबसे पहले समंदर की भयानक लहरें किनारे के शहरों को डुबो देंगी। चाँद की ग्रैविटी खत्म होते ही धरती अपनी धुरी पर डगमगाने लगेगी। दिन-रात का हिसाब बिगड़ जाएगा और तापमान माइनस 40 डिग्री तक गिर जाएगा। आसमान का सारा उजाला छिन जाएगा और हर तरफ सिर्फ अंधेरा और सन्नाटा होगा। शायद इंसान कभी अगली सुबह देख ही ना पाए!\",\n"
+    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो क्या होगा?\",\n"
+    "  \"script\": \"अगर आज रात आसमान से चाँद गायब हो जाए, तो सबसे पहले समंदर की भयानक सुनामी किनारे के शहरों को डूबा देगी। चाँद की ग्रैविटी खत्म होते ही धरती बुरी तरह डगमगाने लगेगी। दिन और रात का कोई हिसाब नहीं रहेगा, तापमान माइनस 40 डिग्री तक गिर जाएगा और चारों तरफ सिर्फ गहरा अंधेरा छा जाएगा। सारे फोन, इंटरनेट और बिजली बंद हो जाएंगे... और शायद इंसान कभी अगली सुबह देख ही ना पाए!\",\n"
     "  \"cta\": \"क्या आपको लगता है कि इंसान इस तबाही में जिंदा बच पाएगा? नीचे कमेंट में बताओ।\"\n"
     "}"
 )
