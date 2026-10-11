@@ -88,10 +88,14 @@
 
                     <div class="form-group">
                         <div class="label-row">
-                            <label for="input-script">Your Custom Script (50-60 words or more):</label>
+                            <label for="input-script">Your Custom Script (Paste text or load from GitHub):</label>
                             <span class="word-counter" id="word-count">24 words (~9s)</span>
                         </div>
-                        <textarea id="input-script" rows="5" placeholder="Paste your 50-60 words custom script here...">Four seconds of absolute silence can break any human mind. When federal agents interrogate a suspect, they never argue. They just stare.</textarea>
+                        <textarea id="input-script" rows="5" placeholder="Paste your custom Hindi or English script here...">Four seconds of absolute silence can break any human mind. When federal agents interrogate a suspect, they never argue. They just stare.</textarea>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="text" id="input-script-url" placeholder="Paste GitHub Raw URL or script URL here..." style="flex: 1; padding: 7px 12px; font-size: 13px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff;">
+                            <button type="button" class="mode-btn" onclick="fetchScriptFromUrl()" style="padding: 7px 14px; font-size: 12px; white-space: nowrap;">📥 Load GitHub URL</button>
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -105,10 +109,11 @@
                             </select>
                         </div>
                         <div class="form-group half">
-                            <label for="select-lang-manual">Voice Language:</label>
+                            <label for="select-lang-manual">Voice & Language:</label>
                             <select id="select-lang-manual">
+                                <option value="hi_swara">Hindi: Swara Neural (Natural Documentary Female - Best)</option>
+                                <option value="hi_madhur">Hindi: Madhur Neural (Documentary Male)</option>
                                 <option value="en">English (Deep Baritone Adam / Christopher)</option>
-                                <option value="hi">Hindi (Native Madhur Neural + Mastering)</option>
                             </select>
                         </div>
                     </div>

@@ -31,7 +31,7 @@ function setupChannelTabs() {
             } else if (currentChannel === 3) {
                 document.getElementById("input-title").value = "अगर आज रात चाँद गायब हो जाए?";
                 document.getElementById("input-script").value = "अगर आज रात अचानक चाँद गायब हो जाए, तो सबसे पहले समंदर में 300 फीट ऊंची सुनामी उठेगी और किनारे के सारे शहर डूब जाएंगे। चाँद धरती की स्पीड को रोकता है, उसके हटते ही हमारा 24 घंटे का दिन सिर्फ 6 घंटे का रह जाएगा!";
-                document.getElementById("select-lang-manual").value = "hi";
+                document.getElementById("select-lang-manual").value = "hi_swara";
             }
             updateWordCount();
             appendLog(`[CHANNEL] Switched to Channel ${currentChannel}`);
@@ -80,6 +80,27 @@ function updateVol(val) {
     document.getElementById("vol-display").innerText = `${val}%`;
 }
 
+async function fetchScriptFromUrl() {
+    const urlInput = document.getElementById("input-script-url");
+    const url = urlInput ? urlInput.value.trim() : "";
+    if (!url) {
+        alert("Please paste a valid raw URL or GitHub raw text link.");
+        return;
+    }
+    appendLog(`[GITHUB] Fetching script from ${url}...`);
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        document.getElementById("input-script").value = text.trim();
+        updateWordCount();
+        appendLog(`[GITHUB] Script successfully imported (${text.trim().length} chars)!`);
+    } catch (e) {
+        appendLog(`[GITHUB ERROR] Could not load script: ${e.message}`, "error");
+        alert("Could not load script directly in browser (CORS). The backend will fetch it directly on render.");
+    }
+}
+
 // 4. Trigger Render Action
 async function triggerRender() {
     const btn = document.getElementById("render-btn");
@@ -90,11 +111,13 @@ async function triggerRender() {
     updateProgress(5, "INITIALIZING WORKER...", "running");
     document.getElementById("video-preview-container").style.display = "none";
 
+    const scriptUrlInput = document.getElementById("input-script-url");
     const payload = {
         channel: currentChannel,
         mode: currentMode,
         title: document.getElementById("input-title").value.trim(),
         script: document.getElementById("input-script").value.trim(),
+        script_url: scriptUrlInput ? scriptUrlInput.value.trim() : "",
         pillar: parseInt(currentMode === "manual" ? document.getElementById("select-pillar-manual").value : document.getElementById("select-pillar-auto").value),
         topic: document.getElementById("input-topic").value.trim(),
         lang: document.getElementById("select-lang-manual").value,

@@ -53,9 +53,11 @@ class RenderRequest(BaseModel):
     mode: str     # "manual" or "autopilot"
     title: Optional[str] = ""
     script: Optional[str] = ""
+    script_url: Optional[str] = ""
     pillar: Optional[int] = 1
     topic: Optional[str] = ""
-    lang: Optional[str] = "en"
+    lang: Optional[str] = "hi"
+    voice: Optional[str] = "swara"
     bg_music: Optional[str] = "auto"
     bg_volume: Optional[float] = 0.52
 
@@ -112,12 +114,15 @@ def run_render_worker(job_id: str, req: RenderRequest):
         elif req.channel == 3:
             emit_log(job_id, f"🌌 Loading Channel 3 (Cosmic What-If / Sci-Fi Pillar #{req.pillar})...", "CHANNEL_3", progress=15)
             from channel_3.run_channel_3 import render_channel_3_short as run_ch3
+            voice_choice = "madhur" if "madhur" in str(req.lang).lower() or "madhur" in str(req.voice).lower() else "swara"
             vid = run_ch3(
                 pillar_id=req.pillar,
                 topic=req.topic if req.mode == "autopilot" else "",
-                lang=req.lang or "hi",
+                lang="hi",
                 custom_script=req.script if req.mode == "manual" else "",
-                custom_title=req.title if req.mode == "manual" else ""
+                custom_title=req.title if req.mode == "manual" else "",
+                script_url=req.script_url or "",
+                voice_name=voice_choice
             )
             out_video_path = Path(vid)
         else:
