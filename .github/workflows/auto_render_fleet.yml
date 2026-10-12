@@ -107,35 +107,53 @@ jobs:
           fi
 
       - name: Render Video via Fleet Dispatcher
+        env:
+          INPUT_CHANNEL: ${{ github.event.inputs.channel }}
+          INPUT_TOPIC: ${{ github.event.inputs.topic }}
+          INPUT_SCRIPT: ${{ github.event.inputs.script }}
+          INPUT_LANG: ${{ github.event.inputs.lang }}
+          INPUT_PRIVACY: ${{ github.event.inputs.privacy }}
+          INPUT_AUTO_UPLOAD: ${{ github.event.inputs.auto_upload }}
         run: |
-          CHANNEL="${{ github.event.inputs.channel || 'all' }}"
-          TOPIC="${{ github.event.inputs.topic || '' }}"
-          CUSTOM_SCRIPT="${{ github.event.inputs.script || '' }}"
-          LANG="${{ github.event.inputs.lang || 'hi' }}"
-          PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
+          CHANNEL="${INPUT_CHANNEL:-3}"
+          TOPIC="${INPUT_TOPIC:-}"
+          LANG="${INPUT_LANG:-hi}"
+          PRIVACY="${INPUT_PRIVACY:-unlisted}"
           UPLOAD_FLAG=""
-          if [ "${{ github.event.inputs.auto_upload }}" != "false" ]; then
+          if [ "$INPUT_AUTO_UPLOAD" = "true" ]; then
             UPLOAD_FLAG="--upload"
           fi
-          
+
+          SCRIPT_ARG=""
+          if [ -n "$INPUT_SCRIPT" ]; then
+            mkdir -p /tmp/fleet_scripts
+            printf '%s' "$INPUT_SCRIPT" > /tmp/fleet_scripts/custom_script.txt
+            SCRIPT_ARG="--script_file /tmp/fleet_scripts/custom_script.txt"
+          fi
+
+          TOPIC_ARG=""
+          if [ -n "$TOPIC" ]; then
+            TOPIC_ARG="--topic \"$TOPIC\" --title \"$TOPIC\""
+          fi
+
           echo "🚀 Event: ${{ github.event_name }} | Channel: $CHANNEL | Lang: $LANG"
-          
+
           if [ "$CHANNEL" = "1" ]; then
-            python fleet_engines/channel_1/run_reddit_pipeline.py "Subway Surfers" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
+            eval "python fleet_engines/channel_1/run_reddit_pipeline.py 'Subway Surfers' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
           elif [ "$CHANNEL" = "2" ]; then
-            python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
+            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
           elif [ "$CHANNEL" = "3" ]; then
             echo "🌌 Channel 3: Rendering Cosmic Video..."
-            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT"
-            if [ -z "$CUSTOM_SCRIPT" ]; then
+            eval "python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG"
+            if [ -z "$INPUT_SCRIPT" ]; then
               echo "🌌 Channel 3: Rendering Daily Video 2 (Mind-Bending What-Ifs)..."
               python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
             fi
           else
             echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K Videos)!"
-            python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
+            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
             python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG"
-            if [ -z "$CUSTOM_SCRIPT" ]; then
+            if [ -z "$INPUT_SCRIPT" ]; then
               python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
             fi
           fi

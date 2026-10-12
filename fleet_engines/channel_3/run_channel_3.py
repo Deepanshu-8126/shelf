@@ -412,13 +412,13 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Channel 3 Cosmic What-If Engine V3")
     parser.add_argument("--pillar", type=int, default=1, choices=[1, 2, 3])
-    parser.add_argument("--topic", type=str, default="")
-    parser.add_argument("--title", type=str, default="")
-    parser.add_argument("--script", type=str, default="")
-    parser.add_argument("--script_file", type=str, default="")
-    parser.add_argument("--script_url", type=str, default="")
-    parser.add_argument("--voice", type=str, default="swara", choices=["swara", "madhur"])
-    parser.add_argument("--lang", type=str, default="hi", choices=["hi", "en"])
+    parser.add_argument("--topic", type=str, nargs="?", default="")
+    parser.add_argument("--title", type=str, nargs="?", default="")
+    parser.add_argument("--script", type=str, nargs="?", default="")
+    parser.add_argument("--script_file", type=str, nargs="?", default="")
+    parser.add_argument("--script_url", type=str, nargs="?", default="")
+    parser.add_argument("--voice", type=str, nargs="?", default="swara", choices=["swara", "madhur"])
+    parser.add_argument("--lang", type=str, nargs="?", default="hi", choices=["hi", "en"])
     args = parser.parse_args()
 
     rendered_path = render_channel_3_short(
