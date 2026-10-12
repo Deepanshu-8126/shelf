@@ -1,4 +1,4 @@
-name: Auto Video Render Factory (Channel 1 & 2)
+name: Auto Video Render Factory (Channel 1, 2 & 3)
 
 on:
   workflow_dispatch:
@@ -6,13 +6,13 @@ on:
       channel:
         description: 'Select Channel to Render'
         required: true
-        default: 'both'
+        default: '3'
         type: choice
         options:
-          - 'all'  # Render ALL Channels (1, 2 & 3)
-          - '1'    # Channel 1: Reddit Drama (Funcyous)
-          - '2'    # Channel 2: Hindi Vox Mystery (Real 4K)
           - '3'    # Channel 3: Cosmic What-If & Dark Science (Real 4K)
+          - '2'    # Channel 2: Hindi Vox Mystery (Real 4K)
+          - '1'    # Channel 1: Reddit Drama (Funcyous)
+          - 'all'  # Render ALL Channels (1, 2 & 3)
       lang:
         description: 'Language for Channel 2 (hi or en)'
         required: true
@@ -127,15 +127,19 @@ jobs:
           elif [ "$CHANNEL" = "2" ]; then
             python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
           elif [ "$CHANNEL" = "3" ]; then
-            echo "🌌 Channel 3: Rendering Daily Video 1 (Cosmic Supervoids)..."
+            echo "🌌 Channel 3: Rendering Cosmic Video..."
             python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT"
-            echo "🌌 Channel 3: Rendering Daily Video 2 (Mind-Bending What-Ifs)..."
-            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
+            if [ -z "$CUSTOM_SCRIPT" ]; then
+              echo "🌌 Channel 3: Rendering Daily Video 2 (Mind-Bending What-Ifs)..."
+              python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
+            fi
           else
-            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (2 Cosmic 4K Videos)!"
+            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K Videos)!"
             python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang "$LANG" --topic "$TOPIC" --title "$TOPIC" --script "$CUSTOM_SCRIPT" $UPLOAD_FLAG --privacy "$PRIVACY"
             python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG"
-            python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
+            if [ -z "$CUSTOM_SCRIPT" ]; then
+              python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
+            fi
           fi
 
       - name: Upload Rendered Videos & Metadata Artifact
