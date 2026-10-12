@@ -6,6 +6,7 @@ instead of generating synthetic textbook AI slop.
 """
 import os
 import sys
+import re
 import json
 import logging
 from pathlib import Path
@@ -47,15 +48,22 @@ def retrieve_best_transcript(topic: str, niche: str = "cosmic_what_if") -> Dict[
     if not category:
         return {}
 
-    topic_words = set(topic.lower().split())
+    topic_lower = topic.lower()
+    topic_words = [w for w in re.findall(r"[\w]+", topic_lower) if len(w) >= 2]
     best_item = category[0]
-    best_score = -1
+    best_score = 0
 
     for item in category:
-        item_words = set((item.get("topic", "") + " " + item.get("transcript", "")).lower().split())
-        overlap = len(topic_words.intersection(item_words))
-        if overlap > best_score:
-            best_score = overlap
+        t_title = (item.get("topic", "") + " " + item.get("id", "")).lower()
+        t_body = item.get("transcript", "").lower()
+        score = 0
+        for w in topic_words:
+            if w in t_title:
+                score += 5
+            elif w in t_body:
+                score += 2
+        if score > best_score:
+            best_score = score
             best_item = item
 
     return best_item
