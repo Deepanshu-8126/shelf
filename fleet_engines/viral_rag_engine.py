@@ -114,30 +114,32 @@ def generate_rag_viral_script(
             prompt=step1_prompt,
             system="You are a master viral suspense story architect.",
             temp=0.65,
-            max_tokens=350,
-            remove_nl=False,
         )
 
         # -------------------------------------------------------------------
-        # STEP 2: Spoken Hindi Drafter (Converting beats to continuous flow)
+        # STEP 2: Spoken Hindi Drafter (Conversational Suspense Narrative)
         # -------------------------------------------------------------------
-        log.info(f"[StoryTeller-Step2] Drafting spoken conversational Hindi script...")
+        log.info(f"[StoryTeller-Step2] Drafting natural spoken Hindi script...")
         step2_prompt = (
             f"Story Outline:\n{outline}\n\n"
             f"VERIFIED VIRAL REFERENCE STYLE (from {ref_views} views video):\n"
             f"\"{ref_transcript}\"\n\n"
-            "INSTRUCTIONS:\n"
+            "INSTRUCTIONS FOR PURE NATURAL CONVERSATIONAL HINDI:\n"
             "- Write ONE unbroken flowing spoken script in natural Devanagari Hindi.\n"
-            "- Single continuous paragraph — like explaining to a friend over chai in one breath.\n"
-            "- Open with a direct punchy question ('अगर आज रात अचानक...').\n"
-            "- NO robotic Sanskrit/textbook words (NO घूर्णन, चक्र, अस्तित्व, मनुष्य, अराजकता).\n"
+            "- Speak directly to the viewer like a gripping Indian documentary narrator / friend over chai.\n"
+            "- Use natural everyday conversational loan words in Devanagari: 'ग्रैविटी' (NOT गुरुत्वाकर्षण), 'ऑर्बिट' (NOT कक्षा), 'सोलर सिस्टम' (NOT सौरमंडल), 'स्पीड' (NOT गति), 'एस्टेरॉयड' (NOT क्षुद्रग्रह), 'टेम्परेचर' (NOT तापमान).\n"
+            "- Use natural conversational connectors:\n"
+            "   * 'आप शायद सोच रहे होंगे कि...'\n"
+            "   * 'लेकिन असली झटका तो तब लगेगा...'\n"
+            "   * 'और सबसे डरावनी बात पता है क्या है?...'\n"
+            "- NO robotic Sanskrit/textbook words (NO घूर्णन, चक्र, अस्तित्व, मनुष्य, अराजकता, यदि, मानव जाति).\n"
             "- USE ultra-simple words: घूमना, अंधेरा, इंसान, लोग, तेज़ हवाएं, तबाही.\n"
             f"- TARGET LENGTH: Exactly {word_count_target - 5} to {word_count_target + 5} words in Devanagari.\n"
             "- Output ONLY the Hindi script paragraph, nothing else."
         )
         draft = llm_complete(
             prompt=step2_prompt,
-            system="You are India's top YouTube Shorts narrator writing spoken Hindi.",
+            system="You are India's top YouTube Shorts narrator writing spoken Hindi like a real human creator.",
             temp=0.55,
             max_tokens=350,
             remove_nl=False,
@@ -149,17 +151,18 @@ def generate_rag_viral_script(
         log.info(f"[StoryTeller-Step3] Reviewing, purging AI slop & polishing JSON...")
         step3_prompt = (
             f"Draft Script to Review:\n\"{draft}\"\n\n"
-            "CRITIQUE & POLISH CHECKLIST:\n"
-            "1. Remove any robotic/textbook words (घूर्णन -> घूमने की रफ़्तार, अस्तित्व -> जान/वजूद, चक्र -> हिसाब, मनुष्य -> इंसान).\n"
-            "2. Make sure sentences are punchy and breathless (30-second spoken short).\n"
-            f"3. Ensure script length is between {word_count_target - 8} and {word_count_target + 8} Devanagari words.\n"
-            "4. Output STRICT JSON with keys: title, hook, script, cta.\n"
+            "CRITIQUE & NATURAL POLISH CHECKLIST:\n"
+            "1. Replace any robotic/textbook words: (गुरुत्वाकर्षण -> ग्रैविटी, कक्षा -> ऑर्बिट, सौरमंडल -> सोलर सिस्टम, गति -> स्पीड, मनुष्य -> इंसान, यदि -> अगर, तापमान -> टेम्परेचर).\n"
+            "2. Make sure sentences are punchy, breathless, and conversational (30-second spoken short).\n"
+            "3. Ending MUST be a natural spoken debate challenge: 'क्या लगता है, इंसान कभी ऐसी तबाही से बच पाएगा? अपनी राय नीचे बताओ।' (NEVER use 'क्या आप सोचते हैं').\n"
+            f"4. Ensure script length is between {word_count_target - 8} and {word_count_target + 8} Devanagari words.\n"
+            "5. Output STRICT JSON with keys: title, hook, script, cta.\n"
             "Format:\n"
             '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script", "cta": "Provocative debate question"}'
         )
         data = llm_json(
             prompt=step3_prompt,
-            system="You are an elite script editor. Return ONLY valid JSON with zero conversational filler.",
+            system="You are an elite script editor enforcing 100% natural conversational Indian Hindi. Return ONLY valid JSON with zero conversational filler.",
             temp=0.35,
             fallback=fallback,
         )
