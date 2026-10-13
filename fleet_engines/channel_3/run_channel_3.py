@@ -77,24 +77,68 @@ PILLARS = {
 # 1. PURE DEVANAGARI SUBTITLE ENGINE (ZERO WHISPER URDU HALLUCINATIONS)
 # =============================================================================
 async def synthesize_voice_with_boundaries(script: str, voice: str, out_raw: Path):
-    """Generates studio voice and simultaneously extracts exact word timestamps directly from Edge-TTS."""
-    import edge_tts
-    # Punchy +3% pacing for retention, WordBoundary for exact subtitle synchronization
-    c = edge_tts.Communicate(script, voice, rate="+3%", boundary="WordBoundary")
-    words = []
+    """Generates studio voice and simultaneously extracts exact word timestamps with resilient fallback."""
+    try:
+        import edge_tts
+        c = edge_tts.Communicate(script, voice, rate="+3%", boundary="WordBoundary")
+        words = []
+        with open(out_raw, "wb") as f:
+            async for chunk in c.stream():
+                if chunk["type"] == "audio":
+                    f.write(chunk["data"])
+                elif chunk["type"] == "WordBoundary":
+                    st_s = chunk["offset"] / 10_000_000.0
+                    dur_s = chunk["duration"] / 10_000_000.0
+                    words.append({
+                        "start": st_s,
+                        "end": st_s + dur_s,
+                        "duration": dur_s,
+                        "word": chunk.get("text", "").strip()
+                    })
+        if out_raw.exists() and out_raw.stat().st_size > 10000 and words:
+            return words
+    except Exception as e:
+        print(f"⚠️ Primary TTS unavailable ({e}). Engaging high-speed Google Cloud Hindi voiceover fallback...")
+
+    # High-speed reliable fallback: Google Cloud Hindi Voice
+    import urllib.parse
+    clean_words = [w for w in re.split(r'\s+', script) if w.strip()]
+    chunks = []
+    curr = ""
+    for s in re.split(r'([।\?!,])', script):
+        if not s.strip(): continue
+        if len(curr) + len(s) < 180: curr += s
+        else:
+            chunks.append(curr.strip())
+            curr = s
+    if curr.strip(): chunks.append(curr.strip())
+
+    audio_bytes = b""
+    for ch in chunks:
+        u = f"https://translate.google.com/translate_tts?ie=UTF-8&q={urllib.parse.quote(ch)}&tl=hi&client=tw-ob"
+        r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
+        if r.status_code == 200:
+            audio_bytes += r.content
+
     with open(out_raw, "wb") as f:
-        async for chunk in c.stream():
-            if chunk["type"] == "audio":
-                f.write(chunk["data"])
-            elif chunk["type"] == "WordBoundary":
-                st_s = chunk["offset"] / 10_000_000.0
-                dur_s = chunk["duration"] / 10_000_000.0
-                words.append({
-                    "start": st_s,
-                    "end": st_s + dur_s,
-                    "duration": dur_s,
-                    "word": chunk.get("text", "").strip()
-                })
+        f.write(audio_bytes)
+
+    dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(out_raw)]
+    dur_res = subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True)
+    total_dur = float(dur_res.stdout.strip()) if dur_res.stdout.strip() else 25.0
+
+    total_chars = sum(len(w) for w in clean_words)
+    curr_t = 0.0
+    words = []
+    for w in clean_words:
+        w_dur = max(0.18, (len(w) / max(total_chars, 1)) * total_dur)
+        words.append({
+            "start": curr_t,
+            "end": curr_t + w_dur,
+            "duration": w_dur,
+            "word": w
+        })
+        curr_t += w_dur
     return words
 
 
