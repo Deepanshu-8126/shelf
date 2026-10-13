@@ -4,8 +4,10 @@ __pycache__/
 output/
 *.wav
 !fleet_engines/ShortGPT/public/Music dj quads.wav
+!fleet_engines/assets/sfx/*.wav
 *.mp4
 !fleet_engines/assets/background_videos/subway_surfers/subway_surfers_clean.mp4
+!fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4
 !fleet_engines/ShortGPT/public/subscribe-animation.mp4
 !fleet_engines/ShortGPT/public/test_minecraft_clip.mp4
 .env
@@ -15,4 +17,5 @@ venv/
 .logs/
 .gradio/
 credentials/
+yt-automator/
 

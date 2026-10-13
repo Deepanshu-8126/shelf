@@ -9,18 +9,18 @@ on:
         default: '3'
         type: choice
         options:
-          - '3'    # Channel 3: Cosmic What-If & Dark Science (Real 4K)
-          - '2'    # Channel 2: Hindi Vox Mystery (Real 4K)
-          - '1'    # Channel 1: Reddit Drama (Funcyous)
+          - '3'    # Channel 3: Cosmic What-If & Dark Science (Hindi Kokoro Dynamic, Real 4K)
+          - '2'    # Channel 2: Vox Mystery Documentary (English Kokoro Michael, Real 4K)
+          - '1'    # Channel 1: Reddit Drama (Dynamic GTA 5 / Subway Surfers)
           - 'all'  # Render ALL Channels (1, 2 & 3)
       lang:
-        description: 'Language for Channel 2 (hi or en)'
+        description: 'Language for Channel 2 (en or hi)'
         required: true
-        default: 'hi'
+        default: 'en'
         type: choice
         options:
-          - 'hi'
           - 'en'
+          - 'hi'
       topic:
         description: 'Custom Topic / Title (Optional)'
         required: false
@@ -117,7 +117,7 @@ jobs:
         run: |
           CHANNEL="${INPUT_CHANNEL:-3}"
           TOPIC="${INPUT_TOPIC:-}"
-          LANG="${INPUT_LANG:-hi}"
+          LANG="${INPUT_LANG:-en}"
           PRIVACY="${INPUT_PRIVACY:-unlisted}"
           UPLOAD_FLAG=""
           if [ "$INPUT_AUTO_UPLOAD" = "true" ]; then
@@ -139,16 +139,20 @@ jobs:
           echo "🚀 Event: ${{ github.event_name }} | Channel: $CHANNEL | Lang: $LANG"
 
           if [ "$CHANNEL" = "1" ]; then
-            eval "python fleet_engines/channel_1/run_reddit_pipeline.py 'Subway Surfers' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
+            echo "🎮 Channel 1: Rendering Reddit Drama Short with Dynamic Gameplay..."
+            eval "python fleet_engines/channel_1/run_reddit_pipeline.py dynamic $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
           elif [ "$CHANNEL" = "2" ]; then
-            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
+            C2_LANG="${LANG:-en}"
+            echo "🕵️ Channel 2: Rendering Vox Mystery Short in $C2_LANG (Kokoro Michael)..."
+            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$C2_LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
           elif [ "$CHANNEL" = "3" ]; then
-            echo "🌌 Channel 3: Rendering High-Cadence Cosmic Video with Dynamic Kokoro Voice..."
-            eval "python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG"
+            echo "🌌 Channel 3: Rendering High-Cadence Cosmic Video with Dynamic Kokoro Hindi Voices..."
+            eval "python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang 'hi' $TOPIC_ARG $SCRIPT_ARG"
           else
-            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K)!"
-            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
-            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang "$LANG"
+            echo "🔥 Full Fleet Autopilot: Rendering All 3 Channels (Channel 1 Reddit, Channel 2 Vox En, Channel 3 Cosmic Hi)!"
+            eval "python fleet_engines/channel_1/run_reddit_pipeline.py dynamic $UPLOAD_FLAG --privacy '$PRIVACY'" || true
+            eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang 'en' $UPLOAD_FLAG --privacy '$PRIVACY'" || true
+            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang "hi" || true
           fi
 
       - name: Upload Rendered Videos & Metadata Artifact

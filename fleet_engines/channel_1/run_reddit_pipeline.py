@@ -43,36 +43,117 @@ for p in [str(CHANNEL_DIR), str(FLEET_DIR), str(WORKSPACE_ROOT), str(SHORTGPT_RO
         sys.path.insert(0, p)
 os.chdir(str(SHORTGPT_ROOT))
 
-# 1. Centralized LLM Engine (single source of truth for all Groq calls)
+# 1. Fast LLM completion via Groq
 from shortGPT.gpt import gpt_utils
-from llm_engine import (
-    llm_complete as groq_runtime_llm,
-    generate_reddit_package as generate_viral_reddit_package,
-    extract_keywords_llm as extract_keywords_via_groq_llm,
-    GROQ_API_KEY as groq_key,
-)
+from openai import OpenAI
 
+groq_key = os.environ.get("GROQ_API_KEY") or "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"
 if not groq_key:
-    raise RuntimeError("GROQ_API_KEY is not set. Add it to .env")
+    raise RuntimeError("GROQ_API_KEY is not set.")
 
-# Patch ShortGPT's internal LLM so it also uses our cascade engine
+def groq_runtime_llm(chat_prompt="", system="", temp=0.7, max_tokens=2000, remove_nl=True, conversation=None):
+    client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
+    messages = conversation if conversation else [
+        {"role": "system", "content": system or ""},
+        {"role": "user", "content": chat_prompt}
+    ]
+    response = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        messages=messages,
+        max_tokens=max_tokens,
+        temperature=temp,
+        timeout=30
+    )
+    text = response.choices[0].message.content.strip()
+    if remove_nl:
+        import re
+        text = re.sub(r'\s+', ' ', text)
+    return text
+
 gpt_utils.llm_completion = groq_runtime_llm
 
-# 2. Story cache alias (generate_viral_reddit_package is now from llm_engine)
+# 2. Viral Reddit Story Engine Hook (Trained Few-Shot Prompt with Hook, Payoff & CTA Ending)
 _viral_story_cache = {}
 
+def generate_viral_reddit_package():
+    global _viral_story_cache
+    if _viral_story_cache:
+        return _viral_story_cache
+
+    themes = [
+        "A toxic boss demands unpaid overtime on an employee's milestone day, but the employee uses the company's own policy for legal revenge.",
+        "An entitled customer/Karen makes a scene trying to get a young worker fired, but security footage destroys her publicly.",
+        "An arrogant roommate secretly steals groceries and lies to everyone's face, so the victim sets an undeniable visual trap.",
+        "An entitled relative demands someone's first-class travel seat or heirloom, and gets utterly humiliated in front of the entire family."
+    ]
+    chosen_theme = random.choice(themes)
+
+    system_prompt = """You are a world-class viral YouTube Shorts scriptwriter specializing in r/pettyrevenge and r/EntitledPeople drama.
+Your scripts consistently achieve 90%+ retention and thousands of comments because they follow a strict 4-stage formula:
+
+1. [0:00 - 0:03s] EXPLOSIVE HOOK: Line 1 drops the viewer straight into high-stakes conflict (starts with 'I...'). Zero filler throat-clearing.
+2. [0:03 - 0:30s] DRAMATIC TENSION: Punchy, spoken dialogue under 12 words per sentence. Relatable human outrage.
+3. [0:30 - 0:40s] SATISFYING PAYOFF: Bad actor gets caught, humiliated, or outsmarted. Fast mic-drop victory.
+4. [0:40 - 0:45s] PROVOCATIVE CTA ENDING: Final sentence MUST be a compelling question that sparks fierce debate in the comments.
+   (Examples: 'Did I take it too far, or did he deserve every bit of it? Drop your thoughts below.' | 'Would you have done the exact same thing? Let me know below.')
+
+Strict Constraints:
+- Length: Exactly between 120 and 135 words (perfect for ~42 seconds of speech).
+- Language: 100% natural, crisp, conversational English.
+- Output JSON format strictly: {"question": "...", "story": "..."}"""
+
+    few_shots = [
+        {
+            "role": "user",
+            "content": "Theme: A toxic boss demands unpaid overtime on an employee's milestone day, but the employee uses company policy for revenge."
+        },
+        {
+            "role": "assistant",
+            "content": json.dumps({
+                "question": "What's the pettiest revenge you've ever pulled on a toxic boss?",
+                "story": "My manager told me: 'If you refuse unpaid overtime, turn in your laptop right now.' So I did. What he forgot was that I was the sole administrator of their cloud database. On Monday morning, their entire checkout system went pitch black. When he called me screaming that the store was losing ten thousand dollars an hour, I answered calmly: 'My freelance emergency rate is two hundred dollars an hour, paid upfront.' He wired the money in three minutes flat. Did I take it too far, or did he deserve every bit of it? Drop your thoughts below."
+            })
+        },
+        {
+            "role": "user",
+            "content": f"Theme: {chosen_theme}"
+        }
+    ]
+
+    client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
+    res = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        messages=[{"role": "system", "content": system_prompt + "\nReturn ONLY valid JSON."}] + few_shots,
+        temperature=0.75
+    )
+    raw = res.choices[0].message.content
+    import re
+    match = re.search(r'\{.*\}', raw, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group(0))
+        except Exception:
+            data = None
+    else:
+        data = None
+
+    if not data or "story" not in data:
+        data = {
+            "question": "What is the most satisfying revenge you've ever witnessed against an entitled person?",
+            "story": "My manager told me: 'If you refuse unpaid overtime, turn in your laptop right now.' So I did. What he forgot was that I was the sole administrator of their cloud database. On Monday morning, their entire checkout system went pitch black. When he called me screaming that the store was losing ten thousand dollars an hour, I answered calmly: 'My freelance emergency rate is two hundred dollars an hour, paid upfront.' He wired the money in three minutes flat. Did I take it too far, or did he deserve every bit of it? Drop your thoughts below."
+        }
+    _viral_story_cache = data
+    return data
 
 from shortGPT.gpt import reddit_gpt
 
 def hooked_getInterestingRedditQuestion():
     pkg = generate_viral_reddit_package()
-    _viral_story_cache.update(pkg)
     print(f"🔥 [VIRAL HOOK GENERATED]: {pkg['question']}", flush=True)
     return pkg["question"]
 
 def hooked_createRedditScript(question):
     pkg = generate_viral_reddit_package()
-    _viral_story_cache.update(pkg)
     story = pkg["story"].strip()
     print(f"📝 [REFINED STORY SCRIPT ({len(story.split())} words)]:\n{story}", flush=True)
     return story
@@ -141,24 +222,36 @@ def safe_get_asset_link(key: str) -> str:
             if os.path.exists(c):
                 return c
 
-    # 2. Background Video: Subway Surfers Clean Master
-    subway_candidates = [
-        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers_clean.mp4",
-        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4",
-        WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4",
-        SHORTGPT_ROOT / "public/test_minecraft_clip.mp4"
-    ]
-    for sc in subway_candidates:
-        if sc.exists():
-            return str(sc)
+    # 2. Background Video Mapping (GTA 5 Action vs Subway Surfers vs Minecraft)
+    if "gta" in norm_key:
+        gta_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4"
+        if gta_path.exists():
+            return str(gta_path)
+
+    if "minecraft" in norm_key:
+        mc_candidates = list((WORKSPACE_ROOT / "fleet_engines/assets/background_videos/minecraft").glob("*.mp4"))
+        if mc_candidates:
+            return str(mc_candidates[0])
+        gta_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4"
+        if gta_path.exists():
+            return str(gta_path)
+
+    if "subway" in norm_key or "gameplay" in norm_key or "default" in norm_key:
+        for sc in [
+            WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_clean_4k9x16.mp4",
+            WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers_clean.mp4",
+            WORKSPACE_ROOT / "fleet_engines/assets/background_videos/subway_surfers/subway_surfers.mp4",
+        ]:
+            if sc.exists():
+                return str(sc)
 
     try:
         return orig_get_asset_link(key)
     except Exception as e:
-        print(f"⚠️ orig_get_asset_link failed for {key}: {e}. Falling back to Subway Surfers.", flush=True)
-        for sc in subway_candidates:
-            if sc.exists():
-                return str(sc)
+        print(f"⚠️ orig_get_asset_link failed for {key}: {e}. Falling back to default gameplay.", flush=True)
+        gta_path = WORKSPACE_ROOT / "fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4"
+        if gta_path.exists():
+            return str(gta_path)
         return ""
 
 AssetDatabase.get_asset_link = safe_get_asset_link
@@ -285,19 +378,10 @@ def enhance_video_with_viral_features(engine: RedditShortEngine, raw_video_path:
         for p in popups:
             print(f"   - {p['keyword']} @ {p['timestamp']:.1f}s (sfx: {p['sfx_type']})", flush=True)
     else:
-        # Fallback: Use centralized LLM engine to extract keywords from the story text
-        print("🤖 [NLP EXTRACTOR] No Whisper data, using LLM engine to extract keywords...", flush=True)
-        story_text = _viral_story_cache.get("story", "")
-        raw_kws = extract_keywords_via_groq_llm(story_text, video_duration)
-        # Enrich with sticker paths for visual_popups_engine
-        from visual_popups_engine import find_sticker_path
-        popups = []
-        for k in raw_kws:
-            sp = find_sticker_path(k["keyword"])
-            if sp:
-                popups.append({"keyword": k["keyword"], "timestamp": k["timestamp"],
-                               "sticker_path": str(sp), "sfx_type": k["sfx_type"]})
-        print(f"🎯 [VISUAL POPUPS] LLM extracted {len(popups)} visuals", flush=True)
+        # Fallback: Use Groq to extract keywords from the story text
+        print("🤖 [NLP EXTRACTOR] No Whisper data, using Groq to extract keywords...", flush=True)
+        popups = extract_keywords_via_groq(_viral_story_cache.get("story", ""), video_duration)
+        print(f"🎯 [VISUAL POPUPS] NLP extracted {len(popups)} visuals", flush=True)
 
     # Feature 1: Apply visual popups
     if popups:
@@ -459,8 +543,12 @@ def run(background_choice=None, custom_title=None, custom_script=None):
     print("🚀 VIRAL ENHANCEMENTS: Popups | SFX | Kinetic Subs | Progress Bar | NLP", flush=True)
     print("=" * 70, flush=True)
 
-    available_bgs = ["Subway Surfers", "GTA 5 Action", "Minecraft jumping circuit"]
-    bg_video = background_choice if background_choice in available_bgs else "Subway Surfers"
+    if (background_choice or "").lower() in ["dynamic", "random"]:
+        import random
+        bg_video = random.choice(["GTA 5 Action", "Subway Surfers"])
+    else:
+        available_bgs = ["Subway Surfers", "GTA 5 Action", "Minecraft jumping circuit"]
+        bg_video = background_choice if background_choice in available_bgs else "Subway Surfers"
     print(f"🎮 [SELECTED BACKGROUND GAMEPLAY]: {bg_video}", flush=True)
 
     voice = EdgeTTSVoiceModule("en-US-ChristopherNeural")
@@ -525,7 +613,7 @@ def run(background_choice=None, custom_title=None, custom_script=None):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Channel 1 Reddit Drama Pipeline")
-    parser.add_argument("bg", nargs="?", default="Subway Surfers", help="Background game theme")
+    parser.add_argument("bg", nargs="?", default="dynamic", help="Background game theme ('dynamic', 'GTA 5 Action', 'Subway Surfers')")
     parser.add_argument("--title", type=str, default="", help="Custom story title")
     parser.add_argument("--script", type=str, default="", help="Custom story script text")
     parser.add_argument("--upload", action="store_true", help="Auto upload to YouTube Channel 1")
@@ -546,13 +634,19 @@ if __name__ == "__main__":
     yt_url = None
     
     if args.upload and vid_path:
-        from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
+        try:
+            from channel_2.youtube_uploader import upload_short_to_youtube
+        except ImportError:
+            from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
         res = upload_short_to_youtube(Path(vid_path), title, desc, channel=1, privacy_status=args.privacy)
         if res:
             yt_url = res.get("video_url")
             
     if args.telegram and vid_path:
-        from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
+        try:
+            from telegram_dispatcher import send_fleet_video_to_telegram
+        except ImportError:
+            from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
         send_fleet_video_to_telegram(
             video_path=Path(vid_path),
             channel=1,
