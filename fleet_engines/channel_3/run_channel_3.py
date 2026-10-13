@@ -56,19 +56,34 @@ from media_fetcher import fetch_mixed_media_clip, plan_beat_visuals
 
 PILLARS = {
     1: {
-        "name": "Cosmic Anomalies & James Webb Voids",
-        "default_topic": "The cosmic supervoid where thousands of galaxies should be but don't exist",
-        "search_terms": ["deep space stars telescope", "spinning galaxy cosmic nebula", "satellite earth night space"]
+        "name": "Deep Earth & Ocean Anomalies",
+        "category": "deep_earth_ocean",
+        "default_topic": "मारियाना ट्रेंच के 11 किलोमीटर नीचे वैज्ञानिकों को क्या मिला?",
+        "search_terms": ["deep sea underwater trench", "stormy ocean rough dark", "strange deep sea creatures"]
     },
     2: {
-        "name": "Mind-Bending What-If Physics",
-        "default_topic": "What if Earth lost gravity for just 5 seconds",
-        "search_terms": ["floating in zero gravity space", "earth from space rotating", "cosmic storm meteor asteroid"]
+        "name": "Bizarre Human Body Science",
+        "category": "bizarre_human_science",
+        "default_topic": "अगर इंसान लगातार 7 दिन तक न सोए तो दिमाग के साथ क्या होता है?",
+        "search_terms": ["brain glowing scan human", "person looking tired insomnia", "medical science laboratory dark"]
     },
     3: {
-        "name": "Dark Universe Paradoxes & Black Holes",
-        "default_topic": "What happens at the event horizon where time itself freezes",
-        "search_terms": ["black hole gravitational lens", "wormhole universe stars travel", "deep ocean dark abyssal void"]
+        "name": "Real Everyday What-Ifs",
+        "category": "everyday_what_ifs",
+        "default_topic": "अगर 24 घंटे के लिए दुनिया का सारा इंटरनेट बंद हो जाए?",
+        "search_terms": ["server room computer network", "modern city traffic night", "empty streets power outage"]
+    },
+    4: {
+        "name": "Mysterious Historic & Dark Science Curiosities",
+        "category": "dark_science_anomalies",
+        "default_topic": "चेरनोबिल का एलीफेंट्स फुट: दुनिया का सबसे खतरनाक पत्थर",
+        "search_terms": ["abandoned chernobyl dark reactor", "radiation danger hazard zone", "mysterious glowing dark artifact"]
+    },
+    5: {
+        "name": "Mind-Bending Deep Space Curiosities",
+        "category": "mind_bending_space",
+        "default_topic": "अंतरिक्ष का वो ग्रह जो पूरा का पूरा हीरे का बना हुआ है",
+        "search_terms": ["deep space stars telescope", "spinning galaxy cosmic nebula", "diamond glowing crystal space"]
     }
 }
 
@@ -256,8 +271,15 @@ def render_channel_3_short(
     print(f"🌌 CHANNEL 3: COSMIC WHAT-IF ENGINE V3 (RAPID CUTS + PEXELS/PIXABAY MIXUP)")
     print("=" * 75)
 
-    pillar = PILLARS.get(pillar_id, PILLARS[1])
-    target_topic = topic or pillar["default_topic"]
+    if not topic and (pillar_id is None or pillar_id == 1):
+        # Auto-rotate dynamically across all 5 categories so no two videos repeat the same domain
+        rot_id = (int(time.time() // 86400) % 5) + 1
+        pillar = PILLARS.get(rot_id, PILLARS[1])
+        target_topic = pillar["default_topic"]
+        print(f"🔄 [Dynamic Rotation] Automatically selected Category #{rot_id}: {pillar['name']}")
+    else:
+        pillar = PILLARS.get(pillar_id, PILLARS[1])
+        target_topic = topic or pillar["default_topic"]
 
     # Resolve script
     resolved_script = load_custom_script(custom_script, script_file, script_url)
@@ -455,7 +477,7 @@ def render_channel_3_short(
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Channel 3 Cosmic What-If Engine V3")
-    parser.add_argument("--pillar", type=int, default=1, choices=[1, 2, 3])
+    parser.add_argument("--pillar", type=int, default=1, choices=[1, 2, 3, 4, 5])
     parser.add_argument("--topic", type=str, nargs="?", default="")
     parser.add_argument("--title", type=str, nargs="?", default="")
     parser.add_argument("--script", type=str, nargs="?", default="")

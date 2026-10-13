@@ -251,7 +251,17 @@ HINDI_SEMANTIC_DICTIONARY = [
     (r"दिमाग|dimaag|brain|amygdala|scan", "glowing human brain scan medical x-ray"),
     (r"कमरा|room|ghar|house|akela|alone", "dark room alone silhouette eerie blue light"),
     (r"सड़क|road|sheher|city|desert|town", "empty desert road night street lights fog cinematic"),
-    (r"सिरदर्द|neend|headache|sleep|dard", "person holding head headache pain darkness")
+    (r"सिरदर्द|neend|headache|sleep|dard|अनिद्रा|insomnia", "person holding head headache pain darkness"),
+    (r"मारियाना|ट्रेंच|गहराई|गड्ढा|trench|abyss|deep ocean", "deep sea underwater ocean abyss"),
+    (r"मछली|जीव|creature|fish|shark|दानव", "strange deep sea glowing creature underwater"),
+    (r"ड्रिल|बोरहोल|borehole|tunnel|hole|छेद", "deep dark tunnel hole underground cavern"),
+    (r"रेबीज|गला|ऐंठन|spasm|hydrophobia|rabies", "person terrified looking glass of water"),
+    (r"इंटरनेट|वाई-फाई|कंप्यूटर|सर्वर|network|internet|wifi", "modern server room computer data blue lights"),
+    (r"विमान|हवाई जहाज|flight|airplane|airport", "airplane flying sky runway airport"),
+    (r"मधुमक्खी|पॉलीनेशन|bee|honeycomb", "honey bee on flower macro nature"),
+    (r"चेरनोबिल|परमाणु|रेडिएशन|radiation|reactor|chernobyl", "abandoned chernobyl nuclear reactor plant eerie"),
+    (r"हीरा|हीरे|रत्न|diamond|crystal|gem", "sparkling raw diamond crystal mineral dark"),
+    (r"समय|घड़ी|सापेक्षता|relativity|clock|seconds", "ticking clock antique watch time passing timelapse")
 ]
 
 
