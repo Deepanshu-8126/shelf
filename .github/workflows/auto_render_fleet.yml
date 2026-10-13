@@ -82,7 +82,7 @@ jobs:
       - name: Install FFmpeg & System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libass-dev libsm6 libxext6 fonts-liberation fonts-noto-core fonts-dejavu
+          sudo apt-get install -y ffmpeg libass-dev libsm6 libxext6 fonts-liberation fonts-noto-core fonts-dejavu espeak-ng fonts-indic
 
       - name: Install Required Python Packages
         run: |
@@ -143,19 +143,12 @@ jobs:
           elif [ "$CHANNEL" = "2" ]; then
             eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
           elif [ "$CHANNEL" = "3" ]; then
-            echo "🌌 Channel 3: Rendering Cosmic Video..."
-            eval "python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG"
-            if [ -z "$INPUT_SCRIPT" ]; then
-              echo "🌌 Channel 3: Rendering Daily Video 2 (Mind-Bending What-Ifs)..."
-              python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
-            fi
+            echo "🌌 Channel 3: Rendering High-Cadence Cosmic Video with Dynamic Kokoro Voice..."
+            eval "python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG"
           else
-            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K Videos)!"
+            echo "🔥 Full Fleet Autopilot: Rendering Channel 2 (Vox 4K) & Channel 3 (Cosmic 4K)!"
             eval "python fleet_engines/channel_2/run_channel_2.py --pillar 1 --lang '$LANG' $TOPIC_ARG $SCRIPT_ARG $UPLOAD_FLAG --privacy '$PRIVACY'"
-            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --lang "$LANG"
-            if [ -z "$INPUT_SCRIPT" ]; then
-              python fleet_engines/channel_3/run_channel_3.py --pillar 2 --lang "$LANG"
-            fi
+            python fleet_engines/channel_3/run_channel_3.py --pillar 1 --voice dynamic --lang "$LANG"
           fi
 
       - name: Upload Rendered Videos & Metadata Artifact

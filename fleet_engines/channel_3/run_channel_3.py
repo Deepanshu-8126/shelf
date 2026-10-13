@@ -91,11 +91,87 @@ PILLARS = {
 # =============================================================================
 # 1. PURE DEVANAGARI SUBTITLE ENGINE (ZERO WHISPER URDU HALLUCINATIONS)
 # =============================================================================
-async def synthesize_voice_with_boundaries(script: str, voice: str, out_raw: Path):
-    """Generates studio voice and simultaneously extracts exact word timestamps with resilient fallback."""
+async def synthesize_voice_with_boundaries(script: str, voice_pref: str, out_raw: Path):
+    """
+    Generates high-fidelity native Hindi voiceover and extracts synchronized word timestamps.
+    Primary Engine: Kokoro-82M (hf_beta, hm_omega, hf_alpha, hm_psi) - 100% on-device neural Indian voice.
+    Secondary Fallback: Edge-TTS (Swara / Madhur)
+    Tertiary Fallback: Google Cloud Hindi Voice
+    """
+    voice_pref = (voice_pref or "dynamic").lower()
+    kokoro_map = {
+        "beta": "hf_beta",     # Warm storytelling female
+        "alpha": "hf_alpha",   # Dynamic facts female
+        "omega": "hm_omega",   # Deep cinematic male
+        "psi": "hm_psi"        # Fast engaging male
+    }
+
+    selected_kokoro_voice = None
+    if voice_pref == "dynamic":
+        import random
+        selected_kokoro_voice = random.choice(["hf_beta", "hm_omega", "hf_alpha", "hm_psi"])
+    elif voice_pref in kokoro_map:
+        selected_kokoro_voice = kokoro_map[voice_pref]
+    elif voice_pref in ["hf_beta", "hf_alpha", "hm_omega", "hm_psi"]:
+        selected_kokoro_voice = voice_pref
+
+    # 1. Try Kokoro-82M First
+    if selected_kokoro_voice:
+        try:
+            print(f"🎙️ Engaging Kokoro-82M Engine (Voice: {selected_kokoro_voice})...")
+            from kokoro import KPipeline
+            import soundfile as sf
+            import numpy as np
+
+            pipeline = KPipeline(lang_code='h')
+            generator = pipeline(script, voice=selected_kokoro_voice, speed=1.05)
+
+            all_audios = []
+            words = []
+            curr_time = 0.0
+
+            for res in generator:
+                chunk_audio = res.audio
+                chunk_dur = len(chunk_audio) / 24000.0
+                all_audios.append(chunk_audio)
+
+                cwords = [w for w in re.split(r'\s+', res.graphemes) if w.strip()]
+                if not cwords:
+                    curr_time += chunk_dur
+                    continue
+
+                total_chars = sum(len(w) for w in cwords)
+                chunk_t = curr_time
+                for w in cwords:
+                    w_dur = max(0.12, (len(w) / max(total_chars, 1)) * chunk_dur)
+                    words.append({
+                        "start": round(chunk_t, 3),
+                        "end": round(chunk_t + w_dur, 3),
+                        "duration": round(w_dur, 3),
+                        "word": w
+                    })
+                    chunk_t += w_dur
+                curr_time += chunk_dur
+
+            if all_audios and words:
+                combined = np.concatenate(all_audios)
+                out_wav = out_raw.with_suffix(".wav")
+                sf.write(str(out_wav), combined, 24000)
+                # Convert to mp3 if needed or copy
+                subprocess.run(["ffmpeg", "-y", "-i", str(out_wav), str(out_raw)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+                if out_wav.exists() and out_wav != out_raw:
+                    out_wav.unlink()
+                print(f"✅ Kokoro-82M synthesized {len(words)} words ({curr_time:.1f}s audio)")
+                return words
+        except Exception as e:
+            print(f"⚠️ Kokoro engine note: {e}. Falling back to Edge-TTS...")
+
+    # 2. Edge-TTS Fallback
+    edge_voice = "hi-IN-SwaraNeural" if voice_pref in ["swara", "female", "beta", "alpha"] else "hi-IN-MadhurNeural"
     try:
         import edge_tts
-        c = edge_tts.Communicate(script, voice, rate="+3%", boundary="WordBoundary")
+        print(f"🎙️ Engaging Edge-TTS Engine ({edge_voice})...")
+        c = edge_tts.Communicate(script, edge_voice, rate="+3%", boundary="WordBoundary")
         words = []
         with open(out_raw, "wb") as f:
             async for chunk in c.stream():
@@ -113,9 +189,9 @@ async def synthesize_voice_with_boundaries(script: str, voice: str, out_raw: Pat
         if out_raw.exists() and out_raw.stat().st_size > 10000 and words:
             return words
     except Exception as e:
-        print(f"⚠️ Primary TTS unavailable ({e}). Engaging high-speed Google Cloud Hindi voiceover fallback...")
+        print(f"⚠️ Edge-TTS unavailable ({e}). Engaging Google Cloud Hindi voiceover fallback...")
 
-    # High-speed reliable fallback: Google Cloud Hindi Voice
+    # 3. High-speed reliable fallback: Google Cloud Hindi Voice
     import urllib.parse
     clean_words = [w for w in re.split(r'\s+', script) if w.strip()]
     chunks = []
@@ -291,7 +367,7 @@ def render_channel_3_short(
             topic=target_topic,
             pillar_name=pillar["name"],
             lang=lang,
-            word_count_target=75,
+            word_count_target=55,
         )
         if custom_title: pkg["title"] = custom_title
 
@@ -301,20 +377,16 @@ def render_channel_3_short(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     final_video = OUTPUT_DIR / f"channel3_cosmic_{pillar_id}_{int(time.time())}.mp4"
 
-    # Select Edge-TTS voice
-    edge_voice = "hi-IN-SwaraNeural" if voice_name.lower() in ["swara", "female", "hi_female"] else "hi-IN-MadhurNeural"
-    voice_label = "Swara (Natural Documentary Female)" if "Swara" in edge_voice else "Madhur (Documentary Male)"
-
     with TemporaryDirectory() as tmp_str:
         tmp = Path(tmp_str)
 
         # 1. Voice Synthesis & Word Boundary Extraction
-        print(f"🎙️ Generating High-Fidelity Voiceover ({voice_label})...")
-        raw_tmp = tmp / "raw_edge.mp3"
+        print(f"🎙️ Generating High-Fidelity Voiceover (Voice: {voice_name})...")
+        raw_tmp = tmp / "raw_voice.mp3"
         audio_file = tmp / "voice.mp3"
 
         timed_words = asyncio.run(
-            synthesize_voice_with_boundaries(pkg["script"], edge_voice, raw_tmp)
+            synthesize_voice_with_boundaries(pkg["script"], voice_name, raw_tmp)
         )
 
         # Studio mastering chain: High pass + chest warmth + clarity + smooth broadcast compressor
@@ -483,7 +555,7 @@ if __name__ == "__main__":
     parser.add_argument("--script", type=str, nargs="?", default="")
     parser.add_argument("--script_file", type=str, nargs="?", default="")
     parser.add_argument("--script_url", type=str, nargs="?", default="")
-    parser.add_argument("--voice", type=str, nargs="?", default="swara", choices=["swara", "madhur"])
+    parser.add_argument("--voice", type=str, nargs="?", default="dynamic", choices=["dynamic", "beta", "alpha", "omega", "psi", "swara", "madhur"])
     parser.add_argument("--lang", type=str, nargs="?", default="hi", choices=["hi", "en"])
     args = parser.parse_args()
 
