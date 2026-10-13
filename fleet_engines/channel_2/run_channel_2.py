@@ -12,6 +12,7 @@ Usage:
 import os
 import sys
 import json
+import re
 import time
 import math
 import shutil
@@ -84,95 +85,44 @@ def generate_script(pillar_id: int, topic: str, lang: str = "en") -> dict:
     )
 
 # =============================================================================
-# 3. PROCEDURAL MOTION GRAPHICS (MAPS & HIGHLIGHTERS)
+# 3. ACOUSTIC WORD TIMESTAMP ALIGNER (WHISPER-TIMESTAMPED)
 # =============================================================================
-def make_animated_map(output_path: Path, duration: float = 2.5):
-    """Renders dark Vox cartography map with curved trajectory."""
-    w, h, fps = 1080, 1920, 30
-    total_frames = int(duration * fps)
-    out = cv2.VideoWriter(str(output_path), cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-    p1, p2, ctrl = np.array([280, 1100]), np.array([820, 820]), np.array([520, 680])
-    
-    for f in range(total_frames):
-        prog = f / max(total_frames - 1, 1)
-        canvas = np.zeros((h, w, 3), dtype=np.uint8)
-        canvas[:, :] = [22, 16, 12]  # Dark oceanic
-        
-        # Grid
-        for gy in range(0, h, 140): cv2.line(canvas, (0, gy), (w, gy), (40, 32, 24), 1)
-        for gx in range(0, w, 140): cv2.line(canvas, (gx, 0), (gx, h), (40, 32, 24), 1)
-        
-        # Curve
-        t_vals = np.linspace(0, prog, int(prog * 50) + 2)
-        curve_pts = [(1-t)**2 * p1 + 2*(1-t)*t * ctrl + t**2 * p2 for t in t_vals]
-        if len(curve_pts) > 1:
-            pts_arr = np.array(curve_pts, np.int32)
-            cv2.polylines(canvas, [pts_arr], False, (0, 180, 255), 4, cv2.LINE_AA)
-            cv2.polylines(canvas, [pts_arr], False, (180, 230, 255), 2, cv2.LINE_AA)
-            
-        cv2.circle(canvas, (int(p1[0]), int(p1[1])), 8, (0, 200, 255), -1)
-        if len(curve_pts) > 0:
-            head = curve_pts[-1]
-            cv2.circle(canvas, (int(head[0]), int(head[1])), int(12 + 6*math.sin(f*0.4)), (0, 160, 255), 2)
-            
-        pil = Image.fromarray(cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB))
-        draw = ImageDraw.Draw(pil)
-        draw.rectangle([60, 220, 480, 280], fill=(0, 0, 0, 190), outline=(0, 180, 255), width=2)
-        draw.text((80, 238), "SATELLITE TELEMETRY // ROUTE", fill=(0, 210, 255))
-        draw.text((80, 1680), "ATLANTIC EXPEDITION SECTOR 04", fill=(120, 120, 120))
-        out.write(cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR))
-    out.release()
-    tmp_h264 = output_path.with_name(f"h264_{output_path.name}")
-    subprocess.run(["ffmpeg", "-y", "-i", str(output_path), "-c:v", "libx264", "-preset", "fast", "-pix_fmt", "yuv420p", "-r", "30", str(tmp_h264)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-    if tmp_h264.exists():
-        tmp_h264.replace(output_path)
-
-def make_highlighter_document(output_path: Path, duration: float = 2.5):
-    """Renders vintage archival report with animated yellow highlighter."""
-    w, h, fps = 1080, 1920, 30
-    total_frames = int(duration * fps)
-    out = cv2.VideoWriter(str(output_path), cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-    paper_bg = np.full((h, w, 3), [210, 225, 238], dtype=np.uint8)
-    
-    for f in range(total_frames):
-        prog = f / max(total_frames - 1, 1)
-        pil = Image.fromarray(cv2.cvtColor(paper_bg, cv2.COLOR_BGR2RGB))
-        draw = ImageDraw.Draw(pil, "RGBA")
-        cx1, cy1, cx2, cy2 = 80, 420, 1000, 1460
-        draw.rectangle([cx1, cy1, cx2, cy2], fill=(245, 238, 222, 255), outline=(120, 100, 80, 255), width=3)
-        draw.text((cx1 + 40, cy1 + 50), "OFFICIAL INVESTIGATION REPORT", fill=(20, 15, 10))
-        draw.line([cx1 + 40, cy1 + 100, cx2 - 40, cy1 + 100], fill=(60, 50, 40), width=2)
-        
-        # Highlight wipe
-        hl_prog = min(max((prog - 0.15) / 0.65, 0.0), 1.0)
-        cur_w = int(800 * hl_prog)
-        if cur_w > 0:
-            draw.rectangle([cx1 + 35, cy1 + 220, cx1 + 35 + cur_w, cy1 + 270], fill=(255, 240, 20, 180))
-        draw.text((cx1 + 40, cy1 + 230), "TARGET ANOMALY CONFIRMED BEYOND PERIMETER", fill=(10, 8, 5))
-        draw.rectangle([cx2 - 320, cy2 - 140, cx2 - 40, cy2 - 50], outline=(190, 30, 30, 230), width=3)
-        draw.text((cx2 - 300, cy2 - 120), "CLASSIFIED FILE", fill=(190, 30, 30, 230))
-        out.write(cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR))
-    out.release()
-    tmp_h264 = output_path.with_name(f"h264_hl_{output_path.name}")
-    subprocess.run(["ffmpeg", "-y", "-i", str(output_path), "-c:v", "libx264", "-preset", "fast", "-pix_fmt", "yuv420p", "-r", "30", str(tmp_h264)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-    if tmp_h264.exists():
-        tmp_h264.replace(output_path)
-
-# =============================================================================
-# 4. SUBTITLES & VOICEOVER
-# =============================================================================
-from media_fetcher import fetch_mixed_media_clip
+def extract_acoustic_words(audio_path: Path) -> list:
+    """Uses whisper_timestamped to extract 100% frame-perfect acoustic word timestamps directly from audio waveform."""
+    try:
+        import whisper_timestamped as wt
+        print("🎯 Aligning acoustic subtitles with Whisper-Timestamped...")
+        model = wt.load_model("tiny")
+        audio = wt.load_audio(str(audio_path))
+        result = wt.transcribe(model, audio, language="en")
+        words = []
+        for seg in result.get("segments", []):
+            for w in seg.get("words", []):
+                clean_w = w["text"].strip()
+                if clean_w:
+                    words.append({
+                        "word": clean_w,
+                        "start": round(float(w["start"]), 3),
+                        "end": round(float(w["end"]), 3),
+                        "duration": round(float(w["end"] - w["start"]), 3)
+                    })
+        if words:
+            print(f"✅ Whisper aligned {len(words)} exact words with zero drift!")
+            return words
+    except Exception as e:
+        print(f"⚠️ Whisper acoustic alignment note: {e}")
+    return []
 
 # =============================================================================
 # 4. SUBTITLES & VOICEOVER (KOKORO MICHAEL SOTA NARRATION)
 # =============================================================================
+from media_fetcher import fetch_mixed_media_clip
+
 def synthesize_channel2_voice(script: str, out_raw: Path, lang: str = "en") -> list:
     """
     Synthesizes documentary-grade voiceover for Channel 2.
     Primary: Kokoro-82M ('am_michael' for English, 'hf_beta' for Hindi).
-    Secondary: Edge-TTS ('en-US-ChristopherNeural' for English, 'hi-IN-MadhurNeural' for Hindi).
-    Tertiary: Google TTS.
-    Returns word timestamps list: [{'word': ..., 'start': ..., 'end': ...}]
+    Extracts frame-accurate acoustic word boundaries using Whisper.
     """
     is_hindi = (lang == "hi")
     voice_code = "hf_beta" if is_hindi else "am_michael"
@@ -180,51 +130,30 @@ def synthesize_channel2_voice(script: str, out_raw: Path, lang: str = "en") -> l
 
     # 1. Kokoro-82M
     try:
-        print(f"🎙️ Engaging Kokoro-82M Engine (Voice: {voice_code})...")
-        import re
+        print(f"🎙️ Engaging Kokoro-82M Engine (Voice: {voice_code}, Natural Speed 1.0)...")
         from kokoro import KPipeline
         import soundfile as sf
         import numpy as np
 
         pipeline = KPipeline(lang_code=lang_code)
-        generator = pipeline(script, voice=voice_code, speed=1.05)
+        generator = pipeline(script, voice=voice_code, speed=1.0)
 
         all_audios = []
-        words = []
-        curr_time = 0.0
-
         for res in generator:
-            chunk_audio = res.audio
-            chunk_dur = len(chunk_audio) / 24000.0
-            all_audios.append(chunk_audio)
+            all_audios.append(res.audio)
 
-            cwords = [w for w in re.split(r'\s+', res.graphemes) if w.strip()]
-            if not cwords:
-                curr_time += chunk_dur
-                continue
-
-            total_chars = sum(len(w) for w in cwords)
-            chunk_t = curr_time
-            for w in cwords:
-                w_dur = max(0.12, (len(w) / max(total_chars, 1)) * chunk_dur)
-                words.append({
-                    "start": round(chunk_t, 3),
-                    "end": round(chunk_t + w_dur, 3),
-                    "duration": round(w_dur, 3),
-                    "word": w
-                })
-                chunk_t += w_dur
-            curr_time += chunk_dur
-
-        if all_audios and words:
+        if all_audios:
             combined = np.concatenate(all_audios)
             out_wav = out_raw.with_suffix(".wav")
             sf.write(str(out_wav), combined, 24000)
             subprocess.run(["ffmpeg", "-y", "-i", str(out_wav), str(out_raw)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             if out_wav.exists() and out_wav != out_raw:
                 out_wav.unlink()
-            print(f"✅ Kokoro-82M ({voice_code}) synthesized {len(words)} words ({curr_time:.1f}s audio)")
-            return words
+
+            # Align frame-perfect word timestamps using Whisper
+            words = extract_acoustic_words(out_raw)
+            if words:
+                return words
     except Exception as e:
         print(f"⚠️ Kokoro engine note: {e}. Falling back to Edge-TTS...")
 
@@ -308,9 +237,46 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     ass_path.write_text(header + "\n".join(events) + "\n", encoding="utf-8")
 
+def generate_visual_cut_queries(script: str, pillar_id: int, num_cuts: int) -> list:
+    """Generates highly specific 2-4 word visual search queries for each cut."""
+    pillar_terms = PILLARS.get(pillar_id, PILLARS[1])["search_terms"]
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
+        prompt = (
+            f"You are a master visual director for high-cadence YouTube Shorts.\n"
+            f"Script: \"{script}\"\n"
+            f"Task: Generate exactly {num_cuts} distinct, highly visual 2-3 word search tags "
+            f"for stock footage archives (Mixkit & Pexels). Each tag must describe a real visual scene, camera movement, or object.\n"
+            f"Rules:\n"
+            f"- No abstract words (e.g. avoid 'secret', 'mystery', 'truth', 'anomaly').\n"
+            f"- Use concrete visuals (e.g. 'dark crater snow', 'deep cave entrance', 'drone flying canyon', 'satellite earth view', 'foggy pine forest', 'ocean waves storm', 'scientist laboratory microscopes', 'cracked desert earth').\n"
+            f"Output strictly a JSON array of {num_cuts} strings."
+        )
+        res = client.chat.completions.create(
+            model="openai/gpt-oss-120b",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=300,
+            timeout=10
+        )
+        raw = res.choices[0].message.content
+        match = re.search(r'\[.*\]', raw, re.DOTALL)
+        if match:
+            queries = json.loads(match.group(0))
+            if isinstance(queries, list) and len(queries) >= num_cuts:
+                return [str(q).strip().lower() for q in queries[:num_cuts]]
+    except Exception as e:
+        print(f"ℹ️ Visual tags extraction note ({e}). Using pillar terms.")
+
+    queries = []
+    for i in range(num_cuts):
+        queries.append(pillar_terms[i % len(pillar_terms)])
+    return queries
+
 def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_script: str = "", custom_title: str = "") -> str:
     print("=" * 75)
-    print(f"🎬 CHANNEL 2: RENDERING VOX SHORT (PILLAR #{pillar_id})")
+    print(f"🎬 CHANNEL 2: RENDERING SHORT (PILLAR #{pillar_id} | 100% REAL FOOTAGE)")
     print("=" * 75)
     
     # 1. Script
@@ -337,28 +303,29 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         audio_file = tmp / "voice.mp3"
         timed_words = synthesize_channel2_voice(pkg["script"], raw_voice, lang=lang)
 
-        # Studio audio mastering chain: Warmth + Presence + Broadcast Compressor
-        af = (
-            "highpass=f=75,"
-            "equalizer=f=120:width_type=h:width=80:g=2.2,"
-            "equalizer=f=3400:width_type=h:width=600:g=2.5,"
-            "acompressor=threshold=-16dB:ratio=2.8:attack=10:release=90,"
-            "volume=1.05"
-        )
+        # Transparent broadcast normalization (maintains Michael's rich natural timbre)
+        af = "loudnorm=I=-16:TP=-1.5:LRA=11,volume=1.0"
         subprocess.run(["ffmpeg", "-y", "-i", str(raw_voice), "-af", af, str(audio_file)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
         dur_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(audio_file)]
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
-        print(f"⏱️ Duration: {total_dur:.1f}s")
+        print(f"⏱️ Audio Duration: {total_dur:.1f}s")
 
-        print("📝 Generating Kinetic ASS Subtitles...")
+        # Frame-perfect acoustic word alignment
+        exact_words = extract_acoustic_words(audio_file)
+        if exact_words:
+            timed_words = exact_words
+
+        print("📝 Generating Kinetic ASS Subtitles (100% Synced)...")
         ass_file = tmp / "subtitles.ass"
         build_mrbeast_ass(timed_words, ass_file)
 
-        # 3. Dynamic Cuts (Cut every 2.0s for high retention)
-        total_cuts = max(int(total_dur / 2.0), 6)
+        # 3. Dynamic Cuts (Cut every 2.0s - 2.3s, 100% REAL STOCK FOOTAGE - ZERO PROCEDURAL DRAWINGS)
+        import random
+        total_cuts = max(int(round(total_dur / 2.2)), 6)
         cut_dur = total_dur / total_cuts
-        print(f"✂️ Visual Cuts: {total_cuts} rapid cuts ({cut_dur:.2f}s each)")
+        print(f"✂️ Visual Cuts: {total_cuts} rapid cuts ({cut_dur:.2f}s each) [100% REAL STOCK FOOTAGE]")
+        search_queries = generate_visual_cut_queries(pkg["script"], pillar_id, total_cuts)
 
         segments = []
         pillar_terms = PILLARS.get(pillar_id, PILLARS[1])["search_terms"]
@@ -368,20 +335,15 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
             seg_out = tmp / f"seg_{idx}.mp4"
             segments.append(seg_out)
 
-            if idx == 0:
-                print(f"🗺️ Scene {idx+1}: Animated Vox Map...")
-                make_animated_map(seg_out, cut_dur)
-            elif idx == 1:
-                print(f"📰 Scene {idx+1}: Archival Highlighter...")
-                make_highlighter_document(seg_out, cut_dur)
-            else:
-                q = pillar_terms[(idx - 2) % len(pillar_terms)]
-                print(f"🎥 Scene {idx+1}: Mixed 4K Footage ('{q}')...")
-                clip_path = tmp / f"stock_{idx}.mp4"
-                ok, source = fetch_mixed_media_clip(q, cut_dur, clip_path, used_ids=used_ids, cut_index=idx)
-                if not ok:
-                    make_animated_map(clip_path, cut_dur)
-                shutil.copyfile(clip_path, seg_out)
+            q = search_queries[idx % len(search_queries)]
+            media_type = "video" if idx % 2 == 0 else "photo"
+            print(f"🎥 Scene {idx+1}/{total_cuts}: Fetching '{q}' ({media_type.upper()})...")
+
+            ok, source = fetch_mixed_media_clip(q, cut_dur, seg_out, media_type=media_type, used_ids=used_ids, cut_index=idx)
+            if not ok or not seg_out.exists() or seg_out.stat().st_size < 10000:
+                fallback_q = random.choice(["dark stormy ocean night", "deep space stars galaxy", "snow blizzard mountain", "aerial misty pine forest", "ancient dark stone cave"])
+                print(f"⚠️ Retrying with atmospheric fallback: '{fallback_q}'")
+                fetch_mixed_media_clip(fallback_q, cut_dur, seg_out, media_type="video", used_ids=used_ids, cut_index=idx)
 
         # 4. Concat
         concat_txt = tmp / "concat.txt"

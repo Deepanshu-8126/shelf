@@ -135,29 +135,55 @@ def _fetch_pixabay(query: str, is_video: bool, out_path: Path, used_ids: set) ->
 
 
 def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> bool:
-    """Live crawler for Mixkit free cinematic HD stock footage."""
+    """Live crawler for Mixkit free cinematic HD stock footage (Priority #1)."""
     if not is_video:
         return False
     try:
+        q_lower = query.lower()
+        candidates = []
+
+        # 1. Semantic category shortcuts
+        category_map = [
+            (r"cave|underground|tunnel|crater|hole", "cave"),
+            (r"snow|ice|permafrost|arctic|frost|blizzard", "snow"),
+            (r"ocean|sea|water|wave|underwater|beach", "ocean"),
+            (r"space|galaxy|star|universe|planet|black hole", "space"),
+            (r"dark|night|shadow|mystery|creepy|fog|mist", "night"),
+            (r"forest|tree|jungle|wood|rainforest", "forest"),
+            (r"storm|lightning|rain|wind|thunder", "storm"),
+            (r"aerial|drone|clouds|sky|airplane", "aerial"),
+            (r"city|building|street|traffic|urban", "city"),
+            (r"fire|flame|explosion|lava|volcano", "fire"),
+            (r"nature|landscape|mountain|river", "nature"),
+            (r"tech|computer|data|server|screen", "technology")
+        ]
+        for pattern, slug in category_map:
+            if re.search(pattern, q_lower):
+                candidates.append(slug)
+                break
+
+        # 2. Query words
         words = [w.lower().strip() for w in re.findall(r'[a-zA-Z]+', query) if len(w) > 2]
-        stopwords = {"dark", "rough", "glowing", "deep", "outer", "fast", "massive", "blazing", "bright", "extreme", "violent"}
+        stopwords = {"dark", "rough", "glowing", "deep", "outer", "fast", "massive", "blazing", "bright", "extreme", "violent", "the", "and"}
         keywords = [w for w in words if w not in stopwords] or words
 
-        candidates = []
         if len(keywords) >= 2:
             candidates.append(f"{keywords[0]}-{keywords[1]}")
-        if keywords:
-            candidates.append(keywords[0])
-            if len(keywords) > 1:
-                candidates.append(keywords[1])
+        for kw in keywords[:3]:
+            if kw not in candidates:
+                candidates.append(kw)
+
+        # Fallback category
+        if "nature" not in candidates:
+            candidates.append("nature")
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
 
-        for slug in candidates[:2]:
+        for slug in candidates[:4]:
             url = f"https://mixkit.co/free-stock-video/{slug}/"
-            r = SESSION.get(url, headers=headers, timeout=5)
+            r = SESSION.get(url, headers=headers, timeout=6)
             if r.status_code != 200:
                 continue
 
@@ -170,7 +196,7 @@ def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
                 if uid in used_ids:
                     continue
 
-                for res in ["720", "360"]:
+                for res in ["1080", "720", "360"]:
                     cdn_url = f"https://assets.mixkit.co/videos/{vid_id}/{vid_id}-{res}.mp4"
                     if _download_stream(cdn_url, out_path, min_bytes=30000, headers=headers):
                         used_ids.add(uid)
