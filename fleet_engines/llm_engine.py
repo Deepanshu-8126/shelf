@@ -70,7 +70,7 @@ def llm_complete(
     prompt: str = "",
     system: str = "",
     temp: float = 0.72,
-    max_tokens: int = 2048,
+    max_tokens: int = 600,
     conversation: Optional[List[Dict]] = None,
     remove_nl: bool = True,
 ) -> str:
@@ -115,7 +115,7 @@ def llm_json(
     prompt: str = "",
     system: str = "",
     temp: float = 0.72,
-    max_tokens: int = 2048,
+    max_tokens: int = 450,
     conversation: Optional[List[Dict]] = None,
     fallback: Optional[Dict] = None,
 ) -> Dict:
@@ -466,13 +466,13 @@ _COSMIC_SYSTEM = (
     "BANNED WORDS — never use: घूर्णन, अस्थिर, ध्वनि, चक्र, संचार, अस्तित्व, प्रकोप, तटवर्ती, "
     "ज्वार-भाटा, अदृश्य, मनुष्य, मानव, अराजकता, लाइक, शेयर, सब्सक्राइब.\n"
     "USE INSTEAD: घूमने की रफ़्तार, बेकाबू, आवाज़, तबाही, सुनामी, गायब, इंसान, लोग, तेज़ हवाएं, दिन-रात.\n\n"
-    "LENGTH: Exactly 65 to 75 words in Devanagari script. Output strict JSON: title, hook, script, cta.\n\n"
-    "GOLD STANDARD — clone this exact cadence and logic depth:\n"
+    "LENGTH: Exactly 40 to 45 words in Devanagari script. Output strict JSON: title, hook, script, cta.\n\n"
+    "GOLD STANDARD — clone this exact 42-word cadence and logic depth:\n"
     "{\n"
-    "  \"title\": \"अगर चाँद गायब हो जाए? #shorts\",\n"
-    "  \"hook\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो क्या होगा?\",\n"
-    "  \"script\": \"अगर आज रात अचानक आसमान से चाँद गायब हो जाए, तो सबसे पहला झटका समंदर को लगेगा—पानी बेकाबू होकर किनारों पर चढ़ जाएगा। लेकिन सबसे बड़ा सच ये है: चाँद हमारी धरती के घूमने की रफ़्तार को कंट्रोल करता है। चाँद हटते ही धरती इतनी तेज़ घूमने लगेगी कि हमारा 24 घंटे का दिन सिर्फ 6 से 8 घंटे का रह जाएगा! 400 किलोमीटर की तूफानी हवाएं चलेंगी और मौसम हमेशा के लिए पागल हो जाएगा। क्या इंसान ऐसी दुनिया में कभी ज़िंदा रह पाएगा?\",\n"
-    "  \"cta\": \"क्या इंसान 6 घंटे के दिन-रात में जिंदा रह पाएगा? नीचे कमेंट में बताओ।\"\n"
+    "  \"title\": \"अगर चाँद अचानक गायब हो जाए? #shorts\",\n"
+    "  \"hook\": \"अगर आज रात चाँद अचानक गायब हो जाए, तो क्या होगा?\",\n"
+    "  \"script\": \"अगर आज रात अचानक चाँद गायब हो जाए, तो समंदर में 100 मीटर ऊंची सुनामी आएगी! धरती इतनी तेज़ घूमने लगेगी कि दिन सिर्फ 6 घंटे का रह जाएगा, और 400 की स्पीड से बर्फीली हवाएं चलेंगी। क्या इंसान ऐसी तबाही में बच पाएगा? कमेंट में बताओ!\",\n"
+    "  \"cta\": \"क्या इंसान 6 घंटे के दिन में जिंदा रह पाएगा? कमेंट में बताओ!\"\n"
     "}"
 )
 
@@ -481,7 +481,7 @@ def generate_channel3_script(
     topic: str,
     pillar_name: str = "Cosmic What-If & Dark Science",
     lang: str = "hi",
-    word_count_target: int = 72,
+    word_count_target: int = 42,
 ) -> Dict[str, str]:
     """
     Generates {title, hook, script, cta, lang} for Channel 3 using
@@ -504,11 +504,11 @@ def generate_channel3_script(
     user_prompt = (
         f"Topic: {topic}\n"
         f"Niche: {pillar_name}\n"
-        f"Target Length: Exactly {word_count_target} to {word_count_target + 8} words in spoken Devanagari Hindi.\n\n"
+        f"Target Length: Exactly {word_count_target} to {word_count_target + 5} words in spoken Devanagari Hindi.\n\n"
         "Output strictly valid JSON:\n"
         '{"title": "Viral 5-word title with #shorts", '
         '"hook": "Opening 0-3 second hook sentence", '
-        '"script": "Full continuous spoken script in natural Devanagari Hindi", '
+        '"script": "Full continuous spoken script in natural Devanagari Hindi (ending with a CTA debate question)", '
         '"cta": "Closing provocative debate question"}'
     )
 
@@ -516,12 +516,11 @@ def generate_channel3_script(
         "title": f"अगर {topic} सच हो जाए? #shorts",
         "hook": f"अगर आज रात अचानक {topic}, तो सबसे पहला झटका धरती को लगेगा!",
         "script": (
-            f"अगर आज रात अचानक {topic}, तो सबसे पहला झटका धरती को लगेगा। "
-            "धरती 400 किलोमीटर प्रति घंटा की रफ्तार से घूमने लगेगी, 6 घंटे में दिन-रात का हिसाब बेकाबू हो जाएगा और समंदर में 100 मीटर ऊंची लहरें उठेंगी। "
-            "टेम्परेचर माइनस 50 डिग्री तक गिर जाएगा और चारों तरफ बर्फ जमने लगेगी। "
-            "और सबसे डरावनी बात: चाँद की ग्रैविटी ही धरती को सीधा रखती थी—बिना उसके धरती झुक जाएगी और हमेशा के लिए अंधेरा छा जाएगा!"
+            f"अगर आज रात अचानक {topic}, तो धरती 400 की रफ्तार से घूमने लगेगी! "
+            "दिन सिर्फ 6 घंटे का रह जाएगा, समंदर में विशाल सुनामी आएगी और बर्फीला अंधेरा छा जाएगा। "
+            "क्या इंसान ऐसी तबाही से कभी बच पाएगा? अपनी राय कमेंट में बताओ!"
         ),
-        "cta": "क्या लगता है, इंसान कभी ऐसी तबाही से बच पाएगा? अपनी राय नीचे बताओ।",
+        "cta": "क्या इंसान कभी ऐसी तबाही से बच पाएगा? नीचे कमेंट में बताओ!",
     }
 
     data = llm_json(

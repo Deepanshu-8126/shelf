@@ -12,6 +12,11 @@ Features:
 import os
 import re
 import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import json
 import random
 import requests
@@ -96,7 +101,8 @@ def _fetch_pexels(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
                     p_id = f"pex_p_{p.get('id')}"
                     if p_id in used_ids: continue
                     src = p.get("src", {})
-                    link = src.get("large2x") or src.get("large") or src.get("original")
+                    # Prefer true 4K uncompressed original camera resolution
+                    link = src.get("original") or src.get("large2x") or src.get("large")
                     if link and _download_stream(link, out_path, min_bytes=10000):
                         used_ids.add(p_id)
                         return True
@@ -115,7 +121,8 @@ def _fetch_pixabay(query: str, is_video: bool, out_path: Path, used_ids: set) ->
                     vid_id = f"pix_v_{h.get('id')}"
                     if vid_id in used_ids: continue
                     streams = h.get("videos", {})
-                    stream = streams.get("medium") or streams.get("large") or streams.get("small")
+                    # Prefer crisp large/HD streams first
+                    stream = streams.get("large") or streams.get("medium") or streams.get("small")
                     if stream and stream.get("url") and _download_stream(stream["url"], out_path, min_bytes=40000):
                         used_ids.add(vid_id)
                         return True
@@ -125,7 +132,8 @@ def _fetch_pixabay(query: str, is_video: bool, out_path: Path, used_ids: set) ->
                 for h in r.json().get("hits", []):
                     p_id = f"pix_p_{h.get('id')}"
                     if p_id in used_ids: continue
-                    link = h.get("largeImageURL") or h.get("webformatURL")
+                    # Prefer fullHD / original photo resolution
+                    link = h.get("fullHDURL") or h.get("imageURL") or h.get("largeImageURL") or h.get("webformatURL")
                     if link and _download_stream(link, out_path, min_bytes=10000):
                         used_ids.add(p_id)
                         return True
@@ -142,20 +150,25 @@ def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
         q_lower = query.lower()
         candidates = []
 
-        # 1. Semantic category shortcuts
+        # 1. Semantic category shortcuts (Mixkit high-yield slugs)
         category_map = [
+            (r"moon|lunar", "moon"),
+            (r"earth|globe", "earth"),
+            (r"stars|star|nebula|constellation", "stars"),
+            (r"space|galaxy|universe|planet|black hole|astronomy|cosmic|mars", "space"),
+            (r"sun|solar|sunrise|sunset", "sun"),
+            (r"ocean|sea|wave|waves|underwater|beach|marine", "ocean"),
+            (r"snow|ice|permafrost|arctic|frost|blizzard|winter|cold", "snow"),
+            (r"storm|lightning|rain|wind|thunder|tornado|cyclone", "storm"),
+            (r"dark|night|shadow|mystery|creepy|fog|mist|black", "night"),
             (r"cave|underground|tunnel|crater|hole", "cave"),
-            (r"snow|ice|permafrost|arctic|frost|blizzard", "snow"),
-            (r"ocean|sea|water|wave|underwater|beach", "ocean"),
-            (r"space|galaxy|star|universe|planet|black hole", "space"),
-            (r"dark|night|shadow|mystery|creepy|fog|mist", "night"),
-            (r"forest|tree|jungle|wood|rainforest", "forest"),
-            (r"storm|lightning|rain|wind|thunder", "storm"),
-            (r"aerial|drone|clouds|sky|airplane", "aerial"),
-            (r"city|building|street|traffic|urban", "city"),
-            (r"fire|flame|explosion|lava|volcano", "fire"),
-            (r"nature|landscape|mountain|river", "nature"),
-            (r"tech|computer|data|server|screen", "technology")
+            (r"forest|tree|jungle|wood|rainforest|leaves", "forest"),
+            (r"aerial|drone|clouds|sky|airplane|flying", "aerial"),
+            (r"city|building|street|traffic|urban|crowd", "city"),
+            (r"fire|flame|explosion|lava|volcano|burning", "fire"),
+            (r"water|river|lake|waterfall|splash", "water"),
+            (r"tech|computer|data|server|screen|cyber", "technology"),
+            (r"nature|landscape|mountain|desert", "nature"),
         ]
         for pattern, slug in category_map:
             if re.search(pattern, q_lower):
@@ -207,38 +220,61 @@ def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
 
 
 def fetch_mixed_media_clip(query: str, target_dur: float, out_video_path: Path, media_type: str = "video", used_ids: set = None, cut_index: int = 0) -> Tuple[bool, str]:
-    """Fetches unique stock footage/photos and returns a ready-to-concat 1080x1920 clip."""
+    """
+    Fetches unique stock assets with strict hierarchy:
+    1. PRIORITY #1: Mixkit Free Cinematic HD Video (Always tried first)
+    2. FALLBACK #1: Pexels (1080p Video -> 4K RAW Photo with Ken-Burns)
+    3. FALLBACK #2: Pixabay (HD Video -> 4K Photo)
+    """
     if used_ids is None: used_ids = set()
     raw = out_video_path.parent / f"raw_{cut_index}_{int(random.random()*10000)}"
     direction = "down" if cut_index % 2 == 0 else "up"
 
-    # Order based on media preference
-    order = [(True, "video"), (False, "photo")] if media_type == "video" else [(False, "photo"), (True, "video")]
+    # =========================================================================
+    # 1. PRIORITY #1: Mixkit Cinematic HD Stock Video
+    # =========================================================================
+    target_vid = raw.with_suffix(".mp4")
+    if _fetch_mixkit(query, True, target_vid, used_ids):
+        print(f"   🎬 [Mixkit Priority #1] Successfully downloaded cinematic HD clip for '{query}'")
+        _render_video_segment(target_vid, out_video_path, target_dur, direction)
+        try: target_vid.unlink()
+        except Exception: pass
+        return True, "video:mixkit"
 
-    for is_vid, kind in order:
-        ext = ".mp4" if is_vid else ".jpg"
-        target_file = raw.with_suffix(ext)
-        # Try Mixkit (primary for video) -> Pexels -> Pixabay
-        fetched = False
-        source = "failed"
-        if is_vid and _fetch_mixkit(query, is_vid, target_file, used_ids):
-            fetched = True
-            source = "mixkit"
-        elif _fetch_pexels(query, is_vid, target_file, used_ids):
-            fetched = True
-            source = "pexels"
-        elif _fetch_pixabay(query, is_vid, target_file, used_ids):
-            fetched = True
-            source = "pixabay"
+    # =========================================================================
+    # 2. FALLBACK: Pexels (Video -> 4K Photo)
+    # =========================================================================
+    if _fetch_pexels(query, True, target_vid, used_ids):
+        print(f"   🎥 [Pexels Fallback] Downloaded HD video for '{query}'")
+        _render_video_segment(target_vid, out_video_path, target_dur, direction)
+        try: target_vid.unlink()
+        except Exception: pass
+        return True, "video:pexels"
 
-        if fetched:
-            if is_vid:
-                _render_video_segment(target_file, out_video_path, target_dur, direction)
-            else:
-                convert_image_to_kenburns(target_file, out_video_path, target_dur, direction)
-            try: target_file.unlink()
-            except Exception: pass
-            return True, f"{kind}:{source}"
+    target_img = raw.with_suffix(".jpg")
+    if _fetch_pexels(query, False, target_img, used_ids):
+        print(f"   📸 [Pexels Fallback] Downloaded 4K photo for '{query}' (Ken-Burns dynamic pan)")
+        convert_image_to_kenburns(target_img, out_video_path, target_dur, direction)
+        try: target_img.unlink()
+        except Exception: pass
+        return True, "photo:pexels"
+
+    # =========================================================================
+    # 3. FALLBACK: Pixabay (Video -> Photo)
+    # =========================================================================
+    if _fetch_pixabay(query, True, target_vid, used_ids):
+        print(f"   🎥 [Pixabay Fallback] Downloaded video for '{query}'")
+        _render_video_segment(target_vid, out_video_path, target_dur, direction)
+        try: target_vid.unlink()
+        except Exception: pass
+        return True, "video:pixabay"
+
+    if _fetch_pixabay(query, False, target_img, used_ids):
+        print(f"   📸 [Pixabay Fallback] Downloaded photo for '{query}'")
+        convert_image_to_kenburns(target_img, out_video_path, target_dur, direction)
+        try: target_img.unlink()
+        except Exception: pass
+        return True, "photo:pixabay"
 
     return False, "failed"
 

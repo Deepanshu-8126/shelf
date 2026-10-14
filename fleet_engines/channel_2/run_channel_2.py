@@ -87,14 +87,14 @@ def generate_script(pillar_id: int, topic: str, lang: str = "en") -> dict:
 # =============================================================================
 # 3. ACOUSTIC WORD TIMESTAMP ALIGNER (WHISPER-TIMESTAMPED)
 # =============================================================================
-def extract_acoustic_words(audio_path: Path) -> list:
+def extract_acoustic_words(audio_path: Path, lang: str = "en") -> list:
     """Uses whisper_timestamped to extract 100% frame-perfect acoustic word timestamps directly from audio waveform."""
     try:
         import whisper_timestamped as wt
-        print("🎯 Aligning acoustic subtitles with Whisper-Timestamped...")
-        model = wt.load_model("tiny")
+        print(f"🎯 Aligning acoustic subtitles with Whisper-Timestamped ({lang})...")
+        model = wt.load_model("base")
         audio = wt.load_audio(str(audio_path))
-        result = wt.transcribe(model, audio, language="en")
+        result = wt.transcribe(model, audio, language=lang)
         words = []
         for seg in result.get("segments", []):
             for w in seg.get("words", []):
@@ -199,16 +199,19 @@ def synthesize_channel2_voice(script: str, out_raw: Path, lang: str = "en") -> l
         curr_t += w_dur
     return words
 
-def build_mrbeast_ass(words: list, ass_path: Path):
+def build_mrbeast_ass(words: list, ass_path: Path, lang: str = "en"):
     """Kinetic ASS subtitles: yellow highlighted active word, bold font, 8px black stroke."""
-    header = """[Script Info]
+    is_hi = (lang == "hi")
+    font_name = "Nirmala UI" if is_hi else "Impact"
+    font_size = 76 if is_hi else 78
+    header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
 PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: MrBeast,Impact,78,&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,2,0,1,8,2,2,60,60,260,1
+Style: MrBeast,{font_name},{font_size},&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,2,0,1,8,2,2,60,60,260,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -223,12 +226,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         for act_idx, w in enumerate(chunk):
             w_start, w_end = w["start"], w["end"]
             if act_idx < len(chunk) - 1:
-                next_st = chunk[act_idx+1]["start"]
-                if next_st > w_end and next_st - w_end < 0.25:
-                    w_end = next_st
+                w_end = chunk[act_idx+1]["start"]
+            else:
+                # Hold last word in chunk smoothly until next chunk or small hold
+                if i + 3 < len(words):
+                    next_chunk_start = words[i+3]["start"]
+                    w_end = max(w_end, min(w_end + 0.22, next_chunk_start))
+                else:
+                    w_end = w_end + 0.30
+            w_end = max(w_end, w_start + 0.12)
+
             parts = []
             for idx, cw in enumerate(chunk):
-                word_clean = cw["word"].strip().upper()
+                word_clean = cw["word"].strip() if is_hi else cw["word"].strip().upper()
                 if idx == act_idx:
                     parts.append(f"{{\\c&H0000FFFF&}}{word_clean}")
                 else:
@@ -280,9 +290,20 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
     print("=" * 75)
     
     # 1. Script
-    if custom_script:
+    resolved_script = custom_script.strip()
+    if not resolved_script:
+        for cand in [Path(WORKSPACE_ROOT) / "custom_script.txt", Path(__file__).parent / "custom_script.txt"]:
+            if cand.exists() and cand.stat().st_size > 10:
+                lines = [l.strip() for l in cand.read_text(encoding="utf-8", errors="replace").splitlines() if l.strip() and not l.strip().startswith("#")]
+                clean_text = " ".join(lines).strip()
+                if clean_text:
+                    print(f"📄 Auto-detected user custom script from: {cand}")
+                    resolved_script = clean_text
+                    break
+
+    if resolved_script:
         title = custom_title or (topic if topic else PILLARS.get(pillar_id, PILLARS[1])["default_topic"])
-        pkg = {"title": title, "script": custom_script}
+        pkg = {"title": title, "script": resolved_script}
         print(f"📌 Custom Title: {pkg['title']}")
         print(f"📜 Custom Script: {pkg['script']}\n")
     else:
@@ -312,13 +333,13 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         print(f"⏱️ Audio Duration: {total_dur:.1f}s")
 
         # Frame-perfect acoustic word alignment
-        exact_words = extract_acoustic_words(audio_file)
+        exact_words = extract_acoustic_words(audio_file, lang=lang)
         if exact_words:
             timed_words = exact_words
 
         print("📝 Generating Kinetic ASS Subtitles (100% Synced)...")
         ass_file = tmp / "subtitles.ass"
-        build_mrbeast_ass(timed_words, ass_file)
+        build_mrbeast_ass(timed_words, ass_file, lang=lang)
 
         # 3. Dynamic Cuts (Cut every 2.0s - 2.3s, 100% REAL STOCK FOOTAGE - ZERO PROCEDURAL DRAWINGS)
         import random

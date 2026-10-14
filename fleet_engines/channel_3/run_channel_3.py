@@ -88,6 +88,38 @@ PILLARS = {
 }
 
 
+
+# =============================================================================
+# 0. ACOUSTIC WORD ALIGNMENT (WHISPER-TIMESTAMPED FOR HINDI)
+# =============================================================================
+def extract_acoustic_words_hindi(audio_path: Path) -> list:
+    """Uses whisper_timestamped to extract frame-perfect acoustic word timestamps from Hindi audio.
+    Returns Devanagari words with exact start/end times aligned to actual speech waveform."""
+    try:
+        import whisper_timestamped as wt
+        print("🎯 Aligning acoustic subtitles with Whisper-Timestamped (Hindi)...")
+        model = wt.load_model("small")
+        audio = wt.load_audio(str(audio_path))
+        result = wt.transcribe(model, audio, language="hi")
+        words = []
+        for seg in result.get("segments", []):
+            for w in seg.get("words", []):
+                clean_w = w["text"].strip()
+                if clean_w:
+                    words.append({
+                        "word": clean_w,
+                        "start": round(float(w["start"]), 3),
+                        "end": round(float(w["end"]), 3),
+                        "duration": round(float(w["end"] - w["start"]), 3)
+                    })
+        if words:
+            print(f"✅ Whisper aligned {len(words)} Hindi words with zero drift!")
+            return words
+    except Exception as e:
+        print(f"⚠️ Whisper Hindi acoustic alignment note: {e}")
+    return []
+
+
 # =============================================================================
 # 1. PURE DEVANAGARI SUBTITLE ENGINE (ZERO WHISPER URDU HALLUCINATIONS)
 # =============================================================================
@@ -281,12 +313,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             if act_idx < len(chunk) - 1:
                 w_end = chunk[act_idx + 1]["start"]
             else:
-                hold = 0.20
                 if c_idx < len(chunks) - 1:
                     next_start = chunks[c_idx + 1][0]["start"]
-                    w_end = min(w["end"] + hold, next_start - 0.05)
+                    w_end = max(w["end"], min(w["end"] + 0.25, next_start))
                 else:
-                    w_end = w["end"] + hold
+                    w_end = w["end"] + 0.35
             w_end = max(w_end, w_start + 0.15)
 
             parts = []
@@ -327,7 +358,19 @@ def load_custom_script(script_text: str = "", script_file: str = "", script_url:
         else:
             print(f"⚠️ Script file not found: {p}")
 
-    return script_text.strip()
+    if script_text and script_text.strip():
+        return script_text.strip()
+
+    # Convenience: Auto-check for custom_script.txt or my_script.txt in channel folder or root
+    for cand in [Path(__file__).parent / "custom_script.txt", Path("custom_script.txt"), Path(WORKSPACE_ROOT) / "custom_script.txt", Path(__file__).parent / "my_script.txt"]:
+        if cand.exists() and cand.stat().st_size > 10:
+            lines = [l.strip() for l in cand.read_text(encoding="utf-8", errors="replace").splitlines() if l.strip() and not l.strip().startswith("#")]
+            clean_text = " ".join(lines).strip()
+            if clean_text:
+                print(f"📄 Auto-detected user custom script from: {cand}")
+                return clean_text
+
+    return ""
 
 
 # =============================================================================
@@ -367,7 +410,7 @@ def render_channel_3_short(
             topic=target_topic,
             pillar_name=pillar["name"],
             lang=lang,
-            word_count_target=55,
+            word_count_target=42,
         )
         if custom_title: pkg["title"] = custom_title
 
@@ -389,14 +432,8 @@ def render_channel_3_short(
             synthesize_voice_with_boundaries(pkg["script"], voice_name, raw_tmp)
         )
 
-        # Studio mastering chain: High pass + chest warmth + clarity + smooth broadcast compressor
-        af = (
-            "highpass=f=75,"
-            "equalizer=f=120:width_type=h:width=80:g=2.2,"
-            "equalizer=f=3400:width_type=h:width=600:g=2.5,"
-            "acompressor=threshold=-16dB:ratio=2.8:attack=10:release=90,"
-            "volume=1.05"
-        )
+        # Transparent EBU R128 broadcast normalization (preserves natural Kokoro Hindi timbre)
+        af = "loudnorm=I=-16:TP=-1.5:LRA=11,volume=1.0"
         subprocess.run(["ffmpeg", "-y", "-i", str(raw_tmp), "-af", af, str(audio_file)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("✅ Native Hindi Voiceover Mastered Successfully!")
 
@@ -404,7 +441,13 @@ def render_channel_3_short(
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
         print(f"⏱️ Audio Duration: {total_dur:.1f}s")
 
-        # 2. Build Clean Devanagari Kinetic Subtitles
+        # 2. Frame-perfect acoustic word alignment (fixes caption drift at end)
+        exact_words = extract_acoustic_words_hindi(audio_file)
+        if exact_words:
+            timed_words = exact_words
+            print(f"🎯 Replaced {len(exact_words)} words with acoustic-aligned timestamps")
+
+        # 3. Build Clean Devanagari Kinetic Subtitles
         print("📝 Generating Pure Devanagari Hindi Kinetic Subtitles...")
         ass_file = tmp / "subtitles.ass"
         build_pure_hindi_ass(timed_words, ass_file)
@@ -482,7 +525,9 @@ def render_channel_3_short(
         pillar_bgm_map = {
             1: "06_cosmic_deep_noise.mp3",
             2: "03_mystery_lightless_dawn.mp3",
-            3: "01_forensic_the_dread.mp3"
+            3: "01_forensic_the_dread.mp3",
+            4: "04_investigation_apprehension.mp3",
+            5: "02_psychology_echoes_of_time.mp3",
         }
         chosen_bgm = None
         target_name = pillar_bgm_map.get(pillar_id, "")
@@ -498,6 +543,7 @@ def render_channel_3_short(
         if chosen_bgm and chosen_bgm.exists():
             from dynamic_bgm_slicer import prepare_synced_bgm
             bgm_file, bgm_volume = prepare_synced_bgm(chosen_bgm, total_dur, bgm_file)
+            print(f"🎵 Using Real Studio BGM: {chosen_bgm.name} (Volume: {bgm_volume:.2f})")
         else:
             drone_cmd = [
                 "ffmpeg", "-y",
@@ -557,6 +603,9 @@ if __name__ == "__main__":
     parser.add_argument("--script_url", type=str, nargs="?", default="")
     parser.add_argument("--voice", type=str, nargs="?", default="dynamic", choices=["dynamic", "beta", "alpha", "omega", "psi", "swara", "madhur"])
     parser.add_argument("--lang", type=str, nargs="?", default="hi", choices=["hi", "en"])
+    parser.add_argument("--upload", action="store_true", help="Auto upload to YouTube Channel 3")
+    parser.add_argument("--telegram", action="store_true", default=True, help="Send video & metadata to Telegram")
+    parser.add_argument("--privacy", type=str, default="unlisted", choices=["public", "unlisted", "private"])
     args = parser.parse_args()
 
     rendered_path = render_channel_3_short(
@@ -571,7 +620,6 @@ if __name__ == "__main__":
     )
 
     if rendered_path:
-        from telegram_dispatcher import send_fleet_video_to_telegram
         p_info = PILLARS.get(args.pillar, PILLARS[1])
         raw_title = args.title.strip() if args.title else (args.topic.strip() if args.topic else p_info["default_topic"])
         clean_title = f"{raw_title} 🌌 #shorts #spacefacts"
@@ -581,11 +629,24 @@ if __name__ == "__main__":
             f"#shorts #space #cosmic #science #whatif #spacefacts #hindifacts #viral #trending"
         )
         tags = ["space", "cosmic", "whatif", "space facts", "universe", "science", "shorts", "hindi facts", "viral"]
-        print("📱 Dispatching Channel 3 Short to Telegram...")
-        send_fleet_video_to_telegram(
-            video_path=Path(rendered_path),
-            channel=3,
-            title=clean_title,
-            description=desc,
-            tags=tags
-        )
+
+        if args.upload:
+            try:
+                from channel_2.youtube_uploader import upload_short_to_youtube
+                upload_short_to_youtube(Path(rendered_path), clean_title, desc, channel=3, privacy_status=args.privacy)
+            except Exception as e:
+                print(f"⚠️ YouTube upload note: {e}")
+
+        if args.telegram:
+            try:
+                from telegram_dispatcher import send_fleet_video_to_telegram
+                print("📱 Dispatching Channel 3 Short to Telegram...")
+                send_fleet_video_to_telegram(
+                    video_path=Path(rendered_path),
+                    channel=3,
+                    title=clean_title,
+                    description=desc,
+                    tags=tags
+                )
+            except Exception as e:
+                print(f"⚠️ Telegram dispatch note: {e}")
