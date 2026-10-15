@@ -48,8 +48,8 @@ jobs:
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || 'Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT' }}
       YT_TOKEN_CH3_B64: ${{ secrets.YT_TOKEN_CH3_B64 || secrets.YT_TOKEN_B64 }}
       YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || '8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY' }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '6486771356' }}
 
     steps:
       - name: Checkout Repository

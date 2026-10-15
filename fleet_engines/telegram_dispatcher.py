@@ -28,8 +28,8 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_BOT_TOKEN = "8809830963:AAG22CFChal-D13uSkNLUmCoyHD3FGvgWjY"
 DEFAULT_CHAT_ID = "6486771356"
 
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", DEFAULT_BOT_TOKEN).strip()
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", DEFAULT_CHAT_ID).strip()
+BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN") or DEFAULT_BOT_TOKEN).strip()
+CHAT_ID = (os.getenv("TELEGRAM_CHAT_ID") or DEFAULT_CHAT_ID).strip()
 API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 
