@@ -160,7 +160,7 @@ def synthesize_channel2_voice(script: str, out_raw: Path, lang: str = "en") -> l
                 out_wav.unlink()
 
             # Align frame-perfect word timestamps using Whisper
-            words = extract_acoustic_words(out_raw)
+            words = extract_acoustic_words(out_raw, lang=lang)
             if words:
                 return words
     except Exception as e:
@@ -342,10 +342,11 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         total_dur = float(subprocess.run(dur_cmd, stdout=subprocess.PIPE, text=True).stdout.strip())
         print(f"⏱️ Audio Duration: {total_dur:.1f}s")
 
-        # Frame-perfect acoustic word alignment
-        exact_words = extract_acoustic_words(audio_file, lang=lang)
-        if exact_words:
-            timed_words = exact_words
+        # Frame-perfect acoustic word alignment (only if not already extracted by synthesizer)
+        if not timed_words:
+            exact_words = extract_acoustic_words(audio_file, lang=lang)
+            if exact_words:
+                timed_words = exact_words
 
         print("📝 Generating Kinetic ASS Subtitles (100% Synced)...")
         ass_file = tmp / "subtitles.ass"
