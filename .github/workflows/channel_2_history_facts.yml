@@ -1,0 +1,123 @@
+name: Channel 2 - History & Facts (English)
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Custom Topic / History Event (Optional - Leave blank for Auto)'
+        required: false
+        default: ''
+        type: string
+      pillar:
+        description: 'Content Pillar'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - '1' # Forbidden Places & Unsolved History
+          - '2' # Forensic & Psychology
+          - '3' # Space & Cosmic Anomalies
+          - '4' # Dark Mind Hacks
+      auto_upload:
+        description: 'Auto-Upload to YouTube? (Unlisted default)'
+        required: true
+        default: false
+        type: boolean
+      privacy:
+        description: 'Video Privacy'
+        required: true
+        default: 'unlisted'
+        type: choice
+        options:
+          - 'unlisted'
+          - 'public'
+          - 'private'
+
+  schedule:
+    # Daily at 12:00 UTC (5:30 PM IST)
+    - cron: '0 12 * * *'
+
+jobs:
+  render_channel_2:
+    name: Render Channel 2 Video
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || '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' }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || 'Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT' }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YT_TOKEN_CH2_B64: ${{ secrets.YT_TOKEN_CH2_B64 || secrets.YT_TOKEN_B64 }}
+      YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install FFmpeg & System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libass-dev libsm6 libxext6 fonts-liberation fonts-noto-core fonts-dejavu espeak-ng
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+
+      - name: Setup Original YouTube Agent Skill
+        run: |
+          mkdir -p youtube_agent_skills
+          if [ ! -d "youtube_agent_skills/youtube-agent-skill" ]; then
+            git clone https://github.com/Jakeschincariol/youtube-agent-skill.git youtube_agent_skills/youtube-agent-skill
+          fi
+
+      - name: Setup YouTube Credentials
+        run: |
+          mkdir -p credentials
+          if [ -n "$YT_TOKEN_CH2_B64" ]; then
+            printf '%s' "$YT_TOKEN_CH2_B64" | base64 -d > credentials/channel_2_token.json
+            cp credentials/channel_2_token.json credentials/token.json
+            echo "✅ Channel 2 token configured"
+          fi
+          if [ -n "$YT_CLIENT_B64" ]; then
+            printf '%s' "$YT_CLIENT_B64" | base64 -d > credentials/client_secrets.json
+            echo "✅ Client secrets configured"
+          fi
+
+      - name: Render Channel 2 Short
+        run: |
+          TOPIC="${{ github.event.inputs.topic }}"
+          PILLAR="${{ github.event.inputs.pillar || '1' }}"
+          PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
+          UPLOAD_FLAG=""
+          if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
+            UPLOAD_FLAG="--upload"
+          fi
+
+          TOPIC_ARG=""
+          if [ -n "$TOPIC" ]; then
+            TOPIC_ARG="--topic \"$TOPIC\""
+          fi
+
+          echo "🚀 Starting Channel 2 (History & Facts English)..."
+          python fleet_engines/channel_2/run_channel_2.py --pillar "$PILLAR" --lang "en" $TOPIC_ARG $UPLOAD_FLAG --privacy "$PRIVACY"
+
+      - name: Upload Video Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-2-rendered-video
+          path: |
+            fleet_engines/output/channel_2*/**/*.mp4
+            fleet_engines/output/channel_2*/**/*.json
+          retention-days: 14
+          if-no-files-found: warn
