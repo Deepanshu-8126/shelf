@@ -18,4 +18,5 @@ venv/
 .gradio/
 credentials/
 yt-automator/
-
+blender_engine/
+youtube_agent_skills/

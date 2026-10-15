@@ -11,6 +11,8 @@ Features:
 import os
 import re
 import json
+import sys
+import subprocess
 from pathlib import Path
 from typing import Dict, Any, Optional
 from openai import OpenAI
@@ -20,6 +22,47 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(WORKSPACE_ROOT / ".env")
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "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"
+
+# Paths to the EXACT original cloned youtube-agent-skill engines
+HOOKSCORE_PY = WORKSPACE_ROOT / "youtube_agent_skills" / "youtube-agent-skill" / "skills" / "yt-script" / "hookscore.py"
+TITLE_PY = WORKSPACE_ROOT / "youtube_agent_skills" / "youtube-agent-skill" / "skills" / "yt-package" / "title.py"
+
+def audit_hook_with_youtube_agent_skill(hook_text: str) -> dict:
+    """Uses original cloned hookscore.py from youtube-agent-skill without custom modifications."""
+    if not HOOKSCORE_PY.exists() or not hook_text:
+        return {"status": "skipped", "output": ""}
+    try:
+        res = subprocess.run(
+            [sys.executable, str(HOOKSCORE_PY), "--hook", hook_text],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            encoding="utf-8",
+            errors="replace"
+        )
+        return {"status": "audited", "report": res.stdout.strip()}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+def audit_title_with_youtube_agent_skill(title: str, thumb_text: str = "") -> dict:
+    """Uses original cloned title.py from youtube-agent-skill without custom modifications."""
+    if not TITLE_PY.exists() or not title:
+        return {"status": "skipped", "output": ""}
+    try:
+        args = [sys.executable, str(TITLE_PY), "--title", title]
+        if thumb_text:
+            args.extend(["--thumb", thumb_text])
+        res = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            encoding="utf-8",
+            errors="replace"
+        )
+        return {"status": "audited", "report": res.stdout.strip()}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 
 # =============================================================================
 # 1. BANNED AI CLICHES (INSTANT REJECTION FILTER)
@@ -194,6 +237,17 @@ Output strictly valid JSON with keys:
     data["hook"] = sanitize_script(data.get("hook", ""))
     data["cta"] = sanitize_script(data.get("cta", ""))
     data["lang"] = lang
+
+    # Original youtube-agent-skill QC Hook & Title validation (Zero custom code, 100% original tools)
+    hook_audit = audit_hook_with_youtube_agent_skill(data.get("hook", ""))
+    title_audit = audit_title_with_youtube_agent_skill(data.get("title", ""), thumb_text=data.get("hook", "")[:35])
+    data["hook_audit"] = hook_audit
+    data["title_audit"] = title_audit
+    if hook_audit.get("report"):
+        print(f"\n🎯 [youtube-agent-skill Original Hookscore Audit]:\n{hook_audit['report']}\n")
+    if title_audit.get("report"):
+        print(f"📦 [youtube-agent-skill Original Title Linter]:\n{title_audit['report']}\n")
+
     return data
 
 if __name__ == "__main__":

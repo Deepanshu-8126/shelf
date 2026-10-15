@@ -89,6 +89,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
+      - name: Setup Original YouTube Agent Skill
+        run: |
+          mkdir -p youtube_agent_skills
+          if [ ! -d "youtube_agent_skills/youtube-agent-skill" ]; then
+            git clone https://github.com/Jakeschincariol/youtube-agent-skill.git youtube_agent_skills/youtube-agent-skill
+          fi
+
       - name: Setup Multi-Channel YouTube Credentials from GitHub Secrets
         run: |
           mkdir -p credentials
