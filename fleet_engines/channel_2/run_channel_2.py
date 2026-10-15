@@ -74,14 +74,16 @@ from universal_humanized_writer import generate_humanized_script
 # =============================================================================
 # 2. SCRIPT GENERATOR (UNIVERSAL HUMANIZED STORYTELLER)
 # =============================================================================
-def generate_script(pillar_id: int, topic: str, lang: str = "en") -> dict:
+def generate_script(pillar_id: int, topic: str, lang: str = "en", target_duration: int = 70) -> dict:
     pillar = PILLARS.get(pillar_id, PILLARS[1])
     target_topic = topic or pillar["default_topic"]
+    # 60-90s spoken script needs ~140-170 words
+    word_count = max(int(target_duration * 2.1), 60)
     return generate_humanized_script(
         topic=target_topic,
         niche_context=pillar["name"],
         lang=lang,
-        word_count_target=55
+        word_count_target=word_count
     )
 
 # =============================================================================
@@ -264,7 +266,7 @@ def generate_visual_cut_queries(script: str, pillar_id: int, num_cuts: int) -> l
             f"Output strictly a JSON array of {num_cuts} strings."
         )
         res = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="qwen/qwen3.8-27b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=300,
@@ -284,7 +286,7 @@ def generate_visual_cut_queries(script: str, pillar_id: int, num_cuts: int) -> l
         queries.append(pillar_terms[i % len(pillar_terms)])
     return queries
 
-def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_script: str = "", custom_title: str = "") -> str:
+def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_script: str = "", custom_title: str = "", target_duration: int = 75) -> str:
     print("=" * 75)
     print(f"🎬 CHANNEL 2: RENDERING SHORT (PILLAR #{pillar_id} | 100% REAL FOOTAGE)")
     print("=" * 75)
@@ -307,7 +309,7 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         print(f"📌 Custom Title: {pkg['title']}")
         print(f"📜 Custom Script: {pkg['script']}\n")
     else:
-        pkg = generate_script(pillar_id, topic, lang)
+        pkg = generate_script(pillar_id, topic, lang, target_duration=target_duration)
         if custom_title:
             pkg["title"] = custom_title
         print(f"📌 Title: {pkg['title']}")
@@ -341,11 +343,11 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
         ass_file = tmp / "subtitles.ass"
         build_mrbeast_ass(timed_words, ass_file, lang=lang)
 
-        # 3. Dynamic Cuts (Cut every 2.0s - 2.3s, 100% REAL STOCK FOOTAGE - ZERO PROCEDURAL DRAWINGS)
+        # 3. Dynamic Cuts (Smooth cinematic pacing: 3.0s - 3.5s per shot, 100% REAL STOCK FOOTAGE)
         import random
-        total_cuts = max(int(round(total_dur / 2.2)), 6)
+        total_cuts = max(int(round(total_dur / 3.2)), 6)
         cut_dur = total_dur / total_cuts
-        print(f"✂️ Visual Cuts: {total_cuts} rapid cuts ({cut_dur:.2f}s each) [100% REAL STOCK FOOTAGE]")
+        print(f"✂️ Visual Cuts: {total_cuts} cinematic cuts ({cut_dur:.2f}s each) [100% REAL STOCK FOOTAGE]")
         search_queries = generate_visual_cut_queries(pkg["script"], pillar_id, total_cuts)
 
         segments = []
@@ -438,6 +440,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Unified Channel 2 Engine")
     parser.add_argument("--pillar", type=int, default=1, choices=[1, 2, 3, 4])
     parser.add_argument("--topic", type=str, default="")
+    parser.add_argument("--duration", type=int, default=75, help="Target duration in seconds (e.g. 60-90s)")
     parser.add_argument("--title", type=str, default="", help="Custom Title override")
     parser.add_argument("--script", type=str, default="", help="Custom Script text override")
     parser.add_argument("--lang", type=str, default="en", choices=["en", "hi"])
@@ -451,18 +454,29 @@ if __name__ == "__main__":
         topic=args.topic,
         lang=args.lang,
         custom_script=args.script,
-        custom_title=args.title
+        custom_title=args.title,
+        target_duration=args.duration
     )
     
     yt_url = None
     raw_title = args.title.strip() if args.title else (args.topic.strip() if args.topic else f"Duniya Ka Sabse Bada Rahasya")
-    title = f"{raw_title} 😱 #shorts #mystery"
-    desc = (
-        f"🕵️ {raw_title}\n\n"
-        f"Kya aapko is anokhi ghatna ka sach pata tha? Apni raye comment me zaroor batayein! 👇\n\n"
-        f"#shorts #mystery #unsolved #facts #amazingfacts #hindifacts #sciencefacts #viral #trending #youtubeshorts"
-    )
-    tags = ["mystery", "unsolved", "facts", "amazing facts", "hindi facts", "science facts", "shorts", "viral shorts", "trending"]
+    
+    if args.lang == "en":
+        title = f"{raw_title} ⚓ #shorts #history #mystery"
+        desc = (
+            f"⚓ {raw_title}\n\n"
+            f"What do you think really happened? Share your theory in the comments below! 👇\n\n"
+            f"#shorts #history #mystery #titanic #unsolved #documentary #facts #historyfacts #viral"
+        )
+        tags = ["titanic", "mystery", "history", "unsolved", "facts", "documentary", "history facts", "shorts", "viral"]
+    else:
+        title = f"{raw_title} 😱 #shorts #mystery"
+        desc = (
+            f"🕵️ {raw_title}\n\n"
+            f"Kya aapko is anokhi ghatna ka sach pata tha? Apni raye comment me zaroor batayein! 👇\n\n"
+            f"#shorts #mystery #unsolved #facts #amazingfacts #hindifacts #sciencefacts #viral #trending #youtubeshorts"
+        )
+        tags = ["mystery", "unsolved", "facts", "amazing facts", "hindi facts", "science facts", "shorts", "viral shorts", "trending"]
     
     if args.upload and rendered_path:
         try:

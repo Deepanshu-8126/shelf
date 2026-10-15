@@ -18,6 +18,11 @@ on:
           - '2' # Forensic & Psychology
           - '3' # Space & Cosmic Anomalies
           - '4' # Dark Mind Hacks
+      duration:
+        description: 'Target Video Duration in Seconds (60-90s)'
+        required: true
+        default: '75'
+        type: string
       auto_upload:
         description: 'Auto-Upload to YouTube? (Unlisted default)'
         required: true
@@ -95,21 +100,21 @@ jobs:
 
       - name: Render Channel 2 Short
         run: |
-          TOPIC="${{ github.event.inputs.topic }}"
+          TOPIC="${{ github.event.inputs.topic || 'The Titanic Mystery: What Really Happened?' }}"
           PILLAR="${{ github.event.inputs.pillar || '1' }}"
+          DURATION="${{ github.event.inputs.duration || '75' }}"
           PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
-          UPLOAD_FLAG=""
-          if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
-            UPLOAD_FLAG="--upload"
-          fi
 
-          TOPIC_ARG=""
+          CMD=(python fleet_engines/channel_2/run_channel_2.py --pillar "$PILLAR" --lang "en" --duration "$DURATION" --privacy "$PRIVACY")
           if [ -n "$TOPIC" ]; then
-            TOPIC_ARG="--topic \"$TOPIC\""
+            CMD+=(--topic "$TOPIC")
+          fi
+          if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
+            CMD+=(--upload)
           fi
 
-          echo "🚀 Starting Channel 2 (History & Facts English)..."
-          python fleet_engines/channel_2/run_channel_2.py --pillar "$PILLAR" --lang "en" $TOPIC_ARG $UPLOAD_FLAG --privacy "$PRIVACY"
+          echo "🚀 Executing Channel 2: ${CMD[*]}"
+          "${CMD[@]}"
 
       - name: Upload Video Artifact
         if: always()

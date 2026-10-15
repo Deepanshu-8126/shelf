@@ -15,6 +15,12 @@ import sys
 import subprocess
 from pathlib import Path
 from typing import Dict, Any, Optional
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -200,7 +206,7 @@ Output strictly valid JSON with keys:
 }}"""
 
     res = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model="qwen/qwen3.8-27b",
         messages=[
             {"role": "system", "content": sys_prompt},
             {"role": "user", "content": user_instructions}

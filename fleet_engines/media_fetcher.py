@@ -152,13 +152,15 @@ def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
 
         # 1. Semantic category shortcuts (Mixkit high-yield slugs)
         category_map = [
+            (r"ship|boat|titanic|vessel|submarine|cruise|sail|yacht", "ship"),
+            (r"iceberg|glacier|ice|frozen|arctic", "ice"),
             (r"moon|lunar", "moon"),
             (r"earth|globe", "earth"),
             (r"stars|star|nebula|constellation", "stars"),
             (r"space|galaxy|universe|planet|black hole|astronomy|cosmic|mars", "space"),
             (r"sun|solar|sunrise|sunset", "sun"),
             (r"ocean|sea|wave|waves|underwater|beach|marine", "ocean"),
-            (r"snow|ice|permafrost|arctic|frost|blizzard|winter|cold", "snow"),
+            (r"snow|permafrost|frost|blizzard|winter|cold", "snow"),
             (r"storm|lightning|rain|wind|thunder|tornado|cyclone", "storm"),
             (r"dark|night|shadow|mystery|creepy|fog|mist|black", "night"),
             (r"cave|underground|tunnel|crater|hole", "cave"),
