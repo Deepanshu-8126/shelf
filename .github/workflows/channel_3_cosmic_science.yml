@@ -68,10 +68,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg libass-dev libsm6 libxext6 fonts-liberation fonts-noto-core fonts-dejavu espeak-ng fonts-indic
 
+      - name: Cache AI Models (Whisper & HF Hub)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/whisper
+            ~/.cache/huggingface
+          key: ${{ runner.os }}-ai-models-v1
+          restore-keys: |
+            ${{ runner.os }}-ai-models-
+
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+          python -m spacy download en_core_web_sm || true
 
       - name: Setup Original YouTube Agent Skill
         run: |
