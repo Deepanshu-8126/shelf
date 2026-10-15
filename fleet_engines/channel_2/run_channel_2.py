@@ -293,11 +293,12 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
     
     # 1. Script
     resolved_script = custom_script.strip()
-    if not resolved_script:
+    if not resolved_script and not topic:
         for cand in [Path(WORKSPACE_ROOT) / "custom_script.txt", Path(__file__).parent / "custom_script.txt"]:
             if cand.exists() and cand.stat().st_size > 10:
                 lines = [l.strip() for l in cand.read_text(encoding="utf-8", errors="replace").splitlines() if l.strip() and not l.strip().startswith("#")]
                 clean_text = " ".join(lines).strip()
+                # Ensure custom script matches channel language
                 if clean_text:
                     print(f"📄 Auto-detected user custom script from: {cand}")
                     resolved_script = clean_text

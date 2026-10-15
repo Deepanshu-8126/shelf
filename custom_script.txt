@@ -1,9 +1,6 @@
 # =============================================================================
-# APNI CUSTOM SCRIPT YAHAN LIKHO (40 - 45 WORDS RECOMMENDED)
+# OPTIONAL CUSTOM SCRIPT FILE
 # =============================================================================
-# Agar aap yahan script likhoge aur 'python fleet_engines/channel_3/run_channel_3.py'
-# ya Channel 2 run karoge, to engine automatic yahi script use karega!
-# Comment lines (# wali) ko chhod kar neeche apna script paste karein:
+# Agar aapko AI ki jagah apni khud ki manual script use karni ho,
+# toh yahan apni script likhein. Agar topic pass karoge to AI khud likhega.
 # =============================================================================
-
-अगर आज रात अचानक चाँद गायब हो जाए, तो समंदर में 100 मीटर ऊंची सुनामी आएगी! धरती इतनी तेज़ घूमने लगेगी कि दिन सिर्फ 6 घंटे का रह जाएगा, और 400 की स्पीड से बर्फीली हवाएं चलेंगी। क्या इंसान ऐसी तबाही में बच पाएगा? कमेंट में बताओ!
