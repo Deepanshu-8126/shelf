@@ -271,7 +271,7 @@ async def synthesize_voice_with_boundaries(script: str, voice_pref: str, out_raw
     try:
         import edge_tts
         print(f"🎙️ Engaging Edge-TTS Engine ({edge_voice})...")
-        c = edge_tts.Communicate(script, edge_voice, rate="+3%", boundary="WordBoundary")
+        c = edge_tts.Communicate(script, edge_voice, rate="+0%", pitch="-1Hz", boundary="WordBoundary")
         words = []
         with open(out_raw, "wb") as f:
             async for chunk in c.stream():
@@ -521,7 +521,7 @@ def render_channel_3_short(
             topic=target_topic,
             pillar_name=pillar["name"],
             lang=lang,
-            word_count_target=42,
+            word_count_target=110,
         )
         if custom_title:
             pkg["title"] = custom_title
@@ -675,12 +675,13 @@ def render_channel_3_short(
             subprocess.run(drone_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             bgm_volume = 0.48
 
-        # 7. Burn Subtitles & Mix Audio (Voice at 1.05, Music at ~50%)
+        # 7. Burn Subtitles & Mix Audio (Voice at 1.20, Music at subtle 16%)
         sub_escaped = str(ass_file).replace("\\", "/").replace(":", "\\:")
+        effective_bgm = max(0.12, min(0.20, bgm_volume * 0.35))
         full_filter = (
             f"[0:v]ass='{sub_escaped}'[vout];"
-            f"[1:a]volume=1.05[voice];"
-            f"[2:a]volume={bgm_volume:.2f}[drone];"
+            f"[1:a]volume=1.20[voice];"
+            f"[2:a]volume={effective_bgm:.2f}[drone];"
             f"[voice][drone]amix=inputs=2:duration=first:dropout_transition=2[aout]"
         )
         final_cmd = [

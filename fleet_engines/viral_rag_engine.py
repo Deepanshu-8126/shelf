@@ -140,70 +140,69 @@ def generate_rag_viral_script(
     ref_views = ref.get("views", "25M")
 
     cat_profile = CATEGORY_TONE_PROFILES.get(detected_cat, CATEGORY_TONE_PROFILES["mind_bending_space"])
-    standard_cta = "ऐसी ही अजीब और रोमांचक साइंस जानकारी के लिए चैनल को सब्सक्राइब कर लो, मिलते हैं अगले वीडियो में!"
-
     clean_topic_name = topic.rstrip("?!. ")
-    # STRICT GUARD: Only use ref_transcript if it actually shares semantic keywords with topic!
-    if match_score > 0 and ref_transcript:
-        fallback_script = ref_transcript
-        fallback_hook = ref_hook or f"क्या आपको पता है कि {clean_topic_name}?"
-    else:
-        fallback_hook = f"क्या आपको पता है कि {clean_topic_name}?"
-        fallback_script = f"क्या आपको पता है कि {clean_topic_name}? जब वैज्ञानिकों ने इस पर गहराई से रिसर्च की, तो उनके होश उड़ गए। रिसर्च में सामने आया कि इसके पीछे एक बेहद हैरान कर देने वाला वैज्ञानिक कारण छिपा हुआ है। {standard_cta}"
+
+    # Topic-specific engaging fallback
+    fallback_hook = f"क्या आपको पता है कि {clean_topic_name}?"
+    fallback_script = (
+        f"सोचिए... क्या आपको पता है कि {clean_topic_name}? "
+        "जब वैज्ञानिकों ने इस पर गहराई से रिसर्च की, तो उनके होश उड़ गए! "
+        "शरीर के अंदर होने वाली यह प्रक्रिया जितनी रहस्यमयी है, उतनी ही चौंकाने वाली भी। "
+        "दरअसल इसके पीछे एक बेहद जटिल न्यूरोलॉजिकल और बायोलॉजिकल कारण छिपा हुआ है। "
+        "क्या आपको इससे पहले इस हैरान कर देने वाले सच के बारे में पता था? कमेंट्स में जरूर बताइए!"
+    )
+    fallback_cta = "क्या आपको इससे पहले इस हैरान कर देने वाले सच के बारे में पता था? कमेंट्स में जरूर बताइए!"
 
     fallback = {
         "title": f"{clean_topic_name[:32]} #shorts",
         "hook": fallback_hook,
         "script": fallback_script,
-        "cta": standard_cta,
+        "cta": fallback_cta,
     }
 
     try:
         # -------------------------------------------------------------------
-        # STEP 1: Causal Beat Outline (Dynamic Category & Tone Alignment)
+        # STEP 1: Causal Beat Outline (Dynamic Category & Dramatic Depth)
         # -------------------------------------------------------------------
         log.info(f"[StoryTeller-Step1] Planning beats for category '{cat_profile['label']}' -> '{topic}'...")
         step1_prompt = (
             f"Topic: {topic}\n"
             f"Category: {cat_profile['label']}\n"
             f"Tone Directive: {cat_profile['tone']}\n\n"
-            "Create a high-retention 4-beat story outline for a 30-second viral YouTube Short:\n"
-            "Beat 1 (Hook 0-3s): Direct curious question ('क्या आपको पता है कि...' or 'कभी सोचा है कि अगर...').\n"
-            "Beat 2 (The Tangible Setup 3-12s): Relatable real-world context (NO screaming, NO fake apocalypse).\n"
-            "Beat 3 (The Jaw-Drop Twist 12-22s): The researched scientific or historical fact that 99% of people don't know.\n"
-            f"Beat 4 (Friendly Closing 22-30s): Smooth wrap-up with CTA: '{standard_cta}'.\n"
-            "Keep each beat 1 short punchy sentence."
+            "Create a high-retention 4-beat story outline for a 45-50 second viral YouTube Short:\n"
+            "Beat 1 (Visual & Emotional Hook 0-6s): Visceral, shocking question or mind-bending scenario using pauses ('सोचिए...').\n"
+            "Beat 2 (The Real Mechanism 6-22s): Step-by-step biological, physical, or historical explanation of WHY and HOW it happens.\n"
+            "Beat 3 (The Mind-Bending Twist 22-38s): The jaw-dropping fact that 99% of people misunderstand or don't know.\n"
+            "Beat 4 (The Provocative Debate CTA 38-48s): An intriguing open loop or debate question asking viewers their thoughts (NEVER ask to subscribe).\n"
+            "Keep each beat punchy and vivid."
         )
         outline = llm_complete(
             prompt=step1_prompt,
-            system="You are an elite YouTube Shorts storyteller writing grounded, highly curious human stories.",
+            system="You are an elite YouTube Shorts documentary director creating high-retention, curiosity-driven scripts.",
             temp=0.60,
         )
 
         # -------------------------------------------------------------------
         # STEP 2: Spoken Hindi Drafter (Conversational Indian Creator Narrative)
         # -------------------------------------------------------------------
-        log.info(f"[StoryTeller-Step2] Drafting natural spoken Hindi script...")
+        log.info(f"[StoryTeller-Step2] Drafting natural spoken Hindi script with dramatic pacing...")
         step2_prompt = (
             f"Story Outline:\n{outline}\n\n"
-            f"VERIFIED VIRAL REFERENCE STYLE (from {ref_views} views video):\n"
-            f"\"{ref_transcript}\"\n\n"
             f"CATEGORY & TONE: {cat_profile['tone']}\n\n"
-            "INSTRUCTIONS FOR NATURAL SPOKEN HINDI CREATOR STORYTELLER:\n"
-            "- Write ONE unbroken flowing spoken script in natural Devanagari Hindi.\n"
-            "- Talk like a 22-year-old passionate Indian creator explaining something mind-blowing to a friend over chai.\n"
-            "- Open directly with either 'क्या आपको पता है कि...' or 'कभी सोचा है कि अगर...' (NEVER say 'नमस्ते दोस्तों').\n"
-            "- Use natural everyday conversational loan words in Devanagari: 'ग्रैविटी', 'स्पीड', 'टेम्परेचर', 'ब्रेन', 'इंसान', 'वायरस', 'इंटरनेट', 'डायमंड', 'रेडिएशन', 'सिस्टम', 'रिसर्च'.\n"
-            "- ZERO MELODRAMA: NEVER scream about 'प्रलय', 'खून-खराबा', 'कयामत', 'नरक', 'सर्वनाश'. Speak with confident curiosity.\n"
-            f"- MUST END with the exact friendly CTA: '{standard_cta}'\n"
-            f"- TARGET LENGTH: Exactly {word_count_target - 5} to {word_count_target + 5} words in Devanagari.\n"
+            "INSTRUCTIONS FOR NATURAL SPOKEN HINDI DOCUMENTARY NARRATOR:\n"
+            "- Write ONE unbroken flowing spoken script in 100% pure Devanagari Hindi (approx 100 to 125 words).\n"
+            "- Talk like a passionate, deep-toned Indian documentary storyteller (like Nitish Rajput or Dhruv Rathee).\n"
+            "- USE DRAMATIC PACING PUNCTUATION: Use ellipses ('...'), em-dashes ('—'), questions ('?'), and commas (',') generously so the voice actor pauses naturally with deep suspense.\n"
+            "- ZERO AI Melodrama ('प्रलय', 'खून-खराबा', 'कयामत' banned), but HIGH EMOTIONAL INTENSITY.\n"
+            "- STRICT PROHIBITION: NEVER say 'नमस्ते दोस्तों', 'चैनल को सब्सक्राइब करें', 'वीडियो को लाइक करें', 'मिलते हैं अगले वीडियो में'.\n"
+            "- END with an intriguing debate question or mind-bending thought that compels the viewer to comment immediately!\n"
             "- Output ONLY the Hindi script paragraph, nothing else."
         )
         draft = llm_complete(
             prompt=step2_prompt,
-            system="You are India's top YouTube Shorts narrator writing spoken Hindi like a real human creator.",
+            system="You are India's top YouTube Shorts narrator writing spoken Hindi with suspenseful, emotional cadence.",
             temp=0.55,
-            max_tokens=350,
+            max_tokens=450,
             remove_nl=False,
         )
 
@@ -214,17 +213,17 @@ def generate_rag_viral_script(
         step3_prompt = (
             f"Draft Script to Review:\n\"{draft}\"\n\n"
             "CRITIQUE & NATURAL POLISH CHECKLIST:\n"
-            "1. Replace any robotic/textbook words: (गुरुत्वाकर्षण -> ग्रैविटी, कक्षा -> ऑर्बिट, सौरमंडल -> सोलर सिस्टम, गति -> स्पीड, मनुष्य -> इंसान, यदि -> अगर, तापमान -> टेम्परेचर).\n"
-            "2. Ensure conversational, breathless flow (30-second spoken short).\n"
-            f"3. Ending MUST be the friendly subscribe CTA: '{standard_cta}'\n"
-            f"4. Ensure script length is between {word_count_target - 8} and {word_count_target + 8} Devanagari words.\n"
+            "1. Fix broken spellings/corrupted text (NO cyrillic letters like 'स्पाзм'; write 'ऐंठन' or 'स्पैज्म').\n"
+            "2. Ensure conversational, suspenseful rhythm with clear emotional breath marks (..., —, ?, !).\n"
+            "3. Ensure total word count is between 100 and 125 Devanagari words (around 45-50 seconds audio).\n"
+            "4. Strictly ensure NO generic subscribe/like callouts. End with a gripping debate question.\n"
             "5. Output STRICT JSON with keys: title, hook, script, cta.\n"
             "Format:\n"
-            '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script", "cta": "Subscribe CTA"}'
+            '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script with dramatic punctuation", "cta": "Closing provocative debate question"}'
         )
         data = llm_json(
             prompt=step3_prompt,
-            system="You are an elite script editor enforcing 100% natural conversational Indian Hindi. Return ONLY valid JSON with zero conversational filler.",
+            system="You are an elite script editor enforcing 100% natural conversational Indian Hindi with dramatic emotional pacing. Return ONLY valid JSON.",
             temp=0.35,
             fallback=fallback,
         )
@@ -234,7 +233,7 @@ def generate_rag_viral_script(
 
     data["script"] = sanitize_script(data.get("script", ""))
     data["hook"] = sanitize_script(data.get("hook", ""))
-    data["cta"] = sanitize_script(data.get("cta", standard_cta))
+    data["cta"] = sanitize_script(data.get("cta", fallback_cta))
     data["category"] = detected_cat
     data["category_label"] = cat_profile["label"]
     data["reference_used"] = ref.get("id", "default")

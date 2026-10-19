@@ -188,10 +188,7 @@ def _fetch_mixkit(query: str, is_video: bool, out_path: Path, used_ids: set) -> 
             if kw not in candidates:
                 candidates.append(kw)
 
-        # Fallback category
-        if "nature" not in candidates:
-            candidates.append("nature")
-
+        # Only search specific keyword slugs, do NOT fallback to generic nature
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
@@ -393,15 +390,25 @@ def plan_beat_visuals(total_dur: float, timed_data: List[Dict[str, Any]], script
     try:
         from llm_engine import llm_complete
         summary = "\n".join([f"Cut {b['cut_index']} [{b['start']}s-{b['end']}s]: '{b['spoken_hindi']}'" for b in beats])
-        prompt = f"Act as elite visual director for a 9:16 short. Here are {num_cuts} cuts with spoken text:\n{summary}\nFor each cut, output an exact 2-4 word English visual search query for Pexels/Pixabay stock. Return ONLY a JSON list of {num_cuts} strings."
-        res = llm_complete(prompt, temp=0.2, max_tokens=400)
+        prompt = (
+            f"Video Context / Full Script: \"{script[:250]}\"\n\n"
+            f"Act as elite visual director for a viral 9:16 vertical short. Here are {num_cuts} cuts with spoken text:\n{summary}\n\n"
+            "DIRECTIVES FOR HIGH-RETENTION VISUALS:\n"
+            "- For each cut, output an exact 2-4 word English visual search query for high-res stock footage.\n"
+            "- Focus on concrete cinematic scenes: medical anatomy, close-up human emotions, laboratory research, macroscopic biology, dramatic atmosphere.\n"
+            "- STRICT PROHIBITION: NEVER use UI or social terms like 'subscribe button', 'like share', 'waving hand', 'goodbye', 'channel preview', 'social media'.\n"
+            "- For closing cuts, show deep contemplation, mystery horizon, microscopic virus, or dramatic curiosity.\n"
+            f"Return ONLY a JSON list of exactly {num_cuts} strings."
+        )
+        res = llm_complete(prompt, temp=0.25, max_tokens=450)
         match = re.search(r"\[.*\]", res, re.DOTALL)
         if match:
             queries = json.loads(match.group(0))
             if isinstance(queries, list) and len(queries) >= len(beats):
                 for idx, q in enumerate(queries[:len(beats)]):
                     cl = str(q).strip().lower()
-                    if len(cl) >= 3: beats[idx]["query"] = cl
+                    if len(cl) >= 3 and not any(ban in cl for ban in ["subscribe", "waving", "goodbye", "button", "youtube"]):
+                        beats[idx]["query"] = cl
     except Exception:
         pass
 
