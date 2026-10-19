@@ -160,17 +160,28 @@ def generate_rag_viral_script(
         "cta": fallback_cta,
     }
 
+    HOOK_FORMATS = [
+        "CONTRARIAN FLIP: Shatter a common myth in the first 3 seconds (e.g. 'हम सब सोचते हैं कि..., लेकिन असलियत रोंगटे खड़े कर देगी।')",
+        "SENSORY CONTRAST: Contrast two extreme physical sensations (e.g. 'गला प्यास से सूख रहा है, लेकिन सामने रखा पानी देखकर इंसान कांपने लगता है।')",
+        "MICROSCOPIC HIJACK: Frame the opening around the hidden pathogen or force (e.g. 'ये कोई वहम नहीं है, ये दिमाग के न्यूरॉन्स पर हुआ एक सोची-समझी साजिश है।')",
+        "CHILLING FACT: Drop a shocking, verified reality that makes the viewer freeze (e.g. 'मेडिकल साइंस का एक ऐसा खौफनाक सच जिसे 99% लोग नहीं जानते।')",
+        "DIRECT DRAMATIC ACTION: Drop straight into the action without preamble (e.g. 'पानी की सिर्फ एक बूंद... और पूरा शरीर बेकाबू होकर तड़पने लगता है।')"
+    ]
+    import random
+    chosen_hook_angle = random.choice(HOOK_FORMATS)
+
     try:
         # -------------------------------------------------------------------
         # STEP 1: Causal Beat Outline (Dynamic Category & Dramatic Depth)
         # -------------------------------------------------------------------
-        log.info(f"[StoryTeller-Step1] Planning beats for category '{cat_profile['label']}' -> '{topic}'...")
+        log.info(f"[StoryTeller-Step1] Planning beats for category '{cat_profile['label']}' -> '{topic}' [Angle: {chosen_hook_angle[:25]}]...")
         step1_prompt = (
             f"Topic: {topic}\n"
             f"Category: {cat_profile['label']}\n"
-            f"Tone Directive: {cat_profile['tone']}\n\n"
+            f"Tone Directive: {cat_profile['tone']}\n"
+            f"Hook Formula Angle to Use: {chosen_hook_angle}\n\n"
             "Create a high-retention 4-beat story outline for a 45-50 second viral YouTube Short:\n"
-            "Beat 1 (Visual & Emotional Hook 0-6s): Visceral, shocking question or mind-bending scenario using pauses ('सोचिए...').\n"
+            f"Beat 1 (Hook 0-6s): Apply the assigned formula. STRICT RULE: NEVER start with 'कभी सोचा है...' or 'सोचिए...'. Open fresh and punchy.\n"
             "Beat 2 (The Real Mechanism 6-22s): Step-by-step biological, physical, or historical explanation of WHY and HOW it happens.\n"
             "Beat 3 (The Mind-Bending Twist 22-38s): The jaw-dropping fact that 99% of people misunderstand or don't know.\n"
             "Beat 4 (The Provocative Debate CTA 38-48s): An intriguing open loop or debate question asking viewers their thoughts (NEVER ask to subscribe).\n"
@@ -202,6 +213,7 @@ def generate_rag_viral_script(
             "  * NEVER use 'मनुष्य' -> ALWAYS use 'इंसान' or 'लोग'\n"
             "  * NEVER use 'प्रक्रिया' -> ALWAYS use 'चीज' or 'सिस्टम'\n"
             "- USE DRAMATIC PACING PUNCTUATION: Use ellipses ('...'), em-dashes ('—'), questions ('?'), and commas (',') generously so the narrator pauses naturally with suspense.\n"
+            "- DYNAMIC FRESH OPENER: Follow Beat 1 outline directly. DO NOT open with 'कभी सोचा है...' or 'सोचिए...'. Start with direct punchy action or the mystery itself.\n"
             "- ZERO AI Melodrama ('प्रलय', 'खून-खराबा', 'कयामत' banned).\n"
             "- STRICT PROHIBITION: NEVER say 'नमस्ते दोस्तों', 'चैनल को सब्सक्राइब करें', 'वीडियो को लाइक करें', 'मिलते हैं अगले वीडियो में'.\n"
             "- END with an intriguing conversational debate question (e.g. 'कमेंट में बताओ, क्या कभी आपके साथ ऐसा हुआ है?').\n"

@@ -393,11 +393,16 @@ def plan_beat_visuals(total_dur: float, timed_data: List[Dict[str, Any]], script
         prompt = (
             f"Video Context / Full Script: \"{script[:250]}\"\n\n"
             f"Act as elite visual director for a viral 9:16 vertical short. Here are {num_cuts} cuts with spoken text:\n{summary}\n\n"
-            "DIRECTIVES FOR HIGH-RETENTION VISUALS:\n"
+            "DIRECTIVES FOR DYNAMIC CINEMATIC VISUALS:\n"
             "- For each cut, output an exact 2-4 word English visual search query for high-res stock footage.\n"
-            "- Focus on concrete cinematic scenes: medical anatomy, close-up human emotions, laboratory research, macroscopic biology, dramatic atmosphere.\n"
-            "- STRICT PROHIBITION: NEVER use UI or social terms like 'subscribe button', 'like share', 'waving hand', 'goodbye', 'channel preview', 'social media'.\n"
-            "- For closing cuts, show deep contemplation, mystery horizon, microscopic virus, or dramatic curiosity.\n"
+            "- DYNAMIC DIVERSITY (DO NOT REPEAT HUMAN FACES!):\n"
+            "  * MAXIMUM 2 cuts can show a human face/person. NEVER show people cut after cut.\n"
+            "  * The rest of the cuts MUST be dynamic non-human cinematic footage:\n"
+            "    1. 3D Microscopic Science: (e.g. 'virus 3d animation', 'neurons firing glow', 'blood cells microscope', 'dna strand rotating')\n"
+            "    2. Cinematic Macro B-Roll: (e.g. 'water drop slow motion', 'dark liquid ripple', 'glass breaking macro', 'steaming beaker lab')\n"
+            "    3. Medical Telemetry: (e.g. 'brain mri scan', 'holographic skeleton mesh', 'heartbeat monitor wave', 'xray skull diagnostic')\n"
+            "    4. Moody Atmospheric Cinematic: (e.g. 'dark hospital corridor', 'shadow silhouette fog', 'abstract science particles')\n"
+            "- STRICT PROHIBITION: NEVER use UI terms like 'subscribe button', 'like share', 'waving hand', 'goodbye', 'channel preview'.\n"
             f"Return ONLY a JSON list of exactly {num_cuts} strings."
         )
         res = llm_complete(prompt, temp=0.25, max_tokens=450)
