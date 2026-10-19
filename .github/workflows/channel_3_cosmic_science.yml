@@ -9,15 +9,17 @@ on:
         default: ''
         type: string
       pillar:
-        description: 'Cosmic Pillar'
+        description: 'Cosmic Pillar (auto for dynamic rotation across all 5 pillars)'
         required: true
-        default: '1'
+        default: 'auto'
         type: choice
         options:
-          - '1' # Black Holes & Cosmic Anomalies
-          - '2' # Quantum Physics & Time Travel
-          - '3' # Alien Megastructures & Fermi Paradox
-          - '4' # Solar Catastrophes
+          - 'auto' # Dynamic Rotation across all 5 pillars
+          - '1' # Deep Earth & Ocean Anomalies
+          - '2' # Bizarre Human Body Science
+          - '3' # Real Everyday What-Ifs
+          - '4' # Mysterious Historic & Dark Science Curiosities
+          - '5' # Mind-Bending Deep Space Curiosities
       auto_upload:
         description: 'Auto-Upload to YouTube? (Unlisted default)'
         required: true
@@ -112,23 +114,20 @@ jobs:
           TOPIC="${{ github.event.inputs.topic }}"
           PILLAR="${{ github.event.inputs.pillar }}"
           PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
-          UPLOAD_FLAG=""
-          if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
-            UPLOAD_FLAG="--upload"
-          fi
 
-          TOPIC_ARG=""
+          CMD=(python fleet_engines/channel_3/run_channel_3.py --voice dynamic --lang 'hi' --privacy "$PRIVACY")
+          if [ -n "$PILLAR" ] && [ "$PILLAR" != "auto" ]; then
+            CMD+=(--pillar "$PILLAR")
+          fi
           if [ -n "$TOPIC" ]; then
-            TOPIC_ARG="--topic \"$TOPIC\""
+            CMD+=(--topic "$TOPIC")
+          fi
+          if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
+            CMD+=(--upload)
           fi
 
-          PILLAR_ARG=""
-          if [ -n "$PILLAR" ]; then
-            PILLAR_ARG="--pillar $PILLAR"
-          fi
-
-          echo "🌌 Starting Channel 3 (Cosmic Science Hindi)..."
-          python fleet_engines/channel_3/run_channel_3.py $PILLAR_ARG --voice dynamic --lang 'hi' $TOPIC_ARG $UPLOAD_FLAG --privacy "$PRIVACY"
+          echo "🌌 Starting Channel 3 (Cosmic Science Hindi): ${CMD[*]}"
+          "${CMD[@]}"
 
       - name: Persist Channel 3 Topic History
         if: always()
@@ -137,7 +136,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add fleet_engines/state/channel_3_history.json || true
           git commit -m "Auto: Update Channel 3 topic history [skip ci]" || true
-          git push || true
+          git push origin main || git push || true
 
       - name: Upload Video Artifact
         if: always()

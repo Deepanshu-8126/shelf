@@ -9,11 +9,12 @@ on:
         default: ''
         type: string
       pillar:
-        description: 'Content Pillar'
+        description: 'Content Pillar (auto for dynamic rotation across all 4 pillars)'
         required: true
-        default: '1'
+        default: 'auto'
         type: choice
         options:
+          - 'auto' # Dynamic Rotation across all pillars
           - '1' # Forbidden Places & Unsolved History
           - '2' # Forensic & Psychology
           - '3' # Space & Cosmic Anomalies
@@ -121,7 +122,7 @@ jobs:
           PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
 
           CMD=(python fleet_engines/channel_2/run_channel_2.py --lang "en" --duration "$DURATION" --privacy "$PRIVACY")
-          if [ -n "$PILLAR" ]; then
+          if [ -n "$PILLAR" ] && [ "$PILLAR" != "auto" ]; then
             CMD+=(--pillar "$PILLAR")
           fi
           if [ -n "$TOPIC" ]; then
@@ -141,7 +142,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add fleet_engines/state/channel_2_history.json || true
           git commit -m "Auto: Update Channel 2 topic history [skip ci]" || true
-          git push || true
+          git push origin main || git push || true
 
       - name: Upload Video Artifact
         if: always()

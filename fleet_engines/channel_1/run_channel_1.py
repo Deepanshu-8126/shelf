@@ -78,9 +78,47 @@ REDDIT_THEMES = [
     "A cheating partner tries to take all joint savings, but gets exposed by automated banking audit notifications in court."
 ]
 
+def get_next_channel1_theme(user_topic: str = "") -> str:
+    """Selects the next unique viral drama theme from history so no story ever repeats."""
+    state_dir = WORKSPACE_ROOT / "fleet_engines/state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    history_file = state_dir / "channel_1_history.json"
+
+    history = {"used_themes": []}
+    if history_file.exists():
+        try:
+            history = json.loads(history_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    used = set(history.get("used_themes", []))
+
+    if user_topic and user_topic.strip():
+        chosen = user_topic.strip()
+        used.add(chosen)
+        history["used_themes"] = list(used)[-200:]
+        history["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+        return chosen
+
+    available = [t for t in REDDIT_THEMES if t not in used]
+    if not available:
+        used = set()
+        available = REDDIT_THEMES
+
+    chosen = available[0]
+    used.add(chosen)
+    history["used_themes"] = list(used)[-200:]
+    history["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    print(f"🔄 [Channel 1 State Engine] Selected Drama Theme: '{chosen[:60]}...'")
+    return chosen
+
+
 def generate_channel1_story(theme: str = "", lang: str = "en") -> Dict[str, str]:
     """Generates punchy 85-110 word viral Reddit drama with a 4-stage retention arc."""
-    chosen_theme = theme or random.choice(REDDIT_THEMES)
+    chosen_theme = get_next_channel1_theme(theme)
     is_hindi = (lang == "hi")
 
     if is_hindi:
@@ -513,7 +551,7 @@ def render_channel_1_short(
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Channel 1 Viral Drama Engine V2")
-    parser.add_argument("--bg", type=str, default="dynamic", choices=["dynamic", "subway", "gta"], help="Gameplay theme")
+    parser.add_argument("--bg", type=str, default="dynamic", choices=["dynamic", "subway", "gta", "gta5"], help="Gameplay theme")
     parser.add_argument("--title", type=str, default="", help="Custom story title")
     parser.add_argument("--topic", type=str, default="", help="Custom story topic/title alias")
     parser.add_argument("--script", type=str, default="", help="Custom story text")

@@ -117,6 +117,15 @@ jobs:
           echo "🚀 Executing Channel 1: ${CMD[*]}"
           "${CMD[@]}"
 
+      - name: Persist Channel 1 Topic History
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fleet_engines/state/channel_1_history.json || true
+          git commit -m "Auto: Update Channel 1 topic history [skip ci]" || true
+          git push origin main || git push || true
+
       - name: Upload Video Artifact
         if: always()
         uses: actions/upload-artifact@v4
