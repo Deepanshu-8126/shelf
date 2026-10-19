@@ -260,79 +260,13 @@ def extract_acoustic_words_hindi(audio_path: Path) -> list:
 async def synthesize_voice_with_boundaries(script: str, voice_pref: str, out_raw: Path):
     """
     Generates high-fidelity native Hindi voiceover and extracts synchronized word timestamps.
-    Primary Engine: Kokoro-82M (hf_beta, hm_omega, hf_alpha, hm_psi) - 100% on-device neural Indian voice.
-    Secondary Fallback: Edge-TTS (Swara / Madhur)
+    Primary Engine: Edge-TTS (Madhur / Swara) - Studio-grade natural neural Indian Hindi.
+    Secondary Fallback: Kokoro-82M (hf_beta, hm_omega, hf_alpha, hm_psi)
     Tertiary Fallback: Google Cloud Hindi Voice
     """
     voice_pref = (voice_pref or "dynamic").lower()
-    kokoro_map = {
-        "beta": "hf_beta",     # Warm storytelling female
-        "alpha": "hf_alpha",   # Dynamic facts female
-        "omega": "hm_omega",   # Deep cinematic male
-        "psi": "hm_psi"        # Fast engaging male
-    }
 
-    selected_kokoro_voice = None
-    if voice_pref == "dynamic":
-        import random
-        selected_kokoro_voice = random.choice(["hf_beta", "hm_omega", "hf_alpha", "hm_psi"])
-    elif voice_pref in kokoro_map:
-        selected_kokoro_voice = kokoro_map[voice_pref]
-    elif voice_pref in ["hf_beta", "hf_alpha", "hm_omega", "hm_psi"]:
-        selected_kokoro_voice = voice_pref
-
-    # 1. Try Kokoro-82M First
-    if selected_kokoro_voice:
-        try:
-            print(f"🎙️ Engaging Kokoro-82M Engine (Voice: {selected_kokoro_voice})...")
-            from kokoro import KPipeline
-            import soundfile as sf
-            import numpy as np
-
-            pipeline = KPipeline(lang_code='h')
-            generator = pipeline(script, voice=selected_kokoro_voice, speed=1.05)
-
-            all_audios = []
-            words = []
-            curr_time = 0.0
-
-            for res in generator:
-                chunk_audio = res.audio
-                chunk_dur = len(chunk_audio) / 24000.0
-                all_audios.append(chunk_audio)
-
-                cwords = [w for w in re.split(r'\s+', res.graphemes) if w.strip()]
-                if not cwords:
-                    curr_time += chunk_dur
-                    continue
-
-                total_chars = sum(len(w) for w in cwords)
-                chunk_t = curr_time
-                for w in cwords:
-                    w_dur = max(0.12, (len(w) / max(total_chars, 1)) * chunk_dur)
-                    words.append({
-                        "start": round(chunk_t, 3),
-                        "end": round(chunk_t + w_dur, 3),
-                        "duration": round(w_dur, 3),
-                        "word": w
-                    })
-                    chunk_t += w_dur
-                curr_time += chunk_dur
-
-            if all_audios and words:
-                combined = np.concatenate(all_audios)
-                out_wav = out_raw.with_suffix(".wav")
-                sf.write(str(out_wav), combined, 24000)
-                # Convert to mp3 if needed or copy
-                subprocess.run(["ffmpeg", "-y", "-i", str(out_wav), str(out_raw)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-                if out_wav.exists() and out_wav != out_raw:
-                    out_wav.unlink()
-                print(f"✅ Kokoro-82M synthesized {len(words)} words ({curr_time:.1f}s audio)")
-                return words
-        except Exception as e:
-            print(f"⚠️ Kokoro engine note: {e}. Falling back to Edge-TTS...")
-
-    # 2. Edge-TTS Fallback
+    # 1. Primary Engine: Edge-TTS Neural Hindi (Studio Quality)
     edge_voice = "hi-IN-SwaraNeural" if voice_pref in ["swara", "female", "beta", "alpha"] else "hi-IN-MadhurNeural"
     try:
         import edge_tts
@@ -353,9 +287,66 @@ async def synthesize_voice_with_boundaries(script: str, voice_pref: str, out_raw
                         "word": chunk.get("text", "").strip()
                     })
         if out_raw.exists() and out_raw.stat().st_size > 10000 and words:
+            print(f"✅ Edge-TTS successfully synthesized {len(words)} aligned words ({words[-1]['end']:.1f}s audio)")
             return words
     except Exception as e:
-        print(f"⚠️ Edge-TTS unavailable ({e}). Engaging Google Cloud Hindi voiceover fallback...")
+        print(f"⚠️ Edge-TTS failed ({e}). Attempting Kokoro-82M fallback...")
+
+    # 2. Kokoro-82M Fallback
+    kokoro_map = {
+        "beta": "hf_beta",     # Warm storytelling female
+        "alpha": "hf_alpha",   # Dynamic facts female
+        "omega": "hm_omega",   # Deep cinematic male
+        "psi": "hm_psi"        # Fast engaging male
+    }
+    selected_kokoro_voice = kokoro_map.get(voice_pref, "hf_beta")
+    try:
+        print(f"🎙️ Engaging Kokoro-82M Fallback Engine (Voice: {selected_kokoro_voice})...")
+        from kokoro import KPipeline
+        import soundfile as sf
+        import numpy as np
+
+        pipeline = KPipeline(lang_code='h')
+        generator = pipeline(script, voice=selected_kokoro_voice, speed=1.05)
+
+        all_audios = []
+        words = []
+        curr_time = 0.0
+
+        for res in generator:
+            chunk_audio = res.audio
+            chunk_dur = len(chunk_audio) / 24000.0
+            all_audios.append(chunk_audio)
+
+            cwords = [w for w in re.split(r'\s+', res.graphemes) if w.strip()]
+            if not cwords:
+                curr_time += chunk_dur
+                continue
+
+            total_chars = sum(len(w) for w in cwords)
+            chunk_t = curr_time
+            for w in cwords:
+                w_dur = max(0.12, (len(w) / max(total_chars, 1)) * chunk_dur)
+                words.append({
+                    "start": round(chunk_t, 3),
+                    "end": round(chunk_t + w_dur, 3),
+                    "duration": round(w_dur, 3),
+                    "word": w
+                })
+                chunk_t += w_dur
+            curr_time += chunk_dur
+
+        if all_audios and words:
+            combined = np.concatenate(all_audios)
+            out_wav = out_raw.with_suffix(".wav")
+            sf.write(str(out_wav), combined, 24000)
+            subprocess.run(["ffmpeg", "-y", "-i", str(out_wav), str(out_raw)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            if out_wav.exists() and out_wav != out_raw:
+                out_wav.unlink()
+            print(f"✅ Kokoro-82M synthesized {len(words)} words ({curr_time:.1f}s audio)")
+            return words
+    except Exception as e:
+        print(f"⚠️ Kokoro engine note: {e}. Engaging Google Cloud Hindi voiceover fallback...")
 
     # 3. High-speed reliable fallback: Google Cloud Hindi Voice
     import urllib.parse

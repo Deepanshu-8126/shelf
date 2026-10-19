@@ -53,8 +53,8 @@ jobs:
     timeout-minutes: 25
 
     env:
-      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || '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' }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY || 'Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT' }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       YT_TOKEN_CH2_B64: ${{ secrets.YT_TOKEN_CH2_B64 || secrets.YT_TOKEN_B64 }}
       YT_CLIENT_B64: ${{ secrets.YT_CLIENT_B64 }}

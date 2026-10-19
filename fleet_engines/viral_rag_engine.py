@@ -83,24 +83,28 @@ def detect_category(topic: str) -> str:
     return best_cat
 
 
-def retrieve_best_transcript(topic: str, forced_category: str = None) -> Tuple[Dict[str, Any], str]:
+def retrieve_best_transcript(topic: str, forced_category: str = None) -> Tuple[Dict[str, Any], str, int]:
     """
     Finds the most relevant viral transcript from the knowledge bank
     across all 5 categories using semantic keyword overlap.
     """
     bank = load_rag_bank()
-    cat_key = forced_category or detect_category(topic)
+    if forced_category and forced_category in bank:
+        cat_key = forced_category
+    else:
+        cat_key = detect_category(topic)
     items = bank.get(cat_key, [])
 
     if not items:
-        # Fallback to any category
-        for c in bank.values():
+        # Fallback across all categories
+        for k, c in bank.items():
             if c:
                 items = c
+                cat_key = k
                 break
 
     if not items:
-        return {}, cat_key
+        return {}, cat_key, 0
 
     topic_lower = topic.lower()
     topic_words = [w for w in re.findall(r"[\w]+", topic_lower) if len(w) >= 2]
@@ -115,7 +119,7 @@ def retrieve_best_transcript(topic: str, forced_category: str = None) -> Tuple[D
             best_score = score
             best_item = item
 
-    return best_item, cat_key
+    return best_item, cat_key, max(0, best_score)
 
 
 def generate_rag_viral_script(
@@ -130,7 +134,7 @@ def generate_rag_viral_script(
       STEP 2: Spoken Hindi Drafter (Flowing conversational Indian creator cadence over chai)
       STEP 3: Slop Reviewer & Polish (Purges melodrama, verifies word count & strict JSON)
     """
-    ref, detected_cat = retrieve_best_transcript(topic, forced_category=niche)
+    ref, detected_cat, match_score = retrieve_best_transcript(topic, forced_category=niche)
     ref_transcript = ref.get("transcript", "")
     ref_hook = ref.get("hook", "")
     ref_views = ref.get("views", "25M")
@@ -138,10 +142,19 @@ def generate_rag_viral_script(
     cat_profile = CATEGORY_TONE_PROFILES.get(detected_cat, CATEGORY_TONE_PROFILES["mind_bending_space"])
     standard_cta = "ऐसी ही अजीब और रोमांचक साइंस जानकारी के लिए चैनल को सब्सक्राइब कर लो, मिलते हैं अगले वीडियो में!"
 
+    clean_topic_name = topic.rstrip("?!. ")
+    # STRICT GUARD: Only use ref_transcript if it actually shares semantic keywords with topic!
+    if match_score > 0 and ref_transcript:
+        fallback_script = ref_transcript
+        fallback_hook = ref_hook or f"क्या आपको पता है कि {clean_topic_name}?"
+    else:
+        fallback_hook = f"क्या आपको पता है कि {clean_topic_name}?"
+        fallback_script = f"क्या आपको पता है कि {clean_topic_name}? जब वैज्ञानिकों ने इस पर गहराई से रिसर्च की, तो उनके होश उड़ गए। रिसर्च में सामने आया कि इसके पीछे एक बेहद हैरान कर देने वाला वैज्ञानिक कारण छिपा हुआ है। {standard_cta}"
+
     fallback = {
-        "title": f"{topic[:30]} #shorts",
-        "hook": ref_hook or f"क्या आपको पता है कि {topic}?",
-        "script": ref_transcript or f"क्या आपको पता है कि {topic}? वैज्ञानिक जब इस पर रिसर्च कर रहे थे, तो उन्हें हैरान कर देने वाले आंकड़े मिले। {standard_cta}",
+        "title": f"{clean_topic_name[:32]} #shorts",
+        "hook": fallback_hook,
+        "script": fallback_script,
         "cta": standard_cta,
     }
 

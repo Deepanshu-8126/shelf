@@ -49,7 +49,8 @@ log = logging.getLogger("llm_engine")
 # ---------------------------------------------------------------------------
 # Config - edit ONLY here, never in individual channel scripts
 # ---------------------------------------------------------------------------
-GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+DEFAULT_GROQ_API_KEY = "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"
+GROQ_API_KEY: str = (os.getenv("GROQ_API_KEY") or DEFAULT_GROQ_API_KEY).strip()
 
 # Model cascade: tries each in order until one succeeds
 # Primary: Qwen 3 (27B) - Top-tier creative multilingual & Hindi storytelling
@@ -491,7 +492,7 @@ def generate_channel3_script(
         from viral_rag_engine import generate_rag_viral_script
         rag_data = generate_rag_viral_script(
             topic=topic,
-            niche="cosmic_what_if",
+            niche=None,
             lang=lang,
             word_count_target=word_count_target,
         )
