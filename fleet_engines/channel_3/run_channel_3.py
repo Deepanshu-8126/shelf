@@ -769,10 +769,13 @@ if __name__ == "__main__":
         desc = getattr(rendered_path, "description", None) or f"🚀 {clean_title}\n\n#shorts #space #science"
         tags = getattr(rendered_path, "tags", None) or ["space", "science", "shorts"]
 
+        yt_url = None
         if args.upload:
             try:
                 from channel_2.youtube_uploader import upload_short_to_youtube
-                upload_short_to_youtube(Path(rendered_path), clean_title, desc, channel=3, privacy_status=args.privacy)
+                res = upload_short_to_youtube(Path(rendered_path), clean_title, desc, channel=3, privacy_status=args.privacy)
+                if res and isinstance(res, dict):
+                    yt_url = res.get("video_url")
             except Exception as e:
                 print(f"⚠️ YouTube upload note: {e}")
 
@@ -786,6 +789,7 @@ if __name__ == "__main__":
                     title=clean_title,
                     description=desc,
                     tags=tags,
+                    youtube_url=yt_url,
                     privacy=args.privacy
                 )
             except Exception as e:

@@ -44,7 +44,7 @@ TOKEN_FILE = CREDENTIALS_DIR / "token.json"
 if not CLIENT_SECRETS_FILE.exists() and (WORKSPACE_ROOT / "client_secrets.json").exists():
     CLIENT_SECRETS_FILE = WORKSPACE_ROOT / "client_secrets.json"
 
-def _auto_decode_env_credentials():
+def _auto_decode_env_credentials(channel: int = 2):
     """Decodes base64 credentials from environment variables if present."""
     import base64
     yt_client_b64 = os.getenv("YT_CLIENT_B64", "").strip()
@@ -55,13 +55,21 @@ def _auto_decode_env_credentials():
         except Exception as e:
             print(f"⚠️ Failed to decode YT_CLIENT_B64: {e}", flush=True)
 
-    yt_token_b64 = (os.getenv("YT_TOKEN_CH2_B64") or os.getenv("YT_TOKEN_B64") or "").strip()
-    if yt_token_b64 and not TOKEN_FILE.exists():
+    target_token = CREDENTIALS_DIR / f"channel_{channel}_token.json"
+    yt_token_b64 = (
+        os.getenv(f"YT_TOKEN_CH{channel}_B64")
+        or os.getenv("YT_TOKEN_CH2_B64")
+        or os.getenv("YT_TOKEN_B64")
+        or ""
+    ).strip()
+    if yt_token_b64 and not target_token.exists():
         try:
-            TOKEN_FILE.write_bytes(base64.b64decode(yt_token_b64))
-            print(f"✅ Decoded token.json from YT_TOKEN_B64 env", flush=True)
+            target_token.write_bytes(base64.b64decode(yt_token_b64))
+            if not TOKEN_FILE.exists():
+                TOKEN_FILE.write_bytes(base64.b64decode(yt_token_b64))
+            print(f"✅ Decoded channel_{channel}_token.json from env", flush=True)
         except Exception as e:
-            print(f"⚠️ Failed to decode YT_TOKEN_B64: {e}", flush=True)
+            print(f"⚠️ Failed to decode YT_TOKEN_CH{channel}_B64: {e}", flush=True)
 
     yt_token_raw = os.getenv("YOUTUBE_TOKEN_JSON", "").strip()
     if yt_token_raw and not TOKEN_FILE.exists():
@@ -72,12 +80,12 @@ def _auto_decode_env_credentials():
             print(f"⚠️ Failed to write YOUTUBE_TOKEN_JSON: {e}", flush=True)
 
 def get_authenticated_service(channel: int = 2):
-    """Returns authenticated YouTube API v3 service for specific channel (1 or 2)."""
-    _auto_decode_env_credentials()
+    """Returns authenticated YouTube API v3 service for specific channel (1, 2, or 3)."""
+    _auto_decode_env_credentials(channel)
     
-    # Check channel-specific token
+    # Check channel-specific token, or fallback to global token.json
     target_token = CREDENTIALS_DIR / f"channel_{channel}_token.json"
-    if not target_token.exists() and channel == 2 and TOKEN_FILE.exists():
+    if not target_token.exists() and TOKEN_FILE.exists():
         target_token = TOKEN_FILE
         
     creds = None
