@@ -190,17 +190,26 @@ def generate_rag_viral_script(
             f"Story Outline:\n{outline}\n\n"
             f"CATEGORY & TONE: {cat_profile['tone']}\n\n"
             "INSTRUCTIONS FOR NATURAL SPOKEN HINDI DOCUMENTARY NARRATOR:\n"
-            "- Write ONE unbroken flowing spoken script in 100% pure Devanagari Hindi (approx 100 to 125 words).\n"
-            "- Talk like a passionate, deep-toned Indian documentary storyteller (like Nitish Rajput or Dhruv Rathee).\n"
-            "- USE DRAMATIC PACING PUNCTUATION: Use ellipses ('...'), em-dashes ('—'), questions ('?'), and commas (',') generously so the voice actor pauses naturally with deep suspense.\n"
-            "- ZERO AI Melodrama ('प्रलय', 'खून-खराबा', 'कयामत' banned), but HIGH EMOTIONAL INTENSITY.\n"
+            "- Write ONE unbroken flowing spoken script in everyday conversational creator Hindi/Hindustani (100 to 125 words).\n"
+            "- Talk like a top Indian YouTube creator (like Dhruv Rathee or Nitish Rajput) talking naturally to a friend over chai.\n"
+            "- STRICT PROHIBITION OF SANSKRIT/TEXTBOOK WORDS:\n"
+            "  * NEVER use 'मस्तिष्क' -> ALWAYS use 'दिमाग'\n"
+            "  * NEVER use 'स्वतंत्र' -> ALWAYS use 'आज़ाद' or 'कंट्रोल में'\n"
+            "  * NEVER use 'राय' or 'अपनी राय बताइए' -> ALWAYS use 'कमेंट में बताओ आप क्या सोचते हो'\n"
+            "  * NEVER use 'नियंत्रित' -> ALWAYS use 'कंट्रोल'\n"
+            "  * NEVER use 'तीव्र' -> ALWAYS use 'खतरनाक' or 'भयानक'\n"
+            "  * NEVER use 'जल' -> ALWAYS use 'पानी'\n"
+            "  * NEVER use 'मनुष्य' -> ALWAYS use 'इंसान' or 'लोग'\n"
+            "  * NEVER use 'प्रक्रिया' -> ALWAYS use 'चीज' or 'सिस्टम'\n"
+            "- USE DRAMATIC PACING PUNCTUATION: Use ellipses ('...'), em-dashes ('—'), questions ('?'), and commas (',') generously so the narrator pauses naturally with suspense.\n"
+            "- ZERO AI Melodrama ('प्रलय', 'खून-खराबा', 'कयामत' banned).\n"
             "- STRICT PROHIBITION: NEVER say 'नमस्ते दोस्तों', 'चैनल को सब्सक्राइब करें', 'वीडियो को लाइक करें', 'मिलते हैं अगले वीडियो में'.\n"
-            "- END with an intriguing debate question or mind-bending thought that compels the viewer to comment immediately!\n"
+            "- END with an intriguing conversational debate question (e.g. 'कमेंट में बताओ, क्या कभी आपके साथ ऐसा हुआ है?').\n"
             "- Output ONLY the Hindi script paragraph, nothing else."
         )
         draft = llm_complete(
             prompt=step2_prompt,
-            system="You are India's top YouTube Shorts narrator writing spoken Hindi with suspenseful, emotional cadence.",
+            system="You are India's top YouTube creator writing 100% natural conversational creator Hindi. Zero Sanskrit textbook words allowed.",
             temp=0.55,
             max_tokens=450,
             remove_nl=False,
@@ -213,17 +222,18 @@ def generate_rag_viral_script(
         step3_prompt = (
             f"Draft Script to Review:\n\"{draft}\"\n\n"
             "CRITIQUE & NATURAL POLISH CHECKLIST:\n"
-            "1. Fix broken spellings/corrupted text (NO cyrillic letters like 'स्पाзм'; write 'ऐंठन' or 'स्पैज्म').\n"
-            "2. Ensure conversational, suspenseful rhythm with clear emotional breath marks (..., —, ?, !).\n"
-            "3. Ensure total word count is between 100 and 125 Devanagari words (around 45-50 seconds audio).\n"
-            "4. Strictly ensure NO generic subscribe/like callouts. End with a gripping debate question.\n"
-            "5. Output STRICT JSON with keys: title, hook, script, cta.\n"
+            "1. REPLACE ALL SANSKRIT/FORMAL SLOP: 'मस्तिष्क' MUST become 'दिमाग', 'स्वतंत्र' MUST become 'आज़ाद', 'नियंत्रित' MUST become 'कंट्रोल', 'राय' MUST become 'सोच', 'तीव्र' MUST become 'खतरनाक'.\n"
+            "2. Fix broken spellings/corrupted text (NO cyrillic letters like 'स्पाзм'; write 'ऐंठन' or 'स्पैज्म').\n"
+            "3. Ensure conversational, suspenseful rhythm with clear emotional breath marks (..., —, ?, !).\n"
+            "4. Ensure total word count is between 100 and 125 words (around 45-50 seconds audio).\n"
+            "5. Strictly ensure NO generic subscribe/like callouts. End with a natural debate question like 'कमेंट में बताओ, आप क्या सोचते हो?'.\n"
+            "6. Output STRICT JSON with keys: title, hook, script, cta.\n"
             "Format:\n"
-            '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script with dramatic punctuation", "cta": "Closing provocative debate question"}'
+            '{"title": "Viral 5-word title #shorts", "hook": "First sentence hook", "script": "Full continuous polished script with natural creator words and dramatic punctuation", "cta": "Closing conversational question"}'
         )
         data = llm_json(
             prompt=step3_prompt,
-            system="You are an elite script editor enforcing 100% natural conversational Indian Hindi with dramatic emotional pacing. Return ONLY valid JSON.",
+            system="You are an elite YouTube script editor enforcing 100% natural conversational Indian Hindi with zero textbook/Sanskrit slop. Return ONLY valid JSON.",
             temp=0.35,
             fallback=fallback,
         )
