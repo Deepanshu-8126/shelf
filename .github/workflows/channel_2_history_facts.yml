@@ -39,8 +39,11 @@ on:
           - 'private'
 
   schedule:
-    # Daily at 12:00 UTC (5:30 PM IST)
-    - cron: '0 12 * * *'
+    # Daily at 13:00 UTC (6:30 PM IST)
+    - cron: '0 13 * * *'
+
+permissions:
+  contents: write
 
 jobs:
   render_channel_2:
@@ -112,12 +115,15 @@ jobs:
 
       - name: Render Channel 2 Short
         run: |
-          TOPIC="${{ github.event.inputs.topic || 'The Titanic Mystery: What Really Happened?' }}"
-          PILLAR="${{ github.event.inputs.pillar || '1' }}"
+          TOPIC="${{ github.event.inputs.topic }}"
+          PILLAR="${{ github.event.inputs.pillar }}"
           DURATION="${{ github.event.inputs.duration || '75' }}"
           PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
 
-          CMD=(python fleet_engines/channel_2/run_channel_2.py --pillar "$PILLAR" --lang "en" --duration "$DURATION" --privacy "$PRIVACY")
+          CMD=(python fleet_engines/channel_2/run_channel_2.py --lang "en" --duration "$DURATION" --privacy "$PRIVACY")
+          if [ -n "$PILLAR" ]; then
+            CMD+=(--pillar "$PILLAR")
+          fi
           if [ -n "$TOPIC" ]; then
             CMD+=(--topic "$TOPIC")
           fi
@@ -127,6 +133,15 @@ jobs:
 
           echo "🚀 Executing Channel 2: ${CMD[*]}"
           "${CMD[@]}"
+
+      - name: Persist Channel 2 Topic History
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fleet_engines/state/channel_2_history.json || true
+          git commit -m "Auto: Update Channel 2 topic history [skip ci]" || true
+          git push || true
 
       - name: Upload Video Artifact
         if: always()

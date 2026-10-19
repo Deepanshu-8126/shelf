@@ -36,6 +36,9 @@ on:
     # Daily at 11:00 UTC (4:30 PM IST)
     - cron: '0 11 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   render_channel_1:
     name: Render Channel 1 Video

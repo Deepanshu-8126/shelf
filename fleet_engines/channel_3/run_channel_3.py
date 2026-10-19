@@ -31,6 +31,7 @@ import requests
 import asyncio
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Optional, Tuple, Dict, Any, List
 from dotenv import load_dotenv
 
 # Path setup
@@ -61,38 +62,164 @@ OUTPUT_DIR = WORKSPACE_ROOT / "fleet_engines/output/channel_3_cosmic_what_if"
 from llm_engine import generate_channel3_script, llm_complete
 from media_fetcher import fetch_mixed_media_clip, plan_beat_visuals
 
+class RenderResult(str):
+    """String subclass that behaves as a path while preserving rich video metadata."""
+    def __new__(cls, video_path: str, title: str = "", description: str = "", tags: list = None, script: str = "", topic: str = ""):
+        inst = super().__new__(cls, video_path)
+        inst.video_path = Path(video_path)
+        inst.title = title
+        inst.description = description
+        inst.tags = tags or []
+        inst.script = script
+        inst.topic = topic
+        return inst
+
+
 PILLARS = {
     1: {
         "name": "Deep Earth & Ocean Anomalies",
         "category": "deep_earth_ocean",
         "default_topic": "मारियाना ट्रेंच के 11 किलोमीटर नीचे वैज्ञानिकों को क्या मिला?",
+        "topics": [
+            "मारियाना ट्रेंच के 11 किलोमीटर नीचे वैज्ञानिकों को क्या मिला?",
+            "रूस का 12 किलोमीटर गहरा गड्ढा जिसे अचानक बंद करना पड़ा",
+            "समंदर के नीचे छिपा 8वां महाद्वीप ज़ीलैंडिया",
+            "अंटार्कटिका की 3 किलोमीटर बर्फ के नीचे छिपी खूनी झील",
+            "धरती के केंद्र में मौजूद समंदर से तीन गुना बड़ा पानी का भंडार",
+            "प्रशांत महासागर का पॉइंट नीमो जहां सैटेलाइट्स का कब्रिस्तान है",
+            "समंदर की गहराई में बहने वाली अंडरवाटर नदियां और रहस्यमयी झरने",
+            "नासा ने अंतरिक्ष छोड़ गहरे समंदर में रिसर्च क्यों शुरू की?",
+            "समंदर के सबसे अंधेरे हिस्से में मिला 500 साल पुराना जीवित जीव",
+            "बरमूडा ट्रायंगल का असली वैज्ञानिक और भूवैज्ञानिक रहस्य"
+        ],
         "search_terms": ["deep sea underwater trench", "stormy ocean rough dark", "strange deep sea creatures"]
     },
     2: {
         "name": "Bizarre Human Body Science",
         "category": "bizarre_human_science",
         "default_topic": "अगर इंसान लगातार 7 दिन तक न सोए तो दिमाग के साथ क्या होता है?",
+        "topics": [
+            "अगर इंसान लगातार 7 दिन तक न सोए तो दिमाग के साथ क्या होता है?",
+            "रेबीज की बीमारी में इंसान पानी से क्यों कांपने लगता है?",
+            "अचानक सोते समय ऊंचाई से गिरने का झटका क्यों लगता है?",
+            "जब इंसान मरने वाला होता है तो दिमाग में 7 मिनट क्या चलता है?",
+            "क्या इंसान के शरीर में सचमुच बिजली बन सकती है?",
+            "इंसानी दिल शरीर से बाहर निकलने के बाद भी क्यों धड़कता है?",
+            "आंखों के सामने तैरने वाले वो अजीब कीड़े जैसी आकृतियां क्या हैं?",
+            "हाइपोथर्मिया में लोग मरने से ठीक पहले कपड़े क्यों उतारने लगते हैं?",
+            "इंसानी दिमाग खुद के न्यूरॉन्स को भूख में कब खाना शुरू करता है?",
+            "इंसान की आंख 1 करोड़ अलग-अलग रंगों को कैसे पहचानती है?"
+        ],
         "search_terms": ["brain glowing scan human", "person looking tired insomnia", "medical science laboratory dark"]
     },
     3: {
         "name": "Real Everyday What-Ifs",
         "category": "everyday_what_ifs",
         "default_topic": "अगर 24 घंटे के लिए दुनिया का सारा इंटरनेट बंद हो जाए?",
+        "topics": [
+            "अगर 24 घंटे के लिए दुनिया का सारा इंटरनेट बंद हो जाए?",
+            "अगर धरती से सिर्फ 5 सेकंड के लिए ऑक्सीजन गायब हो जाए?",
+            "अगर धरती अपनी जगह अचानक घूमना बंद कर दे तो क्या होगा?",
+            "अगर दुनिया की सारी मधुमक्खियां अचानक गायब हो जाएं?",
+            "अगर दुनिया का सारा कच्चा तेल अचानक खत्म हो जाए?",
+            "अगर चांद अचानक धरती के दोगुना करीब आ जाए?",
+            "अगर दुनिया के सारे मच्छर अचानक धरती से गायब हो जाएं?",
+            "अगर धरती के सारे ज्वालामुखी एक साथ फट जाएं?",
+            "अगर सूरज सिर्फ 1 घंटे के लिए अपनी रोशनी बंद कर दे?",
+            "अगर इंसान प्रकाश की गति से दौड़ने लगे तो क्या होगा?"
+        ],
         "search_terms": ["server room computer network", "modern city traffic night", "empty streets power outage"]
     },
     4: {
         "name": "Mysterious Historic & Dark Science Curiosities",
         "category": "dark_science_anomalies",
         "default_topic": "चेरनोबिल का एलीफेंट्स फुट: दुनिया का सबसे खतरनाक पत्थर",
+        "topics": [
+            "चेरनोबिल का एलीफेंट्स फुट: दुनिया का सबसे खतरनाक पत्थर",
+            "टाओस का रहस्यमयी हम: वो आवाज जो सिर्फ कुछ लोगों को सुनाई देती है",
+            "साल 1518 की डांसिंग प्लेग जिसमें लोग नाचते-नाचते मर गए",
+            "दुनिया का सबसे शांत कमरा जहां कोई 45 मिनट से ज्यादा नहीं टिक सका",
+            "रहस्यमयी वोयनिच पांडुलिपि जिसे आज तक कोई डिकोडर नहीं पढ़ पाया",
+            "डीप सी बूप साउंड: समंदर से आई वो रहस्यमयी आवाज जिसने वैज्ञानिकों को डरा दिया",
+            "रूस का डियाटलोव पास हादसा: 9 पर्वतारोहियों की रहस्यमयी मौत",
+            "धरती का वो खौफनाक जंगल जहां जीपीएस और कंपास काम करना बंद कर देते हैं",
+            "प्राचीन काल का ग्रीक फायर जिसका फॉर्मूला आज तक कोई वैज्ञानिक नहीं जान सका",
+            "वो वैज्ञानिक जिसने खुद पर ही खतरनाक प्रयोग कर डाले"
+        ],
         "search_terms": ["abandoned chernobyl dark reactor", "radiation danger hazard zone", "mysterious glowing dark artifact"]
     },
     5: {
         "name": "Mind-Bending Deep Space Curiosities",
         "category": "mind_bending_space",
         "default_topic": "अंतरिक्ष का वो ग्रह जो पूरा का पूरा हीरे का बना हुआ है",
+        "topics": [
+            "अंतरिक्ष का वो ग्रह जो पूरा का पूरा हीरे का बना हुआ है",
+            "ब्रह्मांड का सबसे बड़ा ब्लैक होल जिसमें 100 अरब सूरज समा सकते हैं",
+            "अंतरिक्ष की वो जगह जहां समय धरती से बहुत धीमा चलता है",
+            "ब्रह्मांड में तैरता हुआ शराब और पानी का विशालकाय बादल",
+            "जेम्स वेब टेलीस्कोप ने खोजी अंतरिक्ष की वो संरचना जो होनी ही नहीं चाहिए थी",
+            "अगर कोई अंतरिक्ष यात्री ब्लैक होल के इवेंट होराइजन में गिर जाए?",
+            "न्यूट्रॉन स्टार का एक चम्मच टुकड़ा धरती पर माउंट एवरेस्ट जितना भारी क्यों होता है?",
+            "अंतरिक्ष में कोई आवाज क्यों नहीं होती और वहां किस चीज की गंध आती है?",
+            "वो भटकता हुआ आवारा ग्रह जो बिना किसी सूरज के अंतरिक्ष में तैर रहा है",
+            "ब्रह्मांड की सबसे दूर की तस्वीर में क्या दिखा जिसे देखकर वैज्ञानिक दंग रह गए?"
+        ],
         "search_terms": ["deep space stars telescope", "spinning galaxy cosmic nebula", "diamond glowing crystal space"]
     }
 }
+
+
+def get_next_channel3_topic(requested_pillar: Optional[int] = None, user_topic: str = "") -> Tuple[int, Dict, str]:
+    """Selects the next unique viral topic from history so no script or title ever repeats."""
+    state_dir = WORKSPACE_ROOT / "fleet_engines/state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    history_file = state_dir / "channel_3_history.json"
+
+    history = {"last_pillar": 0, "used_topics": []}
+    if history_file.exists():
+        try:
+            history = json.loads(history_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    used_topics = set(history.get("used_topics", []))
+
+    if user_topic and user_topic.strip():
+        chosen_pillar = requested_pillar if requested_pillar in PILLARS else 1
+        chosen_topic = user_topic.strip()
+        used_topics.add(chosen_topic)
+        history["last_pillar"] = chosen_pillar
+        history["used_topics"] = list(used_topics)[-200:]
+        history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+        return chosen_pillar, PILLARS[chosen_pillar], chosen_topic
+
+    # Rotate pillars: 1 -> 2 -> 3 -> 4 -> 5 -> 1...
+    if requested_pillar and requested_pillar in PILLARS and requested_pillar != 1:
+        chosen_pillar = requested_pillar
+    else:
+        last_p = history.get("last_pillar", 0)
+        chosen_pillar = (last_p % 5) + 1
+
+    pillar_info = PILLARS[chosen_pillar]
+    pool = pillar_info.get("topics", [pillar_info["default_topic"]])
+
+    # Find first topic not yet used
+    available = [t for t in pool if t not in used_topics]
+    if not available:
+        # Reset memory for this pillar when exhausted
+        used_topics = {t for t in used_topics if t not in pool}
+        available = pool
+
+    chosen_topic = available[0]
+    used_topics.add(chosen_topic)
+
+    history["last_pillar"] = chosen_pillar
+    history["used_topics"] = list(used_topics)[-200:]
+    history["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    print(f"🔄 [Channel 3 State Engine] Pillar #{chosen_pillar} ({pillar_info['name']}) -> Selected Topic: '{chosen_topic}'")
+    return chosen_pillar, pillar_info, chosen_topic
 
 
 
@@ -344,7 +471,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 # 2. SCRIPT LOADER (INLINE / FILE / GITHUB RAW URL)
 # =============================================================================
 def load_custom_script(script_text: str = "", script_file: str = "", script_url: str = "") -> str:
-    """Loads script from string, local file path, or remote GitHub URL."""
+    """Loads script ONLY when explicitly provided via string, local file path, or remote URL."""
     if script_url:
         print(f"🌐 Fetching custom script from remote URL: {script_url}...")
         try:
@@ -368,15 +495,7 @@ def load_custom_script(script_text: str = "", script_file: str = "", script_url:
     if script_text and script_text.strip():
         return script_text.strip()
 
-    # Convenience: Auto-check for custom_script.txt or my_script.txt in channel folder or root
-    for cand in [Path(__file__).parent / "custom_script.txt", Path("custom_script.txt"), Path(WORKSPACE_ROOT) / "custom_script.txt", Path(__file__).parent / "my_script.txt"]:
-        if cand.exists() and cand.stat().st_size > 10:
-            lines = [l.strip() for l in cand.read_text(encoding="utf-8", errors="replace").splitlines() if l.strip() and not l.strip().startswith("#")]
-            clean_text = " ".join(lines).strip()
-            if clean_text:
-                print(f"📄 Auto-detected user custom script from: {cand}")
-                return clean_text
-
+    # Zero auto-detection: If not explicitly supplied, let AI generate fresh unique topics!
     return ""
 
 
@@ -397,29 +516,26 @@ def render_channel_3_short(
     print(f"🌌 CHANNEL 3: COSMIC WHAT-IF ENGINE V3 (RAPID CUTS + PEXELS/PIXABAY MIXUP)")
     print("=" * 75)
 
-    if not topic and (pillar_id is None or pillar_id == 1):
-        # Auto-rotate dynamically across all 5 categories so no two videos repeat the same domain
-        rot_id = (int(time.time() // 86400) % 5) + 1
-        pillar = PILLARS.get(rot_id, PILLARS[1])
-        target_topic = pillar["default_topic"]
-        print(f"🔄 [Dynamic Rotation] Automatically selected Category #{rot_id}: {pillar['name']}")
-    else:
-        pillar = PILLARS.get(pillar_id, PILLARS[1])
-        target_topic = topic or pillar["default_topic"]
-
-    # Resolve script
+    # 1. Dynamic Unique Topic Selection (Prevents repetition across days)
     resolved_script = load_custom_script(custom_script, script_file, script_url)
     if resolved_script:
-        title = custom_title or target_topic
-        pkg = {"title": title, "script": resolved_script}
+        chosen_pillar = pillar_id if pillar_id in PILLARS else 1
+        pillar = PILLARS[chosen_pillar]
+        target_topic = topic or custom_title or pillar["default_topic"]
+        pkg = {"title": custom_title or target_topic, "script": resolved_script}
+        print(f"📄 Using explicitly provided custom script for: {target_topic}")
     else:
+        chosen_pillar, pillar, target_topic = get_next_channel3_topic(requested_pillar=pillar_id, user_topic=topic)
         pkg = generate_channel3_script(
             topic=target_topic,
             pillar_name=pillar["name"],
             lang=lang,
             word_count_target=42,
         )
-        if custom_title: pkg["title"] = custom_title
+        if custom_title:
+            pkg["title"] = custom_title
+
+    pillar_id = chosen_pillar
 
     print(f"📌 Title: {pkg['title']}")
     print(f"📜 Script: {pkg['script']}\n")
@@ -596,7 +712,29 @@ def render_channel_3_short(
     print("🌌 [CHANNEL 3 COSMIC SHORT RENDERED SUCCESSFULLY]")
     print(f"📁 Video: {final_video}")
     print("=" * 75)
-    return str(final_video)
+
+    raw_t = pkg.get("title") or target_topic
+    if "#shorts" not in raw_t.lower():
+        final_title = f"{raw_t} 🌌 #shorts #spacefacts"
+    else:
+        final_title = raw_t
+
+    final_desc = (
+        f"🚀 {final_title}\n\n"
+        f"{pkg.get('script', '')}\n\n"
+        f"Kya aapko brahmand ke is sach ke baare mein pata tha? Apni raye comment me batayein! 👇\n\n"
+        f"#shorts #space #cosmic #science #whatif #spacefacts #hindifacts #viral #trending"
+    )
+    final_tags = ["space", "cosmic", "whatif", "space facts", "universe", "science", "shorts", "hindi facts", "viral"]
+
+    return RenderResult(
+        video_path=str(final_video),
+        title=final_title,
+        description=final_desc,
+        tags=final_tags,
+        script=pkg.get("script", ""),
+        topic=target_topic
+    )
 
 
 if __name__ == "__main__":
@@ -627,15 +765,9 @@ if __name__ == "__main__":
     )
 
     if rendered_path:
-        p_info = PILLARS.get(args.pillar, PILLARS[1])
-        raw_title = args.title.strip() if args.title else (args.topic.strip() if args.topic else p_info["default_topic"])
-        clean_title = f"{raw_title} 🌌 #shorts #spacefacts"
-        desc = (
-            f"🚀 {raw_title}\n\n"
-            f"Kya aapko brahmand ke is sach ke baare mein pata tha? Apni raye comment me batayein! 👇\n\n"
-            f"#shorts #space #cosmic #science #whatif #spacefacts #hindifacts #viral #trending"
-        )
-        tags = ["space", "cosmic", "whatif", "space facts", "universe", "science", "shorts", "hindi facts", "viral"]
+        clean_title = getattr(rendered_path, "title", None) or (f"{args.title} 🌌 #shorts" if args.title else "ब्रह्मांड का अद्भुत रहस्य 🌌 #shorts")
+        desc = getattr(rendered_path, "description", None) or f"🚀 {clean_title}\n\n#shorts #space #science"
+        tags = getattr(rendered_path, "tags", None) or ["space", "science", "shorts"]
 
         if args.upload:
             try:
@@ -647,13 +779,14 @@ if __name__ == "__main__":
         if args.telegram:
             try:
                 from telegram_dispatcher import send_fleet_video_to_telegram
-                print("📱 Dispatching Channel 3 Short to Telegram...")
+                print(f"📱 Dispatching Channel 3 Short to Telegram: '{clean_title}'...")
                 send_fleet_video_to_telegram(
                     video_path=Path(rendered_path),
                     channel=3,
                     title=clean_title,
                     description=desc,
-                    tags=tags
+                    tags=tags,
+                    privacy=args.privacy
                 )
             except Exception as e:
                 print(f"⚠️ Telegram dispatch note: {e}")

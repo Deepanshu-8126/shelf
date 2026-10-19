@@ -24,6 +24,7 @@ import numpy as np
 import cv2
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Optional, Tuple, Dict, Any, List
 from PIL import Image, ImageDraw, ImageFont
 
 import warnings
@@ -37,7 +38,6 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 
 import edge_tts
-import whisper
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -48,6 +48,18 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "gsk_vqONfSupYYlKwJYWleQLWGdyb3FYYQi
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY") or "Ng530LMnrpm85zReE4lMhjCD7wm5Pc6h8rTE8NfSsuS7be57Qe7C1AGT"
 OUTPUT_DIR = WORKSPACE_ROOT / "fleet_engines/output/channel_2_vox_mystery"
 
+class RenderResult(str):
+    """String subclass that behaves as a path while preserving rich video metadata."""
+    def __new__(cls, video_path: str, title: str = "", description: str = "", tags: list = None, script: str = "", topic: str = ""):
+        inst = super().__new__(cls, video_path)
+        inst.video_path = Path(video_path)
+        inst.title = title
+        inst.description = description
+        inst.tags = tags or []
+        inst.script = script
+        inst.topic = topic
+        return inst
+
 # =============================================================================
 # 1. THE 4 MASTER VIRAL PILLARS
 # =============================================================================
@@ -55,24 +67,124 @@ PILLARS = {
     1: {
         "name": "Forbidden Places & Coordinates",
         "default_topic": "The Siberian Door to the Underworld crater expanding yearly",
+        "topics": [
+            "The Siberian Door to the Underworld crater expanding yearly",
+            "The North Sentinel Island forbidden coordinates no human can enter",
+            "The Mariana Trench Challenger Deep: 36,000 feet underwater anomalies",
+            "The Chernobyl Elephant's Foot: The most dangerous artifact on Earth",
+            "The Zone of Silence in Mexico where radio waves mysteriously die",
+            "The Blood Falls of Antarctica flowing from a hidden subterranean lake",
+            "The Kola Superdeep Borehole: Why scientists suddenly welded it shut",
+            "The Danakil Depression: The hottest, most alien landscape on Earth",
+            "The Derinkuyu Underground City that sheltered 20,000 people",
+            "The Snake Island of Brazil: Why the military bans all civilians"
+        ],
         "search_terms": ["stormy ocean dark fog", "dark misty rainforest aerial", "ancient cave entrance"]
     },
     2: {
         "name": "Forensic & Interrogation Psychology",
         "default_topic": "The FBI 4-second silence rule that exposes lies",
+        "topics": [
+            "The FBI 4-second silence rule that exposes lies",
+            "The Micro-Expression glitch that unmasks a liar in 0.04 seconds",
+            "The Door-in-the-Face psychological technique negotiators use",
+            "Why psychopaths don't yawn when they see others yawning",
+            "The Stockholm Syndrome psychological trap explained by neuroscience",
+            "How forensic investigators tell suicide from staged murder",
+            "The Eyewitness Memory Paradox: Why human memory rewrites trauma",
+            "The Cognitive Load lie-detection method used by elite interrogators",
+            "The Bystander Effect experiment that shocked social psychology",
+            "How gaslighting physically alters brain structures over time"
+        ],
         "search_terms": ["dark interrogation room", "clock ticking dramatic", "close up eye pupil"]
     },
     3: {
         "name": "Space & Cosmic Anomalies",
         "default_topic": "The James Webb deep void discovery that shouldn't exist",
+        "topics": [
+            "The James Webb deep void discovery that shouldn't exist",
+            "The Wow! Signal: The 72-second extraterrestrial broadcast of 1977",
+            "The rogue planet roaming through deep space without a star",
+            "The Great Attractor pulling our entire galaxy toward darkness",
+            "What actually happens to the human body in a vacuum without a suit",
+            "The neutron star collision that forged all the gold on Earth",
+            "The Boötes Void: 330 million light years of terrifying empty space",
+            "The Dyson Sphere anomaly around Tabby's Star that scientists can't explain",
+            "The time dilation horizon: Spending 1 hour near a supermassive black hole",
+            "The cosmic microwave background cold spot that might touch a multiverse"
+        ],
         "search_terms": ["deep space telescope nebula", "satellite earth night", "spinning galaxy cosmic"]
     },
     4: {
         "name": "Dark Mind Hacks & Subconscious Glitches",
         "default_topic": "How looking at someone's forehead triggers anxiety",
+        "topics": [
+            "How looking at someone's forehead triggers anxiety",
+            "The Baader-Meinhof Phenomenon: Why you suddenly see things everywhere",
+            "The Phantom Vibration syndrome hacking modern human brains",
+            "The Tetris Effect: How repetitive games alter your visual cortex",
+            "Why your brain erases your nose from your field of vision",
+            "The Placebo and Nocebo effects: When belief physically harms you",
+            "The Call of the Void: Why high places tempt healthy human minds",
+            "The Déjà Vu neurological misfire between memory and perception",
+            "How sleep deprivation forces the brain to eat its own synapses",
+            "The Spotlight Effect: Why nobody actually notices your mistakes"
+        ],
         "search_terms": ["mysterious shadow portrait", "chess pieces dramatic", "macro eye dilation"]
     }
 }
+
+
+def get_next_channel2_topic(requested_pillar: Optional[int] = None, user_topic: str = "") -> Tuple[int, Dict, str]:
+    """Selects the next unique viral topic from history so no script or title ever repeats."""
+    state_dir = WORKSPACE_ROOT / "fleet_engines/state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    history_file = state_dir / "channel_2_history.json"
+
+    history = {"last_pillar": 0, "used_topics": []}
+    if history_file.exists():
+        try:
+            history = json.loads(history_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    used_topics = set(history.get("used_topics", []))
+
+    if user_topic and user_topic.strip():
+        chosen_pillar = requested_pillar if requested_pillar in PILLARS else 1
+        chosen_topic = user_topic.strip()
+        used_topics.add(chosen_topic)
+        history["last_pillar"] = chosen_pillar
+        history["used_topics"] = list(used_topics)[-200:]
+        history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+        return chosen_pillar, PILLARS[chosen_pillar], chosen_topic
+
+    # Rotate pillars: 1 -> 2 -> 3 -> 4 -> 1...
+    if requested_pillar and requested_pillar in PILLARS and requested_pillar != 1:
+        chosen_pillar = requested_pillar
+    else:
+        last_p = history.get("last_pillar", 0)
+        chosen_pillar = (last_p % 4) + 1
+
+    pillar_info = PILLARS[chosen_pillar]
+    pool = pillar_info.get("topics", [pillar_info["default_topic"]])
+
+    # Find first topic not yet used
+    available = [t for t in pool if t not in used_topics]
+    if not available:
+        used_topics = {t for t in used_topics if t not in pool}
+        available = pool
+
+    chosen_topic = available[0]
+    used_topics.add(chosen_topic)
+
+    history["last_pillar"] = chosen_pillar
+    history["used_topics"] = list(used_topics)[-200:]
+    history["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    history_file.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    print(f"🔄 [Channel 2 State Engine] Pillar #{chosen_pillar} ({pillar_info['name']}) -> Selected Topic: '{chosen_topic}'")
+    return chosen_pillar, pillar_info, chosen_topic
 
 # Import Universal Anti-AI-Slop Humanized Script & CTA Writer
 sys.path.insert(0, str(WORKSPACE_ROOT / "fleet_engines"))
@@ -298,31 +410,22 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
     print(f"🎬 CHANNEL 2: RENDERING SHORT (PILLAR #{pillar_id} | 100% REAL FOOTAGE)")
     print("=" * 75)
     
-    # 1. Script
-    resolved_script = custom_script.strip()
-    if not resolved_script and not topic:
-        for cand in [Path(WORKSPACE_ROOT) / "custom_script.txt", Path(__file__).parent / "custom_script.txt"]:
-            if cand.exists() and cand.stat().st_size > 10:
-                lines = [l.strip() for l in cand.read_text(encoding="utf-8", errors="replace").splitlines() if l.strip() and not l.strip().startswith("#")]
-                clean_text = " ".join(lines).strip()
-                # Ensure custom script matches channel language
-                if clean_text:
-                    print(f"📄 Auto-detected user custom script from: {cand}")
-                    resolved_script = clean_text
-                    break
-
+    # 1. Script & Topic Resolution (Prevents repetition across runs)
+    resolved_script = custom_script.strip() if custom_script else ""
     if resolved_script:
-        title = custom_title or (topic if topic else PILLARS.get(pillar_id, PILLARS[1])["default_topic"])
-        pkg = {"title": title, "script": resolved_script}
-        print(f"📌 Custom Title: {pkg['title']}")
-        print(f"📜 Custom Script: {pkg['script']}\n")
+        chosen_pillar = pillar_id if pillar_id in PILLARS else 1
+        target_topic = topic or custom_title or PILLARS[chosen_pillar]["default_topic"]
+        pkg = {"title": custom_title or target_topic, "script": resolved_script}
+        print(f"📌 Custom Script provided for topic: {target_topic}")
     else:
-        pkg = generate_script(pillar_id, topic, lang, target_duration=target_duration)
+        chosen_pillar, pillar_info, target_topic = get_next_channel2_topic(requested_pillar=pillar_id, user_topic=topic)
+        pkg = generate_script(chosen_pillar, target_topic, lang, target_duration=target_duration)
         if custom_title:
             pkg["title"] = custom_title
         print(f"📌 Title: {pkg['title']}")
         print(f"📜 Script: {pkg['script']}\n")
     
+    pillar_id = chosen_pillar
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     final_video = OUTPUT_DIR / f"vox_pillar_{pillar_id}_{lang}_{int(time.time())}.mp4"
     
@@ -443,7 +546,41 @@ def render_short(pillar_id: int = 1, topic: str = "", lang: str = "en", custom_s
     print("🎉 [VOX SHORT RENDERED SUCCESSFULLY]")
     print(f"📁 Video: {final_video}")
     print("=" * 75)
-    return str(final_video)
+
+    raw_t = pkg.get("title") or target_topic
+    if lang == "en":
+        if "#shorts" not in raw_t.lower():
+            final_title = f"{raw_t} 🕵️ #shorts #mystery #documentary"
+        else:
+            final_title = raw_t
+        final_desc = (
+            f"🕵️ {final_title}\n\n"
+            f"{pkg.get('script', '')}\n\n"
+            f"What do you think really happened? Share your theory in the comments below! 👇\n\n"
+            f"#shorts #history #mystery #unsolved #documentary #facts #science #viral"
+        )
+        final_tags = ["mystery", "history", "unsolved", "facts", "documentary", "science", "shorts", "viral"]
+    else:
+        if "#shorts" not in raw_t.lower():
+            final_title = f"{raw_t} 😱 #shorts #mystery #facts"
+        else:
+            final_title = raw_t
+        final_desc = (
+            f"🕵️ {final_title}\n\n"
+            f"{pkg.get('script', '')}\n\n"
+            f"Kya aapko is anokhi ghatna ka sach pata tha? Apni raye comment me zaroor batayein! 👇\n\n"
+            f"#shorts #mystery #unsolved #facts #amazingfacts #hindifacts #sciencefacts #viral #trending"
+        )
+        final_tags = ["mystery", "unsolved", "facts", "amazing facts", "hindi facts", "science facts", "shorts", "viral"]
+
+    return RenderResult(
+        video_path=str(final_video),
+        title=final_title,
+        description=final_desc,
+        tags=final_tags,
+        script=pkg.get("script", ""),
+        topic=target_topic
+    )
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Unified Channel 2 Engine")
@@ -467,47 +604,33 @@ if __name__ == "__main__":
         target_duration=args.duration
     )
     
-    yt_url = None
-    raw_title = args.title.strip() if args.title else (args.topic.strip() if args.topic else f"Duniya Ka Sabse Bada Rahasya")
-    
-    if args.lang == "en":
-        title = f"{raw_title} ⚓ #shorts #history #mystery"
-        desc = (
-            f"⚓ {raw_title}\n\n"
-            f"What do you think really happened? Share your theory in the comments below! 👇\n\n"
-            f"#shorts #history #mystery #titanic #unsolved #documentary #facts #historyfacts #viral"
-        )
-        tags = ["titanic", "mystery", "history", "unsolved", "facts", "documentary", "history facts", "shorts", "viral"]
-    else:
-        title = f"{raw_title} 😱 #shorts #mystery"
-        desc = (
-            f"🕵️ {raw_title}\n\n"
-            f"Kya aapko is anokhi ghatna ka sach pata tha? Apni raye comment me zaroor batayein! 👇\n\n"
-            f"#shorts #mystery #unsolved #facts #amazingfacts #hindifacts #sciencefacts #viral #trending #youtubeshorts"
-        )
-        tags = ["mystery", "unsolved", "facts", "amazing facts", "hindi facts", "science facts", "shorts", "viral shorts", "trending"]
-    
-    if args.upload and rendered_path:
-        try:
-            from channel_2.youtube_uploader import upload_short_to_youtube
-        except ImportError:
-            from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
-        video_p = Path(rendered_path)
-        res = upload_short_to_youtube(video_p, title, desc, channel=2, privacy_status=args.privacy)
-        if res:
-            yt_url = res.get("video_url")
-            
-    if args.telegram and rendered_path:
-        try:
-            from telegram_dispatcher import send_fleet_video_to_telegram
-        except ImportError:
-            from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
-        send_fleet_video_to_telegram(
-            video_path=Path(rendered_path),
-            channel=2,
-            title=title,
-            description=desc,
-            tags=tags,
-            youtube_url=yt_url,
-            privacy=args.privacy
-        )
+    if rendered_path:
+        title = getattr(rendered_path, "title", None) or (f"{args.title or args.topic or 'Unsolved Mystery'} 🕵️ #shorts")
+        desc = getattr(rendered_path, "description", None) or f"🕵️ {title}\n\n#shorts #mystery #facts"
+        tags = getattr(rendered_path, "tags", None) or ["mystery", "facts", "shorts"]
+
+        yt_url = None
+        if args.upload:
+            try:
+                from channel_2.youtube_uploader import upload_short_to_youtube
+            except ImportError:
+                from fleet_engines.channel_2.youtube_uploader import upload_short_to_youtube
+            video_p = Path(rendered_path)
+            res = upload_short_to_youtube(video_p, title, desc, channel=2, privacy_status=args.privacy)
+            if res:
+                yt_url = res.get("video_url")
+                
+        if args.telegram:
+            try:
+                from telegram_dispatcher import send_fleet_video_to_telegram
+            except ImportError:
+                from fleet_engines.telegram_dispatcher import send_fleet_video_to_telegram
+            send_fleet_video_to_telegram(
+                video_path=Path(rendered_path),
+                channel=2,
+                title=title,
+                description=desc,
+                tags=tags,
+                youtube_url=yt_url,
+                privacy=args.privacy
+            )

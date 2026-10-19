@@ -49,6 +49,18 @@ if str(FLEET_DIR) not in sys.path:
 
 from llm_engine import llm_json, llm_complete
 
+class RenderResult(str):
+    """String subclass that behaves as a path while preserving rich video metadata."""
+    def __new__(cls, video_path: str, title: str = "", description: str = "", tags: list = None, script: str = "", topic: str = ""):
+        inst = super().__new__(cls, video_path)
+        inst.video_path = Path(video_path)
+        inst.title = title
+        inst.description = description
+        inst.tags = tags or []
+        inst.script = script
+        inst.topic = topic
+        return inst
+
 
 # =============================================================================
 # 1. VIRAL DRAMA STORY ENGINE (Few-Shot Karma, Revenge & Satisfying Stories)
@@ -58,7 +70,12 @@ REDDIT_THEMES = [
     "An entitled Karen makes a scene trying to get a young worker fired, but security camera footage destroys her publicly.",
     "An arrogant roommate secretly steals groceries and lies to everyone, so the victim sets an undeniable visual trap.",
     "An entitled relative demands someone's first-class travel seat or heirloom, and gets utterly humiliated in front of the entire family.",
-    "A greedy landlord tries to steal a tenant's entire security deposit with fake claims, until the tenant pulls out timestamped move-in inspection video."
+    "A greedy landlord tries to steal a tenant's entire security deposit with fake claims, until the tenant pulls out timestamped move-in inspection video.",
+    "A dishonest coworker takes credit for my six-month software project, so I leave an intentional Easter egg that crashes during their executive demo.",
+    "An entitled neighbor builds a fence two feet into my property line, so I hire a surveyor and watch them tear it down at their own expense.",
+    "A scammer tries to blackmail me with fake photos, so I reverse-trace their real location and report them straight to federal cybercrime.",
+    "An arrogant customer snaps their fingers at a waiter and demands free meals, but the manager turns out to be the waiter's father.",
+    "A cheating partner tries to take all joint savings, but gets exposed by automated banking audit notifications in court."
 ]
 
 def generate_channel1_story(theme: str = "", lang: str = "en") -> Dict[str, str]:
@@ -475,7 +492,22 @@ def render_channel_1_short(
     print("🎉 [CHANNEL 1 SHORT RENDERED SUCCESSFULLY]")
     print(f"📁 Video: {final_video}")
     print("=" * 75)
-    return str(final_video)
+
+    raw_t = pkg.get("title") or "Viral Reddit Revenge Story"
+    if "#shorts" not in raw_t.lower():
+        clean_title = f"{raw_t} #shorts #redditstories"
+    else:
+        clean_title = raw_t
+
+    desc = (
+        f"🔥 {clean_title}\n\n"
+        f"{pkg.get('story', '')}\n\n"
+        f"Did they take it too far, or did they get what they deserved? Drop your thoughts below! 👇\n\n"
+        f"#shorts #redditstories #pettyrevenge #drama #viral #storytime #karma #youtubeshorts"
+    )
+    tags = ["reddit", "reddit stories", "petty revenge", "shorts", "viral shorts", "karma", "storytime", "drama", "youtubeshorts"]
+
+    return RenderResult(str(final_video), title=clean_title, description=desc, tags=tags, script=pkg.get("story", ""))
 
 
 if __name__ == "__main__":
@@ -502,13 +534,9 @@ if __name__ == "__main__":
     )
 
     if rendered:
-        clean_title = args.title.strip() if args.title else "Entitled Boss Gets Instant Karma #shorts #redditstories"
-        desc = (
-            f"🔥 {clean_title}\n\n"
-            f"Did they take it too far, or did they get what they deserved? Drop your thoughts below! 👇\n\n"
-            f"#shorts #redditstories #pettyrevenge #drama #viral #storytime #karma #youtubeshorts"
-        )
-        tags = ["reddit", "reddit stories", "petty revenge", "shorts", "viral shorts", "karma", "storytime", "drama", "youtubeshorts"]
+        clean_title = getattr(rendered, "title", None) or (f"{target_title} #shorts #redditstories" if target_title else "Entitled Boss Gets Instant Karma #shorts #redditstories")
+        desc = getattr(rendered, "description", None) or f"🔥 {clean_title}\n\n#shorts #redditstories #drama"
+        tags = getattr(rendered, "tags", None) or ["reddit", "shorts", "drama"]
 
         if args.upload:
             try:
@@ -525,7 +553,8 @@ if __name__ == "__main__":
                     channel=1,
                     title=clean_title,
                     description=desc,
-                    tags=tags
+                    tags=tags,
+                    privacy=args.privacy
                 )
             except Exception as e:
                 print(f"⚠️ Telegram dispatch note: {e}")

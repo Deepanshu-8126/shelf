@@ -79,59 +79,52 @@ def send_fleet_video_to_telegram(
     timing = calculate_optimal_viral_time()
 
     if channel == 1:
-        channel_name = "Channel 1: Funcyous"
+        channel_name = "Channel 1: Funcyous (Reddit Drama)"
         channel_badge = "🎭 VIRAL REDDIT DRAMA & CONFESSIONS"
+        channel_slot = "Daily 4:30 PM IST (11:00 UTC)"
         extra_tags = "#shorts #redditstories #reddit #drama #viral"
     elif channel == 3:
-        channel_name = "Channel 3: Cosmic What-If"
+        channel_name = "Channel 3: Cosmic What-If (हिंदी)"
         channel_badge = "🌌 COSMIC WHAT-IF & DEEP UNIVERSE"
+        channel_slot = "Daily 8:30 PM IST (15:00 UTC)"
         extra_tags = "#shorts #cosmic #space #science #whatif #universe #hindi"
     else:
         channel_name = "Channel 2: Mystery & Curiosity"
-        channel_badge = "🕵️ ZACK D. FILMS / VOX HINDI MYSTERY"
+        channel_badge = "🕵️ VOX MYSTERY & UNSOLVED ANOMALIES"
+        channel_slot = "Daily 6:30 PM IST (13:00 UTC)"
         extra_tags = "#shorts #mystery #unsolved #facts #science #viral"
 
-    caption_card = [
+    # Clean title to prevent Markdown crash
+    safe_title = title.replace("*", "").replace("_", "").replace("`", "").strip()
+    safe_desc = description[:160].replace("*", "").replace("_", "").replace("`", "").strip()
+
+    caption_lines = [
         f"🎬 *{channel_badge}*",
         f"📺 *Channel:* `{channel_name}`",
-        f"🕒 *Rendered at:* `{timing['current_ist']}`",
+        f"⏰ *Timeline Slot:* `{channel_slot}`",
         "",
         f"📌 *Video Title:*",
-        f"*{title}*",
+        f"*{safe_title}*",
         "",
-        f"📝 *Description & Hashtags:*",
-        f"{description[:250]}...",
+        f"📝 *Synopsis:* {safe_desc}...",
         f"`{hashtags_str} {extra_tags}`",
         ""
     ]
 
     if youtube_url:
-        caption_card.extend([
-            f"🔗 *YouTube Direct Link:*",
-            f"👉 {youtube_url}",
-            f"🔒 *Privacy:* `{privacy.upper()}` (Safe Pre-Publish)",
-            ""
-        ])
+        caption_lines.append(f"🔗 *YouTube Link:* {youtube_url} ({privacy.upper()})")
     else:
-        caption_card.extend([
-            f"🔒 *Status:* Rendered & Verified (Ready to upload)",
-            ""
-        ])
+        caption_lines.append(f"🔒 *Status:* Rendered & Verified (Ready to upload)")
 
-    caption_card.extend([
-        f"⏰ *Dynamic Viral Timing Recommendation:*",
-        f"• *Optimal Publish Window:* *{timing['best_slot']}*",
-        f"• *Algorithmic Reason:* _{timing['reason']}_",
-        f"• *Growth Tip:* Pin a controversial debate comment in the first 10 minutes to supercharge watch time! 🚀"
-    ])
+    caption_lines.append(f"🚀 *Peak Viral Window:* {timing['best_slot']}")
 
-    full_text = "\n".join(caption_card)
-    short_caption = "\n".join(caption_card[:7]) + f"\n\n🔗 YouTube: {youtube_url or 'Rendered'}\n⏰ Best Time: {timing['best_slot']}"
+    single_caption = "\n".join(caption_lines)
+    if len(single_caption) > 1020:
+        single_caption = single_caption[:1015] + "..."
 
     print(f"📱 Delivering video to Telegram ({video_path.name})...", flush=True)
 
     try:
-        # Check size (Telegram Bot API limit is 50MB for bots)
         size_mb = video_path.stat().st_size / (1024 * 1024)
         print(f"📊 Video file size: {size_mb:.2f} MB", flush=True)
 
@@ -139,28 +132,27 @@ def send_fleet_video_to_telegram(
             files = {"video": (video_path.name, vf, "video/mp4")}
             data = {
                 "chat_id": CHAT_ID,
-                "caption": short_caption[:1000],
+                "caption": single_caption,
                 "parse_mode": "Markdown",
                 "supports_streaming": "true"
             }
             with httpx.Client(timeout=120) as client:
                 res = client.post(f"{API_BASE}/sendVideo", data=data, files=files)
+                if res.status_code != 200:
+                    # Retry without Markdown in case of syntax character clash
+                    data.pop("parse_mode", None)
+                    plain_caption = single_caption.replace("*", "").replace("`", "")
+                    data["caption"] = plain_caption
+                    vf.seek(0)
+                    res = client.post(f"{API_BASE}/sendVideo", data=data, files=files)
                 
             if res.status_code == 200:
-                print("✅ Telegram video delivery SUCCESSFUL!", flush=True)
+                print("✅ Telegram video delivery SUCCESSFUL! (Single high-signal notification)", flush=True)
+                return True
             else:
                 print(f"⚠️ Telegram video upload returned {res.status_code}: {res.text}", flush=True)
+                return False
 
-        # Send full metadata as follow-up message
-        with httpx.Client(timeout=30) as client:
-            client.post(f"{API_BASE}/sendMessage", json={
-                "chat_id": CHAT_ID,
-                "text": full_text,
-                "parse_mode": "Markdown",
-                "disable_web_page_preview": False
-            })
-
-        return True
     except Exception as e:
         print(f"⚠️ Telegram delivery error: {e}", flush=True)
         return False

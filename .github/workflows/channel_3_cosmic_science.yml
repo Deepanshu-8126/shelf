@@ -34,8 +34,11 @@ on:
           - 'private'
 
   schedule:
-    # Daily at 13:00 UTC (6:30 PM IST)
-    - cron: '0 13 * * *'
+    # Daily at 15:00 UTC (8:30 PM IST)
+    - cron: '0 15 * * *'
+
+permissions:
+  contents: write
 
 jobs:
   render_channel_3:
@@ -107,7 +110,7 @@ jobs:
       - name: Render Channel 3 Short
         run: |
           TOPIC="${{ github.event.inputs.topic }}"
-          PILLAR="${{ github.event.inputs.pillar || '1' }}"
+          PILLAR="${{ github.event.inputs.pillar }}"
           PRIVACY="${{ github.event.inputs.privacy || 'unlisted' }}"
           UPLOAD_FLAG=""
           if [ "${{ github.event.inputs.auto_upload }}" = "true" ]; then
@@ -119,8 +122,22 @@ jobs:
             TOPIC_ARG="--topic \"$TOPIC\""
           fi
 
+          PILLAR_ARG=""
+          if [ -n "$PILLAR" ]; then
+            PILLAR_ARG="--pillar $PILLAR"
+          fi
+
           echo "🌌 Starting Channel 3 (Cosmic Science Hindi)..."
-          python fleet_engines/channel_3/run_channel_3.py --pillar "$PILLAR" --voice dynamic --lang 'hi' $TOPIC_ARG $UPLOAD_FLAG --privacy "$PRIVACY"
+          python fleet_engines/channel_3/run_channel_3.py $PILLAR_ARG --voice dynamic --lang 'hi' $TOPIC_ARG $UPLOAD_FLAG --privacy "$PRIVACY"
+
+      - name: Persist Channel 3 Topic History
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fleet_engines/state/channel_3_history.json || true
+          git commit -m "Auto: Update Channel 3 topic history [skip ci]" || true
+          git push || true
 
       - name: Upload Video Artifact
         if: always()
