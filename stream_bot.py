@@ -1,6 +1,7 @@
 """
 stream_bot.py - 24/7 YouTube Live Streaming Controller Telegram Bot
-Cross-Platform: Runs on Windows local machine or 24/7 Cloud Docker (Hugging Face / Render).
+Cross-Platform: Runs on Windows local machine or 24/7 Cloud Docker (Render / Hugging Face).
+Features: Multi-stream support (Bollywood Lo-Fi + Late Night Coder simultaneously), Auto-start on boot, Auto-reconnect watchdog, HTTP Health API.
 """
 
 import os
@@ -9,6 +10,7 @@ import time
 import json
 import requests
 import threading
+from urllib.parse import urlparse, parse_qs
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess as sp
 from pathlib import Path
@@ -43,36 +45,18 @@ STREAMS = {
     }
 }
 
-active_proc = None
-active_stream_type = None
-start_time = None
-
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
-        uptime_sec = int(time.time() - start_time) if start_time else 0
-        resp = {
-            "status": "healthy",
-            "bot": "@Lofi_banda_bot",
-            "active_stream": active_stream_type,
-            "running": active_proc is not None and active_proc.poll() is None,
-            "uptime_seconds": uptime_sec
-        }
-        self.wfile.write(json.dumps(resp).encode("utf-8"))
-
-    def log_message(self, format, *args):
-        pass
-
-def start_health_server():
-    port = int(os.environ.get("PORT", 10000))
-    print(f"Starting Health Server on port {port}...")
-    server = HTTPServer(("0.0.0.0", port), HealthHandler)
-    server.serve_forever()
-
+active_procs = {
+    "bollywood": None,
+    "coding": None
+}
+start_times = {
+    "bollywood": None,
+    "coding": None
+}
 
 def send_message(chat_id, text, reply_markup=None):
+    if not chat_id:
+        return
     payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}
     if reply_markup:
         payload["reply_markup"] = reply_markup
@@ -85,21 +69,26 @@ def get_menu_keyboard():
     return {
         "inline_keyboard": [
             [
-                {"text": "🌧️ Start Bollywood Lo-Fi", "callback_data": "start_bollywood"},
-                {"text": "💻 Start Late Night Coder", "callback_data": "start_coding"}
+                {"text": "🌧️ Start Bollywood", "callback_data": "start_bollywood"},
+                {"text": "💻 Start Coder", "callback_data": "start_coding"}
             ],
             [
-                {"text": "📊 Check Status / Health", "callback_data": "check_status"},
-                {"text": "🛑 Stop Stream", "callback_data": "stop_stream"}
+                {"text": "🚀 Start BOTH Streams", "callback_data": "start_both"},
+                {"text": "📊 Check Status", "callback_data": "check_status"}
+            ],
+            [
+                {"text": "🛑 Stop All Streams", "callback_data": "stop_all"}
             ]
         ]
     }
 
-def start_stream(stream_type, chat_id):
-    global active_proc, active_stream_type, start_time
-    if active_proc and active_proc.poll() is None:
-        send_message(chat_id, f"⚠️ *Warning:* A stream is already running (*{STREAMS[active_stream_type]['name']}*).\nPehele /stop karo fir naya start karna.", get_menu_keyboard())
-        return
+def start_stream(stream_type, chat_id=None):
+    global active_procs, start_times
+
+    if active_procs[stream_type] and active_procs[stream_type].poll() is None:
+        if chat_id:
+            send_message(chat_id, f"⚠️ *{STREAMS[stream_type]['name']}* already live chal rahi hai!", get_menu_keyboard())
+        return True
 
     cfg = STREAMS[stream_type]
     video_path = cfg["video"]
@@ -125,67 +114,141 @@ def start_stream(stream_type, chat_id):
         f'-fflags +genpts -flvflags no_duration_filesize -f flv "rtmp://a.rtmp.youtube.com/live2/{cfg["key"]}"'
     )
 
-    
     try:
-        active_proc = sp.Popen(cmd, shell=True)
-        active_stream_type = stream_type
-        start_time = time.time()
-        msg = (
-            f"🚀 *LIVE STREAM STARTED!*\n\n"
-            f"🎵 *Channel:* {cfg['name']}\n"
-            f"🔑 *Key:* `{cfg['key']}`\n"
-            f"⚡ *Host:* {'Windows Laptop' if sys.platform == 'win32' else '24/7 Cloud Server'}\n\n"
-            f"YouTube Studio par stream live ho chuki hai! 🔴"
-        )
-        send_message(chat_id, msg, get_menu_keyboard())
+        active_procs[stream_type] = sp.Popen(cmd, shell=True)
+        start_times[stream_type] = time.time()
+        print(f"[{stream_type.upper()}] Stream started with PID {active_procs[stream_type].pid}")
+        if chat_id:
+            msg = (
+                f"🚀 *LIVE STREAM STARTED!*\n\n"
+                f"🎵 *Channel:* {cfg['name']}\n"
+                f"🔑 *Key:* `{cfg['key']}`\n"
+                f"⚡ *Host:* {'Windows Laptop' if sys.platform == 'win32' else '24/7 Cloud Server'}\n\n"
+                f"YouTube Studio par stream live ho chuki hai! 🔴"
+            )
+            send_message(chat_id, msg, get_menu_keyboard())
+        return True
     except Exception as e:
-        send_message(chat_id, f"❌ *Error starting stream:* {e}", get_menu_keyboard())
+        print(f"Error starting {stream_type}: {e}")
+        if chat_id:
+            send_message(chat_id, f"❌ *Error starting {stream_type}:* {e}", get_menu_keyboard())
+        return False
 
-def stop_stream(chat_id):
-    global active_proc, active_stream_type, start_time
-    if active_proc and active_proc.poll() is None:
+def start_both_streams(chat_id=None):
+    res1 = start_stream("bollywood", chat_id)
+    time.sleep(1)
+    res2 = start_stream("coding", chat_id)
+    if chat_id and (res1 or res2):
+        send_message(chat_id, "🔥 *DONO STREAMS CLOUD PAR LIVE HO GAYI HAIN!* 🔴🔴\nYouTube Studio par dono check kar sakte ho.", get_menu_keyboard())
+
+def stop_stream(stream_type, chat_id=None):
+    global active_procs, start_times
+    proc = active_procs.get(stream_type)
+    if proc and proc.poll() is None:
         try:
             if sys.platform == "win32":
-                sp.run(f"taskkill /F /T /PID {active_proc.pid}", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-                sp.run("taskkill /F /IM ffmpeg.exe", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+                sp.run(f"taskkill /F /T /PID {proc.pid}", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
             else:
-                sp.run(f"kill -9 {active_proc.pid}", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-                sp.run("pkill -9 ffmpeg", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
-
-            name = STREAMS[active_stream_type]['name']
-            active_proc = None
-            active_stream_type = None
-            start_time = None
-            send_message(chat_id, f"🛑 *Stream Stopped:*\n*{name}* ko band kar diya gaya hai.", get_menu_keyboard())
-        except Exception as e:
-            send_message(chat_id, f"❌ Error stopping: {e}", get_menu_keyboard())
+                sp.run(f"kill -9 {proc.pid}", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+        except Exception:
+            pass
+        active_procs[stream_type] = None
+        start_times[stream_type] = None
+        if chat_id:
+            send_message(chat_id, f"🛑 *{STREAMS[stream_type]['name']}* band kar di gayi hai.", get_menu_keyboard())
     else:
-        active_proc = None
-        send_message(chat_id, "ℹ️ Abhi koi stream active nahi hai.", get_menu_keyboard())
+        active_procs[stream_type] = None
+        start_times[stream_type] = None
+        if chat_id:
+            send_message(chat_id, f"ℹ️ *{stream_type}* already stopped thi.", get_menu_keyboard())
 
-def check_status(chat_id):
-    global active_proc, active_stream_type, start_time
-    if active_proc and active_proc.poll() is None:
-        elapsed = int(time.time() - start_time)
-        hrs = elapsed // 3600
-        mins = (elapsed % 3600) // 60
-        secs = elapsed % 60
-        uptime = f"{hrs:02d}h {mins:02d}m {secs:02d}s"
-        cfg = STREAMS[active_stream_type]
-        msg = (
-            f"🟢 *STREAM STATUS: LIVE & ACTIVE*\n\n"
-            f"📺 *Stream:* {cfg['name']}\n"
-            f"⏱️ *Uptime:* {uptime}\n"
-            f"⚙️ *Bitrate:* {cfg['bitrate']} @ 30 FPS\n"
-            f"☁️ *Host:* {'Windows Laptop' if sys.platform == 'win32' else '24/7 Cloud Server'}\n"
-            f"🛡️ *Copyright:* 100% Stealth Approved"
-        )
-    else:
-        msg = "⚪ *STREAM STATUS: OFFLINE*\n\nAbhi koi live stream nahi chal rahi hai.\nNeeche button se chalu kar sakte ho."
-    send_message(chat_id, msg, get_menu_keyboard())
+def stop_all_streams(chat_id=None):
+    for st in ["bollywood", "coding"]:
+        stop_stream(st)
+    if sys.platform != "win32":
+        sp.run("pkill -9 ffmpeg", shell=True, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+    if chat_id:
+        send_message(chat_id, "🛑 *ALL STREAMS STOPPED:*\nSari live streams band kar di gayi hain.", get_menu_keyboard())
+
+def check_status(chat_id=None):
+    global active_procs, start_times
+    lines = ["📊 *CLOUD LIVE STREAM STATUS:*\n"]
+    any_live = False
+
+    for st, name in [("bollywood", "🌧️ Bollywood Lo-Fi"), ("coding", "💻 Late Night Coder")]:
+        proc = active_procs[st]
+        st_time = start_times[st]
+        if proc and proc.poll() is None:
+            any_live = True
+            elapsed = int(time.time() - st_time)
+            hrs = elapsed // 3600
+            mins = (elapsed % 3600) // 60
+            secs = elapsed % 60
+            lines.append(f"🟢 *{name}*: LIVE (Uptime: {hrs:02d}h {mins:02d}m {secs:02d}s)")
+        else:
+            lines.append(f"⚪ *{name}*: OFFLINE")
+
+    lines.append(f"\n☁️ *Host:* {'Windows Laptop' if sys.platform == 'win32' else 'Render Cloud 24/7'}")
+    lines.append("🛡️ *Copyright:* 100% ACRCloud Stealth Approved")
+    msg = "\n".join(lines)
+    if chat_id:
+        send_message(chat_id, msg, get_menu_keyboard())
+    return msg
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+
+        if parsed.path == "/start":
+            st = params.get("stream", ["both"])[0]
+            if st == "both":
+                start_both_streams(ALLOWED_USER_ID)
+            elif st in STREAMS:
+                start_stream(st, ALLOWED_USER_ID)
+
+        elif parsed.path == "/stop":
+            stop_all_streams(ALLOWED_USER_ID)
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+
+        status_info = {
+            "status": "healthy",
+            "bot": "@Lofi_banda_bot",
+            "bollywood_live": active_procs["bollywood"] is not None and active_procs["bollywood"].poll() is None,
+            "coding_live": active_procs["coding"] is not None and active_procs["coding"].poll() is None,
+        }
+        self.wfile.write(json.dumps(status_info).encode("utf-8"))
+
+    def log_message(self, format, *args):
+        pass
+
+def start_health_server():
+    port = int(os.environ.get("PORT", 10000))
+    print(f"Starting Health Server on port {port}...")
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    server.serve_forever()
+
+def watchdog_loop():
+    """Auto-restart streams if they drop unexpectedly."""
+    while True:
+        time.sleep(30)
+        for st in ["bollywood", "coding"]:
+            proc = active_procs[st]
+            # If was started before and dropped, auto-recover
+            if start_times[st] is not None and (proc is None or proc.poll() is not None):
+                print(f"[WATCHDOG] Reconnecting {st} stream...")
+                start_stream(st)
 
 def main():
     offset = None
+    
+    # Auto-start both streams on cloud boot!
+    print("Auto-starting both live streams on boot...")
+    start_both_streams(ALLOWED_USER_ID)
+
     while True:
         try:
             params = {"timeout": 20}
@@ -215,8 +278,10 @@ def main():
                         start_stream("bollywood", chat_id)
                     elif data == "start_coding":
                         start_stream("coding", chat_id)
-                    elif data == "stop_stream":
-                        stop_stream(chat_id)
+                    elif data == "start_both":
+                        start_both_streams(chat_id)
+                    elif data == "stop_all":
+                        stop_all_streams(chat_id)
                     elif data == "check_status":
                         check_status(chat_id)
                     continue
@@ -242,7 +307,9 @@ def main():
                     elif text.startswith("/status"):
                         check_status(chat_id)
                     elif text.startswith("/stop"):
-                        stop_stream(chat_id)
+                        stop_all_streams(chat_id)
+                    elif text.startswith("/both") or text.startswith("/all"):
+                        start_both_streams(chat_id)
                     elif text.startswith("/stream1") or text.startswith("/bollywood"):
                         start_stream("bollywood", chat_id)
                     elif text.startswith("/stream2") or text.startswith("/coding"):
@@ -256,6 +323,9 @@ def main():
 if __name__ == "__main__":
     health_thread = threading.Thread(target=start_health_server, daemon=True)
     health_thread.start()
-    print("Health server thread started. Starting Telegram polling loop...")
+    
+    watchdog_thread = threading.Thread(target=watchdog_loop, daemon=True)
+    watchdog_thread.start()
+    
+    print("Health server & Watchdog started. Starting main bot loop...")
     main()
-
