@@ -1,0 +1,14 @@
+name: 24/7 Render Keep Alive Ping
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Cloud Bot
+        run: |
+          curl -s -f https://lofi-live-stream-bot.onrender.com/ || curl -s https://lofi-live-stream-bot.onrender.com/
