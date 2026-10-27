@@ -232,9 +232,22 @@ def start_health_server():
     server.serve_forever()
 
 def watchdog_loop():
-    """Auto-restart streams if they drop unexpectedly."""
+    """Auto-restart streams if they drop unexpectedly and ping self to keep Render awake 24/7."""
+    ping_counter = 0
     while True:
         time.sleep(30)
+        ping_counter += 1
+        
+        # Self-ping Render public URL every 3 minutes (6 * 30s)
+        # This sends an incoming HTTP request through Render edge router, preventing idle spin-down!
+        if ping_counter >= 6:
+            ping_counter = 0
+            try:
+                r = requests.get("https://lofi-live-stream-bot.onrender.com/", timeout=10)
+                print(f"[KEEPALIVE] Render self-ping success (status {r.status_code})")
+            except Exception as e:
+                print(f"[KEEPALIVE] Render self-ping error: {e}")
+
         for st in ["bollywood", "coding"]:
             proc = active_procs[st]
             # If was started before and dropped, auto-recover
