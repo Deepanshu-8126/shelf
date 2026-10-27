@@ -210,6 +210,25 @@ class HealthHandler(BaseHTTPRequestHandler):
         elif parsed.path == "/stop":
             stop_all_streams(ALLOWED_USER_ID)
 
+        elif parsed.path == "/diag":
+            import subprocess
+            ps_out = subprocess.getoutput("ps aux")
+            processes = [line for line in ps_out.splitlines() if "ffmpeg" in line or "python" in line]
+            diag_info = {
+                "status": "healthy",
+                "active_processes": processes,
+                "bollywood_pid": active_procs["bollywood"].pid if active_procs["bollywood"] else None,
+                "bollywood_poll": active_procs["bollywood"].poll() if active_procs["bollywood"] else "None",
+                "coding_pid": active_procs["coding"].pid if active_procs["coding"] else None,
+                "coding_poll": active_procs["coding"].poll() if active_procs["coding"] else "None",
+                "start_times": start_times
+            }
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(diag_info, indent=2).encode("utf-8"))
+            return
+
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
