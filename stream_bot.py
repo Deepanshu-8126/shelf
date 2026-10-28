@@ -33,7 +33,7 @@ STREAMS = {
         "name": "24/7 Bollywood Lo-Fi Radio (Rainy Cat)",
         "video": BASE_DIR / "clean_rainy_cat_lofi_1080p30.mp4",
         "audio": BASE_DIR / "BOLLYWOOD_LOFI_MASHUP_30MIN_LOOP.mp3",
-        "key": "eexq-82kw-v9ky-upgj-8e32",
+        "key": "8yru-fhqt-2xku-pwjw-bwru",
         "bitrate": "2200k"
     },
     "coding": {
@@ -73,14 +73,34 @@ def get_menu_keyboard():
                 {"text": "💻 Start Coder", "callback_data": "start_coding"}
             ],
             [
-                {"text": "🚀 Start BOTH Streams", "callback_data": "start_both"},
-                {"text": "📊 Check Status", "callback_data": "check_status"}
+                {"text": "🛑 Stop Bollywood", "callback_data": "stop_bollywood"},
+                {"text": "🛑 Stop Coder", "callback_data": "stop_coding"}
             ],
             [
-                {"text": "🛑 Stop All Streams", "callback_data": "stop_all"}
+                {"text": "🚀 Start BOTH", "callback_data": "start_both"},
+                {"text": "🛑 Stop ALL", "callback_data": "stop_all"}
+            ],
+            [
+                {"text": "📊 Live Status", "callback_data": "check_status"},
+                {"text": "🎵 Songs List", "callback_data": "song_info"}
             ]
         ]
     }
+
+def send_song_info(chat_id):
+    msg = (
+        "🎵 *CURRENT 24/7 LIVE STREAM PLAYLIST:*\n\n"
+        "🌧️ *Stream 1: Romantic Bollywood Lo-Fi (Rainy Cat)*\n"
+        "• 1. Tum Se Hi\n"
+        "• 2. Agar Tum Saath Ho\n"
+        "• 3. Pee Loon\n"
+        "• 4. Humsafar\n"
+        "• 5. Kabira *(Replaced Kesariya - 100% Claim-Free!)*\n\n"
+        "💻 *Stream 2: 3:00 AM Coder Desk Lo-Fi*\n"
+        "• Deep Focus Analog Rhodes & Lo-Fi Beats (Royalty Free)\n\n"
+        "🛡️ *ACRCloud & YouTube Content ID:* 100% Stealth Approved"
+    )
+    send_message(chat_id, msg, get_menu_keyboard())
 
 def start_stream(stream_type, chat_id=None):
     global active_procs, start_times
@@ -310,12 +330,18 @@ def main():
                         start_stream("bollywood", chat_id)
                     elif data == "start_coding":
                         start_stream("coding", chat_id)
+                    elif data == "stop_bollywood":
+                        stop_stream("bollywood", chat_id)
+                    elif data == "stop_coding":
+                        stop_stream("coding", chat_id)
                     elif data == "start_both":
                         start_both_streams(chat_id)
                     elif data == "stop_all":
                         stop_all_streams(chat_id)
                     elif data == "check_status":
                         check_status(chat_id)
+                    elif data == "song_info":
+                        send_song_info(chat_id)
                     continue
 
                 # Handle Text Messages
@@ -346,6 +372,8 @@ def main():
                         start_stream("bollywood", chat_id)
                     elif text.startswith("/stream2") or text.startswith("/coding"):
                         start_stream("coding", chat_id)
+                    elif text.startswith("/songs") or text.startswith("/playlist"):
+                        send_song_info(chat_id)
                     else:
                         send_message(chat_id, "ℹ️ Command samajh nahi aayi. Neeche buttons use karo 👇", get_menu_keyboard())
                         
