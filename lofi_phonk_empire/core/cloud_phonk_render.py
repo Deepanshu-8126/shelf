@@ -52,10 +52,17 @@ def find_font(bold=False, size=30):
             pass
     return ImageFont.load_default()
 
-def download_audio(youtube_url, output_wav):
-    """Downloads audio using yt-dlp python package into high-quality WAV."""
+def get_audio_wav(youtube_url, output_wav, local_source=None):
+    """Checks for local audio source first, converts to WAV via FFmpeg, or falls back to yt-dlp."""
     if os.path.exists(output_wav) and os.path.getsize(output_wav) > 1000000:
-        print(f"[OK] Audio already exists: {output_wav}", flush=True)
+        print(f"[OK] Audio WAV already prepared: {output_wav}", flush=True)
+        return output_wav
+
+    if local_source and os.path.exists(local_source):
+        print(f"[OK] Found bundled audio ({local_source}). Extracting WAV via FFmpeg...", flush=True)
+        cmd = ["ffmpeg", "-y", "-i", local_source, "-vn", output_wav]
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(f"[OK] WAV extracted. Size: {os.path.getsize(output_wav)/(1024*1024):.2f} MB", flush=True)
         return output_wav
 
     print(f"[INFO] Downloading master audio from: {youtube_url}...", flush=True)
@@ -107,9 +114,10 @@ def render_phonk_cloud(youtube_url, base_img_path, output_mp4, duration_limit=No
     os.makedirs(os.path.dirname(output_mp4), exist_ok=True)
     temp_audio_wav = os.path.join(os.path.dirname(output_mp4), "temp_phonk_audio.wav")
     chapters_json = os.path.join(base_dir, "spiderx_chapters.json")
+    local_audio = os.path.join(base_dir, "audio_35m.webm")
 
-    # 1. Download Audio & Load Chapters
-    download_audio(youtube_url, temp_audio_wav)
+    # 1. Prepare Audio & Load Chapters
+    get_audio_wav(youtube_url, temp_audio_wav, local_source=local_audio)
     chapters = load_chapters(chapters_json)
 
     # 2. Analyze Audio
@@ -302,4 +310,12 @@ if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[1] == "--limit":
         limit = float(sys.argv[2])
 
-    render_phonk_cloud(YT_URL, ARTWORK, OUTPUT, duration_limit=limit)
+    try:
+        render_phonk_cloud(YT_URL, ARTWORK, OUTPUT, duration_limit=limit)
+    except Exception as e:
+        import traceback
+        err_msg = traceback.format_exc()
+        print(f"[FATAL ERROR] {e}\n{err_msg}", flush=True)
+        with open("render_error.log", "w", encoding="utf-8") as f:
+            f.write(err_msg)
+        sys.exit(1)
