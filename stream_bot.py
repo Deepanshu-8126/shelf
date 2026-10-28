@@ -63,9 +63,14 @@ SONGS = [
     {"id": 1, "name": "Agar Tum Saath Ho", "movie": "Tamasha", "artist": "Arijit Singh & Alka Yagnik", "seek": 50.2, "start": 50.2, "end": 93.4},
     {"id": 2, "name": "Pee Loon", "movie": "OUATIM", "artist": "Mohit Chauhan", "seek": 93.4, "start": 93.4, "end": 143.6},
     {"id": 3, "name": "Humsafar", "movie": "Badrinath Ki Dulhania", "artist": "Akhil Sachdeva", "seek": 143.6, "start": 143.6, "end": 187.8},
-    {"id": 4, "name": "Kabira", "movie": "YJHD", "artist": "Tochi Raina & Rekha Bhardwaj", "seek": 187.8, "start": 187.8, "end": 237.8},
+    {"id": 4, "name": "Kabira", "movie": "YJHD", "artist": "Tochi Raina & Rekha Bhardwaj", "seek": 187.8, "start": 187.8, "end": 236.0},
+    {"id": 5, "name": "Husn", "movie": "Indie Pop", "artist": "Anuv Jain", "seek": 236.0, "start": 236.0, "end": 282.2},
+    {"id": 6, "name": "Iktara", "movie": "Wake Up Sid", "artist": "Tochi Raina & Kavita Seth", "seek": 282.2, "start": 282.2, "end": 328.4},
+    {"id": 7, "name": "Subhanallah", "movie": "YJHD", "artist": "Sreerama Chandra", "seek": 328.4, "start": 328.4, "end": 374.6},
+    {"id": 8, "name": "Pani Da Rang", "movie": "Vicky Donor", "artist": "Ayushmann Khurrana", "seek": 374.6, "start": 374.6, "end": 420.8},
+    {"id": 9, "name": "Tu Jaane Na", "movie": "APKGK", "artist": "Atif Aslam", "seek": 420.8, "start": 420.8, "end": 467.0},
 ]
-TOTAL_CYCLE_SEC = 237.8
+TOTAL_CYCLE_SEC = 467.0
 
 def format_uptime(st):
     if not st:
@@ -140,7 +145,16 @@ def get_songs_keyboard():
                 {"text": "▶️ 4. Humsafar", "callback_data": "play_3"}
             ],
             [
-                {"text": "▶️ 5. Kabira (New!)", "callback_data": "play_4"}
+                {"text": "▶️ 5. Kabira", "callback_data": "play_4"},
+                {"text": "▶️ 6. Husn", "callback_data": "play_5"}
+            ],
+            [
+                {"text": "▶️ 7. Iktara", "callback_data": "play_6"},
+                {"text": "▶️ 8. Subhanallah", "callback_data": "play_7"}
+            ],
+            [
+                {"text": "▶️ 9. Pani Da Rang", "callback_data": "play_8"},
+                {"text": "▶️ 10. Tu Jaane Na", "callback_data": "play_9"}
             ],
             [
                 {"text": "🔄 Refresh Playing Status", "callback_data": "song_info"},
