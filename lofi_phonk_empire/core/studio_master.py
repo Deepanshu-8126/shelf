@@ -24,6 +24,12 @@ import sys
 import argparse
 import yt_dlp
 
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 # Ensure core directory is on path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -65,12 +71,12 @@ def main():
     parser.add_argument("--url", help="YouTube URL to download audio from")
     parser.add_argument("--title", default="Husn", help="Song or Brand title")
     parser.add_argument("--artist", default="Anuv Jain", help="Artist name")
-    parser.add_argument("--duration", type=float, default=5.0, help="Duration in seconds")
-    parser.add_argument("--output", help="Optional custom master output path")
-    
     # Lyric Pipeline specific args
-    parser.add_argument("--ratio", default="16:9", choices=["16:9", "9:16"], help="Aspect ratio for lyric video")
-    parser.add_argument("--vocal_start", type=float, default=76.5, help="Start timestamp of vocals")
+    parser.add_argument("--ratio", default="9:16", choices=["9:16", "16:9"], help="Aspect ratio for lyric video (default 9:16)")
+    parser.add_argument("--vocal_start", type=float, default=70.0, help="Start timestamp of vocals (default 70.0s)")
+    parser.add_argument("--duration", type=float, default=22.5, help="Duration in seconds (default 22.5s)")
+    parser.add_argument("--output", help="Optional custom master output path")
+    parser.add_argument("--player", action="store_true", help="Include Spotify player scrubber")
     
     # Phonk Pipeline specific args
     parser.add_argument("--artwork", help="Custom artwork path (defaults to gym warrior)")
@@ -104,14 +110,7 @@ def main():
         
         # Extract clean vocal slice
         temp_wav = os.path.join(parent_dir, "output", "temp_vocal_slice.wav")
-        engine.extract_vocal_slice(audio_path, start_sec=args.vocal_start, duration_sec=args.duration, output_wav_path=temp_wav)
-        
-        # Iconic lyrics config (default to Husn or dynamic words)
-        lines = [
-            {"text": "देखो देखो", "time": 0.75, "scale_pop": 0.12},
-            {"text": "ये ज़माने से थक कर", "time": 2.30, "scale_pop": 0.12},
-            {"text": "आते हो क्यों...", "time": 3.40, "scale_pop": 0.15}
-        ]
+        engine.extract_audio_slice(audio_path, start_sec=args.vocal_start, duration_sec=args.duration, output_wav_path=temp_wav)
         
         mins = int(args.vocal_start) // 60
         secs = int(args.vocal_start) % 60
@@ -121,15 +120,20 @@ def main():
             audio_path=temp_wav,
             title=args.title,
             artist=args.artist,
-            lines_config=lines,
             aspect_ratio=args.ratio,
             duration=args.duration,
             output_mp4=args.output,
-            start_offset_label=start_label
+            show_player=getattr(args, 'player', False),
+            enable_water_caustics=True,
+            start_offset_label=start_label,
+            artwork_path=getattr(args, 'artwork', None)
         )
         if os.path.exists(temp_wav):
-            os.remove(temp_wav)
-        print(f"\n🎉 ALL DONE! Master Lyric Video: {out_video}")
+            try:
+                os.remove(temp_wav)
+            except Exception:
+                pass
+        print(f"\n[DONE] Master Lyric Video: {out_video}")
 
     # =========================================================================
     # PIPELINE 2: PHONK SOUNDWAVE DAGGER VIDEO

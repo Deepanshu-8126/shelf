@@ -64,6 +64,7 @@ jobs:
 
       - name: Create GitHub Release with Master Video
         uses: softprops/action-gh-release@v2
+        continue-on-error: true
         if: startsWith(github.ref, 'refs/heads/clean-fleet') || startsWith(github.ref, 'refs/heads/main')
         with:
           tag_name: phonk-aura-35m-${{ github.run_number }}
