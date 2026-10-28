@@ -53,6 +53,47 @@ start_times = {
     "bollywood": None,
     "coding": None
 }
+seek_offsets = {
+    "bollywood": 0.0,
+    "coding": 0.0
+}
+
+SONGS = [
+    {"id": 0, "name": "Tum Se Hi", "movie": "Jab We Met", "artist": "Mohit Chauhan", "seek": 0.0, "start": 0.0, "end": 50.2},
+    {"id": 1, "name": "Agar Tum Saath Ho", "movie": "Tamasha", "artist": "Arijit Singh & Alka Yagnik", "seek": 50.2, "start": 50.2, "end": 93.4},
+    {"id": 2, "name": "Pee Loon", "movie": "OUATIM", "artist": "Mohit Chauhan", "seek": 93.4, "start": 93.4, "end": 143.6},
+    {"id": 3, "name": "Humsafar", "movie": "Badrinath Ki Dulhania", "artist": "Akhil Sachdeva", "seek": 143.6, "start": 143.6, "end": 187.8},
+    {"id": 4, "name": "Kabira", "movie": "YJHD", "artist": "Tochi Raina & Rekha Bhardwaj", "seek": 187.8, "start": 187.8, "end": 237.8},
+]
+TOTAL_CYCLE_SEC = 237.8
+
+def format_uptime(st):
+    if not st:
+        return "Offline"
+    total_sec = int(time.time() - st)
+    hours = total_sec // 3600
+    minutes = (total_sec % 3600) // 60
+    seconds = total_sec % 60
+    if hours > 0:
+        return f"{hours}h {minutes:02d}m {seconds:02d}s"
+    elif minutes > 0:
+        return f"{minutes}m {seconds:02d}s"
+    else:
+        return f"{seconds}s"
+
+def get_now_playing():
+    if not active_procs["bollywood"] or active_procs["bollywood"].poll() is not None:
+        return None, None
+    st = start_times.get("bollywood")
+    if not st:
+        return None, None
+    elapsed = (time.time() - st) + seek_offsets.get("bollywood", 0.0)
+    cycle_pos = elapsed % TOTAL_CYCLE_SEC
+    for idx, s in enumerate(SONGS):
+        if s["start"] <= cycle_pos < s["end"]:
+            next_idx = (idx + 1) % len(SONGS)
+            return s, SONGS[next_idx]
+    return SONGS[0], SONGS[1]
 
 def send_message(chat_id, text, reply_markup=None):
     if not chat_id:
@@ -81,31 +122,57 @@ def get_menu_keyboard():
                 {"text": "🛑 Stop ALL", "callback_data": "stop_all"}
             ],
             [
-                {"text": "📊 Live Status", "callback_data": "check_status"},
-                {"text": "🎵 Songs List", "callback_data": "song_info"}
+                {"text": "📊 Live Status & Uptime", "callback_data": "check_status"},
+                {"text": "🎛️ Song DJ Control", "callback_data": "song_info"}
+            ]
+        ]
+    }
+
+def get_songs_keyboard():
+    return {
+        "inline_keyboard": [
+            [
+                {"text": "▶️ 1. Tum Se Hi", "callback_data": "play_0"},
+                {"text": "▶️ 2. Agar Tum Saath Ho", "callback_data": "play_1"}
+            ],
+            [
+                {"text": "▶️ 3. Pee Loon", "callback_data": "play_2"},
+                {"text": "▶️ 4. Humsafar", "callback_data": "play_3"}
+            ],
+            [
+                {"text": "▶️ 5. Kabira (New!)", "callback_data": "play_4"}
+            ],
+            [
+                {"text": "🔄 Refresh Playing Status", "callback_data": "song_info"},
+                {"text": "🔙 Main Menu", "callback_data": "main_menu"}
             ]
         ]
     }
 
 def send_song_info(chat_id):
-    msg = (
-        "🎵 *CURRENT 24/7 LIVE STREAM PLAYLIST:*\n\n"
-        "🌧️ *Stream 1: Romantic Bollywood Lo-Fi (Rainy Cat)*\n"
-        "• 1. Tum Se Hi\n"
-        "• 2. Agar Tum Saath Ho\n"
-        "• 3. Pee Loon\n"
-        "• 4. Humsafar\n"
-        "• 5. Kabira *(Replaced Kesariya - 100% Claim-Free!)*\n\n"
-        "💻 *Stream 2: 3:00 AM Coder Desk Lo-Fi*\n"
-        "• Deep Focus Analog Rhodes & Lo-Fi Beats (Royalty Free)\n\n"
-        "🛡️ *ACRCloud & YouTube Content ID:* 100% Stealth Approved"
-    )
-    send_message(chat_id, msg, get_menu_keyboard())
+    b_live = active_procs["bollywood"] is not None and active_procs["bollywood"].poll() is None
+    lines = ["🎛️ *24/7 BOLLYWOOD LO-FI DJ & SONG CONTROLLER*\n"]
+    
+    if b_live:
+        curr, nxt = get_now_playing()
+        if curr:
+            lines.append(f"🎧 *Currently Live Playing:*")
+            lines.append(f"▶️ 🎵 *{curr['name']}* ({curr['movie']})")
+            lines.append(f"🎤 {curr['artist']}")
+            lines.append(f"⏭️ *Up Next:* {nxt['name']} ({nxt['movie']})\n")
+    else:
+        lines.append("⚠️ *Bollywood Stream abhi OFFLINE hai.*\n")
 
-def start_stream(stream_type, chat_id=None):
-    global active_procs, start_times
+    lines.append("👇 *Kisi bhi gaane par click karo — stream turant usi gaane se live bajna shuru ho jayegi:*")
+    send_message(chat_id, "\n".join(lines), get_songs_keyboard())
 
-    if active_procs[stream_type] and active_procs[stream_type].poll() is None:
+def start_stream(stream_type, chat_id=None, seek_sec=0):
+    global active_procs, start_times, seek_offsets
+
+    if seek_sec > 0:
+        stop_stream(stream_type)
+        time.sleep(0.5)
+    elif active_procs[stream_type] and active_procs[stream_type].poll() is None:
         if chat_id:
             send_message(chat_id, f"⚠️ *{STREAMS[stream_type]['name']}* already live chal rahi hai!", get_menu_keyboard())
         return True
@@ -128,16 +195,23 @@ def start_stream(stream_type, chat_id=None):
     else:
         v_opts = "-c:v copy"
 
+    seek_opt = f"-ss {seek_sec} " if seek_sec > 0 else ""
     cmd = (
-        f'ffmpeg -re -stream_loop -1 -i "{video_path}" -re -stream_loop -1 -i "{audio_path}" '
+        f'ffmpeg {seek_opt}-re -stream_loop -1 -i "{video_path}" {seek_opt}-re -stream_loop -1 -i "{audio_path}" '
         f'-map 0:v -map 1:a {v_opts} -c:a aac -b:a 128k -ar 44100 '
         f'-fflags +genpts -flvflags no_duration_filesize -f flv "rtmp://a.rtmp.youtube.com/live2/{cfg["key"]}"'
     )
 
     try:
         active_procs[stream_type] = sp.Popen(cmd, shell=True)
-        start_times[stream_type] = time.time()
-        print(f"[{stream_type.upper()}] Stream started with PID {active_procs[stream_type].pid}")
+        if seek_sec > 0:
+            seek_offsets[stream_type] = seek_sec
+            start_times[stream_type] = time.time()
+        else:
+            seek_offsets[stream_type] = 0.0
+            start_times[stream_type] = time.time()
+
+        print(f"[{stream_type.upper()}] Stream started with PID {active_procs[stream_type].pid} (seek={seek_sec}s)")
         if chat_id:
             msg = (
                 f"🚀 *LIVE STREAM STARTED!*\n\n"
@@ -192,24 +266,30 @@ def stop_all_streams(chat_id=None):
 
 def check_status(chat_id=None):
     global active_procs, start_times
-    lines = ["📊 *CLOUD LIVE STREAM STATUS:*\n"]
-    any_live = False
+    lines = ["📊 *24/7 CLOUD LIVE STREAM TELEMETRY:*\n"]
 
-    for st, name in [("bollywood", "🌧️ Bollywood Lo-Fi"), ("coding", "💻 Late Night Coder")]:
-        proc = active_procs[st]
-        st_time = start_times[st]
-        if proc and proc.poll() is None:
-            any_live = True
-            elapsed = int(time.time() - st_time)
-            hrs = elapsed // 3600
-            mins = (elapsed % 3600) // 60
-            secs = elapsed % 60
-            lines.append(f"🟢 *{name}*: LIVE (Uptime: {hrs:02d}h {mins:02d}m {secs:02d}s)")
-        else:
-            lines.append(f"⚪ *{name}*: OFFLINE")
+    # 1. Bollywood Lo-Fi
+    b_live = active_procs["bollywood"] is not None and active_procs["bollywood"].poll() is None
+    lines.append(f"🌧️ *Bollywood Lo-Fi:* {'🟢 LIVE' if b_live else '🔴 OFFLINE'}")
+    if b_live:
+        lines.append(f"⏱️ *Live Uptime:* `{format_uptime(start_times.get('bollywood'))}`")
+        curr, nxt = get_now_playing()
+        if curr:
+            lines.append(f"🎧 *Playing Right Now:* 🎵 *{curr['name']}* ({curr['movie']})")
+            lines.append(f"⏭️ *Up Next:* {nxt['name']} ({nxt['movie']})")
+    lines.append("")
 
-    lines.append(f"\n☁️ *Host:* {'Windows Laptop' if sys.platform == 'win32' else 'Render Cloud 24/7'}")
-    lines.append("🛡️ *Copyright:* 100% ACRCloud Stealth Approved")
+    # 2. Coding Lo-Fi
+    c_live = active_procs["coding"] is not None and active_procs["coding"].poll() is None
+    lines.append(f"💻 *Coder Desk Lo-Fi:* {'🟢 LIVE' if c_live else '🔴 OFFLINE'}")
+    if c_live:
+        lines.append(f"⏱️ *Live Uptime:* `{format_uptime(start_times.get('coding'))}`")
+        lines.append("🎧 *Music:* Deep Focus Analog Rhodes & Lo-Fi Beats")
+    lines.append("")
+
+    lines.append(f"☁️ *Server:* Render Cloud (Singapore 24/7)")
+    lines.append("🛡️ *Copyright:* 100% Claim-Free Stealth Approved")
+
     msg = "\n".join(lines)
     if chat_id:
         send_message(chat_id, msg, get_menu_keyboard())
@@ -342,6 +422,21 @@ def main():
                         check_status(chat_id)
                     elif data == "song_info":
                         send_song_info(chat_id)
+                    elif data == "main_menu":
+                        send_message(chat_id, "📱 *Main Admin Control Menu:*", get_menu_keyboard())
+                    elif data.startswith("play_"):
+                        s_idx = int(data.split("_")[1])
+                        target_song = SONGS[s_idx]
+                        start_stream("bollywood", chat_id, seek_sec=target_song["seek"])
+                        send_message(
+                            chat_id,
+                            f"🔀 *DJ SONG SWITCH!* 🎧\n\n"
+                            f"Live stream turant jump ho kar chalu ho gayi hai:\n"
+                            f"▶️ 🎵 *{target_song['name']}* ({target_song['movie']})\n"
+                            f"🎤 *Artist:* {target_song['artist']}\n"
+                            f"🔴 *YouTube Live par ab yahi gaana live baj raha hai!*",
+                            get_songs_keyboard()
+                        )
                     continue
 
                 # Handle Text Messages
