@@ -77,6 +77,7 @@ def main():
     parser.add_argument("--duration", type=float, default=22.5, help="Duration in seconds (default 22.5s)")
     parser.add_argument("--output", help="Optional custom master output path")
     parser.add_argument("--player", action="store_true", help="Include Spotify player scrubber")
+    parser.add_argument("--floral", action="store_true", help="Enable aesthetic summer botanical petals and leaves overlay")
     
     # Phonk Pipeline specific args
     parser.add_argument("--artwork", help="Custom artwork path (defaults to gym warrior)")
@@ -124,9 +125,10 @@ def main():
             duration=args.duration,
             output_mp4=args.output,
             show_player=getattr(args, 'player', False),
-            enable_water_caustics=True,
+            enable_water_caustics=("husn" in args.title.lower() and not getattr(args, 'floral', False)),
             start_offset_label=start_label,
-            artwork_path=getattr(args, 'artwork', None)
+            artwork_path=getattr(args, 'artwork', None),
+            enable_floral_overlay=getattr(args, 'floral', False)
         )
         if os.path.exists(temp_wav):
             try:

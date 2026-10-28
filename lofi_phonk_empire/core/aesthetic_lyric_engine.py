@@ -218,7 +218,7 @@ class AestheticLyricEngine:
     def render(self, audio_path, title="Husn", artist="Anuv Jain", cards_config=None,
                aspect_ratio="9:16", duration=22.5, fps=30, output_mp4=None,
                show_player=False, enable_water_caustics=True, start_offset_label="1:10",
-               artwork_path=None):
+               artwork_path=None, enable_floral_overlay=False):
         """
         Master Video Rendering Pipeline with Direct FFmpeg Rawvideo Pipe Streaming.
         """
@@ -259,7 +259,7 @@ class AestheticLyricEngine:
                 if duration > 35.0:
                     cards_config = [
                         {
-                            "start": 0.0, "end": 15.0,
+                            "start": 0.0, "end": 16.5,
                             "items": [
                                 {"text": "छलरे-छलरे वाल...", "time": 0.50, "y": 800 if not is_16x9 else 380, "font": font_hero},
                                 {"text": "मोढ़े रखदे काली शॉल...", "time": 3.00, "y": 980 if not is_16x9 else 500, "font": font_med},
@@ -268,7 +268,7 @@ class AestheticLyricEngine:
                             ]
                         },
                         {
-                            "start": 15.1, "end": 37.0,
+                            "start": 16.5, "end": 39.5,
                             "items": [
                                 {"text": "पावे वण-सवन्ने बाणे...", "time": 17.00, "y": 800 if not is_16x9 else 380, "font": font_large},
                                 {"text": "तेरे दिल दियाँ अल्लाह जाणे...", "time": 22.80, "y": 980 if not is_16x9 else 500, "font": font_med},
@@ -277,12 +277,65 @@ class AestheticLyricEngine:
                             ]
                         },
                         {
-                            "start": 37.1, "end": duration,
+                            "start": 39.5, "end": 56.5,
                             "items": [
                                 {"text": "छलरे-छलरे वाल...", "time": 40.50, "y": 800 if not is_16x9 else 380, "font": font_hero},
                                 {"text": "मोढ़े रखदे काली शॉल...", "time": 43.50, "y": 980 if not is_16x9 else 500, "font": font_med},
                                 {"text": "हथ चे रत्ता रुमाल...", "time": 47.00, "y": 1140 if not is_16x9 else 620, "font": font_med},
-                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 50.00, "y": 1300 if not is_16x9 else 740, "font": font_large}
+                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 50.50, "y": 1300 if not is_16x9 else 740, "font": font_large}
+                            ]
+                        },
+                        {
+                            "start": 56.5, "end": 82.5,
+                            "items": [
+                                {"text": "तेरियाँ रीसाँ कौन करे...", "time": 58.00, "y": 880 if not is_16x9 else 420, "font": font_large},
+                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 64.00, "y": 1040 if not is_16x9 else 540, "font": font_hero},
+                                {"text": "♪ लोक संगीत आलाप ♪", "time": 72.00, "y": 1200 if not is_16x9 else 660, "font": font_med}
+                            ]
+                        },
+                        {
+                            "start": 82.5, "end": 102.5,
+                            "items": [
+                                {"text": "छलरे-छलरे वाल...", "time": 83.50, "y": 800 if not is_16x9 else 380, "font": font_hero},
+                                {"text": "मोढ़े रखदे काली शॉल...", "time": 86.50, "y": 980 if not is_16x9 else 500, "font": font_med},
+                                {"text": "हथ चे रत्ता रुमाल...", "time": 89.50, "y": 1140 if not is_16x9 else 620, "font": font_med},
+                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 93.00, "y": 1300 if not is_16x9 else 740, "font": font_large}
+                            ]
+                        },
+                        {
+                            "start": 102.5, "end": 125.5,
+                            "items": [
+                                {"text": "तूं साँवल फूल कस्तूरी...", "time": 103.00, "y": 800 if not is_16x9 else 380, "font": font_large},
+                                {"text": "तेडी थी गई बहु मशहूरी...", "time": 107.00, "y": 980 if not is_16x9 else 500, "font": font_med},
+                                {"text": "झा झा ते हर झा ते...", "time": 113.50, "y": 1140 if not is_16x9 else 620, "font": font_med},
+                                {"text": "पये देंदे लोक मिसाल...", "time": 118.00, "y": 1300 if not is_16x9 else 740, "font": font_med}
+                            ]
+                        },
+                        {
+                            "start": 125.5, "end": 144.5,
+                            "items": [
+                                {"text": "छलरे-छलरे वाल...", "time": 126.50, "y": 800 if not is_16x9 else 380, "font": font_hero},
+                                {"text": "मोढ़े रखदे काली शॉल...", "time": 129.70, "y": 980 if not is_16x9 else 500, "font": font_med},
+                                {"text": "हथ चे रत्ता रुमाल...", "time": 133.20, "y": 1140 if not is_16x9 else 620, "font": font_med},
+                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 136.50, "y": 1300 if not is_16x9 else 740, "font": font_large}
+                            ]
+                        },
+                        {
+                            "start": 144.5, "end": 169.5,
+                            "items": [
+                                {"text": "अक्खीं वेख के दंग थी गइयाँ...", "time": 146.00, "y": 800 if not is_16x9 else 380, "font": font_large},
+                                {"text": "पहली वार मलंग थी गइयाँ...", "time": 150.00, "y": 980 if not is_16x9 else 500, "font": font_med},
+                                {"text": "तूं बोले, लब खोले...", "time": 158.00, "y": 1140 if not is_16x9 else 620, "font": font_med},
+                                {"text": "तेडे मुँह चूँ किरदे लाल...", "time": 163.00, "y": 1300 if not is_16x9 else 740, "font": font_med}
+                            ]
+                        },
+                        {
+                            "start": 169.5, "end": duration,
+                            "items": [
+                                {"text": "छलरे-छलरे वाल...", "time": 170.50, "y": 800 if not is_16x9 else 380, "font": font_hero},
+                                {"text": "मोढ़े रखदे काली शॉल...", "time": 172.70, "y": 980 if not is_16x9 else 500, "font": font_med},
+                                {"text": "हथ चे रत्ता रुमाल...", "time": 176.20, "y": 1140 if not is_16x9 else 620, "font": font_med},
+                                {"text": "तेरियाँ रीसाँ कौन करे वे...", "time": 179.20, "y": 1300 if not is_16x9 else 740, "font": font_large}
                             ]
                         }
                     ]
@@ -341,6 +394,7 @@ class AestheticLyricEngine:
         dist = np.sqrt(((x_coords - W/2) / (W/2))**2 + ((y_coords - H/2) / (H/2))**2)
         vignette = np.clip(1.0 - (dist - 0.7) * 0.16, 0.88, 1.0)[:, :, np.newaxis]
         paper_base_arr = base_arr * vignette
+        paper_base_img = Image.fromarray(np.uint8(paper_base_arr))
 
         # Floating dust particles
         dust_count = 35
@@ -369,16 +423,74 @@ class AestheticLyricEngine:
                         artwork_path = cand
 
             master_vinyl = self.create_spinning_vinyl(520, title, artist, artwork_path=artwork_path)
+            print("[INFO] Pre-caching vinyl 360-degree rotation table for turbo speed...", flush=True)
+            vinyl_cache = [master_vinyl.rotate(-deg, resample=Image.BICUBIC) for deg in range(360)]
+
             glow_size = 620
             glow_img = Image.new("RGBA", (glow_size, glow_size), (0, 0, 0, 0))
             gdraw = ImageDraw.Draw(glow_img)
             g_center = glow_size // 2
             gdraw.ellipse([g_center - 240, g_center - 240, g_center + 240, g_center + 240], fill=(200, 16, 46, 75))
             glow_img = glow_img.filter(ImageFilter.GaussianBlur(38))
+
+            glow_cache = []
+            for p_idx in range(60):
+                p_mult = 1.0 + 0.04 * np.sin(p_idx * 2 * np.pi / 60)
+                pw, ph = int(glow_size * p_mult), int(glow_size * p_mult)
+                glow_cache.append(glow_img.resize((pw, ph), resample=Image.BILINEAR))
+
             VINYL_X, VINYL_Y = 480, 520
             TEXT_CENTER_X = 1250
         else:
             TEXT_CENTER_X = W // 2
+
+        # 5. Summer Botanical Floral & Petals Overlay Setup
+        floral_particles = []
+        corner_branch = None
+        if enable_floral_overlay:
+            petals_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "botanical_petals")
+            if os.path.exists(petals_dir):
+                sp_files = sorted([f for f in os.listdir(petals_dir) if f.endswith(".png")])
+                sp_imgs = [Image.open(os.path.join(petals_dir, f)).convert("RGBA") for f in sp_files]
+                if sp_imgs:
+                    np.random.seed(99)
+                    for i in range(14):
+                        sp = sp_imgs[i % (len(sp_imgs) - 1)]
+                        target_w = np.random.randint(35, 75)
+                        ratio = target_w / sp.width
+                        target_h = int(sp.height * ratio)
+                        resized_sp = sp.resize((target_w, target_h), Image.Resampling.LANCZOS)
+                        alpha_mult = np.random.uniform(0.60, 0.85)
+                        r, g, b, a = resized_sp.split()
+                        a = a.point(lambda p: int(p * alpha_mult))
+                        resized_sp = Image.merge("RGBA", (r, g, b, a))
+
+                        # Pre-cache 72 rotation angles (every 5 deg) for zero-latency particle motion
+                        rot_cache = [resized_sp.rotate(deg, resample=Image.BICUBIC, expand=True) for deg in range(0, 360, 5)]
+
+                        floral_particles.append({
+                            "x": np.random.uniform(100, W - 100),
+                            "y": np.random.uniform(80, H - 80),
+                            "vx": np.random.uniform(-1.0, -0.3),
+                            "vy": np.random.uniform(0.6, 1.3),
+                            "base_rot": np.random.uniform(0, 360),
+                            "rot_speed": np.random.uniform(10, 28),
+                            "phase": np.random.uniform(0, math.pi * 2),
+                            "sprite": resized_sp,
+                            "rot_cache": rot_cache
+                        })
+
+                    if len(sp_imgs) >= 16:
+                        # Bottom-Right Corner Olive Branch Accent
+                        b_sp = sp_imgs[15]
+                        bw = int(b_sp.width * 0.70)
+                        bh = int(b_sp.height * 0.70)
+                        b_sp = b_sp.resize((bw, bh), Image.Resampling.LANCZOS)
+                        r, g, b, a = b_sp.split()
+                        a = a.point(lambda p: int(p * 0.65))
+                        corner_branch = Image.merge("RGBA", (r, g, b, a)).rotate(-20, expand=True)
+
+        word_aura_cache = {}
 
         # Helper: Render Text Card with Dynamic Kinetic Animation & Smooth Line Scroll
         def render_card_layer(items, active_time, global_alpha=1.0, card_offset_y=0, rms=0.0):
@@ -483,16 +595,22 @@ class AestheticLyricEngine:
                             eff_alpha = int(255 * word_alpha * global_alpha)
                             cy = base_cy + line_dy + dy
 
-                            # Active word soft ambient glow aura
+                            # Active word soft ambient glow aura (cached lookup for turbo speed)
                             if eff_alpha > 50:
-                                bbox = font.getbbox(w)
-                                bw, bh = bbox[2] - bbox[0] + 60, bbox[3] - bbox[1] + 60
-                                if bw > 0 and bh > 0:
-                                    g_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
-                                    g_draw = ImageDraw.Draw(g_box)
-                                    g_draw.text((bw // 2, bh // 2), w, font=font, fill=(*self.COLOR_RED, int(eff_alpha * 0.35)), anchor="mm")
-                                    g_box = g_box.filter(ImageFilter.GaussianBlur(10))
-                                    layer.paste(g_box, (w_center_x - bw // 2, cy - bh // 2), g_box)
+                                if w not in word_aura_cache:
+                                    bbox = font.getbbox(w)
+                                    bw, bh = bbox[2] - bbox[0] + 60, bbox[3] - bbox[1] + 60
+                                    if bw > 0 and bh > 0:
+                                        g_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+                                        g_draw = ImageDraw.Draw(g_box)
+                                        g_draw.text((bw // 2, bh // 2), w, font=font, fill=(*self.COLOR_RED, 80), anchor="mm")
+                                        word_aura_cache[w] = g_box.filter(ImageFilter.GaussianBlur(10))
+                                    else:
+                                        word_aura_cache[w] = None
+
+                                cached_aura = word_aura_cache.get(w)
+                                if cached_aura is not None:
+                                    layer.paste(cached_aura, (w_center_x - cached_aura.width // 2, cy - cached_aura.height // 2), cached_aura)
 
                             # Render active word with scale bounce
                             if abs(scale - 1.0) < 0.01:
@@ -570,7 +688,7 @@ class AestheticLyricEngine:
                 frame_arr = np.clip(paper_base_arr + caustic_cache[f_idx % len(caustic_cache)], 0, 255)
                 frame = Image.fromarray(np.uint8(frame_arr))
             else:
-                frame = Image.fromarray(np.uint8(paper_base_arr))
+                frame = paper_base_img.copy()
             draw = ImageDraw.Draw(frame)
 
             # Floating dust
@@ -579,20 +697,32 @@ class AestheticLyricEngine:
                 py = int((dust_y[i] + dust_vy[i] * profile["particle_speed"] * f_idx) % H)
                 draw.ellipse([px, py, px + dust_sz[i], py + dust_sz[i]], fill=(215, 208, 198))
 
+            # Summer Botanical Floral & Petals Drift (Direct cached paste)
+            if enable_floral_overlay and floral_particles:
+                for p in floral_particles:
+                    px = int((p["x"] + p["vx"] * t * 40 * profile["particle_speed"] + math.sin(t * 1.5 + p["phase"]) * 18) % W)
+                    py = int((p["y"] + p["vy"] * t * 40 * profile["particle_speed"] + math.cos(t * 1.2 + p["phase"]) * 10) % H)
+                    rot = (p["base_rot"] + t * p["rot_speed"] + math.sin(t * 1.8 + p["phase"]) * 18) % 360
+                    if 1050 < px < 1450 and 380 < py < 620:
+                        py += 140
+                    rot_sprite = p["rot_cache"][int(rot / 5) % 72]
+                    frame.paste(rot_sprite, (px - rot_sprite.width // 2, py - rot_sprite.height // 2), rot_sprite)
+
+                if corner_branch and is_16x9:
+                    frame.paste(corner_branch, (W - corner_branch.width - 25, H - corner_branch.height - 25), corner_branch)
+
             # Header
             header_y = 100 if is_16x9 else 360
             draw.text((W // 2, header_y), f"{title.upper()}   •   {artist.upper()}", font=font_meta, fill=self.COLOR_MUTED, anchor="mm")
             draw.line([(W // 2 - 160, header_y + 26), (W // 2 + 160, header_y + 26)], fill=self.COLOR_LINE, width=2)
 
-            # 16:9 Spinning Vinyl Record & Glow
+            # 16:9 Spinning Vinyl Record & Glow (Pre-cached zero-latency lookup)
             if is_16x9:
-                pulse = 1.0 + 0.04 * np.sin(t * 3.5)
-                pw, ph = int(glow_size * pulse), int(glow_size * pulse)
-                cur_glow = glow_img.resize((pw, ph), resample=Image.BILINEAR)
-                frame.paste(cur_glow, (VINYL_X - pw // 2, VINYL_Y - ph // 2), cur_glow)
+                cur_glow = glow_cache[int(t * 3.5 * 60 / (2 * np.pi)) % 60]
+                frame.paste(cur_glow, (VINYL_X - cur_glow.width // 2, VINYL_Y - cur_glow.height // 2), cur_glow)
 
                 rot_angle = (t * profile["vinyl_rot_speed"]) % 360.0
-                rot_vinyl = master_vinyl.rotate(-rot_angle, resample=Image.BICUBIC)
+                rot_vinyl = vinyl_cache[int(rot_angle) % 360]
                 frame.paste(rot_vinyl, (VINYL_X - rot_vinyl.width // 2, VINYL_Y - rot_vinyl.height // 2), rot_vinyl)
 
             # 9:16 Subtle Audio-Reactive Fluid Ripple Wave

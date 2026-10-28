@@ -1,0 +1,91 @@
+name: Render 30-Minute Hindi Trending Songs Master
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/render_hindi_mix.yml'
+      - 'lofi_phonk_empire/core/cloud_hindi_render.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    name: Cloud Hindi 1080p Master Video Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & Fonts)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu
+
+      - name: Install Python Packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow numpy scipy yt-dlp
+
+      - name: Render Full 30-Minute Hindi Trending Video Master
+        run: |
+          python lofi_phonk_empire/core/cloud_hindi_render.py
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render_failure_logs
+          path: |
+            render_error.log
+            *.log
+
+      - name: Verify Output File
+        run: |
+          ls -lh lofi_phonk_empire/output/HINDI_TRENDING_30M_MASTER.mp4
+
+      - name: Upload Master Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HINDI_TRENDING_30M_MASTER
+          path: lofi_phonk_empire/output/HINDI_TRENDING_30M_MASTER.mp4
+          retention-days: 90
+
+      - name: Create GitHub Release with Master Video
+        uses: softprops/action-gh-release@v2
+        continue-on-error: true
+        if: startsWith(github.ref, 'refs/heads/clean-fleet') || startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: hindi-trending-30m-${{ github.run_number }}
+          name: "All Instagram Trending Songs 2026 (30 Min Hindi Master 1080p)"
+          body: |
+            ### 🌸 All Instagram Trending Songs 2026 (30-Minute Master)
+            - **Resolution**: 1080p @ 30 FPS Master
+            - **Audio**: 256kbps High Fidelity Stereo Mix
+            - **Visualizer**: Spinning Vinyl Record Player + Drifting Summer Botanical Floral & Dried Olive Leaves Overlay
+            - **Typography**: Kinetic Devanagari Calligraphy with dynamic active word-by-word red glow
+            - **Tracklist**:
+              1. Barsaat – Bairan (00:00)
+              2. Zulfein – Mehul Mahesh (03:00)
+              3. Tu Aaja Ne Raaji (06:04)
+              4. Aarzu – Asim Azhar (09:46)
+              5. Madira – Hardik Bhardwaj (12:35)
+              6. Bairan – Bairan (15:18)
+              7. Taakkne – SARRB (17:44)
+              8. Taare – Farak (21:24)
+              9. Dooron Dooron – Paresh Pahuja (24:00)
+              10. Pal Pal – Afusic (28:44)
+          files: lofi_phonk_empire/output/HINDI_TRENDING_30M_MASTER.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
