@@ -92,7 +92,7 @@ class AestheticLyricEngine:
                     raw_stanzas.append((cur_items, t))
                     cur_items = []
             else:
-                if cur_items and (t - cur_items[-1][0] > 7.0):
+                if cur_items and (t - cur_items[-1][0] > 14.0):
                     raw_stanzas.append((cur_items, t - 0.6))
                     cur_items = []
                 cur_items.append((t, txt))
@@ -101,7 +101,7 @@ class AestheticLyricEngine:
 
         refined = []
         for items, end_t in raw_stanzas:
-            if len(items) <= 5:
+            if len(items) <= 6:
                 refined.append((items, end_t))
             else:
                 mid = len(items) // 2
@@ -358,64 +358,64 @@ class AestheticLyricEngine:
         # Fallback Narrative Cards if no .lrc found
         if cards_config is None:
             if "chalr" in title.lower() or "chalre" in title.lower() or "sial" in artist.lower():
-                # Official Spotify/Musixmatch Verified 6-Stanza Master Timing
+                # Precision Synchronized Authentic Saraiki Master Timing
                 cards_config = [
                     {
-                        "start": 0.0, "end": 20.0,
+                        "start": 0.0, "end": 18.0,
                         "items": [
-                            {"text": "छलड़े छलड़े बाल", "time": 2.01, "y": 750 if not is_16x9 else 380, "font": font_hero},
-                            {"text": "मंड रखदे काली शाल", "time": 4.72, "y": 880 if not is_16x9 else 480, "font": font_med},
-                            {"text": "हाथ छे नै रत्ता रुमाल", "time": 8.09, "y": 1010 if not is_16x9 else 580, "font": font_med},
-                            {"text": "तेरिया रीसा कौन करे", "time": 10.87, "y": 1140 if not is_16x9 else 680, "font": font_med},
-                            {"text": "मैं तेरिया रीसा कौन करे", "time": 13.85, "y": 1270 if not is_16x9 else 780, "font": font_large}
+                            {"text": "छलरे छलरे वाल", "time": 0.78, "y": 750 if not is_16x9 else 380, "font": font_hero},
+                            {"text": "मोढ़े रखदे काली शॉल", "time": 3.20, "y": 880 if not is_16x9 else 480, "font": font_med},
+                            {"text": "हथ चे रत्ता रुमाल", "time": 6.52, "y": 1010 if not is_16x9 else 580, "font": font_med},
+                            {"text": "तेरियाँ रीसाँ कौन करे", "time": 9.32, "y": 1140 if not is_16x9 else 680, "font": font_med},
+                            {"text": "मैं तेरियाँ रीसाँ कौन करे", "time": 12.20, "y": 1270 if not is_16x9 else 780, "font": font_large}
                         ]
                     },
                     {
-                        "start": 21.0, "end": 42.8,
+                        "start": 21.0, "end": 42.0,
                         "items": [
-                            {"text": "तू सावल फुल कस्तूरी", "time": 24.04, "y": 720 if not is_16x9 else 350, "font": font_med},
-                            {"text": "पेड़ी थी गई बा मशहूरि", "time": 27.21, "y": 835 if not is_16x9 else 440, "font": font_med},
-                            {"text": "तू सावल फुल कस्तूरी", "time": 30.45, "y": 950 if not is_16x9 else 530, "font": font_med},
-                            {"text": "पेड़ी थी गई बा मशहूरि", "time": 33.61, "y": 1065 if not is_16x9 else 620, "font": font_med},
-                            {"text": "झां झां ते हर झां ते", "time": 36.88, "y": 1180 if not is_16x9 else 710, "font": font_med},
-                            {"text": "पे दिन दे लोक मिसाल", "time": 40.06, "y": 1295 if not is_16x9 else 800, "font": font_med}
+                            {"text": "तूं साँवल फूल कस्तूरी", "time": 22.84, "y": 720 if not is_16x9 else 350, "font": font_med},
+                            {"text": "तेडी थी गई बहु मशहूरी", "time": 25.50, "y": 835 if not is_16x9 else 440, "font": font_med},
+                            {"text": "तूं साँवल फूल कस्तूरी", "time": 28.50, "y": 950 if not is_16x9 else 530, "font": font_med},
+                            {"text": "तेडी थी गई बहु मशहूरी", "time": 31.62, "y": 1065 if not is_16x9 else 620, "font": font_med},
+                            {"text": "जां-जां ते हर जां ते", "time": 35.16, "y": 1180 if not is_16x9 else 710, "font": font_med},
+                            {"text": "पये देंदे लोक मिसाल", "time": 38.12, "y": 1295 if not is_16x9 else 800, "font": font_med}
                         ]
                     },
                     {
-                        "start": 42.8, "end": 60.63,
+                        "start": 42.0, "end": 60.0,
                         "items": [
-                            {"text": "छलड़े छलड़े बाल", "time": 43.68, "y": 750 if not is_16x9 else 380, "font": font_hero},
-                            {"text": "मंड रखदे काली शाल", "time": 46.34, "y": 880 if not is_16x9 else 480, "font": font_med},
-                            {"text": "हाथ छे नै रत्ता रुमाल", "time": 49.68, "y": 1010 if not is_16x9 else 580, "font": font_med},
-                            {"text": "तेरिया रीसा कौन करे", "time": 52.42, "y": 1140 if not is_16x9 else 680, "font": font_med},
-                            {"text": "मैं तेरिया रीसा कौन करे", "time": 55.45, "y": 1270 if not is_16x9 else 780, "font": font_large}
+                            {"text": "छलरे छलरे वाल", "time": 42.00, "y": 750 if not is_16x9 else 380, "font": font_hero},
+                            {"text": "मोढ़े रखदे काली शॉल", "time": 44.88, "y": 880 if not is_16x9 else 480, "font": font_med},
+                            {"text": "हथ चे रत्ता रुमाल", "time": 48.00, "y": 1010 if not is_16x9 else 580, "font": font_med},
+                            {"text": "तेरियाँ रीसाँ कौन करे", "time": 51.36, "y": 1140 if not is_16x9 else 680, "font": font_med},
+                            {"text": "मैं तेरियाँ रीसाँ कौन करे", "time": 54.04, "y": 1270 if not is_16x9 else 780, "font": font_large}
                         ]
                     },
-                    # 60.63s to 84.0s: Flute & Dholak Instrumental Solo Break (Tranquil Negative Space)
+                    # 60.0s to 83.0s: Flute & Dholak Instrumental Solo Break (Tranquil Negative Space)
                     {
-                        "start": 84.0, "end": 104.0,
+                        "start": 83.0, "end": 102.0,
                         "items": [
-                            {"text": "अधे देख के दंग थी गईया", "time": 84.86, "y": 860 if not is_16x9 else 420, "font": font_large},
-                            {"text": "पहली बार मा लंग थी गईया", "time": 92.01, "y": 1000 if not is_16x9 else 540, "font": font_large},
-                            {"text": "अधे देख के दंग थी गईया", "time": 97.75, "y": 1140 if not is_16x9 else 660, "font": font_large}
-                        ]
-                    },
-                    {
-                        "start": 104.0, "end": 117.8,
-                        "items": [
-                            {"text": "पहली बार मा लंग थी गईया", "time": 104.85, "y": 860 if not is_16x9 else 420, "font": font_large},
-                            {"text": "तू बोले लब खोले", "time": 110.33, "y": 1000 if not is_16x9 else 540, "font": font_hero},
-                            {"text": "केरे मोचो गिरदे लाल", "time": 113.58, "y": 1140 if not is_16x9 else 660, "font": font_large}
+                            {"text": "अक्खीं वेख के दंग थी गईयाँ", "time": 83.12, "y": 860 if not is_16x9 else 420, "font": font_large},
+                            {"text": "पहली वार मलंग थी गईयाँ", "time": 90.40, "y": 1000 if not is_16x9 else 540, "font": font_large},
+                            {"text": "अक्खीं वेख के दंग थी गईयाँ", "time": 96.00, "y": 1140 if not is_16x9 else 660, "font": font_large}
                         ]
                     },
                     {
-                        "start": 117.8, "end": duration,
+                        "start": 102.0, "end": 116.0,
                         "items": [
-                            {"text": "छलड़े छलड़े बाल", "time": 118.74, "y": 750 if not is_16x9 else 380, "font": font_hero},
-                            {"text": "मंड रखदे काली शाल", "time": 123.19, "y": 880 if not is_16x9 else 480, "font": font_med},
-                            {"text": "हाथ छे नै रत्ता रुमाल", "time": 126.32, "y": 1010 if not is_16x9 else 580, "font": font_med},
-                            {"text": "तेरिया रीसा कौन करे", "time": 129.15, "y": 1140 if not is_16x9 else 680, "font": font_med},
-                            {"text": "मैं तेरिया रीसा कौन करे", "time": 132.18, "y": 1270 if not is_16x9 else 780, "font": font_large}
+                            {"text": "पहली वार मलंग थी गईयाँ", "time": 102.40, "y": 860 if not is_16x9 else 420, "font": font_large},
+                            {"text": "तूं बोले लब खोले", "time": 108.70, "y": 1000 if not is_16x9 else 540, "font": font_hero},
+                            {"text": "तेडे मुँह चूँ किरदे लाल", "time": 111.88, "y": 1140 if not is_16x9 else 660, "font": font_large}
+                        ]
+                    },
+                    {
+                        "start": 116.0, "end": duration,
+                        "items": [
+                            {"text": "छलरे छलरे वाल", "time": 116.50, "y": 750 if not is_16x9 else 380, "font": font_hero},
+                            {"text": "मोढ़े रखदे काली शॉल", "time": 121.00, "y": 880 if not is_16x9 else 480, "font": font_med},
+                            {"text": "हथ चे रत्ता रुमाल", "time": 124.82, "y": 1010 if not is_16x9 else 580, "font": font_med},
+                            {"text": "तेरियाँ रीसाँ कौन करे", "time": 127.54, "y": 1140 if not is_16x9 else 680, "font": font_med},
+                            {"text": "मैं तेरियाँ रीसाँ कौन करे", "time": 130.44, "y": 1270 if not is_16x9 else 780, "font": font_large}
                         ]
                     }
                 ]
@@ -553,7 +553,7 @@ class AestheticLyricEngine:
 
         word_aura_cache = {}
 
-        # Helper: Render Text Card with Dynamic Kinetic Animation & Smooth Line Scroll
+        # Helper: Render Text Card with Dynamic Kinetic Animation & True Aesthetic Typography
         def render_card_layer(items, active_time, global_alpha=1.0, card_offset_y=0, rms=0.0):
             layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
             ldraw = ImageDraw.Draw(layer)
@@ -564,141 +564,100 @@ class AestheticLyricEngine:
                 if active_time >= item["time"]:
                     active_line_idx = idx
 
-            # If stanza has not sung its first line yet (entrance transition phase)
-            if active_line_idx == -1:
-                first_item = items[0]
-                font = first_item["font"]
-                text = first_item["text"]
-                base_cy = first_item["y"] + card_offset_y
-                words = text.split(" ")
-                space_box = font.getbbox(" ")
-                space_w = space_box[2] - space_box[0] if space_box else 16
-                word_boxes = [font.getbbox(w) for w in words]
-                word_widths = [b[2] - b[0] for b in word_boxes]
-                total_w = sum(word_widths) + space_w * (len(words) - 1)
-                start_x = TEXT_CENTER_X - total_w // 2
-                cur_x = start_x
-                ghost_alpha = int(120 * global_alpha)
-                for w, w_w in zip(words, word_widths):
-                    w_center_x = cur_x + w_w // 2
-                    ldraw.text((w_center_x, base_cy), w, font=font, fill=(215, 205, 195, ghost_alpha), anchor="mm")
-                    cur_x += w_w + space_w
-                return layer
-
             for idx, item in enumerate(items):
                 font = item["font"]
                 text = item["text"]
-                words = text.split(" ")
                 base_cy = item["y"] + card_offset_y
 
-                space_box = font.getbbox(" ")
-                space_w = space_box[2] - space_box[0] if space_box else 16
-                word_boxes = [font.getbbox(w) for w in words]
-                word_widths = [b[2] - b[0] for b in word_boxes]
-                total_w = sum(word_widths) + space_w * (len(words) - 1)
-                start_x = TEXT_CENTER_X - total_w // 2
-                cur_x = start_x
+                if active_line_idx == -1:
+                    # Entrance transition phase before first line starts
+                    distance = idx
+                    if distance == 0:
+                        up_alpha = int(210 * global_alpha)
+                        up_rgb = (120, 110, 100)
+                    elif distance == 1:
+                        up_alpha = int(170 * global_alpha)
+                        up_rgb = (145, 135, 125)
+                    else:
+                        up_alpha = int(135 * global_alpha)
+                        up_rgb = (175, 165, 155)
+                    ldraw.text((TEXT_CENTER_X, base_cy), text, font=font, fill=(*up_rgb, up_alpha), anchor="mm")
 
-                if idx < active_line_idx:
-                    # Past lines: dynamic smooth upward glide & color fade from crimson to vintage taupe
+                elif idx < active_line_idx:
+                    # Past lines: subtle upward glide & soft vintage charcoal/taupe
                     if idx == active_line_idx - 1:
                         time_since_passed = active_time - items[active_line_idx]["time"]
                         p_u = min(1.0, max(0.0, time_since_passed / 0.45))
                         p_ease = 1.0 - pow(1.0 - p_u, 3)
-                        line_dy = -int(20.0 * p_ease)
+                        line_dy = -int(18.0 * p_ease)
                         cur_r = int(200 + (145 - 200) * p_ease)
                         cur_g = int(16 + (132 - 16) * p_ease)
                         cur_b = int(46 + (122 - 46) * p_ease)
                         past_alpha = int((255 + (175 - 255) * p_ease) * global_alpha)
                     else:
-                        line_dy = -20
+                        line_dy = -18
                         cur_r, cur_g, cur_b = 145, 132, 122
                         past_alpha = int(175 * global_alpha)
 
-                    for w, w_w in zip(words, word_widths):
-                        w_center_x = cur_x + w_w // 2
-                        ldraw.text((w_center_x, base_cy + line_dy), w, font=font, fill=(cur_r, cur_g, cur_b, past_alpha), anchor="mm")
-                        cur_x += w_w + space_w
+                    ldraw.text((TEXT_CENTER_X, base_cy + line_dy), text, font=font, fill=(cur_r, cur_g, cur_b, past_alpha), anchor="mm")
 
                 elif idx == active_line_idx:
-                    # Current active line: smooth entrance slide-up + word-by-word kinetic bounce + music reactivity
+                    # Current active line: smooth entrance slide-up + music beat pulse + Royal Crimson focus
                     line_age = active_time - item["time"]
-                    line_entrance_dur = profile["line_entrance_dur"]
+                    line_entrance_dur = profile.get("line_entrance_dur", 0.28)
                     line_u = min(1.0, max(0.0, line_age / line_entrance_dur))
                     line_ease = 1.0 - pow(1.0 - line_u, 3)
-                    line_dy = int(22.0 * (1.0 - line_ease))
+                    line_dy = int(18.0 * (1.0 - line_ease))
 
-                    # Adaptive dynamic music beat pulse
-                    beat_scale = 1.0 + min(0.06, rms * profile["beat_pulse_mult"] * 10)
+                    beat_scale = 1.0 + min(0.05, rms * profile.get("beat_pulse_mult", 1.0) * 8)
+                    cy = base_cy + line_dy
 
-                    for w_idx, (w, w_w) in enumerate(zip(words, word_widths)):
-                        w_time = item["time"] + w_idx * profile["word_stagger"]
-                        w_center_x = cur_x + w_w // 2
-
-                        if active_time < w_time:
-                            # Ghost watermark before word is sung (Top Creator Aesthetic)
-                            ghost_alpha = int(115 * global_alpha)
-                            ldraw.text((w_center_x, base_cy + line_dy), w, font=font, fill=(215, 205, 195, ghost_alpha), anchor="mm")
+                    # Soft Royal Crimson ambient aura glow behind the whole line
+                    if text not in word_aura_cache:
+                        bbox = font.getbbox(text)
+                        bw, bh = bbox[2] - bbox[0] + 80, bbox[3] - bbox[1] + 80
+                        if bw > 0 and bh > 0:
+                            g_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+                            g_draw = ImageDraw.Draw(g_box)
+                            g_draw.text((bw // 2, bh // 2), text, font=font, fill=(*self.COLOR_RED, 70), anchor="mm")
+                            word_aura_cache[text] = g_box.filter(ImageFilter.GaussianBlur(12))
                         else:
-                            age = active_time - w_time
-                            entrance_dur = 0.32
-                            if age < entrance_dur:
-                                u = age / entrance_dur
-                                ease_out = 1.0 - pow(1.0 - u, 3)
-                                dy = int(22.0 * (1.0 - ease_out))
-                                scale = (0.92 + (profile["bounce_scale"] - 0.92) * ease_out + 0.05 * math.sin(u * math.pi)) * beat_scale
-                                word_alpha = min(1.0, u * 1.8)
-                            else:
-                                dy = 0
-                                scale = 1.0 * beat_scale
-                                word_alpha = 1.0
+                            word_aura_cache[text] = None
 
-                            eff_alpha = int(255 * word_alpha * global_alpha)
-                            cy = base_cy + line_dy + dy
+                    cached_aura = word_aura_cache.get(text)
+                    if cached_aura is not None:
+                        layer.paste(cached_aura, (TEXT_CENTER_X - cached_aura.width // 2, cy - cached_aura.height // 2), cached_aura)
 
-                            # Active word soft ambient glow aura (cached lookup for turbo speed)
-                            if eff_alpha > 50:
-                                if w not in word_aura_cache:
-                                    bbox = font.getbbox(w)
-                                    bw, bh = bbox[2] - bbox[0] + 60, bbox[3] - bbox[1] + 60
-                                    if bw > 0 and bh > 0:
-                                        g_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
-                                        g_draw = ImageDraw.Draw(g_box)
-                                        g_draw.text((bw // 2, bh // 2), w, font=font, fill=(*self.COLOR_RED, 80), anchor="mm")
-                                        word_aura_cache[w] = g_box.filter(ImageFilter.GaussianBlur(10))
-                                    else:
-                                        word_aura_cache[w] = None
+                    # Draw active text with scale pulse
+                    if abs(beat_scale - 1.0) < 0.01:
+                        ldraw.text((TEXT_CENTER_X, cy), text, font=font, fill=(*self.COLOR_RED, int(255 * global_alpha)), anchor="mm")
+                    else:
+                        bbox = font.getbbox(text)
+                        bw, bh = bbox[2] - bbox[0] + 40, bbox[3] - bbox[1] + 40
+                        if bw > 0 and bh > 0:
+                            t_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+                            b_draw = ImageDraw.Draw(t_box)
+                            b_draw.text((bw // 2, bh // 2), text, font=font, fill=(*self.COLOR_RED, int(255 * global_alpha)), anchor="mm")
+                            nw, nh = max(1, int(bw * beat_scale)), max(1, int(bh * beat_scale))
+                            resz = t_box.resize((nw, nh), resample=Image.BICUBIC)
+                            layer.paste(resz, (TEXT_CENTER_X - nw // 2, cy - nh // 2), resz)
+                        else:
+                            ldraw.text((TEXT_CENTER_X, cy), text, font=font, fill=(*self.COLOR_RED, int(255 * global_alpha)), anchor="mm")
 
-                                cached_aura = word_aura_cache.get(w)
-                                if cached_aura is not None:
-                                    layer.paste(cached_aura, (w_center_x - cached_aura.width // 2, cy - cached_aura.height // 2), cached_aura)
+                else:
+                    # Upcoming lines: Clearly legible, elegant warm charcoal/taupe (Top Creator Design Standard)
+                    distance = idx - active_line_idx
+                    if distance == 1:
+                        up_alpha = int(195 * global_alpha)
+                        up_rgb = (135, 125, 115)
+                    elif distance == 2:
+                        up_alpha = int(165 * global_alpha)
+                        up_rgb = (155, 145, 135)
+                    else:
+                        up_alpha = int(135 * global_alpha)
+                        up_rgb = (175, 165, 155)
 
-                            # Render active word with scale bounce
-                            if abs(scale - 1.0) < 0.01:
-                                ldraw.text((w_center_x, cy), w, font=font, fill=(*self.COLOR_RED, eff_alpha), anchor="mm")
-                            else:
-                                bbox = font.getbbox(w)
-                                bw, bh = bbox[2] - bbox[0] + 40, bbox[3] - bbox[1] + 40
-                                if bw > 0 and bh > 0:
-                                    t_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
-                                    b_draw = ImageDraw.Draw(t_box)
-                                    b_draw.text((bw // 2, bh // 2), w, font=font, fill=(*self.COLOR_RED, eff_alpha), anchor="mm")
-                                    nw, nh = max(1, int(bw * scale)), max(1, int(bh * scale))
-                                    resz = t_box.resize((nw, nh), resample=Image.BICUBIC)
-                                    layer.paste(resz, (w_center_x - nw // 2, cy - nh // 2), resz)
-
-                        cur_x += w_w + space_w
-
-                elif idx == active_line_idx + 1:
-                    # Upcoming line: subtle ghost preview if within 1.0s of singing
-                    time_until = item["time"] - active_time
-                    if time_until <= 1.0:
-                        preview_u = min(1.0, max(0.0, (1.0 - time_until) / 1.0))
-                        ghost_alpha = int(75 * preview_u * global_alpha)
-                        for w, w_w in zip(words, word_widths):
-                            w_center_x = cur_x + w_w // 2
-                            ldraw.text((w_center_x, base_cy), w, font=font, fill=(225, 215, 205, ghost_alpha), anchor="mm")
-                            cur_x += w_w + space_w
+                    ldraw.text((TEXT_CENTER_X, base_cy), text, font=font, fill=(*up_rgb, up_alpha), anchor="mm")
 
             return layer
 
