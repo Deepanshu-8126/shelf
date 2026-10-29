@@ -31,12 +31,20 @@
   - **Top**: Clean artist & track metadata badge (`SONG • ARTIST`).
   - **Bottom Negative Space**: Shimmering water caustics + audio-reactive fluid ripple wave.
 
-## 3. Reticle Audio-Vocal Alignment Standard (Zero Mismatch Law)
-- Never guess lyric timestamps; verify audio-stem vocal entry using Whisper.
-- Slice audio cleanly with crossfades (80ms in, 350ms out).
-- Master execution command:
+## 3. Reticle Audio-Vocal Alignment Standard (Zero Mismatch Law - STRICT LOCK)
+- **Zero-Trust Crowdsourced Policy**:
+  - NEVER feed raw crowdsourced `.lrc` (LRCLIB, Spotify, Musixmatch, Megalobiz) directly into the video encoder. Crowdsourced LRCs suffer from **cumulative human latency lag** (1.2s - 2.5s delay), missing stanza repetitions, and phonetically butchered Hindi/Punjabi/Saraiki lyrics.
+- **The "Pehle Line Theek, Aage Jaake Kharab" Anti-Drift Protocol**:
+  1. **Intro-Silence Zero-Point Alignment ($t_0$)**: YouTube audio rips, Spotify stems, and master WAVs differ in lead-in silence (0.3s to 2.0s). Always calibrate the very first vocal onset against audio RMS energy.
+  2. **Stanza Repeat Auditing**: South Asian / Bollywood songs frequently repeat the Mukhda and Antara lines twice. Verify that repeated couplets exist in the `.lrc`. If a repeat is missing, all subsequent lines will catastrophically drift out of phase.
+  3. **Instrumental Solo Breaks**: Long instrumental passages (flute, sarangi, guitar solos) must have explicit pause markers (`[mm:ss.xx] <empty>`), preventing text ghosting during negative space.
+  4. **Waveform Energy Verification**: Every lyric timestamp must be cross-checked against localized RMS energy or Whisper onsets. Error threshold must be $< 350\text{ms}$.
+- **Pristine Devanagari Typography Shaping Law**:
+  - Never break Devanagari / Gurmukhi scripts using `.split(" ")` with custom word bounding-box calculations. Matras (ि, ी, ु, ू, ँ, ं) and conjuncts (क्, त्) will collide and disintegrate (`केरेमोचोगरिदे`).
+  - Always render full sentences using HarfBuzz / FreeType shaping, employing dynamic step-down fonts (`font_hero → font_large → font_med`) if line width exceeds canvas boundary.
+- **Master execution command**:
   ```bash
-  python core/studio_master.py --pipeline lyric --audio "path/to/song.mp3" --title "Husn" --artist "Anuv Jain" --ratio 9:16 --duration 22.5
+  python core/studio_master.py --pipeline lyric --audio "output/song_master.wav" --title "Song Title" --artist "Artist" --ratio 16:9 --duration 135.65 --lrc "raw_stems/song.lrc" --floral --player --output "output/master.mp4"
   ```
 
 ## 4. Autonomous Audio Intelligence & Dynamic Tempo Sensing
