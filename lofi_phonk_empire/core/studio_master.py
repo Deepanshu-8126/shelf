@@ -78,6 +78,7 @@ def main():
     parser.add_argument("--output", help="Optional custom master output path")
     parser.add_argument("--player", action="store_true", help="Include Spotify player scrubber")
     parser.add_argument("--floral", action="store_true", help="Enable aesthetic summer botanical petals and leaves overlay")
+    parser.add_argument("--lrc", help="Path to verified .lrc synced lyrics file")
     
     # Phonk Pipeline specific args
     parser.add_argument("--artwork", help="Custom artwork path (defaults to gym warrior)")
@@ -109,20 +110,31 @@ def main():
         print("=== LAUNCHING AESTHETIC LYRIC PIPELINE (LOCKED) ===")
         engine = AestheticLyricEngine()
         
-        # Extract clean vocal slice
-        temp_wav = os.path.join(parent_dir, "output", "temp_vocal_slice.wav")
-        engine.extract_audio_slice(audio_path, start_sec=args.vocal_start, duration_sec=args.duration, output_wav_path=temp_wav)
+        # Parse synced lyrics if provided
+        cards_parsed = None
+        if getattr(args, 'lrc', None) and os.path.exists(args.lrc):
+            cards_parsed = engine.parse_lrc_file(args.lrc, args.duration, is_16x9=(args.ratio == "16:9"))
+
+        # Extract clean vocal slice or use direct master wav
+        if audio_path.endswith(".wav") and (args.vocal_start == 0.0 or args.vocal_start is None):
+            temp_wav = None
+            render_audio = audio_path
+        else:
+            temp_wav = os.path.join(parent_dir, "output", "temp_vocal_slice.wav")
+            engine.extract_audio_slice(audio_path, start_sec=args.vocal_start, duration_sec=args.duration, output_wav_path=temp_wav)
+            render_audio = temp_wav
         
         mins = int(args.vocal_start) // 60
         secs = int(args.vocal_start) % 60
         start_label = f"{mins}:{secs:02d}"
 
         out_video = engine.render(
-            audio_path=temp_wav,
+            audio_path=render_audio,
             title=args.title,
             artist=args.artist,
             aspect_ratio=args.ratio,
             duration=args.duration,
+            cards_config=cards_parsed,
             output_mp4=args.output,
             show_player=getattr(args, 'player', False),
             enable_water_caustics=("husn" in args.title.lower() and not getattr(args, 'floral', False)),
@@ -130,7 +142,7 @@ def main():
             artwork_path=getattr(args, 'artwork', None),
             enable_floral_overlay=getattr(args, 'floral', False)
         )
-        if os.path.exists(temp_wav):
+        if temp_wav and os.path.exists(temp_wav):
             try:
                 os.remove(temp_wav)
             except Exception:
