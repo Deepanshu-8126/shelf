@@ -114,8 +114,13 @@ def render_alfaaz_reel():
     total_frames = int(FPS * duration)
 
     root_dir = ROOT_DIR
-    audio_path = os.path.join(root_dir, "output", "alfaaz_baaghan_vichon_viral_hook.mp3")
-    out_mp4 = os.path.join(root_dir, "output", "alfaaz_baaghan_vichon_reel_9x16.mp4")
+    audio_path = os.path.join(root_dir, "raw_stems", "audio", "alfaaz_baaghan_vichon_viral_hook.mp3")
+    if not os.path.exists(audio_path):
+        audio_path = os.path.join(root_dir, "output", "alfaaz_baaghan_vichon_viral_hook.mp3")
+
+    out_dir = os.path.join(root_dir, "output", "reels_9x16")
+    os.makedirs(out_dir, exist_ok=True)
+    out_mp4 = os.path.join(out_dir, "alfaaz_baaghan_vichon_reel_9x16.mp4")
     petals_dir = os.path.join(root_dir, "assets", "botanical_petals")
 
     print("=" * 65)
