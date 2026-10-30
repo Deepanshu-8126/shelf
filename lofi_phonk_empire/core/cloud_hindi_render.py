@@ -36,18 +36,18 @@ DARK_TEXT = (26, 26, 26)         # Charcoal Black
 BAR_TAUPE = (185, 175, 165)      # Visualizer Taupe Flanks
 LINE_COLOR = (225, 218, 210)     # Subtle Separator Line
 
-# 10 Song Tracklist Chapters
+# 10 Song Tracklist Chapters with Authentic Cover Artwork
 CHAPTERS = [
-    {"title": "BARSAAT", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 0.0, "end": 180.0},
-    {"title": "ZULFEIN", "artist": "MEHUL MAHESH  •  TRENDING HINDI INDIE", "start": 180.0, "end": 364.0},
-    {"title": "TU AAJA NE RAAJI", "artist": "FOLK INDIE  •  TRENDING HINDI INDIE", "start": 364.0, "end": 586.0},
-    {"title": "AARZU", "artist": "ASIM AZHAR  •  TRENDING HINDI INDIE", "start": 586.0, "end": 755.0},
-    {"title": "MADIRA", "artist": "HARDIK BHARDWAJ  •  TRENDING HINDI INDIE", "start": 755.0, "end": 918.0},
-    {"title": "BAIRAN", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 918.0, "end": 1064.0},
-    {"title": "TAAKKNE", "artist": "SARRB  •  TRENDING PUNJABI INDIE", "start": 1064.0, "end": 1284.0},
-    {"title": "TAARE", "artist": "FARAK  •  TRENDING HINDI INDIE", "start": 1284.0, "end": 1440.0},
-    {"title": "DOORON DOORON", "artist": "PARESH PAHUJA  •  TRENDING HINDI INDIE", "start": 1440.0, "end": 1724.0},
-    {"title": "PAL PAL", "artist": "AFUSIC  •  TRENDING HINDI INDIE", "start": 1724.0, "end": 1910.0}
+    {"title": "BARSAAT", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 0.0, "end": 180.0, "cover": "01_barsaat.jpg"},
+    {"title": "ZULFEIN", "artist": "MEHUL MAHESH  •  TRENDING HINDI INDIE", "start": 180.0, "end": 364.0, "cover": "02_zulfein.jpg"},
+    {"title": "TU AAJA NE RAAJI", "artist": "FOLK INDIE  •  TRENDING HINDI INDIE", "start": 364.0, "end": 586.0, "cover": "03_tu_aaja_ne_raaji.jpg"},
+    {"title": "AARZU", "artist": "ASIM AZHAR  •  TRENDING HINDI INDIE", "start": 586.0, "end": 755.0, "cover": "04_aarzu.jpg"},
+    {"title": "MADIRA", "artist": "HARDIK BHARDWAJ  •  TRENDING HINDI INDIE", "start": 755.0, "end": 918.0, "cover": "05_madira.jpg"},
+    {"title": "BAIRAN", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 918.0, "end": 1064.0, "cover": "06_bairan.jpg"},
+    {"title": "TAAKKNE", "artist": "SARRB  •  TRENDING PUNJABI INDIE", "start": 1064.0, "end": 1284.0, "cover": "07_taakkne.jpg"},
+    {"title": "TAARE", "artist": "FARAK  •  TRENDING HINDI INDIE", "start": 1284.0, "end": 1440.0, "cover": "08_taare.jpg"},
+    {"title": "DOORON DOORON", "artist": "PARESH PAHUJA  •  TRENDING HINDI INDIE", "start": 1440.0, "end": 1724.0, "cover": "09_dooron_dooron.jpg"},
+    {"title": "PAL PAL", "artist": "AFUSIC  •  TRENDING HINDI INDIE", "start": 1724.0, "end": 1910.0, "cover": "10_pal_pal.jpg"}
 ]
 
 def get_audio_wav(youtube_url, output_wav, local_source=None):
@@ -78,8 +78,8 @@ def get_audio_wav(youtube_url, output_wav, local_source=None):
         ydl.download([youtube_url])
     return output_wav
 
-def create_vinyl_disc(size=520):
-    """High-resolution vinyl disc with realistic grooves and gold-trimmed center label."""
+def create_vinyl_disc(size=520, cover_path=None):
+    """High-resolution vinyl disc with realistic grooves and custom song cover art."""
     vinyl = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     vdraw = ImageDraw.Draw(vinyl)
     center = size // 2
@@ -93,10 +93,28 @@ def create_vinyl_disc(size=520):
         alpha = 110 if r % 18 == 0 else 55
         vdraw.ellipse([center - r, center - r, center + r, center + r], outline=(48, 48, 52, alpha), width=1)
 
-    # Center label
     label_r = int(radius * 0.38)
-    vdraw.ellipse([center - label_r, center - label_r, center + label_r, center + label_r],
-                  fill=(180, 16, 40, 255), outline=(212, 175, 55, 255), width=3)
+    
+    # Custom track artwork or classic crimson label
+    if cover_path and os.path.exists(cover_path):
+        try:
+            cov = Image.open(cover_path).convert("RGBA")
+            min_dim = min(cov.width, cov.height)
+            cov_sq = cov.crop(((cov.width - min_dim) // 2, (cov.height - min_dim) // 2,
+                              (cov.width + min_dim) // 2, (cov.height + min_dim) // 2))
+            cov_resized = cov_sq.resize((label_r * 2, label_r * 2), Image.Resampling.LANCZOS)
+            mask = Image.new("L", (label_r * 2, label_r * 2), 0)
+            mdraw = ImageDraw.Draw(mask)
+            mdraw.ellipse([0, 0, label_r * 2, label_r * 2], fill=255)
+            vinyl.paste(cov_resized, (center - label_r, center - label_r), mask)
+            vdraw.ellipse([center - label_r, center - label_r, center + label_r, center + label_r],
+                          outline=(212, 175, 55, 230), width=3)
+        except Exception:
+            vdraw.ellipse([center - label_r, center - label_r, center + label_r, center + label_r],
+                          fill=(180, 16, 40, 255), outline=(212, 175, 55, 255), width=3)
+    else:
+        vdraw.ellipse([center - label_r, center - label_r, center + label_r, center + label_r],
+                      fill=(180, 16, 40, 255), outline=(212, 175, 55, 255), width=3)
 
     # Spindle hole
     spindle_r = int(label_r * 0.18)
@@ -195,12 +213,15 @@ def main():
             bdraw.line([(x - 3, y), (x + 3, y)], fill=CROSS_COLOR, width=1)
             bdraw.line([(x, y - 3), (x, y + 3)], fill=CROSS_COLOR, width=1)
 
-    # 4. Vinyl Disc & Glow Cache
+    # 4. Vinyl Discs with Dynamic Song Artwork & Ambient Glow
     VINYL_X, VINYL_Y = 460, 520
     vinyl_size = 520
-    master_vinyl = create_vinyl_disc(vinyl_size)
-    print("[INFO] Pre-caching 360-degree vinyl rotation table...", flush=True)
-    vinyl_cache = [master_vinyl.rotate(-deg, resample=Image.Resampling.BILINEAR) for deg in range(360)]
+    covers_dir = os.path.join(base_dir, "assets", "track_covers")
+    print("[INFO] Generating vinyl turntable discs with official cover art for all 10 tracks...", flush=True)
+    chapter_discs = []
+    for ch in CHAPTERS:
+        cov_file = os.path.join(covers_dir, ch["cover"]) if "cover" in ch else None
+        chapter_discs.append(create_vinyl_disc(vinyl_size, cov_file))
 
     glow_size = vinyl_size + 140
     glow_img = Image.new("RGBA", (glow_size, glow_size), (0, 0, 0, 0))
@@ -303,18 +324,20 @@ def main():
 
         # Find Current Active Chapter
         cur_ch = CHAPTERS[-1]
-        for ch in CHAPTERS:
+        cur_ch_idx = len(CHAPTERS) - 1
+        for idx, ch in enumerate(CHAPTERS):
             if ch["start"] <= t < ch["end"]:
                 cur_ch = ch
+                cur_ch_idx = idx
                 break
 
         # Clone Base Canvas
         frame = Image.fromarray(base_arr.copy())
         draw = ImageDraw.Draw(frame)
 
-        # 1. Paste Rotating Vinyl
+        # 1. Paste Rotating Vinyl with Track-Specific Artwork
         deg = int((f_idx * deg_per_frame) % 360)
-        cur_vinyl = vinyl_cache[deg]
+        cur_vinyl = chapter_discs[cur_ch_idx].rotate(-deg, resample=Image.Resampling.BILINEAR)
         frame.paste(cur_vinyl, (VINYL_X - vinyl_size // 2, VINYL_Y - vinyl_size // 2), cur_vinyl)
 
         # 2. Drifting Botanical Petals (Phool Girte Hue)
