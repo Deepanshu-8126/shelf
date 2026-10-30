@@ -17,3 +17,9 @@
 ## 3. Copyright Stealth Standards
 - 100% zero Content ID claims across the entire timeline verified by `deep_sliding_copyright_audit.py` before final delivery.
 - No chipmunk vocals; maintain natural warmth and authentic acoustic instruments.
+
+## 4. Viral Lyric Sync, Header Purity & Aesthetic Template Laws
+- **Zero Guesswork Whisper Mandate**: Never manually estimate lyric timestamps. Always run local Whisper base model on the exact audio slice to extract millisecond ground-truth onsets.
+- **Zero Code Syntax in Visual Canvas**: Never inject `//`, `REEL SESSIONS`, `TEMP`, or code-style markers into visible video frames. Headers must be pure luxury typography (`SONG • ARTIST` with hairline divider).
+- **Design System Lock for Hindi/Lofi Lyric Videos**: Mandatory baseline is `#FAF8F4` ivory parchment + 90-frame looping water caustics mesh + drifting botanical rose petals + 360° spinning vinyl disc with Devanagari medallion + Rozha One Devanagari calligraphy (`#C8102E` with glow aura).
+- **Zero Emoji Unicode in PIL**: Never pass unicode emojis (`🌹`, `⚡`) to PIL `draw.text` with standard TTF fonts; always use transparent PNG sprites or pure typography.
