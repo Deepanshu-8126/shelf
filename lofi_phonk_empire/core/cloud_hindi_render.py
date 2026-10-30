@@ -161,6 +161,36 @@ def compute_audio_spectrum(audio_mono, sr, fps, num_bars=48):
     spectrum_matrix = np.clip(spectrum_matrix / max_val, 0.0, 1.0)
     return spectrum_matrix
 
+def find_font(bold=False, size=24):
+    """Robust cross-platform font resolver for Windows, macOS, and Linux runners."""
+    if bold:
+        candidates = [
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
+            "arialbd.ttf",
+            "C:\\Windows\\Fonts\\arialbd.ttf",
+        ]
+    else:
+        candidates = [
+            "arial.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+            "C:\\Windows\\Fonts\\arial.ttf",
+        ]
+    for c in candidates:
+        if os.path.exists(c):
+            try:
+                return ImageFont.truetype(c, size)
+            except Exception:
+                pass
+        try:
+            return ImageFont.truetype(c, size)
+        except Exception:
+            pass
+    return ImageFont.load_default()
+
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     output_dir = os.path.join(base_dir, "output")
@@ -192,12 +222,16 @@ def main():
 
     # 2. Typography Setup
     font_hero_path = os.path.join(base_dir, "RozhaOne-Regular.ttf")
-    if not os.path.exists(font_hero_path):
-        font_hero_path = "arial.ttf"
+    if os.path.exists(font_hero_path):
+        try:
+            font_title = ImageFont.truetype(font_hero_path, 80)
+        except Exception:
+            font_title = find_font(bold=True, size=80)
+    else:
+        font_title = find_font(bold=True, size=80)
 
-    font_title = ImageFont.truetype(font_hero_path, 80)
-    font_sub = ImageFont.truetype("arial.ttf", 26)
-    font_meta = ImageFont.truetype("arial.ttf", 20)
+    font_sub = find_font(bold=False, size=26)
+    font_meta = find_font(bold=False, size=20)
 
     # 3. Base White Grid Designer Canvas
     grid_size = 60
