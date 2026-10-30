@@ -1,6 +1,7 @@
 """
-Gehra Hua (Dhurandhar) - Full Master Lyrical Mode Video Renderer (45 Seconds Master)
-- Song: Gehra Hua (Arijit Singh x Shashwat Sachdev)
+Gehra Hua (Official Saregama Master) - 100% Ground-Truth Synced Lyric Video
+- Official Audio: Saregama Music (Dhurandhar) - Arijit Singh x Shashwat Sachdev
+- Viral Drop Hook: 45.0 Seconds Exact (Betaab-sa mohabbat ka -> Gehra hua chorus drop)
 - Visual Plate: Dreamina 720p Himalayan Dusk Cinematic Loop (Ping-Pong)
 - Aesthetic: 100% Lyrical Mode (Zero black overlays, natural mountain colors)
 - Typography: Dancing Script White Calligraphy with soft Gaussian Drop Shadow
@@ -21,14 +22,14 @@ def ease_in_out(val):
 
 def render_gehra_hua_master():
     video_in = "d:/facts_yt/lofi_phonk_empire/dreamina-seedance-2.0-720p_b_Create_a_premium_cin.mp4"
-    audio_in = "d:/facts_yt/lofi_phonk_empire/raw_stems/audio/gehra_hua_viral_hook.mp3"
+    audio_in = "d:/facts_yt/lofi_phonk_empire/raw_stems/audio/gehra_hua_official_hook_45s.mp3"
     font_path = "d:/facts_yt/lofi_phonk_empire/assets/fonts_en/DancingScript.ttf"
     tag_font_path = "d:/facts_yt/lofi_phonk_empire/assets/fonts_en/BebasNeue.ttf"
     
     output_dir = "d:/facts_yt/lofi_phonk_empire/output/youtube_16x9"
     os.makedirs(output_dir, exist_ok=True)
-    temp_video = "d:/facts_yt/lofi_phonk_empire/temp_gehra_master_raw.mp4"
-    final_output = os.path.join(output_dir, "gehra_hua_lyrical_mode_master_45s.mp4")
+    temp_video = "d:/facts_yt/lofi_phonk_empire/temp_gehra_official_raw.mp4"
+    final_output = os.path.join(output_dir, "gehra_hua_official_lyrical_master.mp4")
     
     # 1. Load source video frames
     cap = cv2.VideoCapture(video_in)
@@ -52,7 +53,7 @@ def render_gehra_hua_master():
     out = cv2.VideoWriter(temp_video, fourcc, fps, (width, height))
     
     font_lyric_2line = ImageFont.truetype(font_path, 56)
-    font_lyric_1line = ImageFont.truetype(font_path, 58)
+    font_lyric_1line = ImageFont.truetype(font_path, 60)
     font_tag = ImageFont.truetype(tag_font_path, 24)
     
     brand_tag = "GEHRA HUA  •  ARIJIT SINGH x SHASHWAT SACHDEV"
@@ -66,61 +67,47 @@ def render_gehra_hua_master():
     d_tag_fg.text((width // 2, 665), brand_tag, font=font_tag, fill=(255, 255, 255, 220), anchor="mm")
     tag_arr = np.array(tag_blurred, dtype=np.float32)
     
-    # 2. Complete Lyrics Schedule based on Ground-Truth Whisper Alignment
+    # 2. Complete Lyrics Schedule based on Ground-Truth Official Whisper Alignment
     lyrics_schedule = [
         {
             "start": 0.00,
-            "end": 6.80,
-            "lines": ["Tu agar meri, main hoon tera..."],
-            "font": font_lyric_1line,
-            "is_2line": False
-        },
-        {
-            "start": 7.50,
-            "end": 13.40,
-            "lines": ["Tu agar meri ye ujaale tere,"],
-            "font": font_lyric_1line,
-            "is_2line": False
-        },
-        {
-            "start": 13.80,
-            "end": 17.60,
-            "lines": ["Tu agar meri dil hawaale tere,"],
-            "font": font_lyric_1line,
-            "is_2line": False
-        },
-        {
-            "start": 18.00,
-            "end": 21.20,
-            "lines": ["Tu agar meri main hoon tera!"],
-            "font": font_lyric_1line,
-            "is_2line": False
-        },
-        {
-            "start": 21.60,
-            "end": 28.80,
+            "end": 6.50,
             "lines": ["Betaab-sa mohabbat ka", "tu inqalaab hai..."],
             "font": font_lyric_2line,
             "is_2line": True
         },
         {
-            "start": 29.20,
-            "end": 36.20,
+            "start": 6.90,
+            "end": 14.20,
             "lines": ["Mera jahaan teri baahon mein", "khwaab, khwaab hai..."],
             "font": font_lyric_2line,
             "is_2line": True
         },
         {
-            "start": 36.80,
-            "end": 40.20,
+            "start": 14.60,
+            "end": 21.60,
             "lines": ["Gehra hua, gehra hua..."],
             "font": font_lyric_1line,
             "is_2line": False
         },
         {
-            "start": 40.50,
-            "end": 45.00,
-            "lines": ["Rang aashiqui gehra hua,", "tera hua!"],
+            "start": 22.10,
+            "end": 29.20,
+            "lines": ["Rang aashiqui gehra hua..."],
+            "font": font_lyric_1line,
+            "is_2line": False
+        },
+        {
+            "start": 29.70,
+            "end": 36.40,
+            "lines": ["Gehra hua, gehra hua..."],
+            "font": font_lyric_1line,
+            "is_2line": False
+        },
+        {
+            "start": 37.00,
+            "end": 44.50,
+            "lines": ["Dariya dua gehra hua,", "tera hua!"],
             "font": font_lyric_2line,
             "is_2line": True
         }
@@ -156,7 +143,7 @@ def render_gehra_hua_master():
 
     cycle = 2 * (n_raw - 1)
     
-    print("Rendering 1080 frames (45.0 seconds Gehra Hua master)...")
+    print("Rendering 1080 frames (45.0 seconds Official Saregama master)...")
     for f in range(total_frames):
         t = f / fps
         
@@ -198,7 +185,7 @@ def render_gehra_hua_master():
         out.write(final_bgr)
         
     out.release()
-    print("Video frames generated. Muxing 45-second high-fidelity master audio...")
+    print("Video frames generated. Muxing 45-second high-fidelity official Saregama audio...")
     
     # Mux full 45s audio
     cmd = [
@@ -214,7 +201,7 @@ def render_gehra_hua_master():
     if os.path.exists(temp_video):
         os.remove(temp_video)
         
-    print("Full 45-second Gehra Hua master video rendered successfully:", final_output)
+    print("Full 45-second official master video rendered successfully:", final_output)
     return final_output
 
 if __name__ == "__main__":
