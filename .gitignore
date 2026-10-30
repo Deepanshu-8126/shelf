@@ -21,3 +21,6 @@ credentials/
 yt-automator/
 blender_engine/
 youtube_agent_skills/
+*.webm
+reference_*
+temp_*
