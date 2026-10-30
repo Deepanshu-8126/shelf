@@ -1,12 +1,14 @@
 """
 Cloud Hindi Trending Songs Master Renderer (30-Minute Master Turbo Engine)
 --------------------------------------------------------------------------
-- Renders the viral 10-song Bollywood / Hindi Trending playlist.
-- Dynamic YouTube audio download via yt-dlp.
-- Full 10-chapter synchronization with kinetic Devanagari lyrics.
-- Spinning vinyl record player with acoustic artwork & audio-reactive glow.
-- Summer botanical floral petals & dried olive leaves drift in margins.
-- Turbo cached architecture for high-speed cloud throughput (30+ FPS).
+- 10-Song Trending Bollywood / Hindi Indie Master Playlist (https://youtu.be/InBgERNHf_s).
+- Minimalist Warm Ivory Designer Grid (#FAF8F4) with subtle architectural crosshairs.
+- 360-degree rotating vinyl record with ambient crimson aura & gold-trimmed label.
+- Summer botanical floral petals & dried olive leaves drift organically across margins.
+- Rozha One luxury editorial typography with automatic song chapter transitions.
+- Real-time audio-reactive spectrum waveform visualizer (FFT-driven).
+- Clean Spotify seekbar with real-time timestamps (NO 82 BPM badge, NO Sunday Vibes header).
+- Highly optimized for GitHub Actions cloud runners (30+ FPS throughput).
 """
 
 import os
@@ -18,118 +20,46 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from scipy.io import wavfile
 
-# Force UTF-8 stdout
 if sys.stdout.encoding != 'utf-8':
-    sys.stdout.reconfigure(encoding='utf-8')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
-# Global Design Constants
-COLOR_BG = (250, 248, 244)       # Warm Vintage Ivory Paper
-COLOR_RED = (200, 16, 46)        # Heritage Crimson Accent
-COLOR_MUTED = (135, 125, 115)     # Warm Taupe Secondary
-COLOR_LINE = (220, 212, 202)      # Vintage Paper Line
+# Color Palette
+BG_COLOR = (250, 248, 244)       # Warm Ivory White
+GRID_COLOR = (235, 230, 222)     # Soft Architectural Grid
+CROSS_COLOR = (210, 202, 192)    # Subtle Grid Crosshairs
+ACCENT_RED = (200, 16, 46)       # Crimson Accent
+MUTED_TEXT = (140, 130, 120)     # Warm Taupe
+DARK_TEXT = (26, 26, 26)         # Charcoal Black
+BAR_TAUPE = (185, 175, 165)      # Visualizer Taupe Flanks
+LINE_COLOR = (225, 218, 210)     # Subtle Separator Line
 
-# 10 Song Tracklist Chapters with Lyrics
+# 10 Song Tracklist Chapters
 CHAPTERS = [
-    {
-        "title": "BARSAAT", "artist": "BAIRAN", "start": 0.0, "end": 180.0,
-        "lyrics": [
-            {"time": 8.0, "text": "बरसात की भीगी रातों में..."},
-            {"time": 45.0, "text": "तेरी यादें फिर से आ गईं..."},
-            {"time": 95.0, "text": "दिल ढूँढता है वो पुरानी गलियाँ..."},
-            {"time": 140.0, "text": "बरसात में तू सामने आ बैठी..."}
-        ]
-    },
-    {
-        "title": "ZULFEIN", "artist": "MEHUL MAHESH", "start": 180.0, "end": 364.0,
-        "lyrics": [
-            {"time": 190.0, "text": "ये तेरी रेशमी ज़ुल्फ़ें..."},
-            {"time": 230.0, "text": "हवा में लहराती हुई..."},
-            {"time": 275.0, "text": "तेरी आँखों का ये सुरूर..."},
-            {"time": 320.0, "text": "दिल बेताब सा हो गया..."}
-        ]
-    },
-    {
-        "title": "TU AAJA NE RAAJI", "artist": "FOLK INDIE", "start": 364.0, "end": 586.0,
-        "lyrics": [
-            {"time": 375.0, "text": "तू आजा ने राज़ी सजना..."},
-            {"time": 425.0, "text": "तेरे बिन दिल नहियो लग्गदा..."},
-            {"time": 480.0, "text": "अक्खियाँ उडीक दियां तैनू..."},
-            {"time": 535.0, "text": "इक वारि हस के वेख ले..."}
-        ]
-    },
-    {
-        "title": "AARZU", "artist": "ASIM AZHAR", "start": 586.0, "end": 755.0,
-        "lyrics": [
-            {"time": 595.0, "text": "दिल में तेरी आरज़ू है..."},
-            {"time": 635.0, "text": "साँसों में तेरा ही नाम..."},
-            {"time": 675.0, "text": "कैसे बताऊँ इस दिल का हाल..."},
-            {"time": 715.0, "text": "तू ही है मेरी हर सुबह ओ शाम..."}
-        ]
-    },
-    {
-        "title": "MADIRA", "artist": "HARDIK BHARDWAJ", "start": 755.0, "end": 918.0,
-        "lyrics": [
-            {"time": 765.0, "text": "तेरी आँखों की ये मदिरा..."},
-            {"time": 805.0, "text": "होश उड़ा के ले गई..."},
-            {"time": 845.0, "text": "हम तो डूब गए इस दरिया में..."},
-            {"time": 885.0, "text": "तेरी चाहत में मलंग हो गए..."}
-        ]
-    },
-    {
-        "title": "BAIRAN", "artist": "BAIRAN", "start": 918.0, "end": 1064.0,
-        "lyrics": [
-            {"time": 928.0, "text": "बैरन ये रातें सताने लगीं..."},
-            {"time": 965.0, "text": "तेरी यादें फिर से रुलाने लगीं..."},
-            {"time": 1005.0, "text": "क्यूँ दूर हुए तुम हमसे..."},
-            {"time": 1040.0, "text": "ये हवा भी दर्द सुनाने लगी..."}
-        ]
-    },
-    {
-        "title": "TAAKKNE", "artist": "SARRB", "start": 1064.0, "end": 1284.0,
-        "lyrics": [
-            {"time": 1075.0, "text": "तैनू ताकणे दे बहाने..."},
-            {"time": 1125.0, "text": "अखियाँ नू लत लग गई ऐ..."},
-            {"time": 1180.0, "text": "तेरा हसणा क़हर ढावे..."},
-            {"time": 1235.0, "text": "दिल लुट के ले गया ऐ..."}
-        ]
-    },
-    {
-        "title": "TAARE", "artist": "FARAK", "start": 1284.0, "end": 1440.0,
-        "lyrics": [
-            {"time": 1295.0, "text": "तू तारे गिन गिन थक गया..."},
-            {"time": 1335.0, "text": "मैं चाँद तक पहुँच गया..."},
-            {"time": 1375.0, "text": "तेरी राहों में बिछे फूल..."},
-            {"time": 1410.0, "text": "हर तारे में तू नज़र आया..."}
-        ]
-    },
-    {
-        "title": "DOORON DOORON", "artist": "PARESH PAHUJA", "start": 1440.0, "end": 1724.0,
-        "lyrics": [
-            {"time": 1450.0, "text": "दूरों-दूरों तकदे रहे..."},
-            {"time": 1515.0, "text": "नैन मिला के हसदे रहे..."},
-            {"time": 1585.0, "text": "गल दिल दी कह ना सके..."},
-            {"time": 1655.0, "text": "बस चुपके से सहदे रहे..."}
-        ]
-    },
-    {
-        "title": "PAL PAL", "artist": "AFUSIC", "start": 1724.0, "end": 1910.0,
-        "lyrics": [
-            {"time": 1735.0, "text": "पल-पल दिल के पास..."},
-            {"time": 1780.0, "text": "तुम रहती हो..."},
-            {"time": 1825.0, "text": "जीवन मीठी प्यास..."},
-            {"time": 1870.0, "text": "ये कहती हो..."}
-        ]
-    }
+    {"title": "BARSAAT", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 0.0, "end": 180.0},
+    {"title": "ZULFEIN", "artist": "MEHUL MAHESH  •  TRENDING HINDI INDIE", "start": 180.0, "end": 364.0},
+    {"title": "TU AAJA NE RAAJI", "artist": "FOLK INDIE  •  TRENDING HINDI INDIE", "start": 364.0, "end": 586.0},
+    {"title": "AARZU", "artist": "ASIM AZHAR  •  TRENDING HINDI INDIE", "start": 586.0, "end": 755.0},
+    {"title": "MADIRA", "artist": "HARDIK BHARDWAJ  •  TRENDING HINDI INDIE", "start": 755.0, "end": 918.0},
+    {"title": "BAIRAN", "artist": "BAIRAN  •  TRENDING HINDI INDIE", "start": 918.0, "end": 1064.0},
+    {"title": "TAAKKNE", "artist": "SARRB  •  TRENDING PUNJABI INDIE", "start": 1064.0, "end": 1284.0},
+    {"title": "TAARE", "artist": "FARAK  •  TRENDING HINDI INDIE", "start": 1284.0, "end": 1440.0},
+    {"title": "DOORON DOORON", "artist": "PARESH PAHUJA  •  TRENDING HINDI INDIE", "start": 1440.0, "end": 1724.0},
+    {"title": "PAL PAL", "artist": "AFUSIC  •  TRENDING HINDI INDIE", "start": 1724.0, "end": 1910.0}
 ]
 
 def get_audio_wav(youtube_url, output_wav, local_source=None):
+    """Retrieve master audio via local cache or yt-dlp."""
     if os.path.exists(output_wav) and os.path.getsize(output_wav) > 1000000:
         print(f"[OK] Audio WAV ready: {output_wav}", flush=True)
         return output_wav
 
     if local_source and os.path.exists(local_source):
         print(f"[OK] Found local source ({local_source}). Converting to WAV...", flush=True)
-        subprocess.run(["ffmpeg", "-y", "-i", local_source, "-vn", output_wav], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["ffmpeg", "-y", "-i", local_source, "-vn", "-ac", "2", "-ar", "44100", output_wav],
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return output_wav
 
     print(f"[INFO] Downloading master audio from {youtube_url} via yt-dlp...", flush=True)
@@ -148,6 +78,71 @@ def get_audio_wav(youtube_url, output_wav, local_source=None):
         ydl.download([youtube_url])
     return output_wav
 
+def create_vinyl_disc(size=520):
+    """High-resolution vinyl disc with realistic grooves and gold-trimmed center label."""
+    vinyl = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    vdraw = ImageDraw.Draw(vinyl)
+    center = size // 2
+    radius = size // 2 - 4
+
+    # Disc body
+    vdraw.ellipse([center - radius, center - radius, center + radius, center + radius], fill=(20, 20, 22, 255))
+
+    # Grooves
+    for r in range(center - 15, int(radius * 0.42), -6):
+        alpha = 110 if r % 18 == 0 else 55
+        vdraw.ellipse([center - r, center - r, center + r, center + r], outline=(48, 48, 52, alpha), width=1)
+
+    # Center label
+    label_r = int(radius * 0.38)
+    vdraw.ellipse([center - label_r, center - label_r, center + label_r, center + label_r],
+                  fill=(180, 16, 40, 255), outline=(212, 175, 55, 255), width=3)
+
+    # Spindle hole
+    spindle_r = int(label_r * 0.18)
+    vdraw.ellipse([center - spindle_r, center - spindle_r, center + spindle_r, center + spindle_r],
+                  fill=(250, 248, 244, 255), outline=(180, 170, 160, 255), width=2)
+    return vinyl
+
+def compute_audio_spectrum(audio_mono, sr, fps, num_bars=48):
+    """Fast pre-computation of audio FFT frequency spectrum for all frames."""
+    total_frames = int(len(audio_mono) / sr * fps)
+    samples_per_frame = int(sr / fps)
+    freqs = np.logspace(np.log10(40), np.log10(7500), num_bars + 1)
+
+    spectrum_frames = []
+    prev_spectrum = np.zeros(num_bars, dtype=np.float32)
+
+    for f in range(total_frames):
+        start_idx = f * samples_per_frame
+        end_idx = min(len(audio_mono), start_idx + samples_per_frame * 2)
+        chunk = audio_mono[start_idx:end_idx]
+
+        if len(chunk) < 256:
+            spectrum_frames.append(prev_spectrum * 0.8)
+            continue
+
+        window = np.hanning(len(chunk))
+        fft_vals = np.abs(np.fft.rfft(chunk * window))
+        fft_freqs = np.fft.rfftfreq(len(chunk), 1.0 / sr)
+
+        bar_vals = np.zeros(num_bars, dtype=np.float32)
+        for b in range(num_bars):
+            f_low, f_high = freqs[b], freqs[b + 1]
+            mask = (fft_freqs >= f_low) & (fft_freqs < f_high)
+            if np.any(mask):
+                bar_vals[b] = np.mean(fft_vals[mask])
+
+        bar_vals = np.log1p(bar_vals * 5.0)
+        decayed = np.maximum(bar_vals, prev_spectrum * 0.76)
+        prev_spectrum = decayed
+        spectrum_frames.append(decayed)
+
+    spectrum_matrix = np.array(spectrum_frames, dtype=np.float32)
+    max_val = np.percentile(spectrum_matrix, 99.5) + 1e-6
+    spectrum_matrix = np.clip(spectrum_matrix / max_val, 0.0, 1.0)
+    return spectrum_matrix
+
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     output_dir = os.path.join(base_dir, "output")
@@ -157,8 +152,10 @@ def main():
     temp_wav = os.path.join(base_dir, "raw_stems", "hindi_trending_30m.wav")
     os.makedirs(os.path.dirname(temp_wav), exist_ok=True)
 
+    # 1. Download or get Audio
     yt_url = "https://youtu.be/InBgERNHf_s"
-    get_audio_wav(yt_url, temp_wav)
+    local_source = os.path.join(base_dir, "raw_stems", "hindi_trending_30m.mp3")
+    get_audio_wav(yt_url, temp_wav, local_source=local_source)
 
     sr, audio_data = wavfile.read(temp_wav)
     if audio_data.ndim == 2:
@@ -172,65 +169,49 @@ def main():
     fps = 30
     total_frames = int(duration * fps)
     W, H = 1920, 1080
-    samples_per_frame = int(sr / fps)
 
-    print(f"[INFO] Audio Duration: {duration:.2f}s ({duration/60:.1f} mins) | Total Frames: {total_frames}", flush=True)
+    print(f"[INFO] Master Audio: {duration:.1f}s ({duration/60:.1f} mins) | Frames: {total_frames} @ {fps}fps", flush=True)
 
-    # Fonts Setup
+    # 2. Typography Setup
     font_hero_path = os.path.join(base_dir, "RozhaOne-Regular.ttf")
     if not os.path.exists(font_hero_path):
         font_hero_path = "arial.ttf"
 
-    font_hero = ImageFont.truetype(font_hero_path, 105)
-    font_large = ImageFont.truetype(font_hero_path, 88)
-    font_meta = ImageFont.truetype("arial.ttf", 26)
-    font_time = ImageFont.truetype("arial.ttf", 22)
+    font_title = ImageFont.truetype(font_hero_path, 80)
+    font_sub = ImageFont.truetype("arial.ttf", 26)
+    font_meta = ImageFont.truetype("arial.ttf", 20)
 
-    # Static Warm Ivory Canvas with Subtle Vignette
-    np.random.seed(42)
-    base_img = Image.new("RGB", (W, H), COLOR_BG)
-    base_arr = np.array(base_img, dtype=np.float32)
-    noise = np.random.normal(0, 2.5, (H, W, 1))
-    base_arr = np.clip(base_arr + noise, 0, 255)
-    y_coords, x_coords = np.ogrid[:H, :W]
-    dist = np.sqrt(((x_coords - W/2) / (W/2))**2 + ((y_coords - H/2) / (H/2))**2)
-    vignette = np.clip(1.0 - (dist - 0.7) * 0.16, 0.88, 1.0)[:, :, np.newaxis]
-    paper_base_arr = base_arr * vignette
-    paper_base_img = Image.fromarray(np.uint8(paper_base_arr))
+    # 3. Base White Grid Designer Canvas
+    grid_size = 60
+    base_canvas = Image.new("RGB", (W, H), BG_COLOR)
+    bdraw = ImageDraw.Draw(base_canvas)
 
-    # Vinyl Record Setup
+    for x in range(0, W, grid_size):
+        bdraw.line([(x, 0), (x, H)], fill=GRID_COLOR, width=1)
+    for y in range(0, H, grid_size):
+        bdraw.line([(0, y), (W, y)], fill=GRID_COLOR, width=1)
+    for x in range(grid_size, W, grid_size * 2):
+        for y in range(grid_size, H, grid_size * 2):
+            bdraw.line([(x - 3, y), (x + 3, y)], fill=CROSS_COLOR, width=1)
+            bdraw.line([(x, y - 3), (x, y + 3)], fill=CROSS_COLOR, width=1)
+
+    # 4. Vinyl Disc & Glow Cache
+    VINYL_X, VINYL_Y = 460, 520
     vinyl_size = 520
-    vinyl = Image.new("RGBA", (vinyl_size, vinyl_size), (0, 0, 0, 0))
-    vdraw = ImageDraw.Draw(vinyl)
-    center = vinyl_size // 2
+    master_vinyl = create_vinyl_disc(vinyl_size)
+    print("[INFO] Pre-caching 360-degree vinyl rotation table...", flush=True)
+    vinyl_cache = [master_vinyl.rotate(-deg, resample=Image.Resampling.BILINEAR) for deg in range(360)]
 
-    # Outer Disc
-    vdraw.ellipse([0, 0, vinyl_size, vinyl_size], fill=(16, 16, 18, 255))
-    for r in range(center - 15, center - 165, -8):
-        vdraw.ellipse([center - r, center - r, center + r, center + r], outline=(38, 38, 42, 140), width=1)
-
-    # Inner Label
-    lbl_r = 95
-    vdraw.ellipse([center - lbl_r, center - lbl_r, center + lbl_r, center + lbl_r], fill=(195, 20, 48, 255))
-    vdraw.ellipse([center - 22, center - 22, center + 22, center + 22], fill=COLOR_BG)
-
-    print("[INFO] Pre-caching vinyl 360-degree rotation table...", flush=True)
-    vinyl_cache = [vinyl.rotate(-deg, resample=Image.BILINEAR) for deg in range(360)]
-
-    glow_size = 620
+    glow_size = vinyl_size + 140
     glow_img = Image.new("RGBA", (glow_size, glow_size), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glow_img)
-    g_center = glow_size // 2
-    gdraw.ellipse([g_center - 240, g_center - 240, g_center + 240, g_center + 240], fill=(200, 16, 46, 75))
-    glow_img = glow_img.filter(ImageFilter.GaussianBlur(38))
+    gc = glow_size // 2
+    gdraw.ellipse([gc - vinyl_size // 2 - 20, gc - vinyl_size // 2 - 20,
+                   gc + vinyl_size // 2 + 20, gc + vinyl_size // 2 + 20], fill=(200, 16, 46, 50))
+    glow_img = glow_img.filter(ImageFilter.GaussianBlur(34))
+    base_canvas.paste(glow_img, (VINYL_X - glow_size // 2, VINYL_Y - glow_size // 2), glow_img)
 
-    glow_cache = []
-    for p_idx in range(60):
-        p_mult = 1.0 + 0.04 * np.sin(p_idx * 2 * np.pi / 60)
-        pw, ph = int(glow_size * p_mult), int(glow_size * p_mult)
-        glow_cache.append(glow_img.resize((pw, ph), resample=Image.BILINEAR))
-
-    # Botanical Petals Setup
+    # 5. Botanical Petals (Phool Girte Hue) Setup
     floral_particles = []
     corner_branch = None
     petals_dir = os.path.join(base_dir, "assets", "botanical_petals")
@@ -238,63 +219,67 @@ def main():
         sp_files = sorted([f for f in os.listdir(petals_dir) if f.endswith(".png")])
         sp_imgs = [Image.open(os.path.join(petals_dir, f)).convert("RGBA") for f in sp_files]
         if sp_imgs:
-            np.random.seed(99)
-            for i in range(14):
-                sp = sp_imgs[i % (len(sp_imgs) - 1)]
-                target_w = np.random.randint(35, 75)
+            np.random.seed(110)
+            for i in range(16):
+                sp = sp_imgs[i % len(sp_imgs)]
+                target_w = np.random.randint(45, 90)
                 ratio = target_w / sp.width
                 target_h = int(sp.height * ratio)
                 resized_sp = sp.resize((target_w, target_h), Image.Resampling.LANCZOS)
-                alpha_mult = np.random.uniform(0.60, 0.85)
+                alpha_mult = np.random.uniform(0.70, 0.90)
                 r, g, b, a = resized_sp.split()
                 a = a.point(lambda p: int(p * alpha_mult))
                 resized_sp = Image.merge("RGBA", (r, g, b, a))
 
-                rot_cache = [resized_sp.rotate(deg, resample=Image.BILINEAR, expand=True) for deg in range(0, 360, 15)]
-
+                rot_cache = [resized_sp.rotate(deg, resample=Image.Resampling.BILINEAR, expand=True) for deg in range(0, 360, 15)]
                 floral_particles.append({
-                    "x": np.random.uniform(100, W - 100),
-                    "y": np.random.uniform(80, H - 80),
-                    "vx": np.random.uniform(-1.0, -0.3),
-                    "vy": np.random.uniform(0.6, 1.3),
+                    "x": np.random.uniform(60, W - 60),
+                    "y": np.random.uniform(40, H - 40),
+                    "vx": np.random.uniform(-0.8, -0.2),
+                    "vy": np.random.uniform(0.5, 1.2),
                     "base_rot": np.random.uniform(0, 360),
-                    "rot_speed": np.random.uniform(10, 28),
+                    "rot_speed": np.random.uniform(12, 28),
                     "phase": np.random.uniform(0, math.pi * 2),
                     "rot_cache": rot_cache
                 })
 
             if len(sp_imgs) >= 16:
                 b_sp = sp_imgs[15]
-                bw = int(b_sp.width * 0.70)
-                bh = int(b_sp.height * 0.70)
+                bw = int(b_sp.width * 0.65)
+                bh = int(b_sp.height * 0.65)
                 b_sp = b_sp.resize((bw, bh), Image.Resampling.LANCZOS)
                 r, g, b, a = b_sp.split()
                 a = a.point(lambda p: int(p * 0.65))
-                corner_branch = Image.merge("RGBA", (r, g, b, a)).rotate(-20, expand=True)
+                corner_branch = Image.merge("RGBA", (r, g, b, a)).rotate(-25, expand=True)
 
-    word_aura_cache = {}
+    # 6. Audio-Reactive Spectrum
+    num_bars = 48
+    bar_w, bar_gap = 7, 6
+    total_bar_w = num_bars * (bar_w + bar_gap)
+    TEXT_CENTER_X = 1250
+    vis_start_x = TEXT_CENTER_X - total_bar_w // 2
+    vis_base_y = 610
+    active_range_start = int(num_bars * 0.28)
+    active_range_end = int(num_bars * 0.72)
 
-    # Dust particles
-    dust_count = 30
-    dust_x = np.random.uniform(40, W - 40, dust_count)
-    dust_y = np.random.uniform(40, H - 40, dust_count)
-    dust_vx = np.random.uniform(-0.5, 0.5, dust_count)
-    dust_vy = np.random.uniform(-0.9, -0.3, dust_count)
-    dust_sz = np.random.randint(2, 5, dust_count)
+    print("[INFO] Computing real-time FFT spectrum...", flush=True)
+    spectrum_matrix = compute_audio_spectrum(audio_mono, sr, fps, num_bars)
 
-    # FFmpeg Pipe Encoder Setup
+    # Base NumPy canvas for high-speed cloning
+    base_arr = np.array(base_canvas)
+
+    # 7. Launch FFmpeg Encoder
     ffmpeg_cmd = [
         "ffmpeg", "-y",
         "-f", "rawvideo",
-        "-vcodec", "rawvideo",
-        "-s", f"{W}x{H}",
         "-pix_fmt", "rgb24",
+        "-s", f"{W}x{H}",
         "-r", str(fps),
         "-i", "-",
         "-i", temp_wav,
         "-c:v", "libx264",
         "-preset", "veryfast",
-        "-crf", "22",
+        "-crf", "20",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "256k",
@@ -302,14 +287,16 @@ def main():
         master_output
     ]
 
-    print(f"[INFO] Launching FFmpeg encoder: {master_output}...", flush=True)
+    print(f"[INFO] Launching FFmpeg encoder pipe: {master_output}...", flush=True)
     proc = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    total_min = int(duration // 60)
+    total_sec = int(duration % 60)
+    total_dur_str = f"{total_min:02d}:{total_sec:02d}"
+
+    deg_per_frame = 200.0 / fps
     start_time = time.time()
     last_print = start_time
-
-    VINYL_X, VINYL_Y = 480, 520
-    TEXT_CENTER_X = 1250
 
     for f_idx in range(total_frames):
         t = f_idx / fps
@@ -321,118 +308,58 @@ def main():
                 cur_ch = ch
                 break
 
-        # Frame base
-        frame = paper_base_img.copy()
+        # Clone Base Canvas
+        frame = Image.fromarray(base_arr.copy())
         draw = ImageDraw.Draw(frame)
 
-        # Floating dust
-        for i in range(dust_count):
-            px = int((dust_x[i] + dust_vx[i] * f_idx) % W)
-            py = int((dust_y[i] + dust_vy[i] * f_idx) % H)
-            draw.ellipse([px, py, px + dust_sz[i], py + dust_sz[i]], fill=(215, 208, 198))
+        # 1. Paste Rotating Vinyl
+        deg = int((f_idx * deg_per_frame) % 360)
+        cur_vinyl = vinyl_cache[deg]
+        frame.paste(cur_vinyl, (VINYL_X - vinyl_size // 2, VINYL_Y - vinyl_size // 2), cur_vinyl)
 
-        # Summer Botanical Petals Drift
+        # 2. Drifting Botanical Petals (Phool Girte Hue)
         if floral_particles:
             for p in floral_particles:
-                px = int((p["x"] + p["vx"] * t * 40 + math.sin(t * 1.5 + p["phase"]) * 18) % W)
-                py = int((p["y"] + p["vy"] * t * 40 + math.cos(t * 1.2 + p["phase"]) * 10) % H)
-                rot = (p["base_rot"] + t * p["rot_speed"] + math.sin(t * 1.8 + p["phase"]) * 18) % 360
-                if 1050 < px < 1450 and 380 < py < 620:
-                    py += 140
+                px = int((p["x"] + p["vx"] * t * 38 + math.sin(t * 1.4 + p["phase"]) * 16) % W)
+                py = int((p["y"] + p["vy"] * t * 38 + math.cos(t * 1.1 + p["phase"]) * 10) % H)
+                rot = (p["base_rot"] + t * p["rot_speed"] + math.sin(t * 1.6 + p["phase"]) * 16) % 360
+                # Protect title & artist text readability
+                if 1050 < px < 1500 and 380 < py < 530:
+                    py = (py + 160) % (H - 80)
                 rot_sprite = p["rot_cache"][int(rot / 15) % len(p["rot_cache"])]
                 frame.paste(rot_sprite, (px - rot_sprite.width // 2, py - rot_sprite.height // 2), rot_sprite)
 
             if corner_branch:
                 frame.paste(corner_branch, (W - corner_branch.width - 25, H - corner_branch.height - 25), corner_branch)
 
-        # Track Header
-        draw.text((W // 2, 100), f"{cur_ch['title']}   •   {cur_ch['artist']}", font=font_meta, fill=COLOR_MUTED, anchor="mm")
-        draw.line([(W // 2 - 180, 126), (W // 2 + 180, 126)], fill=COLOR_LINE, width=2)
+        # 3. Dynamic Chapter Title & Artist (Rozha One Editorial)
+        draw.text((TEXT_CENTER_X, 420), cur_ch["title"], font=font_title, fill=DARK_TEXT, anchor="mm")
+        draw.text((TEXT_CENTER_X, 490), cur_ch["artist"], font=font_sub, fill=MUTED_TEXT, anchor="mm")
 
-        # Vinyl Record & Glow
-        cur_glow = glow_cache[int(t * 3.5 * 60 / (2 * np.pi)) % 60]
-        frame.paste(cur_glow, (VINYL_X - cur_glow.width // 2, VINYL_Y - cur_glow.height // 2), cur_glow)
+        # 4. Live Audio-Reactive Spectrum Waveform Bars
+        cur_spec = spectrum_matrix[f_idx]
+        for b in range(num_bars):
+            val = cur_spec[b]
+            h_bar = int(8 + val * 105)
+            bx = vis_start_x + b * (bar_w + bar_gap)
+            bar_color = ACCENT_RED if (active_range_start <= b <= active_range_end) else BAR_TAUPE
+            draw.rounded_rectangle([bx, vis_base_y - h_bar // 2, bx + bar_w, vis_base_y + h_bar // 2],
+                                  radius=3, fill=bar_color)
 
-        rot_angle = (t * 55.0) % 360.0
-        rot_vinyl = vinyl_cache[int(rot_angle) % 360]
-        frame.paste(rot_vinyl, (VINYL_X - rot_vinyl.width // 2, VINYL_Y - rot_vinyl.height // 2), rot_vinyl)
-
-        # Kinetic Active Lyric Selection
-        active_lyric = None
-        for lyr in cur_ch["lyrics"]:
-            if t >= lyr["time"]:
-                active_lyric = lyr
-
-        if active_lyric is not None:
-            text = active_lyric["text"]
-            words = text.split(" ")
-            word_boxes = [font_hero.getbbox(w) for w in words]
-            word_widths = [b[2] - b[0] for b in word_boxes]
-            space_w = font_hero.getbbox(" ")[2] - font_hero.getbbox(" ")[0]
-            total_w = sum(word_widths) + space_w * (len(words) - 1)
-
-            cur_x = TEXT_CENTER_X - total_w // 2
-            base_cy = 500
-
-            # Line age & entrance slide
-            line_age = t - active_lyric["time"]
-            line_u = min(1.0, max(0.0, line_age / 0.35))
-            line_ease = 1.0 - pow(1.0 - line_u, 3)
-            line_dy = int(22.0 * (1.0 - line_ease))
-
-            for w_idx, (w, w_w) in enumerate(zip(words, word_widths)):
-                w_time = active_lyric["time"] + w_idx * 0.16
-                w_center_x = cur_x + w_w // 2
-
-                if t < w_time:
-                    draw.text((w_center_x, base_cy + line_dy), w, font=font_hero, fill=(215, 205, 195), anchor="mm")
-                else:
-                    age = t - w_time
-                    if age < 0.32:
-                        u = age / 0.32
-                        ease_out = 1.0 - pow(1.0 - u, 3)
-                        dy = int(22.0 * (1.0 - ease_out))
-                        scale = 1.0 + 0.08 * math.sin(u * math.pi)
-                    else:
-                        dy = 0
-                        scale = 1.0
-
-                    cy = base_cy + line_dy + dy
-
-                    # Cached Aura
-                    if w not in word_aura_cache:
-                        bbox = font_hero.getbbox(w)
-                        bw, bh = bbox[2] - bbox[0] + 60, bbox[3] - bbox[1] + 60
-                        if bw > 0 and bh > 0:
-                            g_box = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
-                            g_d = ImageDraw.Draw(g_box)
-                            g_d.text((bw // 2, bh // 2), w, font=font_hero, fill=(*COLOR_RED, 80), anchor="mm")
-                            word_aura_cache[w] = g_box.filter(ImageFilter.GaussianBlur(10))
-                        else:
-                            word_aura_cache[w] = None
-
-                    aura = word_aura_cache.get(w)
-                    if aura:
-                        frame.paste(aura, (w_center_x - aura.width // 2, cy - aura.height // 2), aura)
-
-                    draw.text((w_center_x, cy), w, font=font_hero, fill=COLOR_RED, anchor="mm")
-
-                cur_x += w_w + space_w
-
-        # Bottom Audio Scrubber Progress Bar
-        bar_x1, bar_x2 = 320, W - 320
+        # 5. Clean Spotify Seekbar
+        bar_x1, bar_x2 = 280, W - 280
         bar_y = 960
         progress_u = min(1.0, max(0.0, t / duration))
-        draw.line([(bar_x1, bar_y), (bar_x2, bar_y)], fill=(225, 218, 208), width=3)
+        draw.line([(bar_x1, bar_y), (bar_x2, bar_y)], fill=LINE_COLOR, width=2)
         cur_px = int(bar_x1 + (bar_x2 - bar_x1) * progress_u)
-        draw.line([(bar_x1, bar_y), (cur_px, bar_y)], fill=COLOR_RED, width=4)
-        draw.ellipse([cur_px - 7, bar_y - 7, cur_px + 7, bar_y + 7], fill=COLOR_RED)
+        draw.line([(bar_x1, bar_y), (cur_px, bar_y)], fill=ACCENT_RED, width=3)
+        draw.ellipse([cur_px - 7, bar_y - 7, cur_px + 7, bar_y + 7], fill=ACCENT_RED)
 
         cur_str = f"{int(t // 60):02d}:{int(t % 60):02d}"
-        tot_str = f"{int(duration // 60):02d}:{int(duration % 60):02d}"
-        draw.text((bar_x1 - 25, bar_y), cur_str, font=font_time, fill=COLOR_MUTED, anchor="rm")
-        draw.text((bar_x2 + 25, bar_y), tot_str, font=font_time, fill=COLOR_MUTED, anchor="lm")
+        draw.text((bar_x1 - 50, bar_y), cur_str, font=font_meta, fill=MUTED_TEXT, anchor="mm")
+        draw.text((bar_x2 + 50, bar_y), total_dur_str, font=font_meta, fill=MUTED_TEXT, anchor="mm")
 
+        # Send raw bytes to FFmpeg stdin
         proc.stdin.write(frame.tobytes())
 
         if time.time() - last_print >= 5.0 or f_idx == total_frames - 1:
@@ -443,10 +370,11 @@ def main():
 
     proc.stdin.close()
     proc.wait()
-    print(f"\n[DONE] Successfully rendered Hindi 30-Min Master Video:")
+
+    total_time = time.time() - start_time
+    print(f"\n[DONE] Successfully rendered 30-Minute Master Video in {total_time:.1f}s ({total_frames/total_time:.1f} fps):")
     print(f"Path: {master_output}")
     print(f"Size: {os.path.getsize(master_output)/(1024*1024):.2f} MB")
-    print(f"Total Render Time: {time.time() - start_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()
