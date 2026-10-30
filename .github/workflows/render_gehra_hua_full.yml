@@ -1,0 +1,82 @@
+name: Render Gehra Hua Full Official Lyrical Master
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/render_gehra_hua_full.yml'
+      - 'lofi_phonk_empire/core/cloud_gehra_hua_full.py'
+      - 'lofi_phonk_empire/raw_stems/lyrics/gehra_hua_full_schedule.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    name: Cloud Gehra Hua Full Lyrical Video Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & Fonts)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu
+
+      - name: Install Python Packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow numpy scipy yt-dlp
+
+      - name: Render Full-Length Gehra Hua Master Video
+        run: |
+          python lofi_phonk_empire/core/cloud_gehra_hua_full.py
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render_failure_logs
+          path: |
+            render_error.log
+            *.log
+
+      - name: Verify Output File
+        run: |
+          ls -lh lofi_phonk_empire/output/youtube_16x9/gehra_hua_full_master.mp4
+
+      - name: Upload Master Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GEHRA_HUA_FULL_OFFICIAL_MASTER
+          path: lofi_phonk_empire/output/youtube_16x9/gehra_hua_full_master.mp4
+          retention-days: 90
+
+      - name: Create GitHub Release with Master Video
+        uses: softprops/action-gh-release@v2
+        continue-on-error: true
+        if: startsWith(github.ref, 'refs/heads/clean-fleet') || startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: gehra-hua-full-${{ github.run_number }}
+          name: "Gehra Hua – Arijit Singh (Full Official Lyrical Master)"
+          body: |
+            ### 🌊 Gehra Hua – Arijit Singh, Shashwat Sachdev & Irshad Kamil
+            - **Track Type**: Complete 3:45 Full Song (Zero movie dialogue, Zero talking intro, 100% pure audio).
+            - **Visuals**: Untouched Dreamina cinematic video plate with seamless ping-pong loop.
+            - **Typography**: Rock-solid stationary calligraphy (`Dancing Script`) with localized Gaussian drop-shadows (`y = 380`).
+            - **Audio Fidelity**: 320kbps High-Resolution Stereo AAC.
+            - **Render Environment**: GitHub Actions Ubuntu Cloud Runner (0% local CPU load).
+          files: lofi_phonk_empire/output/youtube_16x9/gehra_hua_full_master.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
