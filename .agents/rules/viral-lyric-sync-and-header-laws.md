@@ -67,3 +67,13 @@ This document locks the mandatory protocols and prevents recurring regressions d
 - **Legibility via Localized Drop Shadow Only:** Contrast is achieved strictly via Gaussian-blurred text shadow (blur radius 5, dark alpha 240) directly beneath glyphs.
 - **Hermite Smooth Dissolves:** Use Hermite ease-in-out (`t*t*(3 - 2*t)`) for 0.4s fade-in and 0.4s fade-out.
 - **Ping-Pong Seamless Loop:** Background video must play forward and reverse smoothly to eliminate jump cuts entirely.
+
+---
+
+## 7. Zero-Mistake Universal Song Production Mandate (Full-Length Cloud Engine)
+- **Full-Length Song Default (Pura Gaana Standard):** Unless the user explicitly asks for a 30–45s Short/Reel, ALWAYS produce the complete, full-length song (3–4+ minutes) from start to finish.
+- **Pure Studio Audio Mandate (Zero Dialogue & Zero Ads):** Sourced tracks must be stripped of any sponsor voiceovers (e.g. Saregama Carvaan ads) and movie dialogues. 0.0s must begin right at the authentic music intro.
+- **Whisper Ground-Truth Full Schedule:** Run Whisper on the entire clean song track to generate millisecond onsets for EVERY verse, chorus, bridge, and outro. Save full schedule as `.lrc` and `_schedule.json`.
+- **Cloud-First Rendering Mandate (Zero Local Overheating):** Full-length video rendering (5,000+ frames) MUST NEVER run locally on the user's PC. Always route heavy video rendering to GitHub Actions cloud runners (`ubuntu-latest`) with automated Artifact & Release delivery.
+- **Pre-Flight 5-Point Validation:** Never declare any song ready without running: (1) Audio purity check, (2) Lyrics timing check, (3) Visual frame integrity check, (4) Asset git tracking check, and (5) Dry-run sanity check with 0 errors.
+

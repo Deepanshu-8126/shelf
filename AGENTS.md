@@ -26,7 +26,15 @@
 
 ## 5. Lyrical Mode Production Laws (Zero Bootleg & Zero Overlay)
 - **Official Label Audio Mandate**: Never use unofficial, fan-uploaded clips with random intros. Always verify and pull directly from the official record label channel (Saregama, T-Series, Zee Music, Sony Music, official artist).
-- **Audio-Slice First, Whisper Second**: Always slice the exact 30–45s viral hook audio FIRST (`ffmpeg -ss ... -t ...`). Then run Whisper base directly on THAT isolated slice (with `torch.set_num_threads(4)`) so `0.0s` in Whisper maps 1:1 to `0.0s` in the video timeline.
+- **Audio-Slice First, Whisper Second**: Always slice the exact audio FIRST (`ffmpeg -ss ... -t ...`). Then run Whisper base directly on THAT isolated slice (with `torch.set_num_threads(4)`) so `0.0s` in Whisper maps 1:1 to `0.0s` in the video timeline.
 - **Zero Black Overlay / Box Law**: Never draw dark translucent rectangles, letterboxes, or tint overlays over cinematic video plates. The background must remain 100% natural and vibrant.
 - **Rock-Solid Typography (Zero Jitter)**: Text coordinates must be locked as immutable constants (`y = 380`). Never use sine-wave bobbing formulas (`int(np.sin(...) * 2)`) that cause jitter tremors. Contrast is achieved exclusively via Gaussian drop-shadow (radius 5, dark alpha 240) directly beneath glyphs.
 - **Ping-Pong Seamless Loop**: Background video must cycle forward and reverse smoothly to eliminate jump cuts entirely.
+
+## 6. Zero-Mistake Universal Song Production Mandate
+- **Full-Length Song Default (Pura Gaana Standard)**: Unless explicitly instructed to create a 30–45s Short/Reel, ALWAYS produce the complete, full-length song (3–4+ minutes) from start to finish.
+- **Pure Studio Audio Mandate (Zero Dialogue & Zero Ads)**: Sourced tracks must be stripped of any sponsor voiceovers (e.g. Saregama Carvaan ads) and movie dialogues. 0.0s must begin right at the authentic music intro.
+- **Whisper Ground-Truth Full Schedule**: Run Whisper on the entire clean song track to generate millisecond onsets for EVERY verse, chorus, bridge, and outro. Save full schedule as `.lrc` and `_schedule.json`.
+- **Cloud-First Rendering Mandate (Zero Local Overheating)**: Full-length video rendering (5,000+ frames) MUST NEVER run locally on the user's PC. Always route heavy video rendering to GitHub Actions cloud runners (`ubuntu-latest`) with automated Artifact & Release delivery.
+- **Pre-Flight 5-Point Validation**: Never declare any song ready without running: (1) Audio purity check, (2) Lyrics timing check, (3) Visual frame integrity check, (4) Asset git tracking check, and (5) Dry-run sanity check with 0 errors.
+
