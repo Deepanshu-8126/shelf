@@ -10,6 +10,7 @@ output/
 !fleet_engines/assets/background_videos/gta5/user_gta5_action.mp4
 !fleet_engines/ShortGPT/public/subscribe-animation.mp4
 !fleet_engines/ShortGPT/public/test_minecraft_clip.mp4
+!lofi_phonk_empire/assets/gym_warrior_loop.mp4
 .env
 venv/
 .tempmediaStorage/

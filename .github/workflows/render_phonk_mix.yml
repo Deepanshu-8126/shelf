@@ -8,6 +8,11 @@ on:
       - '.github/workflows/render_phonk_mix.yml'
       - 'lofi_phonk_empire/core/cloud_phonk_render.py'
   workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Render Duration in seconds (e.g. 1200 for 20m, 2100 for 35m)'
+        required: false
+        default: '1200'
 
 permissions:
   contents: write
@@ -38,9 +43,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pillow numpy scipy yt-dlp
 
-      - name: Render Full 35-Minute Phonk Video Master
+      - name: Render Full Phonk Video Master
         run: |
-          python lofi_phonk_empire/core/cloud_phonk_render.py
+          python lofi_phonk_empire/core/cloud_phonk_render.py --duration ${{ github.event.inputs.duration || '1200' }}
 
       - name: Upload Failure Logs
         if: failure()
@@ -67,15 +72,15 @@ jobs:
         continue-on-error: true
         if: startsWith(github.ref, 'refs/heads/clean-fleet') || startsWith(github.ref, 'refs/heads/main')
         with:
-          tag_name: phonk-aura-35m-${{ github.run_number }}
-          name: "AURA VIRAL PHONK 2026 (35 Min Master 1080p)"
+          tag_name: phonk-aura-gym-${{ github.run_number }}
+          name: "AURA VIRAL GYM PHONK 2026 (1080p Master)"
           body: |
-            ### ⚡ AURA VIRAL PHONK PLAYLIST 2026 (35-Minute Master)
-            - **Resolution**: 1080p @ 30 FPS Master
-            - **Audio**: 320kbps High Fidelity Mix
-            - **Visualizer**: Audio-Reactive Soundwave Dagger Blade (Gym Warrior Edition)
-            - **Tracks Included**: 19 Brazilian Phonk & Funk Viral Anthems
-            - **Overlays**: 808 Sub-Bass Camera Shake, Embers & Floating Bokeh, 35mm Film Grain
+            ### ⚡ AURA VIRAL GYM PHONK 2026 (Ultra HD 1080p Master)
+            - **Template**: Muscular Anime Gym Warrior with Electric Lightning Loop
+            - **Resolution**: 1080p @ 24 FPS Master (CRF 18 Crisp)
+            - **Audio**: 320kbps High Fidelity Brazilian Phonk & Montagem Mix
+            - **Visualizer**: Real-Time Audio-Reactive Golden Lightning Spectrum Visualizer
+            - **Dynamics**: 808 Sub-Bass Camera Micro-Shake & Chapter Track Synchronization
           files: lofi_phonk_empire/output/AURA_VIRAL_PHONK_2026_MASTER.mp4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
