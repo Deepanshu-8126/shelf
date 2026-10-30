@@ -23,3 +23,10 @@
 - **Zero Code Syntax in Visual Canvas**: Never inject `//`, `REEL SESSIONS`, `TEMP`, or code-style markers into visible video frames. Headers must be pure luxury typography (`SONG • ARTIST` with hairline divider).
 - **Design System Lock for Hindi/Lofi Lyric Videos**: Mandatory baseline is `#FAF8F4` ivory parchment + 90-frame looping water caustics mesh + drifting botanical rose petals + 360° spinning vinyl disc with Devanagari medallion + Rozha One Devanagari calligraphy (`#C8102E` with glow aura).
 - **Zero Emoji Unicode in PIL**: Never pass unicode emojis (`🌹`, `⚡`) to PIL `draw.text` with standard TTF fonts; always use transparent PNG sprites or pure typography.
+
+## 5. Lyrical Mode Production Laws (Zero Bootleg & Zero Overlay)
+- **Official Label Audio Mandate**: Never use unofficial, fan-uploaded clips with random intros. Always verify and pull directly from the official record label channel (Saregama, T-Series, Zee Music, Sony Music, official artist).
+- **Audio-Slice First, Whisper Second**: Always slice the exact 30–45s viral hook audio FIRST (`ffmpeg -ss ... -t ...`). Then run Whisper base directly on THAT isolated slice (with `torch.set_num_threads(4)`) so `0.0s` in Whisper maps 1:1 to `0.0s` in the video timeline.
+- **Zero Black Overlay / Box Law**: Never draw dark translucent rectangles, letterboxes, or tint overlays over cinematic video plates. The background must remain 100% natural and vibrant.
+- **Rock-Solid Typography (Zero Jitter)**: Text coordinates must be locked as immutable constants (`y = 380`). Never use sine-wave bobbing formulas (`int(np.sin(...) * 2)`) that cause jitter tremors. Contrast is achieved exclusively via Gaussian drop-shadow (radius 5, dark alpha 240) directly beneath glyphs.
+- **Ping-Pong Seamless Loop**: Background video must cycle forward and reverse smoothly to eliminate jump cuts entirely.

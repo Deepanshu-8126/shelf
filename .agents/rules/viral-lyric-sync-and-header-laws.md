@@ -56,3 +56,14 @@ This document locks the mandatory protocols and prevents recurring regressions d
 - **The Mandatory Protocol:**
   1. Clean up intermediate WAV slices (`temp_*.wav`, `test_*.wav`, `temp_*_mono.wav`) inside `try ... finally` blocks immediately after RMS/FFT extraction.
   2. Use `Move-Item` instead of `Copy-Item` when relocating large video/audio files on the same drive volume.
+
+---
+
+## 6. Lyrical Mode Master Standard (Zero Bootleg Audio & Zero Black Overlays)
+- **Official Label Audio Mandate:** NEVER use fan-made uploads, bootlegs, or mashups with speech intros. Always verify and pull directly from the official record label channel (Saregama, T-Series, Zee Music, Sony Music, or official artist topic channel).
+- **Audio-Slice First, Whisper Second:** Always slice the exact 30–45s hook audio FIRST (`ffmpeg -ss ... -t ...`). Then run Whisper base directly on THAT isolated slice (with `torch.set_num_threads(4)`) so `0.0s` in Whisper maps 1:1 to `0.0s` in the video timeline. Zero guessing, zero manual offset math.
+- **Zero Black Overlay / Box Law:** NEVER draw dark translucent rectangles, letterboxes, or tint overlays over cinematic background plates. The video must remain 100% natural, crisp, and vibrant.
+- **Rock-Solid Typography Law (Zero Jitter):** Text coordinates must be locked as immutable constants (`y = 380`). NEVER apply sine-wave bobbing/wobbling formulas (`int(np.sin(...) * 2)`) that cause 1–2px jitter tremors.
+- **Legibility via Localized Drop Shadow Only:** Contrast is achieved strictly via Gaussian-blurred text shadow (blur radius 5, dark alpha 240) directly beneath glyphs.
+- **Hermite Smooth Dissolves:** Use Hermite ease-in-out (`t*t*(3 - 2*t)`) for 0.4s fade-in and 0.4s fade-out.
+- **Ping-Pong Seamless Loop:** Background video must play forward and reverse smoothly to eliminate jump cuts entirely.
