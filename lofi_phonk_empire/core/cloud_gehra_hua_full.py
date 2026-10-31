@@ -39,6 +39,8 @@ def main():
     
     # Base paths (works both locally and in GitHub Actions)
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    if not os.path.exists(os.path.join(repo_root, "lofi_phonk_empire")):
+        repo_root = os.getcwd()
     audio_path = os.path.join(repo_root, "lofi_phonk_empire", "raw_stems", "audio", "gehra_hua_full_pure.mp3")
     video_stem_path = os.path.join(repo_root, "lofi_phonk_empire", "dreamina-seedance-2.0-720p_b_Create_a_premium_cin.mp4")
     schedule_path = os.path.join(repo_root, "lofi_phonk_empire", "raw_stems", "lyrics", "gehra_hua_full_schedule.json")
