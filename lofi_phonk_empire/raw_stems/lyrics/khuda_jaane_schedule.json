@@ -1,8 +1,13 @@
 [
   {
-    "start": 0.0,
-    "end": 4.2,
-    "text": "Aaa aa…."
+    "start": 11.2,
+    "end": 16.5,
+    "text": "Aaa... aa..."
+  },
+  {
+    "start": 16.6,
+    "end": 22.5,
+    "text": "Aaa... aa..."
   },
   {
     "start": 23.9,
@@ -113,11 +118,6 @@
     "start": 131.78,
     "end": 137.14,
     "text": "Mila karu sirhaane pe"
-  },
-  {
-    "start": 137.14,
-    "end": 137.9,
-    "text": "Ohhh"
   },
   {
     "start": 137.9,
