@@ -16,5 +16,9 @@ Permanently enforce strict folder cleanliness, zero file bloat, and automated me
    - `output/`: Final production master files (`.mp3`, `.mp4`).
    - `archive/`: Old experiments and retired media.
 
-4. **Self-Auditing**:
+4. **Inspection Frames & Test Clip Hygiene**:
+   - All temporary frame screenshots (`frame_*.jpg`, `inspect_*.png`) and micro-test clips (`*_5s.mp4`, `temp_*.mp4`) generated during verification must be deleted immediately after checking.
+   - `output/youtube_16x9/` and `output/` must contain ONLY verified production master files.
+
+5. **Self-Auditing**:
    - Keep root folders lean (< 10 files). Zero clutter allowed.

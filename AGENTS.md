@@ -3,6 +3,7 @@
 ## 1. Clean Workspace Architecture & Zero Clutter Policy
 - **No Root Dumping**: Never create scratch, test, or tuning scripts (`test_*.py`, `tune_*.py`, `tmp_*`) directly in project root folders.
 - **Media Hygiene**: Large audio/video intermediate WAV chunks (`tmp_*.wav`, `chunk_*.wav`, `test_*.wav`) must be immediately deleted upon generation.
+- **Inspection Frame Purge**: All temporary inspection frames (`frame_*.jpg`, `inspect_*.png`) and micro test cuts (`*_5s.mp4`) generated during verification must be deleted immediately after checking. `output/youtube_16x9/` must strictly hold ONLY verified production masters.
 - **Mandatory 4-Folder Architecture**:
   - `core/`: Production pipeline code.
   - `raw_stems/`: Source high-resolution media.
