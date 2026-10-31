@@ -1,0 +1,83 @@
+name: Render Tum Se Hi Full Official Lyrical Master
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/render_tum_se_hi.yml'
+      - 'lofi_phonk_empire/core/cloud_tum_se_hi.py'
+      - 'lofi_phonk_empire/raw_stems/lyrics/tum_se_hi_schedule.json'
+      - 'lofi_phonk_empire/raw_stems/audio/tum_se_hi_pure.mp3'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    name: Cloud Tum Se Hi Full Lyrical Video Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & Fonts)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu
+
+      - name: Install Python Packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow numpy scipy
+
+      - name: Render Full-Length Tum Se Hi Master Video
+        run: |
+          python lofi_phonk_empire/core/cloud_tum_se_hi.py
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render_failure_logs
+          path: |
+            render_error.log
+            *.log
+
+      - name: Verify Output File
+        run: |
+          ls -lh lofi_phonk_empire/output/youtube_16x9/tum_se_hi_master.mp4
+
+      - name: Upload Master Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TUM_SE_HI_FULL_OFFICIAL_MASTER
+          path: lofi_phonk_empire/output/youtube_16x9/tum_se_hi_master.mp4
+          retention-days: 90
+
+      - name: Create GitHub Release with Master Video
+        uses: softprops/action-gh-release@v2
+        continue-on-error: true
+        if: startsWith(github.ref, 'refs/heads/clean-fleet') || startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: tum-se-hi-full-${{ github.run_number }}
+          name: "Tum Se Hi – Mohit Chauhan (Full Official Lyrical Master)"
+          body: |
+            ### 🌹 Tum Se Hi – Mohit Chauhan, Pritam & Irshad Kamil
+            - **Track Type**: Complete 5:39 Full Song (Zero movie dialogue, Zero talking intro, 100% pure audio).
+            - **Visuals**: Untouched Dreamina cinematic video plate with seamless ping-pong loop.
+            - **Typography**: Rock-solid stationary calligraphy (`Dancing Script`) with localized Gaussian drop-shadows (`y = 380`).
+            - **Audio Fidelity**: 320kbps High-Resolution Stereo AAC.
+            - **Render Environment**: GitHub Actions Ubuntu Cloud Runner (0% local CPU load).
+          files: lofi_phonk_empire/output/youtube_16x9/tum_se_hi_master.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
