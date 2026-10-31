@@ -34,7 +34,13 @@
 ## 6. Zero-Mistake Universal Song Production Mandate
 - **Full-Length Song Default (Pura Gaana Standard)**: Unless explicitly instructed to create a 30–45s Short/Reel, ALWAYS produce the complete, full-length song (3–4+ minutes) from start to finish.
 - **Pure Studio Audio Mandate (Zero Dialogue & Zero Ads)**: Sourced tracks must be stripped of any sponsor voiceovers (e.g. Saregama Carvaan ads) and movie dialogues. 0.0s must begin right at the authentic music intro.
-- **Whisper Ground-Truth Full Schedule**: Run Whisper on the entire clean song track to generate millisecond onsets for EVERY verse, chorus, bridge, and outro. Save full schedule as `.lrc` and `_schedule.json`.
+- **Section-by-Section Slicing & VAD Gate (`universal_lyric_aligner.py`)**:
+  - NEVER feed a raw 4-minute song blindly into Whisper in a single pass.
+  - Automatically detect and isolate Instrumental Breaks (> 3.5s of flute, violin, guitar, or beat drops).
+  - Enforce ZERO lyrics during instrumental solos so musical breaks never bleed into lyric timestamps.
+  - Feed Whisper ONLY isolated vocal slices to extract 100% exact onsets.
+  - Every timestamp MUST pass the 300Hz–3400Hz Voice Activity Detection (VAD) energy check to guarantee vocal attack.
 - **Cloud-First Rendering Mandate (Zero Local Overheating)**: Full-length video rendering (5,000+ frames) MUST NEVER run locally on the user's PC. Always route heavy video rendering to GitHub Actions cloud runners (`ubuntu-latest`) with automated Artifact & Release delivery.
-- **Pre-Flight 5-Point Validation**: Never declare any song ready without running: (1) Audio purity check, (2) Lyrics timing check, (3) Visual frame integrity check, (4) Asset git tracking check, and (5) Dry-run sanity check with 0 errors.
+- **Pre-Flight 5-Point Validation**: Never declare any song ready without running: (1) Audio purity check, (2) VAD Gate lyric timing check, (3) Visual frame integrity check, (4) Asset git tracking check, and (5) Dry-run sanity check with 0 errors.
+
 
