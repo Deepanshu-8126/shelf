@@ -182,6 +182,7 @@ def process_with_auto_stealth(input_path, output_path=None):
                 Reverb(room_size=0.75, damping=0.58, wet_level=prof['wet_reverb'], dry_level=0.78, width=1.0),
                 Limiter(threshold_db=-0.5)
             ])
+            s_proc = dsp(s_data, sr)
             ambient_path = Path("lofi_phonk_empire/assets/ambient_textures/rain_and_vinyl_ambient.wav")
             if ambient_path.exists():
                 amb_data, _ = sf.read(ambient_path)
