@@ -42,6 +42,19 @@
   - Feed Whisper ONLY isolated vocal slices to extract 100% exact onsets.
   - Every timestamp MUST pass the 300Hz–3400Hz Voice Activity Detection (VAD) energy check to guarantee vocal attack.
 - **Cloud-First Rendering Mandate (Zero Local Overheating)**: Full-length video rendering (5,000+ frames) MUST NEVER run locally on the user's PC. Always route heavy video rendering to GitHub Actions cloud runners (`ubuntu-latest`) with automated Artifact & Release delivery.
-- **Pre-Flight 5-Point Validation**: Never declare any song ready without running: (1) Audio purity check, (2) VAD Gate lyric timing check, (3) Visual frame integrity check, (4) Asset git tracking check, and (5) Dry-run sanity check with 0 errors.
+## 7. Locked 3-Template Architecture & Clean Directory Isolation
+- **Strict Template Isolation**:
+  - `templates/phonk_yellow_lightning/`: Yellow electric anime warrior loop + FFT audio-reactive lightning frequency visualizer + chapter track synchronization.
+  - `templates/phonk_white_retro/`: Warm ivory grid (`#FAF8F4`) + 360° spinning vinyl disc + seekbar + Rozha One typography.
+  - `templates/lyrical_hindi_cinema/`: Pure cinematic video plate (0 black box) + Dancing Script calligraphy + localized Gaussian drop-shadow (radius 6, alpha 240) + Hermite ease-in-out dissolves for both 9:16 Shorts/Reels (`y = 1000`) and 16:9 Widescreen (`y = 380`).
+- **Isolated Per-Song Architecture (`songs/<song_slug>/`)**:
+  - Every song must have its own isolated folder:
+    * `audio/`: Clean studio master audio (`*_pure.mp3`) and viral cuts (`*_hook_44s.mp3`).
+    * `lyrics/`: Whisper ground-truth schedule JSON (`*_schedule.json`) with zero guesswork timestamps.
+    * `METADATA.txt`: Copy-paste ready viral titles, keyword-optimized YouTube description, timestamps, tags, and pinned comment.
+- **Zero Hallucination Lyric Gate**:
+  - Slicing audio first and running Whisper directly on that isolated slice is mandatory.
+  - Starting line check: Always verify 0.0s to 15.0s against the actual vocal start (instrumental intro must have empty text, vocalise must be explicitly timestamped).
+
 
 
