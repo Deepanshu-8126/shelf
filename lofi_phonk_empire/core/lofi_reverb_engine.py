@@ -104,9 +104,16 @@ def render_full_track(in_file, out_file, profile, sr=44100):
     ])
     processed = dsp(data, sr)
 
-    # Vinyl texture floor
-    noise = np.random.normal(0, 0.006, processed.shape)
-    processed = processed + noise
+    # Organic Rain & Vinyl Texture Floor (-26dB ambient bed)
+    ambient_path = Path("lofi_phonk_empire/assets/ambient_textures/rain_and_vinyl_ambient.wav")
+    if ambient_path.exists():
+        amb_data, amb_sr = sf.read(ambient_path)
+        reps = int(np.ceil(len(processed) / len(amb_data)))
+        amb_layer = np.tile(amb_data, (reps, 1))[:len(processed)] * 0.06
+        processed = processed + amb_layer
+    else:
+        noise = np.random.normal(0, 0.006, processed.shape)
+        processed = processed + noise
 
     # Peak normalization
     peak = np.max(np.abs(processed))
@@ -175,8 +182,13 @@ def process_with_auto_stealth(input_path, output_path=None):
                 Reverb(room_size=0.75, damping=0.58, wet_level=prof['wet_reverb'], dry_level=0.78, width=1.0),
                 Limiter(threshold_db=-0.5)
             ])
-            s_proc = dsp(s_data, sr)
-            s_proc = s_proc + np.random.normal(0, 0.006, s_proc.shape)
+            ambient_path = Path("lofi_phonk_empire/assets/ambient_textures/rain_and_vinyl_ambient.wav")
+            if ambient_path.exists():
+                amb_data, _ = sf.read(ambient_path)
+                reps = int(np.ceil(len(s_proc) / len(amb_data)))
+                s_proc = s_proc + np.tile(amb_data, (reps, 1))[:len(s_proc)] * 0.06
+            else:
+                s_proc = s_proc + np.random.normal(0, 0.006, s_proc.shape)
             peak = np.max(np.abs(s_proc))
             if peak > 0:
                 s_proc = (s_proc / peak) * 0.94
