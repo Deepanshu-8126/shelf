@@ -56,5 +56,15 @@
   - Slicing audio first and running Whisper directly on that isolated slice is mandatory.
   - Starting line check: Always verify 0.0s to 15.0s against the actual vocal start (instrumental intro must have empty text, vocalise must be explicitly timestamped).
 
+## 8. Content ID Stealth DSP & Mashup Chopping Laws
+- **The 30-Second Correlation Rule**: YouTube Content ID requires 15 to 30 continuous seconds of unbroken acoustic spectrogram match. Never leave an unmodulated raw commercial audio slice running continuously beyond 25 seconds.
+- **Auto-Stealth DSP Engine Mandate (`lofi_reverb_engine.py`)**:
+  - Always enforce off-grid micro-tuning (Profile Epsilon: `-2.8 semitones` / `0.83x speed` / `5800Hz lowpass` / `tape flutter`).
+  - Never use over-saturated generic settings (`-2.0 semitones` / `0.85x`) that have already been claimed by copycat distributors.
+- **Mid-Track Line Chopping & Dialogue Insertion**:
+  - Rearranging lines, inserting dialogue voiceovers, adding ambient vinyl/rain layers, or cutting sections mid-track **BREAKS Content ID's continuous hash chain**, enhancing copyright stealth immunity.
+  - Every master MUST pass the multi-window pre-flight sliding audit (`copyright_checker_agent.py`) with `100% STEALTH APPROVED` before public upload.
+
+
 
 
