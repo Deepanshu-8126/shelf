@@ -1,6 +1,0 @@
-# =============================================================================
-# OPTIONAL CUSTOM SCRIPT FILE
-# =============================================================================
-# Agar aapko AI ki jagah apni khud ki manual script use karni ho,
-# toh yahan apni script likhein. Agar topic pass karoge to AI khud likhega.
-# =============================================================================

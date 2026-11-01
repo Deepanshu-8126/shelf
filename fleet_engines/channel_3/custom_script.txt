@@ -1,7 +1,0 @@
-# =============================================================================
-# OPTIONAL CHANNEL 3 CUSTOM SCRIPT TEMPLATE
-# =============================================================================
-# Agar aapko AI generator ki jagah apni khud ki manual script render karni ho,
-# toh yahan script likhein aur '--script_file custom_script.txt' pass karein.
-# Agar ye file khali hai ya comments hain, to AI automatic viral topic banayega!
-# =============================================================================
